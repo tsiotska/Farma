@@ -1,20 +1,20 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import red from '@material-ui/core/colors/red';
-import robotoFont from '../assets/fonts/Roboto/Roboto-Regular.ttf';
-import robotoMediumFont from '../assets/fonts/Roboto/Roboto-Medium.ttf';
+import SansProSource from '../assets/fonts/SansPro/SansPro-Regular.ttf';
+import SansProMediumSource from '../assets/fonts/SansPro/SansPro-SemiBold.ttf';
 
-const roboto = {
-    fontFamily: 'Roboto',
+const sansPro = {
+    fontFamily: 'Source Sans Pro',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    src: `url(${robotoFont})`
+    src: `url(${SansProSource})`
 };
 
-const robotoMedium = {
-    fontFamily: 'Roboto Medium',
+const SansProMedium = {
+    fontFamily: 'Source Sans Pro SemiBold',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    src: `url(${robotoMediumFont})`
+    src: `url(${SansProMediumSource})`
 };
 
 const palette = {
@@ -40,12 +40,12 @@ const theme = createMuiTheme({
         }
     },
     typography: {
-        fontFamily: 'Roboto, Roboto Medium'
+        fontFamily: 'Source Sans Pro, Source Sans Pro SemiBold'
     },
     overrides: {
         MuiCssBaseline: {
             '@global': {
-                '@font-face': [roboto, robotoMedium]
+                '@font-face': [sansPro, SansProMedium]
             }
         },
         MuiDrawer: {

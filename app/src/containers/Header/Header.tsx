@@ -5,10 +5,12 @@ import withTranslation from '../../components/hoc/withTranslations';
 
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
-import { AppBar, Typography } from '@material-ui/core';
+import { AppBar, Typography, Paper } from '@material-ui/core';
 import { History } from 'history';
 import { matchPath } from 'react-router-dom';
 import { CARDIO_ROUTE, UROLOGY_ROUTE, NAVIGATION_ROUTES } from '../../constants/Router';
+import ProfilePreview from '../../components/ProfilePreview';
+import DepartmentNav from '../../components/DepartmentNav';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -53,11 +55,17 @@ export class Header extends Component<IProps, {}> {
         const { classes } = this.props;
 
         return (
-            <AppBar elevation={0} color='primary' position='relative' className={classes.root}>
-                <Typography variant='h5'>
-                    { this.title }
-                </Typography>
-            </AppBar>
+            <>
+                <Paper>
+                    <AppBar elevation={0} color='primary' position='relative' className={classes.root}>
+                        <Typography variant='h5'>
+                            { this.title }
+                        </Typography>
+                    </AppBar>
+                    <ProfilePreview />
+                </Paper>
+                <DepartmentNav />
+            </>
         );
     }
 }

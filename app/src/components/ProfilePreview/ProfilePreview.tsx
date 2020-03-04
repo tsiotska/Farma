@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     createStyles,
     WithStyles,
-    Paper,
     Grid,
     Avatar,
     Typography,
@@ -34,6 +33,9 @@ const styles = (theme: any) => createStyles({
         height: 100,
         width: 100,
         marginRight: 16
+    },
+    credentials: {
+        fontFamily: 'Source Sans Pro SemiBold'
     },
     textContainer: {
         padding: '8px 0'
@@ -99,7 +101,7 @@ class ProfilePreview extends Component<IProps> {
                             justify='space-around'
                             direction='column'
                             container>
-                            <Typography color='textPrimary'>
+                            <Typography className={classes.credentials} color='textPrimary'>
                                 Мушастикова Ольга Владимировна
                             </Typography>
                             <Typography color='textSecondary' variant='body2'>

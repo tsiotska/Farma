@@ -17,6 +17,7 @@ import SideNav from './SideNav';
 import Cardio from '../Cardio';
 import Urology from '../Urology';
 import ProfilePreview from '../../components/ProfilePreview';
+import DepartmentNav from '../../components/DepartmentNav';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -48,15 +49,12 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <Router history={initialHistory}>
                     <div className={classes.contentWrapper}>
-                            <Paper>
-                                <Route path={NAVIGATION_ROUTES} component={Header} />
-                                <Route path={NAVIGATION_ROUTES} component={ProfilePreview} />
-                            </Paper>
-                            <Switch>
-                                <Route path={UROLOGY_ROUTE} component={Urology} />
-                                <Route path={CARDIO_ROUTE} component={Cardio} />
-                                <Route path={ROOT_ROUTE} render={() => <Redirect to={UROLOGY_ROUTE} />} />
-                            </Switch>
+                        <Route path={NAVIGATION_ROUTES} component={Header} />
+                        <Switch>
+                            <Route path={UROLOGY_ROUTE} component={Urology} />
+                            <Route path={CARDIO_ROUTE} component={Cardio} />
+                            <Route path={ROOT_ROUTE} render={() => <Redirect to={UROLOGY_ROUTE} />} />
+                        </Switch>
                     </div>
                     <SideNav />
                 </Router>
