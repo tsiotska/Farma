@@ -3,7 +3,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { History } from 'history';
-import { createStyles, WithStyles, withStyles } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles, Paper } from '@material-ui/core';
 
 import {
     NAVIGATION_ROUTES,
@@ -48,8 +48,10 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <Router history={initialHistory}>
                     <div className={classes.contentWrapper}>
-                            <Route path={NAVIGATION_ROUTES} component={Header} />
-                            <Route path={NAVIGATION_ROUTES} component={ProfilePreview} />
+                            <Paper>
+                                <Route path={NAVIGATION_ROUTES} component={Header} />
+                                <Route path={NAVIGATION_ROUTES} component={ProfilePreview} />
+                            </Paper>
                             <Switch>
                                 <Route path={UROLOGY_ROUTE} component={Urology} />
                                 <Route path={CARDIO_ROUTE} component={Cardio} />

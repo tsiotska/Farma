@@ -53,6 +53,14 @@ const theme = createMuiTheme({
                 width: 70
             }
         },
+        MuiLinearProgress: {
+            colorPrimary: {
+                backgroundColor: '#e5e7e8'
+            },
+            barColorPrimary: {
+                backgroundColor: palette.green.main
+            }
+        },
         MuiTypography: {
             h5: {
                 fontSize: '1.25rem'

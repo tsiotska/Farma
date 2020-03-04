@@ -51,7 +51,7 @@ export class Header extends Component<IProps, {}> {
 
     render() {
         const { classes } = this.props;
-        console.log('title: ', this.title)
+
         return (
             <AppBar elevation={0} color='primary' position='relative' className={classes.root}>
                 <Typography variant='h5'>
