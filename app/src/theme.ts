@@ -27,7 +27,8 @@ const palette = {
     },
     green: {
         main: '#25d174'
-    }
+    },
+    error: 'red'
 };
 
 const theme = createMuiTheme({
