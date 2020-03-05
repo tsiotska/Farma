@@ -4,9 +4,8 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { CARDIO_ROUTE, UROLOGY_ROUTE } from '../../../constants/Router';
-import { History } from 'history';
-import { matchPath } from 'react-router-dom';
-import { withRouter } from 'react-router';
+import { History, Location } from 'history';
+import { matchPath, withRouter } from 'react-router-dom';
 
 const icon1 = 'https://d1icd6shlvmxi6.cloudfront.net/gsc/FKRQBC/08/ad/eb/08adeb97a686426db061c14be4043b30/images/продажи_ффм/u601.png?token=52fd231568d5d927c3a5ed262c8a973dde2ee4b52aa51617b46689c6ac62bc46';
 const icon2 = 'https://d1icd6shlvmxi6.cloudfront.net/gsc/FKRQBC/08/ad/eb/08adeb97a686426db061c14be4043b30/images/продажи_ффм/u603.png?token=8a4621afb78e8c4b61907fb0fb79950502a0cea0900594c2bff19095e9ad08fc';
@@ -45,9 +44,10 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     history?: History;
+    location?: Location;
 }
 
-@(withRouter as any)
+@withRouter
 @observer
 class SideNav extends Component<IProps> {
     get isUrologyRoute(): boolean {
@@ -60,9 +60,18 @@ class SideNav extends Component<IProps> {
         return !!matchPath(pathname, CARDIO_ROUTE);
     }
 
-    urologyClickHandler = () => this.props.history.push(UROLOGY_ROUTE);
+    createPath = (rootPath: string) => {
+        const { location: { pathname } } = this.props;
+        const delimiter = '/';
 
-    cardioClickHandler = () => this.props.history.push(CARDIO_ROUTE);
+        const [, , ...rest] = pathname.split(delimiter);
+
+        return [rootPath, ...rest].join(delimiter);
+    }
+
+    urologyClickHandler = () => this.props.history.push(this.createPath(UROLOGY_ROUTE));
+
+    cardioClickHandler = () => this.props.history.push(this.createPath(CARDIO_ROUTE));
 
     render() {
         const { classes } = this.props;

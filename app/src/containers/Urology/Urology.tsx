@@ -15,6 +15,7 @@ interface IProps extends WithStyles<typeof styles> {
 class Urology extends Component<RouteComponentProps<{}> & IProps> {
     render() {
         const { match: { path }} = this.props;
+
         return (
             <DepartmentContent currentPath={path} />
         );
