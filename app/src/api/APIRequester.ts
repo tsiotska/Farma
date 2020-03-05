@@ -14,4 +14,15 @@ export class APIRequester {
             withCredentials: true
         });
     }
+
+    defaultErrorHandler = (response: any = null) => (e: any) => {
+        console.error('error: ', e);
+        return response;
+    }
+
+    logout(): Promise<any> {
+        return this.instance.post('/api/signout')
+        .then(() => true)
+        .catch(this.defaultErrorHandler(false));
+    }
 }

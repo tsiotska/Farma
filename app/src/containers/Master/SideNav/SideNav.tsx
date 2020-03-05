@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Drawer, Button, Avatar, Badge } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { CARDIO_ROUTE, UROLOGY_ROUTE } from '../../../constants/Router';
@@ -61,8 +61,18 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     history?: History;
     location?: Location;
+    logout?: () => void;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            logout
+        }
+    }
+}) => ({
+    logout
+}))
 @withRouter
 @observer
 class SideNav extends Component<IProps> {
@@ -94,15 +104,10 @@ class SideNav extends Component<IProps> {
     cardioClickHandler = () => this.props.history.push(this.createPath(CARDIO_ROUTE));
 
     render() {
-        const { classes } = this.props;
-
+        const { classes, logout } = this.props;
+        console.log(this.props);
         return (
-            <Drawer
-                classes={{
-                    root: classes.root,
-                    paper: classes.paper
-                }}
-                variant='permanent'>
+            <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
                     <Button onClick={this.urologyClickHandler} className={cx(classes.iconWrapper, { active: this.isUrologyRoute })}>
                         <img src={icon1} className={classes.iconSm} />
                     </Button>
@@ -118,7 +123,7 @@ class SideNav extends Component<IProps> {
                     <Button className={classes.action}>
                         <Avatar className={classes.avatar}>L</Avatar>
                     </Button>
-                    <Button className={classes.action}>
+                    <Button onClick={logout} className={classes.action}>
                         Out
                     </Button>
             </Drawer>
