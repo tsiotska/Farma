@@ -1,8 +1,9 @@
 import {ILocalizationStore, IRootStore} from '../interfaces';
 import {RouterStore} from 'mobx-react-router';
 import {APIRequester} from '../api/APIRequester';
-import {observable} from 'mobx';
 import LocalizationStore from './LocalizationStore';
+import UserStore from './UserStore';
+import { IUserStore } from '../interfaces/IUserStore';
 
 /**
  * Class representing Root Store container that collects
@@ -11,14 +12,15 @@ import LocalizationStore from './LocalizationStore';
  * @class
  */
 export default class RootStore implements IRootStore {
-    public routingStore: RouterStore;
-    public localizationStore: ILocalizationStore;
-    public api: APIRequester;
+    routingStore: RouterStore;
+    localizationStore: ILocalizationStore;
+    userStore: IUserStore;
+    api: APIRequester;
 
     constructor(routingStore: RouterStore) {
         this.api = new APIRequester();
         this.routingStore = routingStore;
         this.localizationStore = new LocalizationStore();
+        this.userStore = new UserStore(this);
     }
-
 }
