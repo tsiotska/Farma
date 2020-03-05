@@ -62,6 +62,11 @@ const theme = createMuiTheme({
                 backgroundColor: palette.green.main
             }
         },
+        MuiButton: {
+            text: {
+                textTransform: 'none'
+            }
+        },
         MuiTypography: {
             h5: {
                 fontSize: '1.25rem'
