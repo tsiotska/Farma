@@ -16,8 +16,6 @@ import Header from '../Header';
 import SideNav from './SideNav';
 import Cardio from '../Cardio';
 import Urology from '../Urology';
-import ProfilePreview from '../../components/ProfilePreview';
-import DepartmentNav from '../../components/DepartmentNav';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -53,7 +51,7 @@ export class Master extends Component<IProps, null> {
                         <Switch>
                             <Route path={UROLOGY_ROUTE} component={Urology} />
                             <Route path={CARDIO_ROUTE} component={Cardio} />
-                            <Route path={ROOT_ROUTE} render={() => <Redirect to={UROLOGY_ROUTE} />} />
+                            <Route path={ROOT_ROUTE} ><Redirect to={UROLOGY_ROUTE} /></Route>
                         </Switch>
                     </div>
                     <SideNav />

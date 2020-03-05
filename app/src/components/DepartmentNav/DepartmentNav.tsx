@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { NavLink, withRouter } from 'react-router-dom';
 import { match as Match } from 'react-router';
+import { SALES_ROUTE, MARKS_ROUTE, SALARY_ROUTE, WORKERS_ROUTE, MEDICINES_ROUTE, PHARMACY_ROUTE } from '../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -39,12 +40,12 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class DepartmentNav extends Component<IProps> {
     readonly links: ILink[] = [
-        { title: 'Продажи', pathname: '/sales' },
-        { title: 'Баллы', pathname: '/marks' },
-        { title: 'Заработная  плата', pathname: '/salary' },
-        { title: 'Сотрудники', pathname: '/workers' },
-        { title: 'Препараты', pathname: '/medicines' },
-        { title: 'ЛПУ/Аптеки', pathname: '/stores' },
+        { title: 'Продажи', pathname: SALES_ROUTE },
+        { title: 'Баллы', pathname: MARKS_ROUTE },
+        { title: 'Заработная  плата', pathname: SALARY_ROUTE },
+        { title: 'Сотрудники', pathname: WORKERS_ROUTE },
+        { title: 'Препараты', pathname: MEDICINES_ROUTE },
+        { title: 'ЛПУ/Аптеки', pathname: PHARMACY_ROUTE },
     ];
 
     getUrl = (link: string): string => `${this.props.match.path}${link}`;
