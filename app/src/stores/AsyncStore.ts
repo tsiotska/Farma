@@ -70,4 +70,19 @@ export default class AsyncStore implements IAsyncStore {
     public clearParams(key: string): void {
         this.requestParams.delete(key);
     }
+
+    @action.bound
+    public async requestDispatcher<T>(request: Promise<T>, requestName: string, requestParams?: any): Promise<T> {
+        this.setLoading(requestName, requestParams);
+        const res = await request;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
+        this.clearParams(requestName);
+
+        return res;
+    }
 }

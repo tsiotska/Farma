@@ -1,3 +1,4 @@
+import { DepartmentsStore } from './DepartmentsStore';
 import {ILocalizationStore, IRootStore} from '../interfaces';
 import {RouterStore} from 'mobx-react-router';
 import {APIRequester} from '../api/APIRequester';
@@ -15,6 +16,7 @@ export default class RootStore implements IRootStore {
     routingStore: RouterStore;
     localizationStore: ILocalizationStore;
     userStore: IUserStore;
+    departmentsStore: DepartmentsStore;
     api: APIRequester;
 
     constructor(routingStore: RouterStore) {
@@ -22,5 +24,6 @@ export default class RootStore implements IRootStore {
         this.routingStore = routingStore;
         this.localizationStore = new LocalizationStore();
         this.userStore = new UserStore(this);
+        this.departmentsStore = new DepartmentsStore(this);
     }
 }

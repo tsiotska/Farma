@@ -1,10 +1,11 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizer';
-import { IBranch } from '../../interfaces/IBranch';
+import { IDepartment } from '../../interfaces/IDepartment';
 
-const defaultBranch: IBranch = {
+const defaultBranch: IDepartment = {
     id: null,
     name: null,
-    image: null
+    image: null,
+    path: null
 };
 
 const valuesMap: IValuesMap = {
@@ -17,5 +18,10 @@ export const branchesNormalizer = ({ data: { data }}: any) => objectArrayNormali
     data,
     defaultBranch,
     valuesMap,
-    { requiredProps: ['id', 'name', 'image'] }
+    {
+        requiredProps: ['id', 'name', 'image'],
+        valueNormalizers: {
+            name:  (value: string) => value.toLowerCase()
+        }
+    }
 );

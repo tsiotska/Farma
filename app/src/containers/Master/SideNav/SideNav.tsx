@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Drawer, Button, Avatar, Badge } from '@material-ui/core';
+import { createStyles, WithStyles, Drawer, Button, Avatar, Badge, Tooltip } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
-import { CARDIO_ROUTE, UROLOGY_ROUTE } from '../../../constants/Router';
 import { History, Location } from 'history';
 import { matchPath, withRouter } from 'react-router-dom';
 import { NotificationsNoneOutlined } from '@material-ui/icons';
-
-const icon1 = 'https://d1icd6shlvmxi6.cloudfront.net/gsc/FKRQBC/08/ad/eb/08adeb97a686426db061c14be4043b30/images/продажи_ффм/u601.png?token=52fd231568d5d927c3a5ed262c8a973dde2ee4b52aa51617b46689c6ac62bc46';
-const icon2 = 'https://d1icd6shlvmxi6.cloudfront.net/gsc/FKRQBC/08/ad/eb/08adeb97a686426db061c14be4043b30/images/продажи_ффм/u603.png?token=8a4621afb78e8c4b61907fb0fb79950502a0cea0900594c2bff19095e9ad08fc';
+import { IDepartment } from '../../../interfaces/IDepartment';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -62,32 +59,32 @@ interface IProps extends WithStyles<typeof styles> {
     history?: History;
     location?: Location;
     logout?: () => void;
+    departments?: IDepartment[];
 }
 
 @inject(({
     appState: {
         userStore: {
             logout
+        },
+        departmentsStore: {
+            departments
         }
     }
 }) => ({
-    logout
+    logout,
+    departments
 }))
 @withRouter
 @observer
 class SideNav extends Component<IProps> {
-    get isUrologyRoute(): boolean {
-        const { history: { location: { pathname }}} = this.props;
-        return !!matchPath(pathname, UROLOGY_ROUTE);
-    }
-
-    get isCardioRoute(): boolean {
-        const { history: { location: { pathname }}} = this.props;
-        return !!matchPath(pathname, CARDIO_ROUTE);
-    }
-
     get notificationsCount(): number {
         return 2;
+    }
+
+    isActive = (path: string): boolean => {
+        const { history: { location: { pathname }}} = this.props;
+        return !!matchPath(pathname, path);
     }
 
     createPath = (rootPath: string) => {
@@ -99,24 +96,30 @@ class SideNav extends Component<IProps> {
         return [rootPath, ...rest].join(delimiter);
     }
 
-    urologyClickHandler = () => this.props.history.push(this.createPath(UROLOGY_ROUTE));
-
-    cardioClickHandler = () => this.props.history.push(this.createPath(CARDIO_ROUTE));
+    departmentClickHandler = (path: string) => () => this.props.history.push(this.createPath(path));
 
     render() {
-        const { classes, logout } = this.props;
-        console.log(this.props);
+        const { classes, logout, departments } = this.props;
+
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
-                    <Button onClick={this.urologyClickHandler} className={cx(classes.iconWrapper, { active: this.isUrologyRoute })}>
-                        <img src={icon1} className={classes.iconSm} />
-                    </Button>
-                    <Button onClick={this.cardioClickHandler} className={cx(classes.iconWrapper, { active: this.isCardioRoute })}>
-                        <img src={icon2} className={classes.iconMd} />
-                    </Button>
+                    {
+                        departments.map(({ id, name, image, path }) => (
+                            <Tooltip key={id} placement='right' title={name}>
+                                <Button
+                                    onClick={this.departmentClickHandler(path)}
+                                    className={cx(
+                                        classes.iconWrapper,
+                                        { active: this.isActive(path) }
+                                    )}>
+                                    <img src={image} className={classes.iconSm} />
+                                </Button>
+                            </Tooltip>
+                        ))
+                    }
 
                     <Button className={cx(classes.action, { marginTopAuto: true })}>
-                        <Badge badgeContent={4} color='error'>
+                        <Badge badgeContent={this.notificationsCount} color='error'>
                             <NotificationsNoneOutlined />
                         </Badge>
                     </Button>

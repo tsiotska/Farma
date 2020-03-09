@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 import Config from '../../Config';
-import { IBranch } from '../interfaces/IBranch';
+import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 
 /**
@@ -28,9 +28,24 @@ export class APIRequester {
         .catch(this.defaultErrorHandler(false));
     }
 
-    getBranches(): Promise<IBranch[]> {
-        return this.instance.get(`${Config.API_URL}/api/branch`)
+    getBranches(): Promise<IDepartment[]> {
+        const mockDepartments: IDepartment[] = [
+            {
+                id: 1,
+                name: 'urology',
+                image: null,
+                path: null,
+            },
+            {
+                id: 2,
+                name: 'cardiology',
+                image: null,
+                path: null
+            },
+        ];
+
+        return this.instance.get(`${Config.API_URL}api/branch`)
         .then(branchesNormalizer)
-        .catch(this.defaultErrorHandler());
+        .catch(this.defaultErrorHandler(mockDepartments));
     }
 }
