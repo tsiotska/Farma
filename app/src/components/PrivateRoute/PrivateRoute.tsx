@@ -45,7 +45,7 @@ class PrivateRoute extends Route<IProps> {
                 ? loadingMask
                 : <p>should be redirected to auth</p>
             }
-        />
+        />;
     }
 }
 

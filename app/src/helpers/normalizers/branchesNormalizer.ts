@@ -4,8 +4,7 @@ import { IDepartment } from '../../interfaces/IDepartment';
 const defaultBranch: IDepartment = {
     id: null,
     name: null,
-    image: null,
-    path: null
+    image: null
 };
 
 const valuesMap: IValuesMap = {

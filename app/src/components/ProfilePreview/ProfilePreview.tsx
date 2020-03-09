@@ -120,7 +120,6 @@ class ProfilePreview extends Component<IProps> {
                         md
                         className={classes.gridContainer}
                         direction='column'
-                        // alignItems='center'
                         container
                         zeroMinWidth
                         item>

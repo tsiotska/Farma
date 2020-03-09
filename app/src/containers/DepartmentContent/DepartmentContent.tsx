@@ -12,7 +12,6 @@ import { ADMIN, FIELD_FORCE_MANAGER, MEDICAL_AGENT, REGIONAL_MANAGER } from '../
 const styles = (theme: any) => createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
-    currentPath: string;
     role?: string;
 }
 
@@ -27,10 +26,6 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class DepartmentContent extends Component<IProps> {
-    get currentPath(): string {
-        return this.props.currentPath || ROOT_ROUTE;
-    }
-
     get userContent(): IRoleContent[] {
         switch (this.props.role) {
             case ADMIN: return adminContent;
@@ -41,12 +36,6 @@ class DepartmentContent extends Component<IProps> {
         }
     }
 
-    get redirectRoute(): string {
-        return this.userContent.length
-        ? this.userContent[0].path
-        : ROOT_ROUTE;
-    }
-
     render() {
         return (
             <Switch>
@@ -54,14 +43,17 @@ class DepartmentContent extends Component<IProps> {
                     this.userContent.map(({ path, component }) => (
                         <Route
                             key={path}
-                            path={`${this.currentPath}${path}`}
+                            path={path}
                             component={component}
                         />
                     ))
                 }
-                <Route path={ROOT_ROUTE}>
-                    <Redirect to={`${this.currentPath}${this.redirectRoute}`} />
-                </Route>
+                {
+                    this.userContent.length &&
+                    <Route path={ROOT_ROUTE}>
+                        <Redirect to={this.userContent[0].path} />
+                    </Route>
+                }
             </Switch>
         );
     }

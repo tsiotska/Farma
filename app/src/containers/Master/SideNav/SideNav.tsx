@@ -60,6 +60,8 @@ interface IProps extends WithStyles<typeof styles> {
     location?: Location;
     logout?: () => void;
     departments?: IDepartment[];
+    currentDepartment?: IDepartment;
+    setCurrentDepartment?: (departmentName: string) => void;
 }
 
 @inject(({
@@ -68,12 +70,16 @@ interface IProps extends WithStyles<typeof styles> {
             logout
         },
         departmentsStore: {
-            departments
+            departments,
+            setCurrentDepartment,
+            currentDepartment
         }
     }
 }) => ({
     logout,
-    departments
+    departments,
+    setCurrentDepartment,
+    currentDepartment
 }))
 @withRouter
 @observer
@@ -82,21 +88,14 @@ class SideNav extends Component<IProps> {
         return 2;
     }
 
-    isActive = (path: string): boolean => {
-        const { history: { location: { pathname }}} = this.props;
-        return !!matchPath(pathname, path);
+    isActive = (name: string): boolean => {
+        const { currentDepartment } = this.props;
+        return currentDepartment
+        ? currentDepartment.name === name
+        : false;
     }
 
-    createPath = (rootPath: string) => {
-        const { location: { pathname } } = this.props;
-        const delimiter = '/';
-
-        const [, , ...rest] = pathname.split(delimiter);
-
-        return [rootPath, ...rest].join(delimiter);
-    }
-
-    departmentClickHandler = (path: string) => () => this.props.history.push(this.createPath(path));
+    departmentClickHandler = (name: string) => () => this.props.setCurrentDepartment(name);
 
     render() {
         const { classes, logout, departments } = this.props;
@@ -104,13 +103,13 @@ class SideNav extends Component<IProps> {
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
                     {
-                        departments.map(({ id, name, image, path }) => (
+                        departments.map(({ id, name, image }) => (
                             <Tooltip key={id} placement='right' title={name}>
                                 <Button
-                                    onClick={this.departmentClickHandler(path)}
+                                    onClick={this.departmentClickHandler(name)}
                                     className={cx(
                                         classes.iconWrapper,
-                                        { active: this.isActive(path) }
+                                        { active: this.isActive(name) }
                                     )}>
                                     <img src={image} className={classes.iconSm} />
                                 </Button>

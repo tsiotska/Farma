@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 
 import withTranslation from '../../components/hoc/withTranslations';
 
@@ -7,10 +7,9 @@ import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { AppBar, Typography, Paper } from '@material-ui/core';
 import { History } from 'history';
-import { matchPath } from 'react-router-dom';
-import { CARDIO_ROUTE, UROLOGY_ROUTE, NAVIGATION_ROUTES } from '../../constants/Router';
 import ProfilePreview from '../../components/ProfilePreview';
 import DepartmentNav from '../../components/DepartmentNav';
+import { IDepartment } from '../../interfaces/IDepartment';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -25,30 +24,27 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     t?: (key: string) => string;
     history?: History;
+    currentDepartment?: IDepartment;
 }
 
 @withTranslation
+@inject(({
+    appState: {
+        departmentsStore: {
+            currentDepartment
+        }
+    }
+}) => ({
+    currentDepartment
+}))
 @observer
 export class Header extends Component<IProps, {}> {
-    readonly titles = {
-        [CARDIO_ROUTE]: 'Кардиология',
-        [UROLOGY_ROUTE]: 'Урология'
-    };
-
     get title(): string {
-        const { history: { location: { pathname }}} = this.props;
+        const { currentDepartment } = this.props;
 
-        let currentRoute: string;
-        for (const route of NAVIGATION_ROUTES) {
-            currentRoute = route;
-            if (!!matchPath(pathname, route)) {
-                break;
-            }
-        }
-
-        return currentRoute
-        ? this.titles[currentRoute]
-        : '';
+        return currentDepartment
+        ? currentDepartment.name
+        : null;
     }
 
     render() {

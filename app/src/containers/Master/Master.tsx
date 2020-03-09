@@ -1,23 +1,16 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Route, Router, Switch, Redirect } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import { History } from 'history';
-import { createStyles, WithStyles, withStyles, Paper } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import {
-    NAVIGATION_ROUTES,
-    CARDIO_ROUTE,
-    UROLOGY_ROUTE,
-    ROOT_ROUTE
-} from '../../constants/Router';
+import { NAVIGATION_ROUTES } from '../../constants/Router';
 
 import Header from '../Header';
 import SideNav from './SideNav';
-import Cardio from '../Cardio';
-import Urology from '../Urology';
-import RedirectRoute from './RedirectRoute';
 import PrivateRoute from '../../components/PrivateRoute';
+import DepartmentContent from '../DepartmentContent';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -54,11 +47,7 @@ export class Master extends Component<IProps, null> {
                             component={Header}
                             loadingPlaceholder={() => <p>Loading...</p>}
                         />
-                        <Switch>
-                            <PrivateRoute path={UROLOGY_ROUTE} component={Urology} />
-                            <PrivateRoute path={CARDIO_ROUTE} component={Cardio} />
-                            <RedirectRoute path={ROOT_ROUTE} />
-                        </Switch>
+                        <DepartmentContent />
                     </div>
                     <SideNav />
                 </Router>

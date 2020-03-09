@@ -1,6 +1,4 @@
 export const ROOT_ROUTE: string = '/';
-export const CARDIO_ROUTE: string = '/cardio';
-export const UROLOGY_ROUTE: string = '/urology';
 
 export const SALES_ROUTE: string = '/sales';
 export const MARKS_ROUTE: string = '/marks';
@@ -20,8 +18,12 @@ export const SUB_ROUTES: string[] = [
 
 // routes, where navigation is resolved
 export const NAVIGATION_ROUTES: string[] = [
-    CARDIO_ROUTE,
-    UROLOGY_ROUTE
+    SALES_ROUTE,
+    MARKS_ROUTE,
+    SALARY_ROUTE,
+    WORKERS_ROUTE,
+    MEDICINES_ROUTE,
+    PHARMACY_ROUTE,
 ];
 
 export const AUTH_ROUTES: string[] = [

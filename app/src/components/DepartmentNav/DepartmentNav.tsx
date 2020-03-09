@@ -49,8 +49,6 @@ class DepartmentNav extends Component<IProps> {
         { title: 'ЛПУ/Аптеки', pathname: PHARMACY_ROUTE },
     ];
 
-    getUrl = (link: string): string => `${this.props.match.path}${link}`;
-
     render() {
         const { classes } = this.props;
 
@@ -60,7 +58,7 @@ class DepartmentNav extends Component<IProps> {
                     this.links.map(({ title, pathname }) => (
                         <NavLink
                             key={pathname}
-                            to={this.getUrl(pathname)}
+                            to={pathname}
                             className={classes.link}
                             activeClassName={classes.active}>
                             { title }

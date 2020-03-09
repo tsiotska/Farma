@@ -39,13 +39,11 @@ export class APIRequester {
                 id: 1,
                 name: 'urology',
                 image: null,
-                path: null,
             },
             {
                 id: 2,
                 name: 'cardiology',
                 image: null,
-                path: null
             },
         ];
 

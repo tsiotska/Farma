@@ -3,7 +3,6 @@ import { computed, action, observable } from 'mobx';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
-import { ADMIN } from '../constants/Roles';
 import { IUser } from '../interfaces';
 
 export default class UserStore extends AsyncStore implements IUserStore {
@@ -29,7 +28,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get role(): string {
-        return ADMIN;
+        return this.user
+        ? this.user.position
+        : null;
     }
 
     @action.bound
