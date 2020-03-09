@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 
 import Config from '../../Config';
+import { IBranch } from '../interfaces/IBranch';
+import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 
 /**
  * Class representing API requester
@@ -24,5 +26,11 @@ export class APIRequester {
         return this.instance.post('/api/signout')
         .then(() => true)
         .catch(this.defaultErrorHandler(false));
+    }
+
+    getBranches(): Promise<IBranch[]> {
+        return this.instance.get(`${Config.API_URL}/api/branch`)
+        .then(branchesNormalizer)
+        .catch(this.defaultErrorHandler());
     }
 }
