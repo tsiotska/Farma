@@ -72,7 +72,7 @@ export default class AsyncStore implements IAsyncStore {
     }
 
     @action.bound
-    public async requestDispatcher<T>(request: Promise<T>, requestName: string, requestParams?: any): Promise<T> {
+    public async dispatchRequest<T>(request: Promise<T>, requestName: string, requestParams?: any): Promise<T> {
         this.setLoading(requestName, requestParams);
         const res = await request;
 

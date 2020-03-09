@@ -3,6 +3,8 @@ import axios, { AxiosInstance } from 'axios';
 import Config from '../../Config';
 import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
+import { IUser } from '../interfaces';
+import { userNormalizer } from '../helpers/normalizers/userNormalizer';
 
 /**
  * Class representing API requester
@@ -47,5 +49,11 @@ export class APIRequester {
         return this.instance.get(`${Config.API_URL}api/branch`)
         .then(branchesNormalizer)
         .catch(this.defaultErrorHandler(mockDepartments));
+    }
+
+    getUser(): Promise<IUser> {
+        return this.instance.get(`${Config.API_URL}api/user`)
+        .then(userNormalizer)
+        .catch(this.defaultErrorHandler());
     }
 }

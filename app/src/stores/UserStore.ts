@@ -1,8 +1,8 @@
+import { computed, action } from 'mobx';
+
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
-import { computed, action } from 'mobx';
-
 import { ADMIN } from '../constants/Roles';
 import { IUser } from '../interfaces';
 
@@ -13,6 +13,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
+        this.loadUserProfile();
     }
 
     @computed
@@ -21,11 +22,20 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async logout() {
+    async loadUserProfile() {
+        const requestName = 'loadUserProfile';
+        const { api } = this.rootStore;
+
+        const user = await this.dispatchRequest(api.getUser(), requestName);
+
+        if (user) this.user = user;
+    }
+
+    @action.bound
+    logout() {
         const requestName = 'logout';
         const { api } = this.rootStore;
-        this.setLoading(requestName);
-        await api.logout();
-        this.setSuccess(requestName);
+
+        this.dispatchRequest(api.logout(), requestName);
     }
 }
