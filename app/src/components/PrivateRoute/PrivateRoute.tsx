@@ -31,6 +31,7 @@ class PrivateRoute extends Route<IProps> {
             showLoader,
             ...props
         } = this.props;
+
         const { location: { search, pathname }} = props;
 
         const redirectPath = isLogined
