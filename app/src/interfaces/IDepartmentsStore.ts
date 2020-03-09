@@ -1,4 +1,4 @@
-import { IDepartment } from './../interfaces/IDepartment';
+import { IDepartment } from './IDepartment';
 
 export interface IDepartmentsStore {
     departments: IDepartment[];

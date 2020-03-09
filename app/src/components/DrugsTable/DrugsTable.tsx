@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, TableContainer, Table, Paper, TableHead, TableBody, TableRow, TableCell, Typography, Grid } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable } from 'mobx';
 import isEqual from 'lodash/isEqual';
 
 const styles = (theme: any) => createStyles({
@@ -51,8 +50,9 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    // data?: any[];
-    // dataProps?: string[];
+    salesHeaderHeight?: number;
+    setSalesHeaderHeight?: (value: number) => void;
+
     data?: any[][];
     headers?: string[];
 
@@ -62,19 +62,31 @@ interface IProps extends WithStyles<typeof styles> {
     headerAppend?: React.Component;
 }
 
+@inject(({
+    appState: {
+        uiStore: {
+            salesHeaderHeight,
+            setSalesHeaderHeight
+        }
+    }
+}) => ({
+    salesHeaderHeight,
+    setSalesHeaderHeight
+}))
 @observer
 class DrugsTable extends Component<IProps> {
-    @observable marginTop: number = 0;
     readonly headerHeight: number = 20;
     headerRefs: any = {};
+
+    get marginTop(): number {
+        return this.props.salesHeaderHeight || this.headerHeight;
+    }
 
     calculateTopMargin = () => {
         const refs = [...Object.values(this.headerRefs)];
         const heights = refs.map((current: any) => current.getBoundingClientRect().height);
         const newValue = Math.max(...heights) - this.headerHeight;
-        this.marginTop = newValue > 0
-        ? newValue
-        : 0;
+        this.props.setSalesHeaderHeight(newValue);
     }
 
     componentDidMount() {
