@@ -1,48 +1,51 @@
 import React from 'react';
 import {inject, observer} from 'mobx-react';
 import {Redirect, Route, RouteProps} from 'react-router';
-import {ROOT_ROUTE} from '../../constants/Router';
+import { IUser } from '../../interfaces';
+import { toJS } from 'mobx';
 
 interface IProps extends RouteProps {
-    isLogined?: boolean;
-    showLoader?: boolean;
-    setRedirect?: (path: string) => void;
+    user?: IUser;
+    isUserLoading?: boolean;
+    loadingPlaceholder?: any;
 }
 
 @inject(({
     appState: {
         userStore: {
-            isLogined,
-            setRedirect,
-            showLoader
+            user,
+            isUserLoading
         }
     }
 }) => ({
-    isLogined,
-    setRedirect,
-    showLoader
+    user,
+    isUserLoading
 }))
 @observer
 class PrivateRoute extends Route<IProps> {
     render() {
         const {
-            isLogined,
-            setRedirect,
-            showLoader,
+            user,
+            isUserLoading,
+            loadingPlaceholder: LoadingPlaceholder,
+            component,
             ...props
         } = this.props;
 
-        const { location: { search, pathname }} = props;
+        if (user) return <Route {...props} component={component} />;
 
-        const redirectPath = isLogined
-            ? ''
-            : ROOT_ROUTE;
+        const loadingMask = LoadingPlaceholder
+        ? <LoadingPlaceholder />
+        : null;
 
-        if (redirectPath) setRedirect(`${pathname}${search}`);
-
-        return redirectPath && !showLoader
-            ? <Route {...props} component={() => <Redirect to={redirectPath} />} />
-            : <Route {...props} />;
+        return <Route
+            {...props}
+            render={
+                () => isUserLoading
+                ? loadingMask
+                : <p>should be redirected to auth</p>
+            }
+        />
     }
 }
 

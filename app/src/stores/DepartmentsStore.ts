@@ -1,7 +1,7 @@
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import { observable, toJS } from 'mobx';
+import { observable, action } from 'mobx';
 import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
 import { CARDIO_ROUTE, UROLOGY_ROUTE } from '../constants/Router';
 
@@ -21,6 +21,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.loadDepartments();
     }
 
+    @action.bound
+    setCurrentDepartment(departmentName: string) {
+        this.currentDepartment = this.departments.find(({ name }) => name === departmentName);
+    }
+
+    @action.bound
     async loadDepartments() {
         const requestName = 'loadDepartments';
         const { api } = this.rootStore;

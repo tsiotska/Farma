@@ -17,6 +17,7 @@ import SideNav from './SideNav';
 import Cardio from '../Cardio';
 import Urology from '../Urology';
 import RedirectRoute from './RedirectRoute';
+import PrivateRoute from '../../components/PrivateRoute';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -48,10 +49,14 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <Router history={initialHistory}>
                     <div className={classes.contentWrapper}>
-                        <Route path={NAVIGATION_ROUTES} component={Header} />
+                        <PrivateRoute
+                            path={NAVIGATION_ROUTES}
+                            component={Header}
+                            loadingPlaceholder={() => <p>Loading...</p>}
+                        />
                         <Switch>
-                            <Route path={UROLOGY_ROUTE} component={Urology} />
-                            <Route path={CARDIO_ROUTE} component={Cardio} />
+                            <PrivateRoute path={UROLOGY_ROUTE} component={Urology} />
+                            <PrivateRoute path={CARDIO_ROUTE} component={Cardio} />
                             <RedirectRoute path={ROOT_ROUTE} />
                         </Switch>
                     </div>

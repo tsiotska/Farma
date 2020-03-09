@@ -1,3 +1,4 @@
+import { ADMIN } from './../constants/Roles';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
 
@@ -56,7 +57,17 @@ export class APIRequester {
     getUser(): Promise<IUser> {
         return this.instance.get(`${Config.API_URL}api/user`)
         .then(userNormalizer)
-        .catch(this.defaultErrorHandler());
+        .catch(this.defaultErrorHandler({
+            id: 1,
+            name: 'Мушастикова Ольга Владимировна',
+            position: ADMIN,
+            avatar: null,
+            doctorsCount: null,
+            pharmacyCount: null,
+            region: null,
+            level: null,
+            city: null,
+        }));
     }
 
     getMeds(department: string): Promise<IMedicine[]> {

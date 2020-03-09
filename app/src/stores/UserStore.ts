@@ -1,4 +1,4 @@
-import { computed, action } from 'mobx';
+import { computed, action, observable } from 'mobx';
 
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
@@ -8,12 +8,23 @@ import { IUser } from '../interfaces';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
-    user: IUser;
+    @observable user: IUser;
 
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
         this.loadUserProfile();
+    }
+
+    @computed
+    get isUserFetched(): boolean {
+        const { success, error } = this.getAsyncStatus('loadUserProfile');
+        return success || error;
+    }
+
+    @computed
+    get isUserLoading(): boolean {
+        return this.getAsyncStatus('loadUserProfile').loading;
     }
 
     @computed
