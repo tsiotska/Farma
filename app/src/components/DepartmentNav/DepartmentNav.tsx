@@ -8,7 +8,8 @@ import { SALES_ROUTE, MARKS_ROUTE, SALARY_ROUTE, WORKERS_ROUTE, MEDICINES_ROUTE,
 
 const styles = (theme: any) => createStyles({
     root: {
-        margin: '20px 0'
+        margin: '20px 0',
+        padding: '0 16px'
     },
     link: {
         textDecoration: 'none',

@@ -18,7 +18,7 @@ const SansProMedium = {
 };
 
 const palette = {
-    main: '#FAFCFE',
+    main: '#F0F1F6',
     white: '#fff',
     gray: {
         main: '#333',
