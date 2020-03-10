@@ -1,23 +1,28 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { observer } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
+import { IMedicine } from '../../../interfaces/IMedicine';
+import ListItem from '../ListItem';
 
-const styles = (theme: any) => createStyles({});
-
-interface IProps extends WithStyles<typeof styles> {
-
+interface IProps {
+    meds: IMedicine[];
 }
 
 @observer
 class List extends Component<IProps> {
     render() {
+        const { meds } = this.props;
+
         return (
-            <div>
-                List
-            </div>
+            <Grid direction='column' container>
+                {
+                    meds.map(medicine => (
+                        <ListItem key={medicine.id} medicine={medicine} />
+                    ))
+                }
+            </Grid>
         );
     }
 }
 
-export default withStyles(styles)(List);
+export default List;

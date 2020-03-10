@@ -7,6 +7,7 @@ import { History, Location } from 'history';
 import { matchPath, withRouter } from 'react-router-dom';
 import { NotificationsNoneOutlined } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
+import { toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -90,6 +91,7 @@ class SideNav extends Component<IProps> {
 
     isActive = (name: string): boolean => {
         const { currentDepartment } = this.props;
+
         return currentDepartment
         ? currentDepartment.name === name
         : false;

@@ -1,3 +1,4 @@
+import { mockDrugs } from './mock/mockDrugs';
 import { ADMIN } from './../constants/Roles';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
@@ -7,7 +8,7 @@ import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
 import { userNormalizer } from '../helpers/normalizers/userNormalizer';
-import { IMedicine } from '../interfaces/IMedicine.';
+import { IMedicine } from '../interfaces/IMedicine';
 
 /**
  * Class representing API requester
@@ -71,6 +72,6 @@ export class APIRequester {
     getMeds(department: string): Promise<IMedicine[]> {
         return this.instance.get(`${Config.API_URL}api/branch/${department}/drug`)
         .then(medsNormalizer)
-        .catch(this.defaultErrorHandler());
+        .catch(this.defaultErrorHandler(mockDrugs));
     }
 }

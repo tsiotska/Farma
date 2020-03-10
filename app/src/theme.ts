@@ -62,6 +62,11 @@ const theme = createMuiTheme({
                 backgroundColor: palette.green.main
             }
         },
+        MuiCircularProgress: {
+            colorPrimary: {
+                color: '#002afd'
+            }
+        },
         MuiButton: {
             text: {
                 textTransform: 'none'

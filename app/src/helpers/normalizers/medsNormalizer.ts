@@ -1,5 +1,5 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizer';
-import { IMedicine } from './../../interfaces/IMedicine.';
+import { IMedicine } from './../../interfaces/IMedicine';
 
 const defaultMedicine: IMedicine = {
     id: null,

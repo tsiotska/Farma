@@ -17,8 +17,8 @@ import { IUIStore } from '../interfaces/IUIStore';
 export default class RootStore implements IRootStore {
     routingStore: RouterStore;
     localizationStore: ILocalizationStore;
-    userStore: IUserStore;
     departmentsStore: DepartmentsStore;
+    userStore: IUserStore;
     uiStore: IUIStore;
     api: APIRequester;
 
