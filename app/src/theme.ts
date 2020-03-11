@@ -74,7 +74,7 @@ const theme = createMuiTheme({
         },
         MuiTypography: {
             h5: {
-                fontSize: '1.25rem'
+                fontSize: '1.25rem' // 20 px
             },
             h6: {
               fontSize: '1.125rem' // 18px
