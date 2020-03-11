@@ -28,6 +28,7 @@ const palette = {
     green: {
         main: '#25d174'
     },
+    blue: '#2196F3',
     error: 'red'
 };
 
