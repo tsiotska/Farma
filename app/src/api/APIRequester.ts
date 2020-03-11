@@ -1,5 +1,5 @@
+import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
 import { mockDrugs } from './mock/mockDrugs';
-import { ADMIN } from './../constants/Roles';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
 
@@ -9,6 +9,7 @@ import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
 import { userNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
+import { IPosition } from '../interfaces/IPosition';
 
 /**
  * Class representing API requester
@@ -48,18 +49,18 @@ export class APIRequester {
             },
         ];
 
-        return this.instance.get(`${Config.API_URL}api/branch`)
+        return this.instance.get('api/branch')
         .then(branchesNormalizer)
         .catch(this.defaultErrorHandler(mockDepartments));
     }
 
     getUser(): Promise<IUser> {
-        return this.instance.get(`${Config.API_URL}api/user`)
+        return this.instance.get('api/user')
         .then(userNormalizer)
         .catch(this.defaultErrorHandler({
             id: 1,
             name: 'Мушастикова Ольга Владимировна',
-            position: ADMIN,
+            position: 1,
             avatar: null,
             doctorsCount: null,
             pharmacyCount: null,
@@ -70,8 +71,20 @@ export class APIRequester {
     }
 
     getMeds(department: string): Promise<IMedicine[]> {
-        return this.instance.get(`${Config.API_URL}api/branch/${department}/drug`)
+        return this.instance.get(`api/branch/${department}/drug`)
         .then(medsNormalizer)
         .catch(this.defaultErrorHandler(mockDrugs));
+    }
+
+    getPositions(): Promise<IPosition[]> {
+        return this.instance.get('api/position')
+        .then(positionsNormalizer)
+        .catch(this.defaultErrorHandler([
+            {
+                id: 1,
+                name: 'admin',
+                alias: 'adm'
+            }
+        ]));
     }
 }

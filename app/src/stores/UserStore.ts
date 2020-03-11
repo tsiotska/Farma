@@ -4,6 +4,13 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
+import {
+    UNKNOWN,
+    FIELD_FORCE_MANAGER,
+    ADMIN,
+    REGIONAL_MANAGER,
+    MEDICAL_AGENT
+} from '../constants/Roles';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
@@ -28,9 +35,17 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get role(): string {
-        return this.user
+        const position = this.user
         ? this.user.position
-        : null;
+        : -1;
+
+        switch (position) {
+            case 1: return ADMIN;
+            case 2: return FIELD_FORCE_MANAGER;
+            case 3: return REGIONAL_MANAGER;
+            case 4: return MEDICAL_AGENT;
+            default: return UNKNOWN;
+        }
     }
 
     @action.bound

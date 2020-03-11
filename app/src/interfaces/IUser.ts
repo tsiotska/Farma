@@ -6,7 +6,7 @@ export interface IUserCredentials {
 export interface IUser {
     id: number;
     name: string;
-    position: string;
+    position: number;
     avatar: string;
     doctorsCount: number;
     pharmacyCount: number;

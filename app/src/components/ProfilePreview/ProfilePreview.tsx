@@ -9,9 +9,11 @@ import {
     LinearProgress,
     Hidden
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
+import { IUser } from '../../interfaces';
+import { IPosition } from '../../interfaces/IPosition';
 
 const styles = (theme: any) => createStyles({
     container: {
@@ -69,13 +71,57 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-
+    user?: IUser;
+    positions?: Map<number, IPosition>;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            user
+        },
+        departmentsStore: {
+            positions
+        }
+    }
+}) => ({
+    user,
+    positions
+}))
 @observer
 class ProfilePreview extends Component<IProps> {
     get realizationPercent(): number {
         return 65;
+    }
+
+    get userName(): string {
+        return this.props.user
+        ? this.props.user.name
+        : '';
+    }
+
+    get userPosition(): string {
+        const { positions, user } = this.props;
+
+        const userPosition = user
+        ? user.position
+        : -1;
+
+        const pos = positions.get(userPosition);
+
+        return pos
+        ? pos.name
+        : '';
+    }
+
+    get avatarProps(): any {
+        const { user } = this.props;
+
+        if (!user) return {};
+
+        return user.avatar
+        ? { src: user.avatar }
+        : { children: this.userName[0] };
     }
 
     render() {
@@ -95,17 +141,17 @@ class ProfilePreview extends Component<IProps> {
                         wrap='nowrap'
                         container
                         item>
-                        <Avatar className={classes.avatar}>L</Avatar>
+                        <Avatar className={classes.avatar} {...this.avatarProps} />
                         <Grid
                             className={classes.textContainer}
                             justify='space-around'
                             direction='column'
                             container>
                             <Typography className={classes.credentials} color='textPrimary'>
-                                Мушастикова Ольга Владимировна
+                                { this.userName }
                             </Typography>
                             <Typography color='textSecondary' variant='body2'>
-                                position
+                                { this.userPosition }
                             </Typography>
                         </Grid>
                     </Grid>
