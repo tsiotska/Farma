@@ -110,12 +110,13 @@ class DateRangeModal extends Component<IProps> {
             <Dialog
                 open={openedModal === DATA_RANGE_MODAL}
                 onClose={this.closeHandler}
-                title='Дата'
                 maxWidth='md'
-            >
-                <Grid className={classes.pickersContainer} container>
+                title='Дата'>
+                <Grid className={classes.pickersContainer} alignItems='center' justify='center' container>
                     <DatePicker
                         autoOk
+                        disableFuture
+                        disableToolbar
                         variant='static'
                         openTo='date'
                         value={this.localDateFrom || dateFrom}
@@ -123,6 +124,8 @@ class DateRangeModal extends Component<IProps> {
                     />
                     <DatePicker
                         autoOk
+                        disableFuture
+                        disableToolbar
                         variant='static'
                         openTo='date'
                         value={this.localDateTo || dateTo}

@@ -7,7 +7,7 @@ import Statistic from './Statistic';
 import Plot from './Plot';
 import DateRangeModal from './DateRangeModal';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import DateTimeUtils from './DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -39,7 +39,7 @@ class Sales extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
                         <Plot />

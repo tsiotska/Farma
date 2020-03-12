@@ -5,7 +5,7 @@ import { observable, action } from 'mobx';
 
 export class UIStore extends AsyncStore implements IUIStore {
     @observable salesHeaderHeight: number;
-    @observable openedModal: string = DATA_RANGE_MODAL;
+    @observable openedModal: string;
 
     @action.bound
     setSalesHeaderHeight(value: number) {
