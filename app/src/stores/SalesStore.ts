@@ -3,10 +3,13 @@ import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action } from 'mobx';
 
+export type DisplayMode = 'pack' | 'currency';
+
 export default class SalesStore extends AsyncStore implements ISalesStore {
     rootStore: IRootStore;
     @observable dateFrom: Date;
     @observable dateTo: Date;
+    @observable displayMode: DisplayMode = 'pack';
 
     constructor(rootStore: IRootStore) {
         super();
@@ -36,5 +39,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     setDateTo(newDate: Date) {
         this.dateTo = newDate;
+    }
+
+    @action.bound
+    setDisplayMode(newMode: DisplayMode) {
+        this.displayMode = newMode;
     }
 }
