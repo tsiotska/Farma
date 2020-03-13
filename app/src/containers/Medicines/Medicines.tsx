@@ -32,7 +32,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    meds?: IMedicine[];
+    meds?: Map<number, IMedicine>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
@@ -71,7 +71,7 @@ class Medicines extends Component<IProps> {
                 {
                     this.isMedsLoading
                     ? <LoadingMask color='primary' />
-                    : <List meds={meds} />
+                    : <List meds={[...meds.values()]} />
                 }
             </Grid>
         );

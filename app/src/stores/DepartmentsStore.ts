@@ -12,7 +12,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @observable departments: IDepartment[] = [];
     @observable currentDepartment: IDepartment = null;
-    @observable meds: IMedicine[] = [];
+    // @observable meds: IMedicine[] = [];
+    @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
 
     constructor(rootStore: IRootStore) {
@@ -24,8 +25,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    setCurrentDepartment(departmentName: string) {
-        this.currentDepartment = this.departments.find(({ name }) => name === departmentName);
+    setCurrentDepartment(department: string | IDepartment) {
+        console.log('new dep: ', department);
+        if (typeof department === 'string') {
+            this.currentDepartment = this.departments.find(({ name }) => name === department);
+        } else {
+            this.currentDepartment = department;
+        }
     }
 
     @action.bound
@@ -39,7 +45,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.departments = res;
 
-        if (!this.currentDepartment) this.currentDepartment = res[0];
+        if (!this.currentDepartment) this.setCurrentDepartment(res[0]);
     }
 
     @action.bound
@@ -49,13 +55,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (!this.currentDepartment) return;
 
-        this.meds = [];
+        this.meds.clear();
 
         const request = api.getMeds(this.currentDepartment.name);
 
         const res = await this.dispatchRequest(request, requestName);
 
-        if (res) this.meds = res;
+        if (res) {
+            const mapped: Array<[number, IMedicine]> = res.map(x => ([ x.id, x ]));
+            this.meds = new Map(mapped);
+        }
     }
 
     @action.bound

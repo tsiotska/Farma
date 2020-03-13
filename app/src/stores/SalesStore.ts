@@ -1,7 +1,8 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action } from 'mobx';
+import { observable, action, autorun, reaction } from 'mobx';
+import { IDepartment } from '../interfaces/IDepartment';
 
 export type DisplayMode = 'pack' | 'currency';
 
@@ -14,6 +15,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
+
+        reaction(
+            () => this.rootStore.departmentsStore.currentDepartment,
+            this.loadStat
+        );
 
         const currentDate = new Date(Date.now());
         this.dateTo = new Date(
@@ -44,5 +50,36 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     setDisplayMode(newMode: DisplayMode) {
         this.displayMode = newMode;
+    }
+
+    @action.bound
+    async loadStat(department: IDepartment) {
+        console.log('load stat');
+        /*
+        const requestName = 'loadStat';
+        const { api } = this.rootStore;
+
+        const departmentId: number = department
+        ? department.id
+        : -1;
+
+        if (departmentId === -1) return;
+
+        this.setLoading(requestName, departmentId);
+        const res = await api.getStat(departmentId);
+
+        const storedId = this.getRequestParams(requestName);
+
+        // if fetched data is not relevant
+        if (storedId !== departmentId) return;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
+        this.clearParams(requestName);
+        */
+        // TODO: ...
     }
 }
