@@ -7,6 +7,7 @@ import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import Config from '../../Config';
+import { getRandomColor } from '../helpers/getRandomColor';
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
@@ -28,7 +29,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     setCurrentDepartment(department: string | IDepartment) {
-        console.log('new dep: ', department);
         if (typeof department === 'string') {
             this.currentDepartment = this.departments.find(({ name }) => name === department);
         } else {
@@ -64,7 +64,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const res = await this.dispatchRequest(request, requestName);
 
         if (res) {
-            const mapped: Array<[number, IMedicine]> = res.map(x => ([ x.id, x ]));
+            const mapped: Array<[number, IMedicine]> = res.map(x => (
+                [ x.id, { ...x, color: getRandomColor() } ]
+            ));
             this.meds = new Map(mapped);
         }
     }

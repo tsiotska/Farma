@@ -1,3 +1,4 @@
+import { salesNormalizer } from './../helpers/normalizers/salesNormalizer';
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
 import { mockDrugs } from './mock/mockDrugs';
@@ -12,6 +13,8 @@ import { userNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
+import { ISalesStat } from '../interfaces/ISalesStat';
+import { mockSales } from './mock/mockSales';
 
 /**
  * Class representing API requester
@@ -105,5 +108,11 @@ export class APIRequester {
         return this.instance.get('api/lpu')
         .then(lpuNormalizer)
         .catch(this.defaultErrorHandler(mockMedicalDepartments));
+    }
+
+    getSalesStat(url: string): Promise<ISalesStat[]> {
+        return this.instance.get(url)
+        .then(salesNormalizer)
+        .catch(this.defaultErrorHandler(mockSales));
     }
 }

@@ -7,4 +7,5 @@ export interface IMedicine {
     manufacturer: string;
     bonus: number;
     price: number;
+    color?: string;
 }

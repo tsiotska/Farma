@@ -9,6 +9,7 @@ import Plot from './Plot';
 import DateRangeModal from './DateRangeModal';
 import DateTimeUtils from './DateTimeUtils';
 import { IDepartment } from '../../interfaces/IDepartment';
+import { ISalesStat } from '../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -24,7 +25,8 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
-    loadStat?: () => void;
+    salesStat?: ISalesStat[];
+    setSalesStatDemand?: (value: boolean) => void;
 }
 
 @inject(({
@@ -32,21 +34,35 @@ interface IProps extends WithStyles<typeof styles> {
         uiStore: {
             openedModal,
         },
+        salesStore: {
+            setSalesStatDemand,
+            salesStat
+        }
     }
 }) => ({
     openedModal,
+    setSalesStatDemand,
+    salesStat
 }))
 @observer
 class Sales extends Component<IProps> {
+    componentDidMount() {
+        this.props.setSalesStatDemand(true);
+    }
+
+    componentWillUnmount() {
+        this.props.setSalesStatDemand(false);
+    }
+
     render() {
-        const { classes } = this.props;
+        const { classes, salesStat } = this.props;
 
         return (
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
                         <Plot />
-                        <Statistic />
+                        <Statistic salesStat={salesStat} />
                     </Grid>
                     {/* <DrugsTable
                         headers={['qwer', 'qwer1', 'qwer2', 'qwer3']}

@@ -5,6 +5,10 @@ import { withStyles } from '@material-ui/styles';
 import { DisplayMode } from '../../../../stores/SalesStore';
 
 const styles = (theme: any) => createStyles({
+    root: {
+        paddingLeft: 2,
+        marginBottom: theme.spacing(2)
+    },
     text: {
         marginRight: 8,
         color: theme.palette.primary.gray.light
@@ -39,7 +43,7 @@ class Header extends Component<IProps> {
         const { classes, displayMode } = this.props;
 
         return (
-            <Grid alignItems='center' container>
+            <Grid className={classes.root} alignItems='center' container>
                 <Typography variant='body2' className={classes.text}>
                     Измерения:
                 </Typography>
