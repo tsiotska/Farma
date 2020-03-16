@@ -41,6 +41,7 @@
     "query-string": "5.1.1",
     "react": "16.9.0",
     "react-dom": "16.9.0",
+    "react-dropzone": "^10.2.1",
     "react-final-form": "6.3.0",
     "react-i18next": "10.12.4",
     "react-router": "5.0.1",

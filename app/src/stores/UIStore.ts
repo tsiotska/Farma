@@ -1,4 +1,3 @@
-import { DATA_RANGE_MODAL } from './../constants/Modals';
 import AsyncStore from './AsyncStore';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action } from 'mobx';

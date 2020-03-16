@@ -22,6 +22,7 @@ const palette = {
     white: '#fff',
     gray: {
         main: '#333',
+        mainLight: '#555',
         light: '#aaa',
         secondary: '#868698'
     },
@@ -69,7 +70,7 @@ const theme = createMuiTheme({
             }
         },
         MuiButton: {
-            text: {
+            root: {
                 textTransform: 'none'
             }
         },

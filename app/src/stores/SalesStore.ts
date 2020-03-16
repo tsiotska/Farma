@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, autorun, reaction } from 'mobx';
+import { observable, action, reaction } from 'mobx';
 import { IDepartment } from '../interfaces/IDepartment';
 
 export type DisplayMode = 'pack' | 'currency';

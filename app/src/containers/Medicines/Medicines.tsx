@@ -14,6 +14,8 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import LoadingMask from '../../components/LoadingMask';
 import ListHeader from './ListHeader';
 import List from './List';
+import { ADD_MEDICINE_MODAL } from '../../constants/Modals';
+import AddMedsModal from './AddMedsModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -34,6 +36,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -41,17 +44,23 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             meds,
             getAsyncStatus
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
     meds,
-    getAsyncStatus
+    getAsyncStatus,
+    openModal
 }))
 @observer
 class Medicines extends Component<IProps> {
     get isMedsLoading(): boolean {
         return this.props.getAsyncStatus('loadMeds').loading;
     }
+
+    addMedsClickHandler = () => this.props.openModal(ADD_MEDICINE_MODAL);
 
     render() {
         const { classes, meds } = this.props;
@@ -62,7 +71,10 @@ class Medicines extends Component<IProps> {
                     <Typography variant='h5' color='textPrimary'>
                         Препараты
                     </Typography>
-                    <Button className={classes.addButton} variant='contained'>
+                    <Button
+                        onClick={this.addMedsClickHandler}
+                        className={classes.addButton}
+                        variant='contained'>
                         Добавить препарат
                     </Button>
                 </Grid>
@@ -73,6 +85,8 @@ class Medicines extends Component<IProps> {
                     ? <LoadingMask color='primary' />
                     : <List meds={[...meds.values()]} />
                 }
+
+                <AddMedsModal />
             </Grid>
         );
     }
