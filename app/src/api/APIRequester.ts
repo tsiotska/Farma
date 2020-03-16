@@ -1,3 +1,4 @@
+import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
 import { mockDrugs } from './mock/mockDrugs';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
@@ -10,6 +11,7 @@ import { IUser } from '../interfaces';
 import { userNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
+import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
 
 /**
  * Class representing API requester
@@ -55,9 +57,7 @@ export class APIRequester {
     }
 
     getUser(): Promise<IUser> {
-        return this.instance.get('api/user')
-        .then(userNormalizer)
-        .catch(this.defaultErrorHandler({
+        const mockUser: IUser = {
             id: 1,
             name: 'Мушастикова Ольга Владимировна',
             position: 1,
@@ -67,7 +67,11 @@ export class APIRequester {
             region: null,
             level: null,
             city: null,
-        }));
+        };
+
+        return this.instance.get('api/user')
+        .then(userNormalizer)
+        .catch(this.defaultErrorHandler(mockUser));
     }
 
     getMeds(department: string): Promise<IMedicine[]> {
@@ -77,14 +81,29 @@ export class APIRequester {
     }
 
     getPositions(): Promise<IPosition[]> {
-        return this.instance.get('api/position')
-        .then(positionsNormalizer)
-        .catch(this.defaultErrorHandler([
+        const mockPositions: IPosition[] = [
             {
                 id: 1,
                 name: 'admin',
                 alias: 'adm'
             }
-        ]));
+        ];
+
+        return this.instance.get('api/position')
+        .then(positionsNormalizer)
+        .catch(this.defaultErrorHandler(mockPositions));
+    }
+
+    getMedicalDepartments(): Promise<ILPU[]> {
+        const mockMedicalDepartments: ILPU[] = [
+            {
+                id: 1,
+                name: 'test lpu'
+            }
+        ];
+
+        return this.instance.get('api/lpu')
+        .then(lpuNormalizer)
+        .catch(this.defaultErrorHandler(mockMedicalDepartments));
     }
 }

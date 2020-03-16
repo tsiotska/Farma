@@ -1,7 +1,8 @@
+import { observable, action, reaction } from 'mobx';
+import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import { observable, action, reaction } from 'mobx';
 import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
@@ -12,9 +13,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @observable departments: IDepartment[] = [];
     @observable currentDepartment: IDepartment = null;
-    // @observable meds: IMedicine[] = [];
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
+    @observable medicalDepartments: Map<number, ILPU> = new Map();
 
     constructor(rootStore: IRootStore) {
         super();
@@ -22,6 +23,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         reaction(() => this.currentDepartment, this.loadMeds);
         this.loadDepartments();
         this.loadPositions(true);
+        this.loadMedicalDepartments(true);
     }
 
     @action.bound
@@ -74,7 +76,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
 
-        const res = await this.dispatchRequest(api.getPositions(), requestName);
+        const res = await this.dispatchRequest(
+            api.getPositions(),
+            requestName
+        );
 
         if (res) {
             const mapped: Array<[number, IPosition]> = res.map(x => ([ x.id, x ]));
@@ -82,6 +87,36 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             return;
         }
 
+        this.retryPolicy(this.loadPositions, requestName);
+    }
+
+    @action.bound
+    async loadMedicalDepartments(isInitial: boolean = false) {
+        const requestName = 'loadMedicalDepartments';
+        const { api } = this.rootStore;
+
+        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
+
+        const res = await this.dispatchRequest(
+            api.getMedicalDepartments(),
+            requestName
+        );
+
+        if (res) {
+            const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
+            this.medicalDepartments = new Map(mapped);
+            return;
+        }
+
+        this.retryPolicy(this.loadMedicalDepartments, requestName);
+    }
+
+    @action.bound
+    async loadDoctors() {
+        console.log('load doctors');
+    }
+
+    private retryPolicy(requestMethod: () => any, requestName: string) {
         const currentRetryCount = this.getRetryCount(requestName);
 
         const newRetryCount = currentRetryCount > 1
@@ -90,7 +125,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (newRetryCount) {
             this.setRetryCount(requestName, newRetryCount);
-            setTimeout(this.loadPositions, 5000);
+            setTimeout(requestMethod, Config.RETRY_INTERVAL);
         }
     }
 }

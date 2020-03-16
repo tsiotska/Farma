@@ -7,4 +7,5 @@ export default class Config {
     public static RENEW_INTERVAL: number = 30000;
     public static SECTION_MAX_COUNT: number = 253;
     public static MAX_RENEW_COUNT: number = 5;
+    public static RETRY_INTERVAL: number = 5000;
 }
