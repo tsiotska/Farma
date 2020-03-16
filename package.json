@@ -40,6 +40,7 @@
     "notistack": "^0.9.4",
     "query-string": "5.1.1",
     "react": "16.9.0",
+    "react-chartjs-2": "2.9.0",
     "react-dom": "16.9.0",
     "react-dropzone": "^10.2.1",
     "react-final-form": "6.3.0",
@@ -49,6 +50,7 @@
     "shortid": "2.2.14"
   },
   "devDependencies": {
+    "chart.js": "2.9.3",
     "@types/classnames": "2.2.9",
     "@types/enzyme": "3.10.3",
     "@types/enzyme-adapter-react-16": "1.0.5",
