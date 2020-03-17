@@ -11,6 +11,7 @@ interface IProps {
     meds?: Map<number, IMedicine>;
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;
+    className?: string;
 }
 
 @inject(({
@@ -35,13 +36,19 @@ class List extends Component<IProps> {
             salesStat,
             meds,
             displayMode,
-            medsDisplayStatus
+            medsDisplayStatus,
+            className,
         } = this.props;
 
         if (!salesStat || !meds) return null;
 
         return (
-            <Grid alignItems='center' wrap='nowrap' direction='column' container>
+            <Grid
+                className={className}
+                alignItems='center'
+                wrap='nowrap'
+                direction='column'
+                container>
                 {
                     salesStat.map(stat => (
                         <ListItem

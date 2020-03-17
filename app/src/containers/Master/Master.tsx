@@ -18,7 +18,6 @@ const styles = (theme: any) => createStyles({
         backgroundColor: theme.palette.primary.main,
         display: 'flex',
         justifyContent: 'center',
-        minWidth: 800
     },
     contentWrapper: {
         width: '100%',

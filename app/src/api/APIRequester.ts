@@ -23,6 +23,7 @@ import { mockSales } from './mock/mockSales';
 export class APIRequester {
     protected instance: AxiosInstance;
     constructor() {
+        console.log('apiurl: ', Config.API_URL);
         this.instance = axios.create({
             baseURL: Config.API_URL,
             withCredentials: true
@@ -77,8 +78,8 @@ export class APIRequester {
         .catch(this.defaultErrorHandler(mockUser));
     }
 
-    getMeds(department: string): Promise<IMedicine[]> {
-        return this.instance.get(`api/branch/${department}/drug`)
+    getMeds(departmentId: number): Promise<IMedicine[]> {
+        return this.instance.get(`api/branch/${departmentId}/drug`)
         .then(medsNormalizer)
         .catch(this.defaultErrorHandler(mockDrugs));
     }

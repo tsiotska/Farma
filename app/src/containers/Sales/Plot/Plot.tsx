@@ -1,23 +1,78 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Line } from 'react-chartjs-2';
+import {
+    eachMonthOfInterval,
+    eachYearOfInterval,
+    eachDayOfInterval,
+    lightFormat,
+    differenceInCalendarMonths,
+    getDate
+} from 'date-fns';
+import { observable } from 'mobx';
 import DataRangeButton from '../DataRangeButton';
+import {
+    ISalesStat,
+    IPeriodSalesStat,
+    IDaySalesStat,
+    IMonthSalesStat,
+    IYearSalesStat
+} from '../../../interfaces/ISalesStat';
+import { IMedicine } from '../../../interfaces/IMedicine';
+import { DisplayMode } from '../../../stores/SalesStore';
+import { ruMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     header: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: theme.spacing(2)
+    },
+    root: {
+        overflow: 'hidden',
+        paddingBottom: 50,
+        maxHeight: 500,
+        minHeight: 250,
+        height: '33vw'
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-
+    salesStat: ISalesStat[];
+    dateFrom?: Date;
+    dateTo?: Date;
+    meds?: Map<number, IMedicine>;
+    displayMode?: DisplayMode;
+    medsDisplayStatus?: Map<number, boolean>;
 }
 
+type LabelType = 'year' | 'month' | 'day' | 'unknown';
+
+@inject(({
+    appState: {
+        salesStore: {
+            dateFrom,
+            dateTo,
+            displayMode,
+            medsDisplayStatus
+        },
+        departmentsStore: {
+            meds
+        }
+    }
+}) => ({
+    dateFrom,
+    dateTo,
+    meds,
+    displayMode,
+    medsDisplayStatus
+}))
 @observer
 class Plot extends Component<IProps> {
+    @observable rootRef: any = React.createRef();
+
     readonly defaultLineParams: any = {
         fill: false,
         lineTension: 0.1,
@@ -29,47 +84,161 @@ class Plot extends Component<IProps> {
         pointHoverBorderWidth: 2,
         pointRadius: 1,
         pointHitRadius: 10,
+        pointBorderColor: 'white',
     };
 
-    readonly data = {
-        // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-          {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            pointBorderColor: 'rgba(75,192,192,1)',
-            pointBackgroundColor: '#fff',
-            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-            pointHoverBorderColor: 'rgba(220,220,220,1)',
-            // data: [65, 59, 80, 81, 56, 55, 40],
-            data: [{x: 0, y: 2}, { x: 1, y: 4}, { x: 2, y: 5}],
-            ...this.defaultLineParams
-          },
-          {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            pointBackgroundColor: 'red',
-            pointHoverBackgroundColor: 'green',
-            pointHoverBorderColor: 'blue',
-            // data: [100, 10, 20, 31, 65, 70],
-            data: [{x: 0, y: 5}, { x: 1, y: 7}],
-            ...this.defaultLineParams
-          }
-        ]
-    };
+    get data(): any {
+        return {
+            labels: this.getLabels(),
+            datasets: this.getDataSets()
+        };
+    }
+
+    get labelType(): LabelType {
+        for (const saleStat of this.props.salesStat) {
+            for (const timeSpanStat of saleStat.periods) {
+                const { day, year, month } = (timeSpanStat as any);
+                if (day !== undefined) return 'day';
+                if (month !== undefined) return 'month';
+                if (year !== undefined) return 'year';
+            }
+        }
+        return 'unknown';
+    }
+
+    get eachIntervalDay(): Date[] {
+        const { dateFrom: start, dateTo: end } = this.props;
+        if (!start || !end) return [];
+
+        switch (this.labelType) {
+            case 'day': return eachDayOfInterval({ start, end });
+            case 'month': return eachMonthOfInterval({ start, end });
+            case 'year': return eachYearOfInterval({ start, end });
+            default: return [];
+        }
+    }
+
+    getDataSets = (): any[] => {
+        const {
+            salesStat,
+            meds,
+            displayMode,
+            medsDisplayStatus
+        } = this.props;
+
+        if (!salesStat || !meds || this.labelType === 'unknown') return [];
+
+        const comparer = this.getDateComparer();
+        const propName = displayMode === 'currency'
+        ? 'money'
+        : 'amount';
+
+        return salesStat.map(x => {
+            const medicine = meds.get(x.medId);
+
+            if (!medicine || !medsDisplayStatus.get(x.medId)) return;
+
+            let i: number = 0;
+            const data = this.eachIntervalDay.map((day: Date) => {
+                const period = comparer(day, x.periods, i);
+
+                if (period) {
+                    i += 1;
+                    return period[propName];
+                }
+
+                return 0;
+            });
+
+            return {
+                label: medicine.name,
+                data,
+                borderColor: medicine.color,
+                pointBackgroundColor: medicine.color,
+
+                pointHoverBackgroundColor: medicine.color,
+                ...this.defaultLineParams
+            };
+        }).filter(x => !!x);
+    }
+
+    getDateComparer = (): (day: Date, periods: IPeriodSalesStat[], from: number) => IPeriodSalesStat => {
+        switch (this.labelType) {
+            case 'day': return this.dayComparer;
+            case 'month': return this.monthComparer;
+            case 'year': return this.yearComparer;
+        }
+    }
+
+    getLabels = (): string[] => {
+        switch (this.labelType) {
+            case 'day': return this.getDayLabels();
+            case 'month': return this.getMonthLabels();
+            case 'year': return this.getYearLabels();
+            default: return [];
+        }
+    }
+
+    dayComparer = (day: Date, periods: IDaySalesStat[], from: number): IDaySalesStat => {
+        const dayOfMonth = getDate(day);
+
+        for (let i = from; i < periods.length; ++i) {
+            if (periods[i].day === dayOfMonth) return periods[i];
+        }
+    }
+
+    monthComparer = (day: Date, periods: IMonthSalesStat[], from: number): IMonthSalesStat => {
+        const month = day.getMonth();
+
+        for (let i = from; i < periods.length; ++i) {
+            if (periods[i].month === month) return periods[i];
+        }
+    }
+
+    yearComparer = (day: Date, periods: IYearSalesStat[], from: number): IYearSalesStat => {
+        const year = day.getFullYear();
+
+        for (let i = from; i < periods.length; ++i) {
+            if (periods[i].year === year) return periods[i];
+        }
+    }
+
+    getDayLabels = (): string[] => this.eachIntervalDay.map(day => lightFormat(day, 'dd.MM'));
+
+    getMonthLabels = (): string[] => differenceInCalendarMonths(this.props.dateFrom, this.props.dateTo) <= 12
+    ? this.eachIntervalDay.map(day => lightFormat(day, 'MM'))
+    : this.eachIntervalDay.map(day => lightFormat(day, 'MM.YYYY'))
+
+    getYearLabels = (): string[] => this.eachIntervalDay.map(day => lightFormat(day, 'YYYY'));
+
+    titleRenderer = (tooltips: any[]) => {
+        const initialLabel = tooltips[0].label;
+        const monthNumber = +initialLabel;
+        const actualMonthNumber = monthNumber === 0
+        ? 11
+        : monthNumber - 1;
+        return ruMonthsNames[actualMonthNumber] || initialLabel;
+    }
 
     render() {
         const { classes } = this.props;
 
         return (
-            <Grid direction='column' container>
+            <Grid className={classes.root} ref={this.rootRef} wrap='nowrap' direction='column' container>
                 <Typography className={classes.header} variant='h5'>
                     Реализация препаратов за
                     <DataRangeButton />
                 </Typography>
-                <Line data={this.data} legend={{ display: false }} />
+                <Line
+                    data={this.data}
+                    legend={{ display: false }}
+                    options={{
+                        maintainAspectRatio: false,
+                        tooltips: { callbacks: {
+                            title: this.titleRenderer
+                        } },
+                    }}
+                />
             </Grid>
         );
     }

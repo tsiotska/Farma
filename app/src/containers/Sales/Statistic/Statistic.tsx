@@ -9,7 +9,12 @@ import List from './List';
 
 const styles = (theme: any) => createStyles({
     root: {
-        maxWidth: 400
+        maxWidth: 350,
+        overflowY: 'auto'
+    },
+    list: {
+        overflowY: 'auto',
+        maxHeight: 500
     }
 });
 
@@ -23,10 +28,12 @@ class Statistic extends Component<IProps> {
         const { classes, salesStat } = this.props;
 
         return (
-            <Grid className={classes.root} direction='column' container>
+            <Grid className={classes.root} wrap='nowrap' direction='column' container>
                 <Header />
                 <ListHeader />
-                <List salesStat={salesStat} />
+                <List
+                    className={classes.list}
+                    salesStat={salesStat} />
             </Grid>
         );
     }

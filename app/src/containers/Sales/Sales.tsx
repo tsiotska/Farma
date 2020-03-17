@@ -17,7 +17,9 @@ const styles = (theme: any) => createStyles({
     },
     plotContainer: {
         [theme.breakpoints.down('sm')]: {
-            flexDirection: 'column'
+            padding: '0 20px',
+            flexDirection: 'column',
+            alignItems: 'center'
         }
     }
 });
@@ -61,7 +63,7 @@ class Sales extends Component<IProps> {
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
-                        <Plot />
+                        <Plot salesStat={salesStat} />
                         <Statistic salesStat={salesStat} />
                     </Grid>
                     {/* <DrugsTable

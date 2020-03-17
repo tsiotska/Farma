@@ -59,7 +59,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.meds.clear();
 
-        const request = api.getMeds(this.currentDepartment.name);
+        const request = api.getMeds(this.currentDepartment.id);
 
         const res = await this.dispatchRequest(request, requestName);
 

@@ -15,6 +15,9 @@ const styles = (theme: any) => createStyles({
     },
     label: {
         fontSize: theme.typography.pxToRem(14)
+    },
+    checkbox: {
+        padding: 8
     }
 });
 
@@ -50,6 +53,7 @@ class Header extends Component<IProps> {
                 <FormControlLabel
                     control={
                     <Checkbox
+                        className={classes.checkbox}
                         color='default'
                         size='small'
                         checked={displayMode === 'pack'}
@@ -60,6 +64,7 @@ class Header extends Component<IProps> {
                 />
                 <FormControlLabel
                     control={<Checkbox
+                        className={classes.checkbox}
                         color='default'
                         size='small'
                         checked={displayMode === 'currency'}

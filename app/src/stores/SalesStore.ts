@@ -4,11 +4,15 @@ import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action, reaction } from 'mobx';
 import { IDepartment } from '../interfaces/IDepartment';
 import { ISalesStat } from '../interfaces/ISalesStat';
+import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
+import { stringify } from 'query-string';
 
 export type DisplayMode = 'pack' | 'currency';
 
 export default class SalesStore extends AsyncStore implements ISalesStore {
-    rootStore: IRootStore;
+    readonly rootStore: IRootStore;
+    readonly dateMask: string = 'yyyy-MM-dd';
+
     @observable dateFrom: Date;
     @observable dateTo: Date;
     @observable displayMode: DisplayMode = 'pack';
@@ -21,7 +25,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         super();
         this.rootStore = rootStore;
 
-        // TODO: fetch sales stat only when it is needed
         reaction(
             () => [this.rootStore.departmentsStore.currentDepartment, this.needSalesStat],
             ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
@@ -103,7 +106,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.setLoading(requestName, departmentId);
 
-        const res = await api.getSalesStat(`api/branch/${departmentId}/ffm/sales`);
+        const url = this.getLoadStatUrl(departmentId);
+        const res = await api.getSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
 
@@ -120,5 +124,23 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.salesStat = res;
         this.medsDisplayStatus = new Map(res.map(x => ([ x.medId, true ])));
+    }
+
+    private getLoadStatUrl(departmentId: number): string {
+        const apiUrl = `api/branch/${departmentId}/ffm/sales`;
+
+        let group_by: string = 'year';
+        if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
+        else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
+
+        const urlParamsObject = {
+            from: format(this.dateFrom, this.dateMask),
+            to: format(this.dateTo, this.dateMask),
+            group_by
+        };
+
+        const urlParams = stringify(urlParamsObject);
+
+        return `${apiUrl}?${urlParams}`;
     }
 }

@@ -3,7 +3,7 @@ import { IMedicine } from '../../interfaces/IMedicine';
 export const mockDrugs: IMedicine[] = [
     {
         id: 1,
-        name: 'qrqwer',
+        name: 'the ifsrt',
         image: null,
         releaseForm: '4213',
         dosage: 32,
@@ -23,7 +23,7 @@ export const mockDrugs: IMedicine[] = [
     },
     {
         id: 3,
-        name: 'qrqwer',
+        name: 'aaaaaaaa',
         image: null,
         releaseForm: '4213',
         dosage: 32,
