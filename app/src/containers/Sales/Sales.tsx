@@ -10,16 +10,25 @@ import DateRangeModal from './DateRangeModal';
 import DateTimeUtils from './DateTimeUtils';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { ISalesStat } from '../../interfaces/ISalesStat';
+import { IMedicine } from '../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
     root: {
         padding: '0 20px'
     },
     plotContainer: {
+        marginBottom: theme.spacing(4),
+        '& > *:last-child': {
+            marginLeft: 20
+        },
         [theme.breakpoints.down('sm')]: {
             padding: '0 20px',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            '& > *:last-child': {
+                maxWidth: 'none',
+                marginLeft: 0
+            },
         }
     }
 });
@@ -29,6 +38,8 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartment?: IDepartment;
     medsSalesStat?: ISalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
+    meds?: Map<number, IMedicine>;
+    medsDisplayStatus?: Map<number, boolean>;
 }
 
 @inject(({
@@ -38,13 +49,19 @@ interface IProps extends WithStyles<typeof styles> {
         },
         salesStore: {
             setSalesStatDemand,
-            medsSalesStat
+            medsSalesStat,
+            medsDisplayStatus
+        },
+        departmentsStore: {
+            meds
         }
     }
 }) => ({
     openedModal,
     setSalesStatDemand,
-    medsSalesStat
+    medsSalesStat,
+    medsDisplayStatus,
+    meds
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -57,7 +74,12 @@ class Sales extends Component<IProps> {
     }
 
     render() {
-        const { classes, medsSalesStat } = this.props;
+        const {
+            classes,
+            medsSalesStat,
+            meds,
+            medsDisplayStatus
+        } = this.props;
 
         return (
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
@@ -66,10 +88,11 @@ class Sales extends Component<IProps> {
                         <Plot medsSalesStat={medsSalesStat} />
                         <Statistic medsSalesStat={medsSalesStat} />
                     </Grid>
-                    {/* <DrugsTable
-                        headers={['qwer', 'qwer1', 'qwer2', 'qwer3']}
-                        data={[[4, 2, 5, 2]]}
-                    /> */}
+                    <DrugsTable
+                        meds={meds}
+                        medsDisplayStatuses={medsDisplayStatus}
+                        data={[]}
+                    />
                     <DateRangeModal />
                 </Grid>
             </MuiPickersUtilsProvider>

@@ -5,6 +5,7 @@ import { ADD_MEDICINE_MODAL } from '../../../constants/Modals';
 import Dialog from '../../../components/Dialog';
 import PhotoDropzone from '../PhotoDropzone';
 import FormContent from '../FormContent';
+import Config from '../../../../Config';
 
 interface IProps {
     openedModal?: string;

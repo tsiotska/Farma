@@ -63,7 +63,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadMeds() {
         const requestName = 'loadMeds';
-        const { api } = this.rootStore;
+        const { api, salesStore: { initMedsDisplayStatuses } } = this.rootStore;
 
         if (!this.currentDepartment) return;
 
@@ -78,6 +78,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 [ x.id, { ...x, color: getRandomColor() } ]
             ));
             this.meds = new Map(mapped);
+            initMedsDisplayStatuses();
         }
     }
 

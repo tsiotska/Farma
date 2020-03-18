@@ -62,7 +62,35 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class ListItem extends Component<IProps> {
-    onCheckboxChange = () => this.props.toggleMedsDisplayStatus(this.props.stat.medId);
+    get kpd(): string {
+        const { stat } = this.props;
+        return stat
+        ? `${stat.kpd}`
+        : '-';
+    }
+
+    get money(): string {
+        const { stat } = this.props;
+        return stat
+        ? `${stat.money}`
+        : '-';
+    }
+
+    get amount(): string {
+        const { stat } = this.props;
+        return stat
+        ? `${stat.amount}`
+        : '-';
+    }
+
+    get medId(): number {
+        const { stat, medicament } = this.props;
+        if (stat) return stat.medId;
+        if (medicament) return medicament.id;
+        return -1;
+    }
+
+    onCheckboxChange = () => this.props.toggleMedsDisplayStatus(this.medId);
 
     render() {
         const {
@@ -70,11 +98,6 @@ class ListItem extends Component<IProps> {
             displayMode,
             medicament,
             displayed,
-            stat: {
-                amount,
-                money,
-                kpd
-            }
         } = this.props;
 
         if (!medicament) return null;
@@ -96,15 +119,15 @@ class ListItem extends Component<IProps> {
                 </Grid>
                 <Grid xs item>
                     <Typography variant='subtitle1'>
-                        { kpd }
+                        { this.kpd }
                     </Typography>
                 </Grid>
                 <Grid xs item>
                     <Typography variant='subtitle1'>
                         {
                             displayMode === 'pack'
-                            ? amount
-                            : money
+                            ? this.amount
+                            : this.money
                         }
                     </Typography>
                 </Grid>

@@ -3,6 +3,8 @@ import { createStyles, WithStyles, TableContainer, Table, Paper, TableHead, Tabl
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import isEqual from 'lodash/isEqual';
+import { IMedicine } from '../../interfaces/IMedicine';
+import HeaderItem from './HeaderItem';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -11,23 +13,6 @@ const styles = (theme: any) => createStyles({
     thCell: {
         '&:last-of-type': {
             width: 100
-        }
-    },
-    headerText: {
-        transformOrigin: 'left top',
-        transform: 'rotate(-30deg)',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        display: 'flex',
-        alignItems: 'center',
-        '&::before': {
-            content: '""',
-            width: 10,
-            height: 10,
-            backgroundColor: 'red',
-            marginRight: 8,
-            borderRadius: 2
         }
     },
     tr: {},
@@ -41,7 +26,8 @@ const styles = (theme: any) => createStyles({
         tableLayout: 'fixed'
     },
     container: {
-        overflow: 'visible',
+        // overflow: 'visible',
+        overflowY: 'hidden',
         transition: '0.3s',
     },
     prepend: {},
@@ -54,7 +40,8 @@ interface IProps extends WithStyles<typeof styles> {
     setSalesHeaderHeight?: (value: number) => void;
 
     data?: any[][];
-    headers?: string[];
+    meds?: Map<number, IMedicine>;
+    medsDisplayStatuses?: Map<number, boolean>;
 
     rowPrepend?: React.Component;
     rowAppend?: React.Component;
@@ -84,8 +71,8 @@ class DrugsTable extends Component<IProps> {
 
     calculateTopMargin = () => {
         const refs = [...Object.values(this.headerRefs)];
-        const heights = refs.map((current: any) => current.getBoundingClientRect().height);
-        const newValue = Math.max(...heights) - this.headerHeight;
+        const heights = refs.map((current: any) => current && current.getBoundingClientRect().height);
+        const newValue = Math.max(...heights);
         this.props.setSalesHeaderHeight(newValue);
     }
 
@@ -94,36 +81,33 @@ class DrugsTable extends Component<IProps> {
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { headers: prevHeaders } = prevProps;
-        const { headers: actualHeaders } = this.props;
+        const { meds: prevMeds } = prevProps;
+        const { meds: actualMeds } = this.props;
 
-        const headersChanged = !isEqual(
-            [...prevHeaders].sort(),
-            [...actualHeaders].sort()
-        );
+        const medsIsChanged = prevMeds !== actualMeds || prevMeds.size !== actualMeds.size;
 
-        if (headersChanged) {
-            this.headerRefs = prevHeaders.reduce(
-                (refs, header) => {
-                    if (actualHeaders.includes(header)) return refs;
-
-                    const { [header]: omitted, ...rest } = refs;
-
+        if (medsIsChanged) {
+            this.headerRefs = [...prevMeds.values()].reduce(
+                (refs, meds) => {
+                    if (actualMeds.has(meds.id)) return refs;
+                    const { [meds.id]: omitted, ...rest } = refs;
                     return rest;
                 },
                 this.headerRefs
             );
-            this.calculateTopMargin();
         }
+
+        this.calculateTopMargin();
     }
 
     render() {
         const {
             classes,
-            headers,
+            meds,
             headerAppend,
             headerPrepend,
-            data
+            data,
+            medsDisplayStatuses
         } = this.props;
 
         return (
@@ -134,11 +118,11 @@ class DrugsTable extends Component<IProps> {
                             { headerPrepend }
 
                             {
-                                headers.map(header => <TableCell key={header} className={classes.thCell}>
+                                [...meds.values()].map(medicine =>
+                                    medsDisplayStatuses.get(medicine.id) &&
+                                    <TableCell key={medicine.id} className={classes.thCell}>
                                         <Grid container>
-                                            <Typography variant='subtitle1' ref={el => this.headerRefs[header] = el} className={classes.headerText}>
-                                                { header }
-                                            </Typography>
+                                            <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
                                         </Grid>
                                     </TableCell>
                                 )

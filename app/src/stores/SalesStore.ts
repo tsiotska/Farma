@@ -139,7 +139,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.clearParams(requestName);
 
         this.medsSalesStat = res;
-        this.initMedsDisplayStatuses();
     }
 
     @action.bound

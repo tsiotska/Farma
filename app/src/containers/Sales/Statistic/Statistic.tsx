@@ -10,11 +10,12 @@ import List from './List';
 const styles = (theme: any) => createStyles({
     root: {
         maxWidth: 350,
-        overflowY: 'auto'
+        maxHeight: 500,
+        overflowY: 'auto',
+        height: '33vw'
     },
     list: {
         overflowY: 'auto',
-        maxHeight: 500
     }
 });
 
