@@ -9,21 +9,17 @@ export const numberValidator: Validator = (value: string): boolean => {
 };
 
 export const moneyValidator: Validator = (value: string): boolean => {
-    const q = value.match(/\.([^.]*)$/);
+    const mantissa = value.match(/\.([^.]*)$/);
 
-    return q === null
+    return mantissa === null
     ? numberValidator(value)
-    : numberValidator(value) && q[0].length <= 3;
+    : numberValidator(value) && mantissa[0].length <= 3;
 };
 
-export const lengthValidator: Validator = (value: string): boolean => {
-    return value.length >= 1;
+export const emailValidator: Validator = (value: string): boolean => {
+    return value.match(/^.+@[^\.].*\.[a-z]{2,}$/) !== null;
 };
 
-export const composeValidators = (...validators: Validator[]) =>
-    (value: string): boolean => {
-        return validators.reduce(
-            (result, validator) => result && validator(value),
-            true
-        );
-    };
+export const lengthValidator = (minLength: number, value: string): boolean => {
+    return value.length >= minLength;
+};

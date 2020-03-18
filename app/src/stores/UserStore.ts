@@ -1,3 +1,4 @@
+import { IUserCredentials } from './../interfaces/IUser';
 import { computed, action, observable } from 'mobx';
 
 import { IRootStore } from './../interfaces/IRootStore';
@@ -56,6 +57,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const user = await this.dispatchRequest(api.getUser(), requestName);
 
         if (user) this.user = user;
+        return !!user;
     }
 
     @action.bound
@@ -64,5 +66,23 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api } = this.rootStore;
 
         this.dispatchRequest(api.logout(), requestName);
+    }
+
+    @action.bound
+    async login(credentials: IUserCredentials): Promise<boolean> {
+        const requestName = 'login';
+        const { api } = this.rootStore;
+
+        this.setLoading(requestName);
+        const loggedIn: boolean = await api.login(credentials);
+
+        if (!loggedIn) {
+            this.setError(requestName);
+            return false;
+        }
+
+        const userFetched = await this.loadUserProfile();
+        this.setSuccess(requestName);
+        return userFetched;
     }
 }

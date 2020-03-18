@@ -4,10 +4,11 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { ROOT_ROUTE } from '../../constants/Router';
+import { ROOT_ROUTE, LOGIN_ROUTE } from '../../constants/Router';
 
 import { IRoleContent, adminContent, FFMContent, RMContent, MAContent } from './RolesPresets';
 import { ADMIN, FIELD_FORCE_MANAGER, MEDICAL_AGENT, REGIONAL_MANAGER } from '../../constants/Roles';
+import PrivateRoute from '../../components/PrivateRoute';
 
 const styles = (theme: any) => createStyles({});
 
@@ -41,7 +42,7 @@ class DepartmentContent extends Component<IProps> {
             <Switch>
                 {
                     this.userContent.map(({ path, component }) => (
-                        <Route
+                        <PrivateRoute
                             key={path}
                             path={path}
                             component={component}
@@ -50,10 +51,13 @@ class DepartmentContent extends Component<IProps> {
                 }
                 {
                     this.userContent.length &&
-                    <Route path={ROOT_ROUTE}>
+                    <PrivateRoute path={ROOT_ROUTE}>
                         <Redirect to={this.userContent[0].path} />
-                    </Route>
+                    </PrivateRoute>
                 }
+                <Route path={ROOT_ROUTE}>
+                    <Redirect to={LOGIN_ROUTE} />
+                </Route>
             </Switch>
         );
     }

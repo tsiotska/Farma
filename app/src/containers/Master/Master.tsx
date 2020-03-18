@@ -1,16 +1,17 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import { NAVIGATION_ROUTES } from '../../constants/Router';
+import { NAVIGATION_ROUTES, LOGIN_ROUTE } from '../../constants/Router';
 
 import Header from '../Header';
 import SideNav from './SideNav';
 import PrivateRoute from '../../components/PrivateRoute';
 import DepartmentContent from '../DepartmentContent';
+import Login from '../Login';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -42,6 +43,7 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <Router history={initialHistory}>
                     <div className={classes.contentWrapper}>
+                        <Route path={LOGIN_ROUTE} component={Login} />
                         <PrivateRoute
                             path={NAVIGATION_ROUTES}
                             component={Header}
@@ -49,7 +51,7 @@ export class Master extends Component<IProps, null> {
                         />
                         <DepartmentContent />
                     </div>
-                    <SideNav />
+                    <Route path={NAVIGATION_ROUTES} component={SideNav} />
                 </Router>
             </main>
         );

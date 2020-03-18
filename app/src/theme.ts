@@ -33,6 +33,24 @@ const palette = {
     error: 'red'
 };
 
+const typographyOverrides: any = {
+    h5: {
+        fontSize: '1.25rem' // 20 px
+    },
+    h6: {
+      fontSize: '1.125rem' // 18px
+    },
+    body1: {
+        fontSize: '1rem' // 16px
+    },
+    body2: {
+        fontSize: '0.875rem' // 14px
+    },
+    subtitle1: {
+        fontSize: '0.8125rem' // 13px
+    }
+};
+
 const theme = createMuiTheme({
     palette: {
         primary: palette,
@@ -69,28 +87,51 @@ const theme = createMuiTheme({
                 color: '#002afd'
             }
         },
+        MuiInput: {
+            formControl: {
+                border: `1px solid ${palette.gray.light}`,
+                marginBottom: 20,
+                borderRadius: 1,
+                '&.Mui-error': {
+                    borderColor: palette.error
+                }
+            }
+        },
+        MuiInputLabel: {
+            formControl: {
+                color: palette.gray.mainLight,
+                '&.Mui-focused': {
+                    color: palette.gray.mainLight
+                },
+                '&.Mui-error': {
+                    color: palette.error
+                }
+            },
+            shrink: {
+                transform: 'translateY(-5px)',
+                fontSize: typographyOverrides.subtitle1.fontSize,
+            },
+        },
         MuiButton: {
             root: {
                 textTransform: 'none'
+            },
+            // usually this is submit button
+            containedPrimary: {
+                color: palette.white,
+                backgroundColor: palette.blue,
+                '&:hover': {
+                    backgroundColor: '#1d8ce4',
+                }
             }
         },
-        MuiTypography: {
-            h5: {
-                fontSize: '1.25rem' // 20 px
-            },
-            h6: {
-              fontSize: '1.125rem' // 18px
-            },
-            body1: {
-                fontSize: '1rem' // 16px
-            },
-            body2: {
-                fontSize: '0.875rem' // 14px
-            },
-            subtitle1: {
-                fontSize: '0.8125rem' // 13px
+        MuiFormHelperText: {
+            root: {
+                position: 'absolute',
+                bottom: 0
             }
-        }
+        },
+        MuiTypography: typographyOverrides
     }
 });
 

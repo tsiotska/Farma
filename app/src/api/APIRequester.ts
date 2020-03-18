@@ -1,3 +1,4 @@
+import { IUserCredentials } from './../interfaces/IUser';
 import { salesNormalizer } from './../helpers/normalizers/salesNormalizer';
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
@@ -33,6 +34,12 @@ export class APIRequester {
     defaultErrorHandler = (response: any = null) => (e: any) => {
         console.error('error: ', e);
         return response;
+    }
+
+    login(credentials: IUserCredentials): Promise<boolean> {
+        return this.instance.post('/api/signin', credentials)
+        .then(() => true)
+        .catch(this.defaultErrorHandler(false));
     }
 
     logout(): Promise<any> {
@@ -75,7 +82,8 @@ export class APIRequester {
 
         return this.instance.get('api/user')
         .then(userNormalizer)
-        .catch(this.defaultErrorHandler(mockUser));
+        .catch(this.defaultErrorHandler());
+        // .catch(this.defaultErrorHandler(mockUser));
     }
 
     getMeds(departmentId: number): Promise<IMedicine[]> {

@@ -3,6 +3,7 @@ import {inject, observer} from 'mobx-react';
 import {Redirect, Route, RouteProps} from 'react-router';
 import { IUser } from '../../interfaces';
 import { toJS } from 'mobx';
+import { LOGIN_ROUTE } from '../../constants/Router';
 
 interface IProps extends RouteProps {
     user?: IUser;
@@ -43,7 +44,7 @@ class PrivateRoute extends Route<IProps> {
             render={
                 () => isUserLoading
                 ? loadingMask
-                : <p>should be redirected to auth</p>
+                : <Redirect to={LOGIN_ROUTE} />
             }
         />;
     }

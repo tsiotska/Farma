@@ -22,11 +22,11 @@ const styles = (theme: any) => createStyles({
     submitButton: {
         margin: '8px 0 0 auto',
         padding: '4px 16px',
-        color: theme.palette.primary.white,
-        backgroundColor: theme.palette.primary.blue,
-        '&:hover': {
-            backgroundColor: '#1d8ce4',
-        }
+        // color: theme.palette.primary.white,
+        // backgroundColor: theme.palette.primary.blue,
+        // '&:hover': {
+        //     backgroundColor: '#1d8ce4',
+        // }
     },
 });
 
@@ -165,6 +165,7 @@ class FormContent extends Component<IProps> {
                     disabled={!this.isSubmitAllowed}
                     className={classes.submitButton}
                     variant='contained'
+                    color='primary'
                     onClick={this.submitHandler}>
                     Добавить
                 </Button>
