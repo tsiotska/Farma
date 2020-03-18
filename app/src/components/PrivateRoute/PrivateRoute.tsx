@@ -7,6 +7,7 @@ import { LOGIN_ROUTE } from '../../constants/Router';
 
 interface IProps extends RouteProps {
     user?: IUser;
+    children?: any;
     isUserLoading?: boolean;
     loadingPlaceholder?: any;
 }
@@ -23,17 +24,22 @@ interface IProps extends RouteProps {
     isUserLoading
 }))
 @observer
-class PrivateRoute extends Route<IProps> {
+class PrivateRoute extends Route<IProps & any> {
     render() {
         const {
             user,
             isUserLoading,
             loadingPlaceholder: LoadingPlaceholder,
             component,
+            children,
             ...props
         } = this.props;
 
-        if (user) return <Route {...props} component={component} />;
+        if (user) {
+            return children
+            ? <Route {...props} children={children} />
+            : <Route {...props} component={component} />;
+        }
 
         const loadingMask = LoadingPlaceholder
         ? <LoadingPlaceholder />

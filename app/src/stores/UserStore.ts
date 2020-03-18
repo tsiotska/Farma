@@ -54,9 +54,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const requestName = 'loadUserProfile';
         const { api } = this.rootStore;
 
-        const user = await this.dispatchRequest(api.getUser(), requestName);
+        this.setLoading(requestName);
+        const user = await api.getUser();
 
-        if (user) this.user = user;
+        if (user) {
+            this.user = user;
+            this.setError(requestName);
+        } else {
+            this.setSuccess(requestName);
+        }
+
         return !!user;
     }
 
@@ -66,6 +73,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api } = this.rootStore;
 
         this.dispatchRequest(api.logout(), requestName);
+        this.user = null;
     }
 
     @action.bound

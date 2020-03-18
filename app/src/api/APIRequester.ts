@@ -24,7 +24,6 @@ import { mockSales } from './mock/mockSales';
 export class APIRequester {
     protected instance: AxiosInstance;
     constructor() {
-        console.log('apiurl: ', Config.API_URL);
         this.instance = axios.create({
             baseURL: Config.API_URL,
             withCredentials: true
@@ -43,7 +42,7 @@ export class APIRequester {
     }
 
     logout(): Promise<any> {
-        return this.instance.post('/api/signout')
+        return this.instance.delete('/api/signout')
         .then(() => true)
         .catch(this.defaultErrorHandler(false));
     }
@@ -80,7 +79,7 @@ export class APIRequester {
             city: null,
         };
 
-        return this.instance.get('api/user')
+        return this.instance.get('api/profile')
         .then(userNormalizer)
         .catch(this.defaultErrorHandler());
         // .catch(this.defaultErrorHandler(mockUser));

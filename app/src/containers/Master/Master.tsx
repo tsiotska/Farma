@@ -51,7 +51,7 @@ export class Master extends Component<IProps, null> {
                         />
                         <DepartmentContent />
                     </div>
-                    <Route path={NAVIGATION_ROUTES} component={SideNav} />
+                    <PrivateRoute path={NAVIGATION_ROUTES} component={SideNav} />
                 </Router>
             </main>
         );
