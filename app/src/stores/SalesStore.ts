@@ -37,7 +37,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 if (this.currentDepartmentId !== newDepartmentId) this.salesStat = [];
 
                 this.currentDepartmentId = newDepartmentId;
-                this.loadStat(newDepartmentId);
+                this.loadStat();
             }
         );
 
@@ -98,21 +98,21 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
-    async loadStat(departmentId: number) {
+    async loadStat() {
         const requestName = 'loadStat';
         const { api } = this.rootStore;
 
-        if (departmentId === -1) return;
+        if (this.currentDepartmentId === -1) return;
 
-        this.setLoading(requestName, departmentId);
+        this.setLoading(requestName, this.currentDepartmentId);
 
-        const url = this.getLoadStatUrl(departmentId);
+        const url = this.getLoadStatUrl(this.currentDepartmentId);
         const res = await api.getSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
 
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
-        if (storedId !== departmentId) return;
+        if (storedId !== this.currentDepartmentId) return;
 
         // if fetched data is relevant we process it
         const callback = res

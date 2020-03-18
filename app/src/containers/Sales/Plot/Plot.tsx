@@ -23,6 +23,8 @@ import {
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../stores/SalesStore';
 import { ruMonthsNames } from '../DateTimeUtils/DateTimeUtils';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -46,6 +48,7 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine>;
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
 type LabelType = 'year' | 'month' | 'day' | 'unknown';
@@ -56,7 +59,8 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
             dateFrom,
             dateTo,
             displayMode,
-            medsDisplayStatus
+            medsDisplayStatus,
+            getAsyncStatus
         },
         departmentsStore: {
             meds
@@ -67,12 +71,11 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
     dateTo,
     meds,
     displayMode,
-    medsDisplayStatus
+    medsDisplayStatus,
+    getAsyncStatus
 }))
 @observer
 class Plot extends Component<IProps> {
-    @observable rootRef: any = React.createRef();
-
     readonly defaultLineParams: any = {
         fill: false,
         lineTension: 0.1,
@@ -86,6 +89,10 @@ class Plot extends Component<IProps> {
         pointHitRadius: 10,
         pointBorderColor: 'white',
     };
+
+    get isLoading(): boolean {
+        return this.props.getAsyncStatus('loadStat').loading;
+    }
 
     get data(): any {
         return {
@@ -224,21 +231,25 @@ class Plot extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <Grid className={classes.root} ref={this.rootRef} wrap='nowrap' direction='column' container>
+            <Grid className={classes.root} wrap='nowrap' direction='column' container>
                 <Typography className={classes.header} variant='h5'>
                     Реализация препаратов за
                     <DataRangeButton />
                 </Typography>
-                <Line
-                    data={this.data}
-                    legend={{ display: false }}
-                    options={{
-                        maintainAspectRatio: false,
-                        tooltips: { callbacks: {
-                            title: this.titleRenderer
-                        } },
-                    }}
-                />
+                {
+                    this.isLoading
+                    ? <LoadingMask />
+                    : <Line
+                        data={this.data}
+                        legend={{ display: false }}
+                        options={{
+                            maintainAspectRatio: false,
+                            tooltips: { callbacks: {
+                                title: this.titleRenderer
+                            } },
+                        }}
+                      />
+                }
             </Grid>
         );
     }

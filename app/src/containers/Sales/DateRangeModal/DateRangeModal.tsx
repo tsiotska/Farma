@@ -27,6 +27,7 @@ interface IProps extends WithStyles<typeof styles> {
     dateTo?: Date;
     setDateTo?: (newDate: Date) => void;
     setDateFrom?: (newDate: Date) => void;
+    loadStat?: () => void;
 }
 
 @inject(({
@@ -40,6 +41,7 @@ interface IProps extends WithStyles<typeof styles> {
             dateTo,
             setDateTo,
             setDateFrom,
+            loadStat
         }
     }
 }) => ({
@@ -49,6 +51,7 @@ interface IProps extends WithStyles<typeof styles> {
     dateTo,
     setDateTo,
     setDateFrom,
+    loadStat
 }))
 @observer
 class DateRangeModal extends Component<IProps> {
@@ -70,7 +73,8 @@ class DateRangeModal extends Component<IProps> {
             setDateFrom,
             setDateTo,
             dateFrom,
-            dateTo
+            dateTo,
+            loadStat
         } = this.props;
 
         const isDateToChanged = this.localDateTo
@@ -84,6 +88,7 @@ class DateRangeModal extends Component<IProps> {
         if (isDateToChanged) setDateTo(this.localDateTo);
         if (isDateFromChanged) setDateFrom(this.localDateFrom);
         this.closeHandler();
+        if (isDateToChanged || isDateFromChanged) loadStat();
     }
 
     componentDidUpdate(prevProps: IProps) {
