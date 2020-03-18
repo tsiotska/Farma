@@ -19,13 +19,13 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    salesStat: ISalesStat[];
+    medsSalesStat: ISalesStat[];
 }
 
 @observer
 class Statistic extends Component<IProps> {
     render() {
-        const { classes, salesStat } = this.props;
+        const { classes, medsSalesStat } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
@@ -33,7 +33,7 @@ class Statistic extends Component<IProps> {
                 <ListHeader />
                 <List
                     className={classes.list}
-                    salesStat={salesStat} />
+                    medsSalesStat={medsSalesStat} />
             </Grid>
         );
     }

@@ -6,17 +6,19 @@ import { IDepartment } from '../interfaces/IDepartment';
 import { ISalesStat } from '../interfaces/ISalesStat';
 import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
 import { stringify } from 'query-string';
+import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
 
 export type DisplayMode = 'pack' | 'currency';
 
 export default class SalesStore extends AsyncStore implements ISalesStore {
     readonly rootStore: IRootStore;
-    readonly dateMask: string = 'yyyy-MM-dd';
+    readonly apiDateMask: string = 'yyyy-MM-dd';
 
     @observable dateFrom: Date;
     @observable dateTo: Date;
     @observable displayMode: DisplayMode = 'pack';
-    @observable salesStat: ISalesStat[] = [];
+    @observable medsSalesStat: ISalesStat[] = [];
+    @observable localeSalesStat: ILocaleSalesStat[] = [];
     @observable needSalesStat: boolean = false;
     @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
@@ -24,23 +26,31 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
+        this.initializeStore();
 
         reaction(
             () => [this.rootStore.departmentsStore.currentDepartment, this.needSalesStat],
-            ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
+            async ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
                 if (!isSalesStatNeeded) return;
 
                 const newDepartmentId: number = currentDepartment
                 ? currentDepartment.id
                 : -1;
 
-                if (this.currentDepartmentId !== newDepartmentId) this.salesStat = [];
+                if (this.currentDepartmentId !== newDepartmentId) {
+                    this.medsSalesStat = [];
+                    this.localeSalesStat = [];
+                }
 
                 this.currentDepartmentId = newDepartmentId;
-                this.loadStat();
+                await this.loadMedsStat();
+                await this.loadLocaleSalesStat();
             }
         );
+    }
 
+    @action.bound
+    initializeStore() {
         const currentDate = new Date(Date.now());
         this.dateTo = new Date(
             currentDate.getFullYear(),
@@ -55,6 +65,12 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             fromYear,
             0
         );
+
+        this.displayMode = 'pack';
+        this.medsSalesStat = [];
+        this.needSalesStat = false;
+        this.currentDepartmentId = null;
+        this.medsDisplayStatus = new Map();
     }
 
     @action.bound
@@ -98,8 +114,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
-    async loadStat() {
-        const requestName = 'loadStat';
+    async loadMedsStat() {
+        const requestName = 'loadMedsStat';
         const { api } = this.rootStore;
 
         if (this.currentDepartmentId === -1) return;
@@ -122,8 +138,51 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         callback(requestName);
         this.clearParams(requestName);
 
-        this.salesStat = res;
-        this.medsDisplayStatus = new Map(res.map(x => ([ x.medId, true ])));
+        this.medsSalesStat = res;
+        this.initMedsDisplayStatuses();
+    }
+
+    @action.bound
+    async loadLocaleSalesStat() {
+        const requestName = 'loadLocaleSalesStat';
+        const { api } = this.rootStore;
+
+        if (this.currentDepartmentId === -1) return;
+        this.setLoading(requestName, this.currentDepartmentId);
+        const url = this.getLocaleSalesStatUrl(this.currentDepartmentId);
+        const res = await api.getLocaleSalesStat(url);
+        const storedId = this.getRequestParams(requestName);
+
+        if (storedId !== this.currentDepartmentId) return;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
+        this.clearParams(requestName);
+
+        this.localeSalesStat = res;
+    }
+
+    @action.bound
+    initMedsDisplayStatuses() {
+        const { departmentsStore: { meds }} = this.rootStore;
+        const values: Array<[number, boolean]> = [...meds.keys()].map(id => ([ id, true ]));
+        this.medsDisplayStatus = new Map(values);
+    }
+
+    private getLocaleSalesStatUrl(departmentId: number): string {
+        const apiUrl = `api/branch/${departmentId}/ffm/sales/region`;
+
+        const urlParamsObject = {
+            from: format(this.dateFrom, this.apiDateMask),
+            to: format(this.dateTo, this.apiDateMask),
+        };
+
+        const urlParams = stringify(urlParamsObject);
+
+        return `${apiUrl}?${urlParams}`;
     }
 
     private getLoadStatUrl(departmentId: number): string {
@@ -134,8 +193,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
 
         const urlParamsObject = {
-            from: format(this.dateFrom, this.dateMask),
-            to: format(this.dateTo, this.dateMask),
+            from: format(this.dateFrom, this.apiDateMask),
+            to: format(this.dateTo, this.apiDateMask),
             group_by
         };
 

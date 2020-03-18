@@ -1,4 +1,4 @@
-interface ICommonStat {
+export interface ICommonStat {
     money: number;
     amount: number;
 }

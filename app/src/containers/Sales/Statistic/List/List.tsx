@@ -7,7 +7,7 @@ import { DisplayMode } from '../../../../stores/SalesStore';
 import ListItem from '../ListItem';
 
 interface IProps {
-    salesStat: ISalesStat[];
+    medsSalesStat: ISalesStat[];
     meds?: Map<number, IMedicine>;
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;
@@ -33,14 +33,14 @@ interface IProps {
 class List extends Component<IProps> {
     render() {
         const {
-            salesStat,
+            medsSalesStat,
             meds,
             displayMode,
             medsDisplayStatus,
             className,
         } = this.props;
 
-        if (!salesStat || !meds) return null;
+        if (!medsSalesStat || !meds) return null;
 
         return (
             <Grid
@@ -50,7 +50,7 @@ class List extends Component<IProps> {
                 direction='column'
                 container>
                 {
-                    salesStat.map(stat => (
+                    medsSalesStat.map(stat => (
                         <ListItem
                             key={stat.medId}
                             stat={stat}

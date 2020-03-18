@@ -21,10 +21,20 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
+        this.initializeStore();
         reaction(() => this.currentDepartment, this.loadMeds);
         this.loadDepartments();
         this.loadPositions(true);
         this.loadMedicalDepartments(true);
+    }
+
+    @action.bound
+    initializeStore() {
+        this.departments = [];
+        this.currentDepartment = null;
+        this.meds = new Map();
+        this.positions = new Map();
+        this.medicalDepartments = new Map();
     }
 
     @action.bound

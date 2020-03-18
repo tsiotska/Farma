@@ -1,3 +1,4 @@
+import { ISalesStore } from './ISalesStore';
 import { IDepartmentsStore } from './IDepartmentsStore';
 import { ILocalizationStore } from './ILocalizationStore';
 import { APIRequester } from '../api/APIRequester';
@@ -8,4 +9,5 @@ export interface IRootStore {
     api: APIRequester;
     routingStore: RouterStore;
     departmentsStore: IDepartmentsStore;
+    salesStore: ISalesStore;
 }

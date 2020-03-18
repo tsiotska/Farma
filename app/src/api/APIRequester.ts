@@ -16,6 +16,8 @@ import { IPosition } from '../interfaces/IPosition';
 import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
 import { ISalesStat } from '../interfaces/ISalesStat';
 import { mockSales } from './mock/mockSales';
+import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
+import { localeSalesStatNormalizer } from '../helpers/normalizers/localeSalesStatNormalizer';
 
 /**
  * Class representing API requester
@@ -122,5 +124,11 @@ export class APIRequester {
         return this.instance.get(url)
         .then(salesNormalizer)
         .catch(this.defaultErrorHandler(mockSales));
+    }
+
+    getLocaleSalesStat(url: string): Promise<ILocaleSalesStat[]> {
+        return this.instance.get(url)
+        .then(localeSalesStatNormalizer)
+        .catch(this.defaultErrorHandler());
     }
 }

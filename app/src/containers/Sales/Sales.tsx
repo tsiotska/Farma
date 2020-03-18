@@ -27,7 +27,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
-    salesStat?: ISalesStat[];
+    medsSalesStat?: ISalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
 }
 
@@ -38,13 +38,13 @@ interface IProps extends WithStyles<typeof styles> {
         },
         salesStore: {
             setSalesStatDemand,
-            salesStat
+            medsSalesStat
         }
     }
 }) => ({
     openedModal,
     setSalesStatDemand,
-    salesStat
+    medsSalesStat
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -57,14 +57,14 @@ class Sales extends Component<IProps> {
     }
 
     render() {
-        const { classes, salesStat } = this.props;
+        const { classes, medsSalesStat } = this.props;
 
         return (
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
-                        <Plot salesStat={salesStat} />
-                        <Statistic salesStat={salesStat} />
+                        <Plot medsSalesStat={medsSalesStat} />
+                        <Statistic medsSalesStat={medsSalesStat} />
                     </Grid>
                     {/* <DrugsTable
                         headers={['qwer', 'qwer1', 'qwer2', 'qwer3']}

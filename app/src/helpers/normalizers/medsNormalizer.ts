@@ -27,7 +27,5 @@ export const medsNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
     data,
     defaultMedicine,
     valuesMap,
-    {
-        requiredProps: [ 'id', 'name' ]
-    }
-);
+    { requiredProps: [ 'id', 'name' ] }
+).sort((a, b) => a.id - b.id);
