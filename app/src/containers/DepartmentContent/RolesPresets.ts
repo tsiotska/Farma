@@ -17,35 +17,43 @@ import Medicines from '../Medicines';
 export interface IRoleContent {
     path: string;
     component: any;
+    title: string;
 }
 
+const sales = { title: 'Продажи', path: SALES_ROUTE, component: Sales };
+const marks = { title: 'Баллы', path: MARKS_ROUTE, component: Marks };
+const salary = { title: 'Заработная  плата', path: SALARY_ROUTE, component: Salary };
+const workers = { title: 'Сотрудники', path: WORKERS_ROUTE, component: Workers };
+const meds = { title: 'Препараты', path: MEDICINES_ROUTE, component: Medicines };
+const pharmacy = { title: 'ЛПУ/Аптеки', path: PHARMACY_ROUTE, component: Pharmacy };
+
 export const adminContent: IRoleContent[] = [
-    { path: SALES_ROUTE, component: Sales },
-    { path: MARKS_ROUTE, component: Marks },
-    { path: SALARY_ROUTE, component: Salary },
-    { path: WORKERS_ROUTE, component: Workers },
-    { path: MEDICINES_ROUTE, component: Medicines },
-    { path: PHARMACY_ROUTE, component: Pharmacy },
+    sales,
+    marks,
+    salary,
+    workers,
+    meds,
+    pharmacy,
 ];
 
 export const FFMContent: IRoleContent[] = [
-    { path: SALES_ROUTE, component: Sales },
-    { path: MARKS_ROUTE, component: Marks },
-    { path: SALARY_ROUTE, component: Salary },
-    { path: WORKERS_ROUTE, component: Workers },
-    { path: MEDICINES_ROUTE, component: Medicines },
-    { path: PHARMACY_ROUTE, component: Pharmacy },
+    sales,
+    marks,
+    salary,
+    workers,
+    meds,
+    pharmacy,
 ];
 
 export const RMContent: IRoleContent[] = [
-    { path: SALES_ROUTE, component: Sales },
-    { path: MARKS_ROUTE, component: Marks },
-    { path: WORKERS_ROUTE, component: Workers },
+    sales,
+    marks,
+    workers
 ];
 
 export const MAContent: IRoleContent[] = [
-    { path: SALES_ROUTE, component: Sales },
-    { path: MARKS_ROUTE, component: Marks },
-    { path: WORKERS_ROUTE, component: Workers },
-    { path: PHARMACY_ROUTE, component: Pharmacy },
+    sales,
+    marks,
+    workers,
+    pharmacy
 ];

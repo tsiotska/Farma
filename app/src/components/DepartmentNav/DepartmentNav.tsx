@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { NavLink, withRouter } from 'react-router-dom';
 import { match as Match } from 'react-router';
 import { SALES_ROUTE, MARKS_ROUTE, SALARY_ROUTE, WORKERS_ROUTE, MEDICINES_ROUTE, PHARMACY_ROUTE } from '../../constants/Router';
+import { IRoleContent, adminContent, FFMContent, RMContent, MAContent } from '../../containers/DepartmentContent/RolesPresets';
+import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -35,19 +37,30 @@ interface ILink {
 
 interface IProps extends WithStyles<typeof styles> {
     match?: Match<any>;
+    role?: string;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            role
+        }
+    }
+}) => ({
+    role
+}))
 @withRouter
 @observer
 class DepartmentNav extends Component<IProps> {
-    readonly links: ILink[] = [
-        { title: 'Продажи', pathname: SALES_ROUTE },
-        { title: 'Баллы', pathname: MARKS_ROUTE },
-        { title: 'Заработная  плата', pathname: SALARY_ROUTE },
-        { title: 'Сотрудники', pathname: WORKERS_ROUTE },
-        { title: 'Препараты', pathname: MEDICINES_ROUTE },
-        { title: 'ЛПУ/Аптеки', pathname: PHARMACY_ROUTE },
-    ];
+    get userLinks(): IRoleContent[] {
+        switch (this.props.role) {
+            case ADMIN: return adminContent;
+            case FIELD_FORCE_MANAGER: return FFMContent;
+            case REGIONAL_MANAGER: return RMContent;
+            case MEDICAL_AGENT: return MAContent;
+            default: return [];
+        }
+    }
 
     render() {
         const { classes } = this.props;
@@ -55,10 +68,10 @@ class DepartmentNav extends Component<IProps> {
         return (
             <Grid className={classes.root} alignItems='center' container>
                 {
-                    this.links.map(({ title, pathname }) => (
+                    this.userLinks.map(({ title, path }) => (
                         <NavLink
-                            key={pathname}
-                            to={pathname}
+                            key={path}
+                            to={path}
                             className={classes.link}
                             activeClassName={classes.active}>
                             { title }
