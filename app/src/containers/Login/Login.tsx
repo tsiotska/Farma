@@ -9,7 +9,8 @@ import {
     InputLabel,
     Input,
     Button,
-    Snackbar
+    Snackbar,
+    IconButton
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { observer, inject } from 'mobx-react';
@@ -20,6 +21,8 @@ import { Validator, emailValidator, lengthValidator } from '../../helpers/valida
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { Redirect } from 'react-router-dom';
 import { ROOT_ROUTE } from '../../constants/Router';
+import { Visibility } from '@material-ui/icons';
+// import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -43,6 +46,11 @@ const styles = (theme: any) => createStyles({
     },
     snackbar: {
         position: 'absolute'
+    },
+    iconButton: {
+        padding: 6,
+        borderRadius: 4,
+        color: theme.palette.primary.gray.light
     }
 });
 
@@ -71,6 +79,7 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class Login extends Component<IProps> {
     lengthValidator: Validator;
+    @observable showPassword: boolean = false;
     @observable openSnackbar: boolean = false;
     @observable credentials: IUserCredentials = {
         email: '',
@@ -136,6 +145,14 @@ class Login extends Component<IProps> {
         window.removeEventListener('keypress', this.enterPressHandler);
     }
 
+    visibilityFocusHandler = () => {
+        this.showPassword = true;
+    }
+
+    visibilityBlurHandler = () => {
+        this.showPassword = false;
+    }
+
     render() {
         const { classes, user, isUserLoading } = this.props;
 
@@ -167,7 +184,15 @@ class Login extends Component<IProps> {
                     <Input
                         onChange={this.changeHandler}
                         disableUnderline
-                        type='password' />
+                        type={this.showPassword ? 'text' : 'password'}
+                        endAdornment={
+                            <IconButton
+                                onMouseDown={this.visibilityFocusHandler}
+                                onMouseUp={this.visibilityBlurHandler}
+                                className={classes.iconButton}>
+                                <Visibility fontSize='small' />
+                            </IconButton>
+                        }/>
                     <FormHelperText></FormHelperText>
                 </FormControl>
 

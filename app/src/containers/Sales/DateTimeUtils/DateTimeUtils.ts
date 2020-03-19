@@ -1,5 +1,5 @@
 import DateFnsUtils from '@date-io/date-fns';
-import { ru } from 'date-fns/locale';
+import ru from 'date-fns/locale/ru';
 
 export const ruMonthsNames: string[] = [
     'январь',

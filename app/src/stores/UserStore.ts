@@ -72,14 +72,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const requestName = 'logout';
         const {
             api,
-            departmentsStore: { initializeStore: reInitDepartmentsStore  },
-            salesStore: { initializeStore: reInitSalesStore }
+            departmentsStore: { resetStore: resetDepartmentsStore  },
+            salesStore: { resetStore: resetSalesStore }
         } = this.rootStore;
 
         this.dispatchRequest(api.logout(), requestName);
         this.user = null;
-        reInitDepartmentsStore();
-        reInitSalesStore();
+        resetDepartmentsStore();
+        resetSalesStore();
     }
 
     @action.bound

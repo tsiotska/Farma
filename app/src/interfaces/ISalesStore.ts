@@ -1,6 +1,6 @@
 export interface ISalesStore {
     dateFrom: Date;
     dateTo: Date;
-    initializeStore: () => void;
+    resetStore: () => void;
     initMedsDisplayStatuses: () => void;
 }

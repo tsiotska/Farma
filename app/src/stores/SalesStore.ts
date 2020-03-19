@@ -26,8 +26,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
-        this.initializeStore();
-
+        this.resetStore();
         reaction(
             () => [this.rootStore.departmentsStore.currentDepartment, this.needSalesStat],
             async ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
@@ -50,7 +49,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
-    initializeStore() {
+    resetStore() {
         const currentDate = new Date(Date.now());
         this.dateTo = new Date(
             currentDate.getFullYear(),
@@ -121,7 +120,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (this.currentDepartmentId === -1) return;
 
         this.setLoading(requestName, this.currentDepartmentId);
-
         const url = this.getLoadStatUrl(this.currentDepartmentId);
         const res = await api.getSalesStat(url);
 

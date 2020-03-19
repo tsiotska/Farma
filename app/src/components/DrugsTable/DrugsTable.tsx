@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, TableContainer, Table, Paper, TableHead, TableBody, TableRow, TableCell, Typography, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import isEqual from 'lodash/isEqual';
 import { IMedicine } from '../../interfaces/IMedicine';
 import HeaderItem from './HeaderItem';
 

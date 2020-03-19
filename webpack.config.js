@@ -78,7 +78,6 @@ module.exports = {
     port: 9999
   },
   optimization: {
-    // minimize: true, // isProd
     minimize: isProd,
     minimizer: [
       new TerserPlugin({
@@ -136,18 +135,35 @@ module.exports = {
             before: [
               tsImportPluginFactory([
                 {
-                libraryName: '@material-ui/icons',
-                libraryDirectory: 'esm',
-                camel2DashComponentName: false
-              }, {
-                libraryName: '@material-ui/core',
-                libraryDirectory: 'esm',
-                camel2DashComponentName: false
-              }, {
-                libraryName: '@material-ui/lab',
-                libraryDirectory: 'esm',
-                camel2DashComponentName: false
-              }
+                  libraryName: '@material-ui/icons',
+                  libraryDirectory: 'esm',
+                  camel2DashComponentName: false
+                },
+                {
+                  camel2DashComponentName: false,
+                  libraryDirectory: "esm",
+                  libraryName: "@material-ui/core"
+                },
+                {
+                  camel2DashComponentName: false,
+                  libraryDirectory: "esm",
+                  libraryName: "@material-ui/core/styles"
+                },
+                {
+                  camel2DashComponentName: false,
+                  libraryDirectory: "esm",
+                  libraryName: "@material-ui/core/colors"
+                },
+                {
+                  libraryName: '@material-ui/lab',
+                  libraryDirectory: 'esm',
+                  camel2DashComponentName: false
+                },
+                {
+                  libraryName: 'date-fns',
+                  libraryDirectory: 'esm',
+                  camel2DashComponentName: false,
+                }
               ])
             ]
           }),
