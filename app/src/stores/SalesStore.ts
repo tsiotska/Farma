@@ -67,6 +67,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.displayMode = 'pack';
         this.medsSalesStat = [];
+        this.localeSalesStat = [];
         this.needSalesStat = false;
         this.currentDepartmentId = null;
         this.medsDisplayStatus = new Map();
@@ -145,6 +146,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const { api } = this.rootStore;
 
         if (this.currentDepartmentId === -1) return;
+
         this.setLoading(requestName, this.currentDepartmentId);
         const url = this.getLocaleSalesStatUrl(this.currentDepartmentId);
         const res = await api.getLocaleSalesStat(url);

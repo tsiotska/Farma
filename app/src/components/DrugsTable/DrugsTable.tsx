@@ -4,6 +4,9 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../interfaces/IMedicine';
 import HeaderItem from './HeaderItem';
+import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
+import Body from './Body';
+import { DisplayMode } from '../../stores/SalesStore';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -25,7 +28,6 @@ const styles = (theme: any) => createStyles({
         tableLayout: 'fixed'
     },
     container: {
-        // overflow: 'visible',
         overflowY: 'hidden',
         transition: '0.3s',
     },
@@ -38,9 +40,10 @@ interface IProps extends WithStyles<typeof styles> {
     salesHeaderHeight?: number;
     setSalesHeaderHeight?: (value: number) => void;
 
-    data?: any[][];
     meds?: Map<number, IMedicine>;
+    medsStat?: ILocaleSalesStat[];
     medsDisplayStatuses?: Map<number, boolean>;
+    displayMode?: DisplayMode;
 
     rowPrepend?: React.Component;
     rowAppend?: React.Component;
@@ -52,12 +55,16 @@ interface IProps extends WithStyles<typeof styles> {
     appState: {
         uiStore: {
             salesHeaderHeight,
-            setSalesHeaderHeight
+            setSalesHeaderHeight,
+        },
+        salesStore: {
+            displayMode
         }
     }
 }) => ({
     salesHeaderHeight,
-    setSalesHeaderHeight
+    setSalesHeaderHeight,
+    displayMode
 }))
 @observer
 class DrugsTable extends Component<IProps> {
@@ -105,8 +112,9 @@ class DrugsTable extends Component<IProps> {
             meds,
             headerAppend,
             headerPrepend,
-            data,
-            medsDisplayStatuses
+            medsDisplayStatuses,
+            medsStat,
+            displayMode
         } = this.props;
 
         return (
@@ -135,29 +143,12 @@ class DrugsTable extends Component<IProps> {
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.body}>
-                        {
-                            data.map((rowValues, ind) => {
-                                let total: number = 0;
-
-                                const cells = rowValues.map((value, i) => {
-                                    total += value;
-                                    return (
-                                        <TableCell key={`${i}${value}`} className={classes.cell}>
-                                            { value }
-                                        </TableCell>
-                                    );
-                                });
-
-                                return (
-                                    <TableRow key={ind} className={classes.tr}>
-                                        { cells }
-                                        <TableCell className={classes.cell}>
-                                            { total }
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })
-                        }
+                        <Body
+                            meds={meds}
+                            salesStat={medsStat}
+                            displayStatuses={medsDisplayStatuses}
+                            displayMode={displayMode}
+                        />
                     </TableBody>
                 </Table>
             </TableContainer>

@@ -18,6 +18,7 @@ import { ISalesStat } from '../interfaces/ISalesStat';
 import { mockSales } from './mock/mockSales';
 import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
 import { localeSalesStatNormalizer } from '../helpers/normalizers/localeSalesStatNormalizer';
+import { mockRegionSalesState } from './mock/mockRegionSalesStat';
 
 /**
  * Class representing API requester
@@ -129,6 +130,6 @@ export class APIRequester {
     getLocaleSalesStat(url: string): Promise<ILocaleSalesStat[]> {
         return this.instance.get(url)
         .then(localeSalesStatNormalizer)
-        .catch(this.defaultErrorHandler());
+        .catch(this.defaultErrorHandler(mockRegionSalesState));
     }
 }

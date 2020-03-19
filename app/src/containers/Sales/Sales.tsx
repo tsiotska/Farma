@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
+import { toJS } from 'mobx';
 import { withStyles } from '@material-ui/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DrugsTable from '../../components/DrugsTable';
@@ -11,6 +12,7 @@ import DateTimeUtils from './DateTimeUtils';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { ISalesStat } from '../../interfaces/ISalesStat';
 import { IMedicine } from '../../interfaces/IMedicine';
+import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,6 +39,7 @@ interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
     medsSalesStat?: ISalesStat[];
+    localeSalesStat?: ILocaleSalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
@@ -50,7 +53,8 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             setSalesStatDemand,
             medsSalesStat,
-            medsDisplayStatus
+            medsDisplayStatus,
+            localeSalesStat
         },
         departmentsStore: {
             meds
@@ -61,7 +65,8 @@ interface IProps extends WithStyles<typeof styles> {
     setSalesStatDemand,
     medsSalesStat,
     medsDisplayStatus,
-    meds
+    meds,
+    localeSalesStat
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -78,7 +83,8 @@ class Sales extends Component<IProps> {
             classes,
             medsSalesStat,
             meds,
-            medsDisplayStatus
+            medsDisplayStatus,
+            localeSalesStat
         } = this.props;
 
         return (
@@ -91,7 +97,7 @@ class Sales extends Component<IProps> {
                     <DrugsTable
                         meds={meds}
                         medsDisplayStatuses={medsDisplayStatus}
-                        data={[]}
+                        medsStat={localeSalesStat}
                     />
                     <DateRangeModal />
                 </Grid>

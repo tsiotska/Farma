@@ -1,41 +1,39 @@
-import { objectArrayNormalizer, IValuesMap } from './normalizer';
+import { objectArrayNormalizer, IValuesMap, IOptions } from './normalizer';
 import { ILocaleSalesStat, IMedSalesStat } from '../../interfaces/ILocaleSalesStat';
 
-const defaultLocaleSalesStat: ILocaleSalesStat = {
-    id: null, // regionId, LPUId, etc
-    stat: []
-};
+export const localeSalesStatNormalizer = ({ data: { data }}: any) => {
+    const normalizerOptions: IOptions<IMedSalesStat> = { requiredProps: [ 'drug' ] };
+    const defaultMedSalesStat: IMedSalesStat = {
+        medId: null,
+        money: null,
+        amount: null
+    };
+    const medsStatValuesMap: IValuesMap = {
+        drug: 'medId',
+        money: 'money',
+        amount: 'amount'
+    };
 
-const localesStatValuesMap: IValuesMap = {
-    region: 'id',
-    stat: 'stat'
-};
+    const res: ILocaleSalesStat[] = [];
 
-const defaultMedSalesStat: IMedSalesStat = {
-    medId: null,
-    money: null,
-    amount: null
-};
+    for (const regionId in data) {
+        const id = +regionId;
 
-const medsStatValuesMap: IValuesMap = {
-    medId: 'medId',
-    money: 'money',
-    amount: 'amount'
-};
+        if (!Number.isInteger(id)) continue;
 
-export const localeSalesStatNormalizer = ({ data: { data }}: any): ILocaleSalesStat[] => objectArrayNormalizer(
-    data,
-    defaultLocaleSalesStat,
-    localesStatValuesMap,
-    {
-        requiredProps: [ 'region', 'stat' ],
-        valueNormalizers: {
-            stat: (statArray: any[]): IMedSalesStat[] => objectArrayNormalizer(
-                statArray,
-                defaultMedSalesStat,
-                medsStatValuesMap,
-                { requiredProps: [ 'medId' ] }
-            ).sort((a, b) => a.medId - b.medId)
-        }
+        const periodsStat = data[id];
+        const stat = objectArrayNormalizer(
+            periodsStat,
+            defaultMedSalesStat,
+            medsStatValuesMap,
+            normalizerOptions
+        );
+
+        res.push({
+            id,
+            stat
+        });
     }
-);
+
+    return res;
+};
