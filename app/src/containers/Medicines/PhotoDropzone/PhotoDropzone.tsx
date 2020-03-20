@@ -9,7 +9,7 @@ import DropzoneContent from '../DropzoneContent';
 const styles = (theme: any) => createStyles({
     section: {
         minHeight: 300,
-        border: `1px dashed ${theme.palette.primary.blue}`,
+        border: `1px dashed ${theme.palette.primary.lightBlue}`,
         margin: '26px 0',
         display: 'flex',
         position: 'relative',

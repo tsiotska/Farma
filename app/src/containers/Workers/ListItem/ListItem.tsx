@@ -24,11 +24,17 @@ import { IPosition } from '../../../interfaces/IPosition';
 const styles = (theme: any) => createStyles({
     root: {
         width: '100%',
-        // cursor: 'crosshair',
         marginBottom: theme.spacing(2),
         '&:before': {
             content: 'none'
         },
+        '& p': {
+            cursor: 'text !important',
+            userSelect: 'all',
+            paddingLeft: 5,
+            textOverflow: 'ellipsis',
+            overflow: 'hidden'
+        }
     },
     expanded: {
         marginTop: '0 !important'
@@ -53,11 +59,14 @@ const styles = (theme: any) => createStyles({
     summaryRoot: {
         cursor: ({ children }: any) => children ? 'initial' : 'default !important',
         padding: 0,
-        minHeight: '0px !important',
+        // minHeight: '0px !important',
         border: '1px solid #ddd',
     },
     iconButton: {
         borderRadius: 2
+    },
+    gridItem: {
+        overflow: 'hidden'
     }
 });
 
@@ -79,8 +88,9 @@ class ListItem extends Component<IProps> {
     }
 
     get region(): string {
-        const { region } = this.props;
-        return region ? region.name : '-';
+        // const { region } = this.props;
+        // return region ? region.name : '-';
+        return '-';
     }
 
     get date(): string {
@@ -90,17 +100,17 @@ class ListItem extends Component<IProps> {
         } = this.props;
 
         const emptyPlaceholder = isFired
-        ? '...'
-        : '-';
+            ? '...'
+            : '-';
 
         const from = isValid(hired)
-        ? format(hired, this.dateFormat, { locale: ru })
-        : emptyPlaceholder;
+            ? format(hired, this.dateFormat, { locale: ru })
+            : emptyPlaceholder;
 
         if (isFired) {
             const to = isValid(fired)
-            ? format(fired, this.dateFormat, { locale: ru })
-            : emptyPlaceholder;
+                ? format(fired, this.dateFormat, { locale: ru })
+                : emptyPlaceholder;
 
             return `${from} - ${to}`;
         }
@@ -124,7 +134,8 @@ class ListItem extends Component<IProps> {
                 hired,
                 email,
                 phone,
-                card
+                card,
+                isVacancy
             }
         } = this.props;
 
@@ -137,59 +148,67 @@ class ListItem extends Component<IProps> {
                     expanded: classes.expanded
                 }}>
                 <ExpansionPanelSummary
-                    expandIcon={<KeyboardArrowDown fontSize='small' />}
+                    expandIcon={fired === false && <KeyboardArrowDown fontSize='small' />}
                     classes={{
                         content: classes.summaryContent,
                         root: classes.summaryRoot,
                         expandIcon: classes.expandIcon
                     }}>
-                    <Grid xs={3} wrap='nowrap' zeroMinWidth container item>
+                    <Grid xs={3} className={classes.gridItem} wrap='nowrap' zeroMinWidth container item>
                         <ImageLoader
                             className={classes.avatar}
                             component={Avatar}
                             src={avatar}
                         />
                         <Typography variant='body2'>
-                            { name }
+                            {name}
                         </Typography>
                     </Grid>
-                    <Grid xs container item>
+                    <Grid xs className={classes.gridItem} container zeroMinWidth item>
                         <Typography variant='body2'>
-                            { fired ? this.region : this.position }
+                            {fired ? this.region : this.position}
                         </Typography>
                     </Grid>
-                    <Grid xs={fired ? 2 : true} container item>
+                    <Grid xs={fired ? 2 : true} className={classes.gridItem} zeroMinWidth container item>
                         <Typography variant='body2'>
-                            { this.date }
+                            {this.date}
                         </Typography>
                     </Grid>
-                    <Grid xs container item>
+                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
                         <Typography variant='body2'>
-                            { email }
+                            {email}
                         </Typography>
                     </Grid>
-                    <Grid xs container item>
+                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
                         <Typography variant='body2'>
-                            { phone }
+                            {phone}
                         </Typography>
                     </Grid>
-                    <Grid xs container item>
+                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
                         <Typography variant='body2'>
-                            { card }
+                            {card}
                         </Typography>
                     </Grid>
 
-                    <IconButton className={classes.iconButton}>
-                        <NotInterested fontSize='small' />
-                    </IconButton>
-                    <IconButton className={classes.iconButton}>
-                        <Edit fontSize='small' />
-                    </IconButton>
+                    {
+                        fired === false &&
+                        <>
+                            {
+                                isVacancy === false &&
+                                <IconButton className={classes.iconButton}>
+                                    <NotInterested fontSize='small' />
+                                </IconButton>
+                            }
+                            <IconButton className={classes.iconButton}>
+                                <Edit fontSize='small' />
+                            </IconButton>
+                        </>
+                    }
                 </ExpansionPanelSummary>
                 {
                     children &&
                     <ExpansionPanelDetails>
-                        { children }
+                        {children}
                     </ExpansionPanelDetails>
                 }
             </ExpansionPanel>

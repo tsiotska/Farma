@@ -29,20 +29,17 @@ const valuesMap: IValuesMap = {
     vacancy: 'isVacancy'
 };
 
-export const workersNormalizer = ({ data: { data }}: any): IWorker[] => {
-    console.log('data: ', data);
-    return objectArrayNormalizer(
-        data,
-        defaultWorker,
-        valuesMap,
-        {
-            requiredProps: [ 'id' ],
-            valueNormalizers: {
-                fired: (value: string) => new Date(value),
-                hired: (value: string) =>  new Date(value),
-                created: (value: string) =>  new Date(value),
-                isVacancy: (value: any) => !!value
-            }
+export const workersNormalizer = ({ data: { data }}: any): IWorker[] => objectArrayNormalizer(
+    data,
+    defaultWorker,
+    valuesMap,
+    {
+        requiredProps: [ 'id' ],
+        valueNormalizers: {
+            fired: (value: string) => new Date(value),
+            hired: (value: string) =>  new Date(value),
+            created: (value: string) =>  new Date(value),
+            isVacancy: (value: any) => !!value
         }
-    );
-};
+    }
+);

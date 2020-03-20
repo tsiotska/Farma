@@ -7,13 +7,13 @@ import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     button: {
-        borderColor: theme.palette.primary.blue,
+        borderColor: theme.palette.primary.lightBlue,
         '&.white': {
             color: theme.palette.primary.white,
-            backgroundColor: theme.palette.primary.blue
+            backgroundColor: theme.palette.primary.lightBlue
         },
         '&.black': {
-            color: theme.palette.primary.blue
+            color: theme.palette.primary.lightBlue
         }
     },
     helperText: {
