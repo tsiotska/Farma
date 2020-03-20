@@ -45,6 +45,8 @@ interface IProps extends WithStyles<typeof styles> {
     medsDisplayStatuses?: Map<number, boolean>;
     displayMode?: DisplayMode;
 
+    rowStartAddornment?: React.Component;
+    rowEndAddornment?: React.Component;
     rowPrepend?: React.Component;
     rowAppend?: React.Component;
     headerPrepend?: React.Component;
@@ -70,6 +72,11 @@ interface IProps extends WithStyles<typeof styles> {
 class DrugsTable extends Component<IProps> {
     readonly headerHeight: number = 20;
     headerRefs: any = {};
+
+    get medsArray(): IMedicine[] {
+        return [...this.props.meds.values()]
+        .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
+    }
 
     get marginTop(): number {
         return this.props.salesHeaderHeight || this.headerHeight;
@@ -125,8 +132,7 @@ class DrugsTable extends Component<IProps> {
                             { headerPrepend }
 
                             {
-                                [...meds.values()].map(medicine =>
-                                    medsDisplayStatuses.get(medicine.id) &&
+                                this.medsArray.map(medicine =>
                                     <TableCell key={medicine.id} className={classes.thCell}>
                                         <Grid container>
                                             <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
@@ -135,9 +141,12 @@ class DrugsTable extends Component<IProps> {
                                 )
                             }
 
-                            <TableCell className={classes.thCell}>
-                                total
-                            </TableCell>
+                            {
+                                !!this.medsArray.length &&
+                                <TableCell className={classes.thCell}>
+                                    total
+                                </TableCell>
+                            }
 
                             { headerAppend }
                         </TableRow>

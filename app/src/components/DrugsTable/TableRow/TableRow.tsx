@@ -13,39 +13,52 @@ interface IProps extends WithStyles<typeof styles> {
     medsIds: number[];
     medStat: IMedSalesStat[];
     targetProperty: 'amount' | 'money';
+    rowEndAddornment?: (data: number[]) => number | string;
 }
 
 @observer
 class TableRow extends Component<IProps> {
-    readonly defaultValue: string = '-';
+    get data(): number[] {
+        const { medsIds, medStat, targetProperty } = this.props;
+        const ids = medStat.map(x => x.medId);
 
-    get statIds(): number[] {
-        return this.props.medStat.map(x => x.medId);
+        let i: number = 0;
+        return medsIds.map(x => {
+            const ind = ids.indexOf(x, i);
+
+            if (ind !== -1) i = ind;
+
+            const value = ind === -1
+                ? null
+                : medStat[ind][targetProperty];
+
+            return value;
+        });
     }
 
     render() {
-        const {
-            medsIds,
-            classes,
-            medStat,
-            targetProperty
-        } = this.props;
+        const { classes, rowEndAddornment, medStat, medsIds } = this.props;
 
-        let i: number = 0;
+        if (!this.data.length) return null;
+
         return (
             <MuiTableRow className={classes.row}>
                 {
-                    medsIds.map(x => {
-                        const value = this.statIds.includes(x , i)
-                        ? medStat[i][targetProperty]
-                        : this.defaultValue;
-
-                        if (value !== this.defaultValue) ++i;
-
-                        return  <TableCell key={x} className={classes.cell}>
-                            { value }
-                        </TableCell>;
-                    })
+                    this.data.map((x, i) => (
+                        <TableCell key={i} className={classes.cell}>
+                            {
+                                x === null
+                                    ? '-'
+                                    : x
+                            }
+                        </TableCell>
+                    ))
+                }
+                {
+                    rowEndAddornment &&
+                    <TableCell className={classes.cell}>
+                        { rowEndAddornment(this.data) }
+                    </TableCell>
                 }
             </MuiTableRow>
         );
