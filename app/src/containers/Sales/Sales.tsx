@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { toJS } from 'mobx';
 import { withStyles } from '@material-ui/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DrugsTable from '../../components/DrugsTable';

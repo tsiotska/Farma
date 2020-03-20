@@ -1,3 +1,4 @@
+import { workersNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
 import { salesNormalizer } from './../helpers/normalizers/salesNormalizer';
 import { ILPU } from './../interfaces/ILPU';
@@ -19,6 +20,7 @@ import { mockSales } from './mock/mockSales';
 import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
 import { localeSalesStatNormalizer } from '../helpers/normalizers/localeSalesStatNormalizer';
 import { mockRegionSalesState } from './mock/mockRegionSalesStat';
+import { IWorker } from '../interfaces/IWorker';
 
 /**
  * Class representing API requester
@@ -131,5 +133,11 @@ export class APIRequester {
         return this.instance.get(url)
         .then(localeSalesStatNormalizer)
         .catch(this.defaultErrorHandler(mockRegionSalesState));
+    }
+
+    getWorkers(url: string): Promise<IWorker[]> {
+        return this.instance.get(url)
+        .then(workersNormalizer)
+        .catch(this.defaultErrorHandler());
     }
 }

@@ -8,6 +8,8 @@ import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import Config from '../../Config';
 import { getRandomColor } from '../helpers/getRandomColor';
+import { IWorker } from '../interfaces/IWorker';
+import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../constants/Roles';
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
@@ -17,6 +19,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
     @observable medicalDepartments: Map<number, ILPU> = new Map();
+    @observable workers: IWorker[] = [];
+    @observable firedWorkers: IWorker[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
@@ -35,6 +39,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     resetStore() {
         this.meds = new Map();
+        this.workers = [];
+        this.firedWorkers = [];
     }
 
     @action.bound
@@ -44,6 +50,32 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         } else {
             this.currentDepartment = department;
         }
+    }
+
+    @action.bound
+    async loadWorkers() {
+        const requestName = 'loadWorkers';
+        const { api } = this.rootStore;
+
+        const url = this.getWorkersApiUrl();
+        if (url === null) return;
+
+        const res = await this.dispatchRequest(api.getWorkers(url), requestName);
+        console.log('loaded workers: ', res);
+        if (res) this.workers = res;
+    }
+
+    @action.bound
+    async loadFiredWorkers() {
+        const requestName = 'loadFiredWorkers';
+        const { api } = this.rootStore;
+
+        const url = this.getWorkersApiUrl(true);
+        if (url === null) return;
+
+        const res = await this.dispatchRequest(api.getWorkers(url), requestName);
+
+        if (res) this.firedWorkers = res;
     }
 
     @action.bound
@@ -139,6 +171,32 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (newRetryCount) {
             this.setRetryCount(requestName, newRetryCount);
             setTimeout(requestMethod, Config.RETRY_INTERVAL);
+        }
+    }
+
+    private getWorkersApiUrl(fired?: boolean): string {
+        const { userStore: { user, role } } = this.rootStore;
+
+        const userId = user
+        ? user.id
+        : null;
+
+        const departmentId = this.currentDepartment
+        ? this.currentDepartment.id
+        : null;
+
+        const queryParam = fired
+        ? '?fired=1'
+        : '';
+
+        if (userId === null || departmentId === null) return null;
+
+        switch (role) {
+            case ADMIN: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
+            case FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
+            case REGIONAL_MANAGER: return `api/branch/${this.currentDepartment.id}/rm/${userId}/worker${queryParam}`;
+            case MEDICAL_AGENT: return `api/branch/${this.currentDepartment.id}/mp/${userId}/worker${queryParam}`;
+            default: return null;
         }
     }
 }

@@ -214,9 +214,9 @@ class Plot extends Component<IProps> {
 
     getMonthLabels = (): string[] => differenceInCalendarMonths(this.props.dateFrom, this.props.dateTo) <= 12
     ? this.eachIntervalDay.map(day => lightFormat(day, 'MM'))
-    : this.eachIntervalDay.map(day => lightFormat(day, 'MM.YYYY'))
+    : this.eachIntervalDay.map(day => lightFormat(day, 'MM.yyyy'))
 
-    getYearLabels = (): string[] => this.eachIntervalDay.map(day => lightFormat(day, 'YYYY'));
+    getYearLabels = (): string[] => this.eachIntervalDay.map(day => lightFormat(day, 'yyyy'));
 
     titleRenderer = (tooltips: any[]) => {
         const initialLabel = tooltips[0].label;

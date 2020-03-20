@@ -13,6 +13,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles>, ImgHTMLAttributes<HTMLImageElement> {
     className: string;
     loadPlaceholder?: JSX.Element;
+    component?: any;
 }
 
 @observer
@@ -28,15 +29,24 @@ class ImageLoader extends Component<IProps> {
             className,
             loadPlaceholder,
             classes,
+            component: CustomComponent,
             ...imageProps
         } = this.props;
 
         return <>
-            <img
-                className={cx(className, { [classes.invisible]: !this.imageLoaded })}
-                onLoad={this.imageLoadHandler}
-                {...imageProps}
-            />
+            {
+                CustomComponent
+                ? <CustomComponent
+                    className={cx(className, { [classes.invisible]: !this.imageLoaded })}
+                    onLoad={this.imageLoadHandler}
+                    {...imageProps}
+                  />
+                : <img
+                    className={cx(className, { [classes.invisible]: !this.imageLoaded })}
+                    onLoad={this.imageLoadHandler}
+                    {...imageProps}
+                  />
+            }
             {
                 (!this.imageLoaded && loadPlaceholder)
                 ? loadPlaceholder
