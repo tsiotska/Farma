@@ -21,6 +21,8 @@ import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
 import { localeSalesStatNormalizer } from '../helpers/normalizers/localeSalesStatNormalizer';
 import { mockRegionSalesState } from './mock/mockRegionSalesStat';
 import { IWorker } from '../interfaces/IWorker';
+import { IRegion } from '../interfaces/IRegion';
+import { regionNormalizer } from '../helpers/normalizers/regionNormalizer';
 
 /**
  * Class representing API requester
@@ -30,7 +32,7 @@ export class APIRequester {
     protected instance: AxiosInstance;
     constructor() {
         this.instance = axios.create({
-            baseURL: Config.API_URL,
+            baseURL: Config.API_URL.trim(),
             withCredentials: true
         });
     }
@@ -40,16 +42,21 @@ export class APIRequester {
         return response;
     }
 
-    login(credentials: IUserCredentials): Promise<boolean> {
-        return this.instance.post('/api/signin', credentials)
-        .then(() => true)
-        .catch(this.defaultErrorHandler(false));
+    login({ email, password }: IUserCredentials): Promise<boolean> {
+        const preparedCredentials: IUserCredentials = {
+            email: email.trim(),
+            password: password.trim()
+        };
+
+        return this.instance.post('/api/signin', preparedCredentials)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
     }
 
     logout(): Promise<any> {
         return this.instance.delete('/api/signout')
-        .then(() => true)
-        .catch(this.defaultErrorHandler(false));
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
     }
 
     getBranches(): Promise<IDepartment[]> {
@@ -66,9 +73,9 @@ export class APIRequester {
             },
         ];
 
-        return this.instance.get('api/branch')
-        .then(branchesNormalizer)
-        .catch(this.defaultErrorHandler(mockDepartments));
+        return this.instance.get('/api/branch')
+            .then(branchesNormalizer)
+            .catch(this.defaultErrorHandler(mockDepartments));
     }
 
     getUser(): Promise<IUser> {
@@ -85,15 +92,15 @@ export class APIRequester {
         };
 
         return this.instance.get('api/profile')
-        .then(userNormalizer)
-        .catch(this.defaultErrorHandler());
+            .then(userNormalizer)
+            .catch(this.defaultErrorHandler());
         // .catch(this.defaultErrorHandler(mockUser));
     }
 
     getMeds(departmentId: number): Promise<IMedicine[]> {
         return this.instance.get(`api/branch/${departmentId}/drug`)
-        .then(medsNormalizer)
-        .catch(this.defaultErrorHandler(mockDrugs));
+            .then(medsNormalizer)
+            .catch(this.defaultErrorHandler(mockDrugs));
     }
 
     getPositions(): Promise<IPosition[]> {
@@ -106,8 +113,8 @@ export class APIRequester {
         ];
 
         return this.instance.get('api/position')
-        .then(positionsNormalizer)
-        .catch(this.defaultErrorHandler(mockPositions));
+            .then(positionsNormalizer)
+            .catch(this.defaultErrorHandler(mockPositions));
     }
 
     getMedicalDepartments(): Promise<ILPU[]> {
@@ -119,25 +126,31 @@ export class APIRequester {
         ];
 
         return this.instance.get('api/lpu')
-        .then(lpuNormalizer)
-        .catch(this.defaultErrorHandler(mockMedicalDepartments));
+            .then(lpuNormalizer)
+            .catch(this.defaultErrorHandler(mockMedicalDepartments));
     }
 
     getSalesStat(url: string): Promise<ISalesStat[]> {
         return this.instance.get(url)
-        .then(salesNormalizer)
-        .catch(this.defaultErrorHandler(mockSales));
+            .then(salesNormalizer)
+            .catch(this.defaultErrorHandler(mockSales));
     }
 
     getLocaleSalesStat(url: string): Promise<ILocaleSalesStat[]> {
         return this.instance.get(url)
-        .then(localeSalesStatNormalizer)
-        .catch(this.defaultErrorHandler(mockRegionSalesState));
+            .then(localeSalesStatNormalizer)
+            .catch(this.defaultErrorHandler(mockRegionSalesState));
     }
 
     getWorkers(url: string): Promise<IWorker[]> {
         return this.instance.get(url)
-        .then(workersNormalizer)
-        .catch(this.defaultErrorHandler());
+            .then(workersNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getRegions(): Promise<IRegion[]> {
+        return this.instance.get('api/region')
+            .then(regionNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 }

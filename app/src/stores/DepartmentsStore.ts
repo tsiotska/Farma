@@ -1,4 +1,4 @@
-import { observable, action, reaction } from 'mobx';
+import { observable, action, reaction, toJS } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -10,6 +10,7 @@ import Config from '../../Config';
 import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
 import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../constants/Roles';
+import { IRegion } from '../interfaces/IRegion';
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
@@ -21,6 +22,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable medicalDepartments: Map<number, ILPU> = new Map();
     @observable workers: IWorker[] = [];
     @observable firedWorkers: IWorker[] = [];
+    @observable regions: Map<number, IRegion> = new Map();
 
     constructor(rootStore: IRootStore) {
         super();
@@ -32,6 +34,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     initializeStore() {
         this.loadDepartments();
+        this.loadRegions(true);
         this.loadPositions(true);
         this.loadMedicalDepartments(true);
     }
@@ -61,7 +64,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (url === null) return;
 
         const res = await this.dispatchRequest(api.getWorkers(url), requestName);
-        console.log('loaded workers: ', res);
+
         if (res) this.workers = res;
     }
 
@@ -107,7 +110,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res) {
             const mapped: Array<[number, IMedicine]> = res.map(x => (
-                [ x.id, { ...x, color: getRandomColor() } ]
+                [x.id, { ...x, color: getRandomColor() }]
             ));
             this.meds = new Map(mapped);
             initMedsDisplayStatuses();
@@ -127,7 +130,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (res) {
-            const mapped: Array<[number, IPosition]> = res.map(x => ([ x.id, x ]));
+            const mapped: Array<[number, IPosition]> = res.map(x => ([x.id, x]));
             this.positions = new Map(mapped);
             return;
         }
@@ -157,6 +160,27 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadRegions(isInitial: boolean = false) {
+        const requestName = 'loadRegions';
+        const { api } = this.rootStore;
+
+        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
+
+        const res = await this.dispatchRequest(
+            api.getRegions(),
+            requestName
+        );
+
+        if (res) {
+            const mapped: Array<[number, IRegion]> = res.map(x => ([ x.id, x ]));
+            this.regions = new Map(mapped);
+            return;
+        }
+
+        this.retryPolicy(this.loadRegions, requestName);
+    }
+
+    @action.bound
     async loadDoctors() {
         console.log('load doctors');
     }
@@ -165,8 +189,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const currentRetryCount = this.getRetryCount(requestName);
 
         const newRetryCount = currentRetryCount > 1
-        ? currentRetryCount - 1
-        : 0;
+            ? currentRetryCount - 1
+            : 0;
 
         if (newRetryCount) {
             this.setRetryCount(requestName, newRetryCount);
@@ -178,16 +202,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { userStore: { user, role } } = this.rootStore;
 
         const userId = user
-        ? user.id
-        : null;
+            ? user.id
+            : null;
 
         const departmentId = this.currentDepartment
-        ? this.currentDepartment.id
-        : null;
+            ? this.currentDepartment.id
+            : null;
 
         const queryParam = fired
-        ? '?fired=1'
-        : '';
+            ? '?fired=1'
+            : '';
 
         if (userId === null || departmentId === null) return null;
 

@@ -9,14 +9,18 @@ import { IPosition } from '../../../interfaces/IPosition';
 const styles = (theme: any) => createStyles({
     header: {
         color: theme.palette.primary.gray.light,
-        margin: '20px 0 10px',
-        paddingLeft: ({ fired }: any) => fired ? 0 : 34,
+        margin: '24px 0 10px',
+        paddingLeft: ({ fired }: any) => fired
+            ? 0
+            : 34,
         '& > *:last-of-type': {
-            marginRight: ({ fired }: any) => fired ? 0 : 88
+            marginRight: ({ fired }: any) => fired
+                ? 0
+                : 90
         },
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
-            paddingRight: 5,
+            paddingLeft: 5,
             textOverflow: 'ellipsis',
             overflow: 'hidden'
         }
@@ -54,8 +58,8 @@ class List extends Component<IProps> {
                         <Typography variant='body2'>
                             {
                                 fired
-                                ? 'Регион'
-                                : 'Должность'
+                                    ? 'Регион'
+                                    : 'Должность'
                             }
                         </Typography>
                     </Grid>
@@ -66,8 +70,8 @@ class List extends Component<IProps> {
                         <Typography variant='body2'>
                             {
                                 fired
-                                ? 'Начало-завершение роботы'
-                                : 'Начало роботы'
+                                    ? 'Начало-завершение роботы'
+                                    : 'Начало роботы'
                             }
 
                         </Typography>

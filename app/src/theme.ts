@@ -29,7 +29,8 @@ const palette = {
     green: {
         main: '#25d174'
     },
-    blue: '#2196F3',
+    lightBlue: '#2196F3',
+    blue: '#647CFE',
     error: 'red'
 };
 
@@ -119,7 +120,7 @@ const theme = createMuiTheme({
             // usually this is submit button
             containedPrimary: {
                 color: palette.white,
-                backgroundColor: palette.blue,
+                backgroundColor: palette.lightBlue,
                 '&:hover': {
                     backgroundColor: '#1d8ce4',
                 }

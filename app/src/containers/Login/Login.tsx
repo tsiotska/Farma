@@ -22,7 +22,6 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { Redirect } from 'react-router-dom';
 import { ROOT_ROUTE } from '../../constants/Router';
 import { Visibility } from '@material-ui/icons';
-// import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const styles = (theme: any) => createStyles({
     root: {

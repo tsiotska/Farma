@@ -16,7 +16,7 @@ const styles = (theme: any) => createStyles({
     },
     submitButton: {
         marginLeft: 'auto',
-        color: theme.palette.primary.blue
+        color: theme.palette.primary.lightBlue
     }
 });
 

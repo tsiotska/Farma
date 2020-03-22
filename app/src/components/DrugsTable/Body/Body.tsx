@@ -19,6 +19,11 @@ class Body extends Component<IProps> {
         .filter(x => this.props.displayStatuses.get(x) === true);
     }
 
+    endAddornment = (data: number[]) => data.reduce(
+            (total, current) => total + current,
+            0
+        )
+
     render() {
         const { salesStat, displayMode } = this.props;
 
@@ -32,6 +37,7 @@ class Body extends Component<IProps> {
                 medsIds={this.medsIds}
                 medStat={stat.stat}
                 targetProperty={targetProperty}
+                rowEndAddornment={this.endAddornment}
             />
         ));
     }
