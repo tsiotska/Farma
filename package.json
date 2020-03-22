@@ -9,7 +9,7 @@
     "start-dev": "NODE_ENV=production webpack-dev-server -p --open",
     "start": "NODE_ENV=development API_URL=http://167.172.37.102:8001/ webpack-dev-server --open ",
     "dev-server": "webpack-dev-server --open",
-    "build": " NODE_ENV=production API_URL=http://admiral-api-stg.valarcloud.com/ webpack -p",
+    "build": " NODE_ENV=production API_URL=http://167.172.37.102:8001/ webpack -p",
     "test": "jest --no-cache",
     "test-w": "jest --watch --no-cache",
     "tslint": "node_modules/tslint/bin/tslint 'app/**/*.ts*'",
