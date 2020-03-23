@@ -11,6 +11,7 @@ import { IPosition } from '../../interfaces/IPosition';
 import { IWorker } from '../../interfaces/IWorker';
 import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
+import { FIELD_FORCE_MANAGER } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -36,6 +37,7 @@ interface IProps extends WithStyles<typeof styles> {
     workers?: IWorker[];
     firedWorkers?: IWorker[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    role?: string;
 }
 
 type TabValue = 'all' | 'fired';
@@ -51,6 +53,9 @@ type TabValue = 'all' | 'fired';
             firedWorkers,
             getAsyncStatus
         },
+        userStore: {
+            role
+        }
     }
 }) => ({
     currentDepartment,
@@ -59,12 +64,17 @@ type TabValue = 'all' | 'fired';
     positions,
     workers,
     firedWorkers,
-    getAsyncStatus
+    getAsyncStatus,
+    role
 }))
 @withRouter
 @observer
 class Workers extends Component<IProps> {
     @observable tab: TabValue = 'all';
+
+    get isFFM(): boolean {
+        return this.props.role === FIELD_FORCE_MANAGER;
+    }
 
     loadData = () => {
         const { loadWorkers, loadFiredWorkers } = this.props;
@@ -110,7 +120,7 @@ class Workers extends Component<IProps> {
         const { history: { location: { search } } } = this.props;
         const queryParams = parse(search);
 
-        this.tab = 'fired' in queryParams
+        this.tab = ('fired' in queryParams && this.isFFM)
             ? 'fired'
             : 'all';
 
@@ -118,28 +128,37 @@ class Workers extends Component<IProps> {
     }
 
     render() {
-        const { classes, workers, firedWorkers, positions } = this.props;
+        const {
+            classes,
+            workers,
+            firedWorkers,
+            positions
+        } = this.props;
 
         return (
             <Grid direction='column' container>
-                <Tabs
-                    classes={{
-                        root: classes.tabs,
-                        indicator: classes.indicator
-                    }}
-                    onChange={this.tabChangeHandler}
-                    value={this.tab}>
-                    <Tab className={classes.tab} value='all' label='Сотрудники' />
-                    <Tab className={classes.tab} value='fired' label='Уволеные сотрудники' />
-                </Tabs>
+                {
+                    this.isFFM &&
+                    <Tabs
+                        classes={{
+                            root: classes.tabs,
+                            indicator: classes.indicator
+                        }}
+                        onChange={this.tabChangeHandler}
+                        value={this.tab}>
+                        <Tab className={classes.tab} value='all' label='Сотрудники' />
+                        <Tab className={classes.tab} value='fired' label='Уволеные сотрудники' />
+                    </Tabs>
+                }
                 <List
                     positions={positions}
                     workers={
-                        this.tab === 'fired'
+                        this.tab === (this.isFFM && 'fired')
                             ? firedWorkers
                             : workers
                     }
-                    fired={this.tab === 'fired'}
+                    fired={this.isFFM && this.tab === 'fired'}
+                    expandable={this.isFFM && this.tab === 'all'}
                 />
             </Grid>
         );

@@ -1,5 +1,17 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, TableContainer, Table, Paper, TableHead, TableBody, TableRow, TableCell, Typography, Grid } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    TableContainer,
+    Table,
+    Paper,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Grid,
+    LinearProgress
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../interfaces/IMedicine';
@@ -7,14 +19,29 @@ import HeaderItem from './HeaderItem';
 import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
+import { IAsyncStatus } from '../../stores/AsyncStore';
+import { toJS } from 'mobx';
+import { IRegion } from '../../interfaces/IRegion';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     td: {},
     th: {},
-    thRow: {},
+    thRow: {
+    },
     thCell: {
+        height: 48,
+        '&:first-of-type': {
+            paddingLeft: 5,
+            [theme.breakpoints.up('md')]: {
+                width: 220,
+            }
+        },
         '&:last-of-type': {
-            width: 100
+            width: 100,
+        },
+        '&.alignBottom': {
+            verticalAlign: 'bottom'
         }
     },
     tr: {},
@@ -33,7 +60,8 @@ const styles = (theme: any) => createStyles({
     },
     prepend: {},
     append: {},
-    body: {}
+    body: {},
+
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -44,6 +72,8 @@ interface IProps extends WithStyles<typeof styles> {
     medsStat?: ILocaleSalesStat[];
     medsDisplayStatuses?: Map<number, boolean>;
     displayMode?: DisplayMode;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
+    regions?: Map<number, IRegion>;
 
     rowStartAddornment?: React.Component;
     rowEndAddornment?: React.Component;
@@ -60,22 +90,35 @@ interface IProps extends WithStyles<typeof styles> {
             setSalesHeaderHeight,
         },
         salesStore: {
-            displayMode
+            displayMode,
+            getAsyncStatus
+        },
+        departmentsStore: {
+            regions
         }
     }
 }) => ({
     salesHeaderHeight,
     setSalesHeaderHeight,
-    displayMode
+    displayMode,
+    getAsyncStatus,
+    regions
 }))
 @observer
 class DrugsTable extends Component<IProps> {
     readonly headerHeight: number = 20;
     headerRefs: any = {};
 
+    get isLoading(): boolean {
+        const { getAsyncStatus } = this.props;
+        const s1 = getAsyncStatus('loadLocaleSalesStat');
+        const s2 = getAsyncStatus('loadMedsStat');
+        return s1.loading || s2.loading;
+    }
+
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
-        .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
+            .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
     }
 
     get marginTop(): number {
@@ -121,19 +164,24 @@ class DrugsTable extends Component<IProps> {
             headerPrepend,
             medsDisplayStatuses,
             medsStat,
-            displayMode
+            displayMode,
+            regions
         } = this.props;
 
         return (
-            <TableContainer style={{paddingTop: this.marginTop}} component={Paper} className={classes.container} >
+            <TableContainer style={{ paddingTop: this.marginTop }} component={Paper} className={classes.container} >
                 <Table padding='none' className={classes.table}>
                     <TableHead className={classes.th}>
                         <TableRow className={classes.thRow}>
-                            { headerPrepend }
+                            {headerPrepend}
+
+                            <TableCell colSpan={2} className={classes.thCell}>
+                                регион
+                            </TableCell>
 
                             {
                                 this.medsArray.map(medicine =>
-                                    <TableCell key={medicine.id} className={classes.thCell}>
+                                    <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
                                         <Grid container>
                                             <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
                                         </Grid>
@@ -148,16 +196,25 @@ class DrugsTable extends Component<IProps> {
                                 </TableCell>
                             }
 
-                            { headerAppend }
+                            {headerAppend}
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.body}>
-                        <Body
-                            meds={meds}
-                            salesStat={medsStat}
-                            displayStatuses={medsDisplayStatuses}
-                            displayMode={displayMode}
-                        />
+                        {
+                            (this.isLoading && !medsStat.length)
+                            ? <TableRow>
+                                <TableCell colSpan={this.medsArray.length + 1}>
+                                    <LinearProgress />
+                                </TableCell>
+                              </TableRow>
+                            : <Body
+                                meds={meds}
+                                salesStat={medsStat}
+                                displayStatuses={medsDisplayStatuses}
+                                displayMode={displayMode}
+                                regions={regions}
+                              />
+                        }
                     </TableBody>
                 </Table>
             </TableContainer>

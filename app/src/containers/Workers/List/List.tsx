@@ -5,6 +5,8 @@ import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
+import Sublist from '../Sublist';
+import { observable } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -29,18 +31,29 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     workers: IWorker[];
-    fired?: boolean;
+    fired: boolean;
     positions: Map<number, IPosition>;
+    expandable: boolean;
 }
 
 @observer
 class List extends Component<IProps> {
+    @observable expanded: number = null;
+
+    expandChangeHandler = (workerId: number) => (event: any, expanded: boolean) => {
+        if (this.props.expandable === false) return;
+        this.expanded = expanded
+            ? workerId
+            : null;
+    }
+
     render() {
         const {
             classes,
             workers,
             positions,
-            fired
+            fired,
+            expandable
         } = this.props;
 
         return (
@@ -98,8 +111,12 @@ class List extends Component<IProps> {
                         <ListItem
                             key={x.id}
                             worker={x}
-                            position={positions.get(x.position)}
                             fired={fired}
+                            expandable={expandable}
+                            isExpanded={this.expanded === x.id}
+                            expandChangeHandler={this.expandChangeHandler(x.id)}
+                            position={positions.get(x.position)}
+                            children={expandable && <Sublist rmId={x.id} positions={positions} />}
                         />
                     ))
                 }

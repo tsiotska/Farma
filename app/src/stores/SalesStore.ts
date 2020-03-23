@@ -150,6 +150,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.setLoading(requestName, this.currentDepartmentId);
         const url = this.getLocaleSalesStatUrl(this.currentDepartmentId);
         const res = await api.getLocaleSalesStat(url);
+
         const storedId = this.getRequestParams(requestName);
 
         if (storedId !== this.currentDepartmentId) return;

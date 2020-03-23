@@ -185,6 +185,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         console.log('load doctors');
     }
 
+    @action.bound
+    async loadSubWorkers(rmId: number) {
+        const { api } = this.rootStore;
+        const url = `/api/branch/${this.currentDepartment.id}/rm/${rmId}/worker`;
+        return api.getWorkers(url);
+    }
+
     private retryPolicy(requestMethod: () => any, requestName: string) {
         const currentRetryCount = this.getRetryCount(requestName);
 

@@ -24,7 +24,7 @@ import { IPosition } from '../../../interfaces/IPosition';
 const styles = (theme: any) => createStyles({
     root: {
         width: '100%',
-        marginBottom: theme.spacing(2),
+        marginBottom: 2,
         '&:before': {
             content: 'none'
         },
@@ -59,28 +59,37 @@ const styles = (theme: any) => createStyles({
     summaryRoot: {
         cursor: ({ children }: any) => children ? 'initial' : 'default !important',
         padding: 0,
-        // minHeight: '0px !important',
-        border: '1px solid #ddd',
+        minHeight: '48px !important',
+        // border: '1px solid #ddd',
     },
     iconButton: {
         borderRadius: 2
     },
     gridItem: {
         overflow: 'hidden'
+    },
+    details: {
+        padding: '8px 0 24px 32px',
+        backgroundColor: '#f5f5f5'
+    },
+    actions: {
+        width: 88
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     position: IPosition;
     worker: IWorker;
+    fired: boolean;
+    expandable?: boolean;
     children?: any;
-    fired?: boolean;
+    isExpanded?: boolean;
+    expandChangeHandler?: (e: any, expanded: boolean) => void;
 }
 
 @observer
 class ListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
-    @observable expanded: boolean = false;
 
     get position(): string {
         const { position } = this.props;
@@ -118,16 +127,15 @@ class ListItem extends Component<IProps> {
         return from;
     }
 
-    changeHandler = (e: any, expanded: boolean) => {
-        this.expanded = expanded;
-    }
-
     render() {
         const {
             classes,
             children,
             position,
             fired,
+            expandable,
+            expandChangeHandler,
+            isExpanded,
             worker: {
                 avatar,
                 name,
@@ -141,14 +149,18 @@ class ListItem extends Component<IProps> {
 
         return (
             <ExpansionPanel
-                expanded={!!children && this.expanded}
-                onChange={this.changeHandler}
+                TransitionProps={{
+                    mountOnEnter: true,
+                    unmountOnExit: true
+                }}
+                onChange={expandChangeHandler}
+                expanded={isExpanded}
                 elevation={0} classes={{
                     root: classes.root,
                     expanded: classes.expanded
                 }}>
                 <ExpansionPanelSummary
-                    expandIcon={fired === false && <KeyboardArrowDown fontSize='small' />}
+                    expandIcon={expandable && <KeyboardArrowDown fontSize='small' />}
                     classes={{
                         content: classes.summaryContent,
                         root: classes.summaryRoot,
@@ -190,24 +202,26 @@ class ListItem extends Component<IProps> {
                         </Typography>
                     </Grid>
 
-                    {
-                        fired === false &&
-                        <>
-                            {
-                                isVacancy === false &&
+                    <Grid justify='flex-end' className={classes.actions} container>
+                        {
+                            fired === false &&
+                            <>
+                                {
+                                    isVacancy === false &&
+                                    <IconButton className={classes.iconButton}>
+                                        <NotInterested fontSize='small' />
+                                    </IconButton>
+                                }
                                 <IconButton className={classes.iconButton}>
-                                    <NotInterested fontSize='small' />
+                                    <Edit fontSize='small' />
                                 </IconButton>
-                            }
-                            <IconButton className={classes.iconButton}>
-                                <Edit fontSize='small' />
-                            </IconButton>
-                        </>
-                    }
+                            </>
+                        }
+                    </Grid>
                 </ExpansionPanelSummary>
                 {
                     children &&
-                    <ExpansionPanelDetails>
+                    <ExpansionPanelDetails className={classes.details}>
                         {children}
                     </ExpansionPanelDetails>
                 }

@@ -12,6 +12,7 @@ interface IProps {
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;
     className?: string;
+    rootRef: any;
 }
 
 @inject(({
@@ -59,6 +60,7 @@ class List extends Component<IProps> {
             displayMode,
             medsDisplayStatus,
             className,
+            rootRef
         } = this.props;
 
         if (!medsSalesStat || !meds) return null;
@@ -79,6 +81,7 @@ class List extends Component<IProps> {
 
         return (
             <Grid
+                ref={rootRef}
                 className={className}
                 alignItems='center'
                 wrap='nowrap'

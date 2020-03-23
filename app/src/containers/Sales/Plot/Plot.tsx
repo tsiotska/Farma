@@ -102,7 +102,11 @@ class Plot extends Component<IProps> {
     }
 
     get labelType(): LabelType {
-        for (const saleStat of this.props.medsSalesStat) {
+        const { medsSalesStat } = this.props;
+
+        if (medsSalesStat === null) return 'unknown';
+
+        for (const saleStat of medsSalesStat) {
             for (const timeSpanStat of saleStat.periods) {
                 const { day, year, month } = (timeSpanStat as any);
                 if (day !== undefined) return 'day';

@@ -133,13 +133,13 @@ export class APIRequester {
     getSalesStat(url: string): Promise<ISalesStat[]> {
         return this.instance.get(url)
             .then(salesNormalizer)
-            .catch(this.defaultErrorHandler(mockSales));
+            .catch(this.defaultErrorHandler());
     }
 
     getLocaleSalesStat(url: string): Promise<ILocaleSalesStat[]> {
         return this.instance.get(url)
             .then(localeSalesStatNormalizer)
-            .catch(this.defaultErrorHandler(mockRegionSalesState));
+            .catch(this.defaultErrorHandler());
     }
 
     getWorkers(url: string): Promise<IWorker[]> {

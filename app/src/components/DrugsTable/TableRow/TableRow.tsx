@@ -6,7 +6,15 @@ import { IMedSalesStat } from '../../../interfaces/ILocaleSalesStat';
 
 const styles = (theme: any) => createStyles({
     row: {},
-    cell: {}
+    cell: {
+        paddingRight: 5,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        height: 48,
+        '&:first-of-type': {
+            paddingLeft: 5
+        }
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -14,6 +22,7 @@ interface IProps extends WithStyles<typeof styles> {
     medStat: IMedSalesStat[];
     targetProperty: 'amount' | 'money';
     rowEndAddornment?: (data: number[]) => number | string;
+    rowStartAddornment?: JSX.Element;
 }
 
 @observer
@@ -37,19 +46,28 @@ class TableRow extends Component<IProps> {
     }
 
     render() {
-        const { classes, rowEndAddornment, medStat, medsIds } = this.props;
+        const { classes, rowEndAddornment, rowStartAddornment, targetProperty } = this.props;
+        const mantisLength = targetProperty === 'money'
+        ? 2
+        : 0;
 
         if (!this.data.length) return null;
 
         return (
             <MuiTableRow className={classes.row}>
                 {
+                    rowStartAddornment &&
+                    <TableCell colSpan={2} className={classes.cell}>
+                        { rowStartAddornment }
+                    </TableCell>
+                }
+                {
                     this.data.map((x, i) => (
                         <TableCell key={i} className={classes.cell}>
                             {
                                 x === null
                                     ? '-'
-                                    : x
+                                    : x.toFixed(mantisLength)
                             }
                         </TableCell>
                     ))

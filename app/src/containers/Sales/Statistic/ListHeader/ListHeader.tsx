@@ -14,7 +14,8 @@ const styles = (theme: any) => createStyles({
         '& *': {
             lineHeight: 1
         },
-        marginBottom: 8
+        marginBottom: 8,
+        paddingRight: ({ paddingRight }: any) => paddingRight
     },
     checkbox: {
         marginRight: 5,
@@ -25,6 +26,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     toggleAllMedsDisplayStatus?: () => void;
     medsDisplayStatus?: Map<number, boolean>;
+    paddingRight: number;
 }
 
 @inject(({
@@ -46,16 +48,17 @@ class ListHeader extends Component<IProps> {
         return [...medsDisplayStatus.values()].every(x => !!x);
     }
 
-    checkboxChangeHandler = () => {
-        this.props.toggleAllMedsDisplayStatus();
-    }
-
     render() {
         const { classes, toggleAllMedsDisplayStatus } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                <Checkbox checked={this.isAllMedsDisplayed} onChange={this.checkboxChangeHandler} className={classes.checkbox} size='small' color='default' />
+                <Checkbox
+                    checked={this.isAllMedsDisplayed}
+                    onChange={toggleAllMedsDisplayStatus}
+                    className={classes.checkbox}
+                    size='small'
+                    color='default' />
 
                 <Grid xs={6} container item>
                     <Typography variant='subtitle1' color='textSecondary'>
