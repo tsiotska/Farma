@@ -69,17 +69,19 @@ class ListItem extends Component<IProps> {
         : '-';
     }
 
-    get money(): string {
-        const { stat } = this.props;
-        return stat
-        ? `${stat.money}`
-        : '-';
-    }
+    get total(): string {
+        const { stat, displayMode } = this.props;
 
-    get amount(): string {
-        const { stat } = this.props;
+        const propName = displayMode === 'currency'
+        ? 'money'
+        : 'amount';
+
+        const mantisLength = displayMode === 'currency'
+        ? 2
+        : 0;
+
         return stat
-        ? `${stat.amount}`
+        ? stat[propName].toFixed(mantisLength)
         : '-';
     }
 
@@ -95,7 +97,6 @@ class ListItem extends Component<IProps> {
     render() {
         const {
             classes,
-            displayMode,
             medicament,
             displayed,
         } = this.props;
@@ -124,11 +125,7 @@ class ListItem extends Component<IProps> {
                 </Grid>
                 <Grid xs item>
                     <Typography variant='subtitle1'>
-                        {
-                            displayMode === 'pack'
-                            ? this.amount
-                            : this.money
-                        }
+                        { this.total }
                     </Typography>
                 </Grid>
             </Grid>

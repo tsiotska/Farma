@@ -9,8 +9,8 @@ import {
     Button
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
+import { observable } from 'mobx';
 import { IWorker } from '../../../interfaces/IWorker';
-import { observable, toJS } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
@@ -118,17 +118,15 @@ class Sublist extends Component<IProps> {
                 {this.getList()}
                 {
                     this.asyncStatus.error &&
-                    <>
-                        <Typography className={classes.errorMessage} variant='body2'>
-                            Не удалось получить список сотрудников
-                            <Button
-                                variant='outlined'
-                                onClick={this.loadWorkers}
-                                className={classes.retryButton}>
-                                Повторить Запрос
-                            </Button>
-                        </Typography>
-                    </>
+                    <Typography className={classes.errorMessage} variant='body2'>
+                        Не удалось получить список сотрудников
+                        <Button
+                            variant='outlined'
+                            onClick={this.loadWorkers}
+                            className={classes.retryButton}>
+                            Повторить Запрос
+                        </Button>
+                    </Typography>
                 }
             </Grid>
         );

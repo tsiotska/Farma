@@ -20,14 +20,28 @@ import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
 import { IAsyncStatus } from '../../stores/AsyncStore';
+import { toJS } from 'mobx';
+import { IRegion } from '../../interfaces/IRegion';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     td: {},
     th: {},
-    thRow: {},
+    thRow: {
+    },
     thCell: {
+        height: 48,
+        '&:first-of-type': {
+            paddingLeft: 5,
+            [theme.breakpoints.up('md')]: {
+                width: 220,
+            }
+        },
         '&:last-of-type': {
-            width: 100
+            width: 100,
+        },
+        '&.alignBottom': {
+            verticalAlign: 'bottom'
         }
     },
     tr: {},
@@ -46,7 +60,8 @@ const styles = (theme: any) => createStyles({
     },
     prepend: {},
     append: {},
-    body: {}
+    body: {},
+
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -58,6 +73,7 @@ interface IProps extends WithStyles<typeof styles> {
     medsDisplayStatuses?: Map<number, boolean>;
     displayMode?: DisplayMode;
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    regions?: Map<number, IRegion>;
 
     rowStartAddornment?: React.Component;
     rowEndAddornment?: React.Component;
@@ -76,13 +92,17 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             displayMode,
             getAsyncStatus
+        },
+        departmentsStore: {
+            regions
         }
     }
 }) => ({
     salesHeaderHeight,
     setSalesHeaderHeight,
     displayMode,
-    getAsyncStatus
+    getAsyncStatus,
+    regions
 }))
 @observer
 class DrugsTable extends Component<IProps> {
@@ -144,7 +164,8 @@ class DrugsTable extends Component<IProps> {
             headerPrepend,
             medsDisplayStatuses,
             medsStat,
-            displayMode
+            displayMode,
+            regions
         } = this.props;
 
         return (
@@ -154,9 +175,13 @@ class DrugsTable extends Component<IProps> {
                         <TableRow className={classes.thRow}>
                             {headerPrepend}
 
+                            <TableCell colSpan={2} className={classes.thCell}>
+                                регион
+                            </TableCell>
+
                             {
                                 this.medsArray.map(medicine =>
-                                    <TableCell key={medicine.id} className={classes.thCell}>
+                                    <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
                                         <Grid container>
                                             <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
                                         </Grid>
@@ -187,6 +212,7 @@ class DrugsTable extends Component<IProps> {
                                 salesStat={medsStat}
                                 displayStatuses={medsDisplayStatuses}
                                 displayMode={displayMode}
+                                regions={regions}
                               />
                         }
                     </TableBody>
