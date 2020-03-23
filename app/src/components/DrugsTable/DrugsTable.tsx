@@ -1,5 +1,17 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, TableContainer, Table, Paper, TableHead, TableBody, TableRow, TableCell, Typography, Grid } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    TableContainer,
+    Table,
+    Paper,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Grid,
+    LinearProgress
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../interfaces/IMedicine';
@@ -7,6 +19,7 @@ import HeaderItem from './HeaderItem';
 import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
+import { IAsyncStatus } from '../../stores/AsyncStore';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -44,6 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     medsStat?: ILocaleSalesStat[];
     medsDisplayStatuses?: Map<number, boolean>;
     displayMode?: DisplayMode;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 
     rowStartAddornment?: React.Component;
     rowEndAddornment?: React.Component;
@@ -60,22 +74,31 @@ interface IProps extends WithStyles<typeof styles> {
             setSalesHeaderHeight,
         },
         salesStore: {
-            displayMode
+            displayMode,
+            getAsyncStatus
         }
     }
 }) => ({
     salesHeaderHeight,
     setSalesHeaderHeight,
-    displayMode
+    displayMode,
+    getAsyncStatus
 }))
 @observer
 class DrugsTable extends Component<IProps> {
     readonly headerHeight: number = 20;
     headerRefs: any = {};
 
+    get isLoading(): boolean {
+        const { getAsyncStatus } = this.props;
+        const s1 = getAsyncStatus('loadLocaleSalesStat');
+        const s2 = getAsyncStatus('loadMedsStat');
+        return s1.loading || s2.loading;
+    }
+
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
-        .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
+            .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
     }
 
     get marginTop(): number {
@@ -125,11 +148,11 @@ class DrugsTable extends Component<IProps> {
         } = this.props;
 
         return (
-            <TableContainer style={{paddingTop: this.marginTop}} component={Paper} className={classes.container} >
+            <TableContainer style={{ paddingTop: this.marginTop }} component={Paper} className={classes.container} >
                 <Table padding='none' className={classes.table}>
                     <TableHead className={classes.th}>
                         <TableRow className={classes.thRow}>
-                            { headerPrepend }
+                            {headerPrepend}
 
                             {
                                 this.medsArray.map(medicine =>
@@ -148,16 +171,24 @@ class DrugsTable extends Component<IProps> {
                                 </TableCell>
                             }
 
-                            { headerAppend }
+                            {headerAppend}
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.body}>
-                        <Body
-                            meds={meds}
-                            salesStat={medsStat}
-                            displayStatuses={medsDisplayStatuses}
-                            displayMode={displayMode}
-                        />
+                        {
+                            (this.isLoading && !medsStat.length)
+                            ? <TableRow>
+                                <TableCell colSpan={this.medsArray.length + 1}>
+                                    <LinearProgress />
+                                </TableCell>
+                              </TableRow>
+                            : <Body
+                                meds={meds}
+                                salesStat={medsStat}
+                                displayStatuses={medsDisplayStatuses}
+                                displayMode={displayMode}
+                              />
+                        }
                     </TableBody>
                 </Table>
             </TableContainer>

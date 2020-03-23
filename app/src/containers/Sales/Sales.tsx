@@ -18,8 +18,6 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     plotContainer: {
-        // minHeight: '33vw',
-        // maxHeight: 500,
         marginBottom: theme.spacing(4),
         '& > *:last-child': {
             marginLeft: 20
