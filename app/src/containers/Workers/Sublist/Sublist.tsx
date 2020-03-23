@@ -5,7 +5,8 @@ import {
     WithStyles,
     LinearProgress,
     Grid,
-    Typography
+    Typography,
+    Button
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IWorker } from '../../../interfaces/IWorker';
@@ -18,6 +19,13 @@ const styles = (theme: any) => createStyles({
     title: {
         fontFamily: 'Source Sans Pro SemiBold',
         margin: '22px 0'
+    },
+    errorMessage: {
+        display: 'flex',
+        alignItems: 'center'
+    },
+    retryButton: {
+        marginLeft: theme.spacing(2)
     }
 });
 
@@ -50,6 +58,8 @@ class Sublist extends Component<IProps> {
     loadWorkers = async () => {
         const { rmId, loadSubWorkers } = this.props;
 
+        this.asyncStatus.loading = true;
+        this.asyncStatus.error = false;
         const res = await loadSubWorkers(rmId);
 
         if (this.isUnmounted) return;
@@ -73,9 +83,29 @@ class Sublist extends Component<IProps> {
         this.isUnmounted = true;
     }
 
+    getList = () => {
+        if (!Array.isArray(this.workers)) return;
+
+        const { positions } = this.props;
+
+        return this.workers.length
+        ? this.workers.map(x => (
+            <ListItem
+                key={x.id}
+                position={positions.get(x.position)}
+                worker={x}
+                fired={false}
+                isExpanded={false}
+            />
+          ))
+        : <Typography>
+            Список сотрудников пуст
+          </Typography>;
+    }
+
     render() {
-        const { classes, positions } = this.props;
-        console.log('positions: ', toJS(positions));
+        const { classes } = this.props;
+
         return (
             <Grid direction='column' container>
                 <Typography className={classes.title} color='textSecondary'>
@@ -85,21 +115,20 @@ class Sublist extends Component<IProps> {
                     this.asyncStatus.loading &&
                     <LinearProgress />
                 }
-                {
-                    Array.isArray(this.workers) &&
-                    this.workers.map(x => (
-                        <ListItem
-                            key={x.id}
-                            position={positions.get(x.position)}
-                            worker={x}
-                            fired={false}
-                            isExpanded={false}
-                        />
-                    ))
-                }
+                {this.getList()}
                 {
                     this.asyncStatus.error &&
-                    <Typography>loading error</Typography>
+                    <>
+                        <Typography className={classes.errorMessage} variant='body2'>
+                            Не удалось получить список сотрудников
+                            <Button
+                                variant='outlined'
+                                onClick={this.loadWorkers}
+                                className={classes.retryButton}>
+                                Повторить Запрос
+                            </Button>
+                        </Typography>
+                    </>
                 }
             </Grid>
         );
