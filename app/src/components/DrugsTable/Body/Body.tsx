@@ -22,7 +22,7 @@ class Body extends Component<IProps> {
     endAddornment = (data: number[]) => data.reduce(
             (total, current) => total + current,
             0
-        )
+        ).toFixed(2)
 
     render() {
         const { salesStat, displayMode } = this.props;

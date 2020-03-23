@@ -49,7 +49,7 @@ class TableRow extends Component<IProps> {
                             {
                                 x === null
                                     ? '-'
-                                    : x
+                                    : x.toFixed(2)
                             }
                         </TableCell>
                     ))
