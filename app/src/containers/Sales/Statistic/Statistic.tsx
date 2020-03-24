@@ -30,7 +30,7 @@ class Statistic extends Component<IProps> {
     ref: React.RefObject<HTMLInputElement> = React.createRef();
 
     updScrollbar = () => {
-        if (!this.ref) return;
+        if (!this.ref || !this.ref.current) return;
         const { offsetWidth, clientWidth } = this.ref.current;
         this.scrollBarWidth = offsetWidth - clientWidth;
     }

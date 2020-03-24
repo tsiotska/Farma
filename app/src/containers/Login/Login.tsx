@@ -55,7 +55,6 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     login?: (credentials: IUserCredentials) => boolean;
-    getAsyncStatus?: (key: string) => IAsyncStatus;
     user?: IUser;
     isUserLoading?: boolean;
 }
@@ -65,13 +64,11 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             isUserLoading,
             login,
-            getAsyncStatus,
             user
         }
     }
 }) => ({
     login,
-    getAsyncStatus,
     user,
     isUserLoading
 }))
@@ -101,10 +98,6 @@ class Login extends Component<IProps> {
         this.lengthValidator = lengthValidator.bind(this, 6);
     }
 
-    get isLoading(): boolean {
-        return this.props.getAsyncStatus('login').loading;
-    }
-
     changeHandler = ({ target: { type, value } }: any) => {
         this.openSnackbar = false;
         const propName = type === 'text'
@@ -115,17 +108,23 @@ class Login extends Component<IProps> {
     }
 
     submitHandler = async () => {
+        const preparedCreds: IUserCredentials = {
+            email: this.credentials.email.trim(),
+            password: this.credentials.password.trim()
+        };
+
         this.showErrors.email = true;
         this.showErrors.password = true;
 
-        this.validityStatuses.email = emailValidator(this.credentials.email);
-        this.validityStatuses.password = this.lengthValidator(this.credentials.password);
+        this.validityStatuses.email = emailValidator(preparedCreds.email);
+        this.validityStatuses.password = this.lengthValidator(preparedCreds.password);
 
         const isValid = this.validityStatuses.email && this.validityStatuses.password;
 
         if (!isValid) return;
 
-        this.openSnackbar = !await this.props.login(this.credentials);
+        const loggedIn = await this.props.login(preparedCreds);
+        this.openSnackbar = !loggedIn;
     }
 
     snackbarCloseHandler = () => {
@@ -153,9 +152,11 @@ class Login extends Component<IProps> {
     }
 
     render() {
-        const { classes, user, isUserLoading } = this.props;
-
-        if (isUserLoading) return null;
+        const {
+            classes,
+            user,
+            isUserLoading
+        } = this.props;
 
         if (user) return <Redirect to={ROOT_ROUTE} />;
 
@@ -171,6 +172,7 @@ class Login extends Component<IProps> {
                         Email
                     </InputLabel>
                     <Input
+                        value={this.credentials.email}
                         onChange={this.changeHandler}
                         disableUnderline />
                     <FormHelperText></FormHelperText>
@@ -181,6 +183,7 @@ class Login extends Component<IProps> {
                         Пароль
                     </InputLabel>
                     <Input
+                        value={this.credentials.password}
                         onChange={this.changeHandler}
                         disableUnderline
                         type={this.showPassword ? 'text' : 'password'}
@@ -196,7 +199,7 @@ class Login extends Component<IProps> {
                 </FormControl>
 
                 <Button
-                    disabled={this.isLoading}
+                    disabled={isUserLoading}
                     onClick={this.submitHandler}
                     variant='contained'
                     color='primary'

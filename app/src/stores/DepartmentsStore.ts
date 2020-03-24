@@ -12,23 +12,39 @@ import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { IRegion } from '../interfaces/IRegion';
 
+export interface IExpandedWorker {
+    id: number;
+    subworkers: IWorker[];
+}
+
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
-    @observable departments: IDepartment[] = [];
-    @observable currentDepartment: IDepartment = null;
+    // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
-    @observable medicalDepartments: Map<number, ILPU> = new Map();
-    @observable workers: IWorker[] = [];
-    @observable firedWorkers: IWorker[] = [];
+    @observable LPUs: Map<number, ILPU> = new Map();
     @observable regions: Map<number, IRegion> = new Map();
+
+    @observable departments: IDepartment[] = [];
+    @observable currentDepartment: IDepartment = null;
+
+    @observable workers: IWorker[] = [];
+    @observable expandedWorker: IExpandedWorker = null;
+    @observable firedWorkers: IWorker[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
-        reaction(() => this.currentDepartment, this.loadMeds);
+        reaction(() => this.currentDepartment, this.departmentChangeHandler);
         this.initializeStore();
+    }
+
+    private departmentChangeHandler = () => {
+        this.loadMeds();
+        this.expandedWorker = null;
+        this.workers = [];
+        this.firedWorkers = [];
     }
 
     @action.bound
@@ -36,7 +52,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.loadDepartments();
         this.loadRegions(true);
         this.loadPositions(true);
-        this.loadMedicalDepartments(true);
+        this.loadLPUs(true);
     }
 
     @action.bound
@@ -44,6 +60,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.meds = new Map();
         this.workers = [];
         this.firedWorkers = [];
+    }
+
+    setExpandedWorker = (workerId: number | null) => {
+        if (workerId === null) {
+            this.expandedWorker = null;
+            return;
+        }
+
+        this.expandedWorker = {
+            id: workerId,
+            subworkers: []
+        };
+        window.setTimeout(
+            this.loadSubworkers,
+            500
+        );
     }
 
     @action.bound
@@ -139,8 +171,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadMedicalDepartments(isInitial: boolean = false) {
-        const requestName = 'loadMedicalDepartments';
+    async loadLPUs(isInitial: boolean = false) {
+        const requestName = 'loadLPUs';
         const { api } = this.rootStore;
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
@@ -152,11 +184,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res) {
             const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
-            this.medicalDepartments = new Map(mapped);
+            this.LPUs = new Map(mapped);
             return;
         }
 
-        this.retryPolicy(this.loadMedicalDepartments, requestName);
+        this.retryPolicy(this.loadLPUs, requestName);
     }
 
     @action.bound
@@ -186,10 +218,33 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadSubWorkers(rmId: number) {
+    async loadSubworkers() {
+        const requestName = 'loadSubworkers';
         const { api } = this.rootStore;
-        const url = `/api/branch/${this.currentDepartment.id}/rm/${rmId}/worker`;
-        return api.getWorkers(url);
+
+        const branchId = this.currentDepartment
+        ? this.currentDepartment.id
+        : null;
+
+        const workerId = this.expandedWorker
+        ? this.expandedWorker.id
+        : null;
+
+        if (branchId === null || workerId === null) return;
+        this.setLoading(requestName);
+        const res = await api.getWorkers(`/api/branch/${branchId}/rm/${workerId}/worker`);
+
+        const isRelevant = branchId === (this.currentDepartment && this.currentDepartment.id)
+        && workerId === (this.expandedWorker && this.expandedWorker.id);
+
+        if (!isRelevant) return;
+
+        if (res) {
+            this.expandedWorker.subworkers = res;
+            this.setSuccess(requestName);
+        } else {
+            this.setError(requestName);
+        }
     }
 
     private retryPolicy(requestMethod: () => any, requestName: string) {

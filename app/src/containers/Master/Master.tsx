@@ -1,11 +1,11 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Router, Route } from 'react-router-dom';
+import { Router, Route, Switch } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import { NAVIGATION_ROUTES, LOGIN_ROUTE } from '../../constants/Router';
+import { NAVIGATION_ROUTES, LOGIN_ROUTE, ROOT_ROUTE } from '../../constants/Router';
 
 import Header from '../Header';
 import SideNav from './SideNav';
@@ -43,13 +43,15 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <Router history={initialHistory}>
                     <div className={classes.contentWrapper}>
-                        <Route path={LOGIN_ROUTE} component={Login} />
                         <PrivateRoute
                             path={NAVIGATION_ROUTES}
                             component={Header}
                             loadingPlaceholder={() => <p>Loading...</p>}
                         />
-                        <DepartmentContent />
+                        <Switch>
+                            <Route path={LOGIN_ROUTE} component={Login} />
+                            <PrivateRoute path={ROOT_ROUTE} component={DepartmentContent} />
+                        </Switch>
                     </div>
                     <PrivateRoute path={NAVIGATION_ROUTES} component={SideNav} />
                 </Router>

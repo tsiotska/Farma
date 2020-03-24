@@ -7,7 +7,6 @@ import { LOGIN_ROUTE } from '../../constants/Router';
 
 interface IProps extends RouteProps {
     user?: IUser;
-    children?: any;
     isUserLoading?: boolean;
     loadingPlaceholder?: any;
 }
@@ -31,14 +30,11 @@ class PrivateRoute extends Route<IProps & any> {
             isUserLoading,
             loadingPlaceholder: LoadingPlaceholder,
             component,
-            children,
             ...props
         } = this.props;
 
         if (user) {
-            return children
-            ? <Route {...props} children={children} />
-            : <Route {...props} component={component} />;
+            return <Route {...props} component={component} />;
         }
 
         const loadingMask = LoadingPlaceholder
