@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { ISalesStat } from '../../../../interfaces/ISalesStat';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../../stores/SalesStore';
 import ListItem from '../ListItem';
+import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
 
 interface IProps {
-    medsSalesStat: ISalesStat[];
+    medsSalesStat: IMedsSalesStat[];
     meds?: Map<number, IMedicine>;
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;

@@ -1,6 +1,6 @@
-import { ILocaleSalesStat } from './../../interfaces/ILocaleSalesStat';
+import { ISalesStat } from '../../interfaces/ISalesStat';
 
-export const mockRegionSalesState: ILocaleSalesStat[] = [
+export const mockRegionSalesState: ISalesStat[] = [
     {
         id: 1,
         stat: [

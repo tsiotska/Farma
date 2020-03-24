@@ -14,11 +14,11 @@ import {
 import { observable } from 'mobx';
 import DataRangeButton from '../DataRangeButton';
 import {
-    ISalesStat,
     IPeriodSalesStat,
     IDaySalesStat,
     IMonthSalesStat,
-    IYearSalesStat
+    IYearSalesStat,
+    IMedsSalesStat
 } from '../../../interfaces/ISalesStat';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../stores/SalesStore';
@@ -42,7 +42,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    medsSalesStat: ISalesStat[];
+    medsSalesStat: IMedsSalesStat[];
     dateFrom?: Date;
     dateTo?: Date;
     meds?: Map<number, IMedicine>;

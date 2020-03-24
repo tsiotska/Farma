@@ -62,6 +62,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.firedWorkers = [];
     }
 
+    @action.bound
     setExpandedWorker = (workerId: number | null) => {
         if (workerId === null) {
             this.expandedWorker = null;
@@ -70,7 +71,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.expandedWorker = {
             id: workerId,
-            subworkers: []
+            subworkers: null
         };
         window.setTimeout(
             this.loadSubworkers,
@@ -236,15 +237,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const isRelevant = branchId === (this.currentDepartment && this.currentDepartment.id)
         && workerId === (this.expandedWorker && this.expandedWorker.id);
-
         if (!isRelevant) return;
 
-        if (res) {
-            this.expandedWorker.subworkers = res;
-            this.setSuccess(requestName);
-        } else {
-            this.setError(requestName);
-        }
+        this.expandedWorker.subworkers = res;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
     }
 
     private retryPolicy(requestMethod: () => any, requestName: string) {

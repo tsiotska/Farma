@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, TableRow as MuiTableRow, TableCell } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IMedSalesStat } from '../../../interfaces/ILocaleSalesStat';
+import { IMedSalesInfo } from '../../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     row: {},
@@ -19,7 +19,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     medsIds: number[];
-    medStat: IMedSalesStat[];
+    medStat: IMedSalesInfo[];
     targetProperty: 'amount' | 'money';
     rowEndAddornment?: (data: number[]) => number | string;
     rowStartAddornment?: JSX.Element;

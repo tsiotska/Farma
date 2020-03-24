@@ -1,9 +1,10 @@
 import { objectArrayNormalizer, IValuesMap, IOptions } from './normalizer';
-import { ILocaleSalesStat, IMedSalesStat } from '../../interfaces/ILocaleSalesStat';
+import { ISalesStat, IMedSalesInfo } from '../../interfaces/ISalesStat';
+// import { ILocaleSalesStat, IMedSalesStat } from '../../interfaces/ILocaleSalesStat';
 
 export const localeSalesStatNormalizer = ({ data: { data }}: any) => {
-    const normalizerOptions: IOptions<IMedSalesStat> = { requiredProps: [ 'drug' ] };
-    const defaultMedSalesStat: IMedSalesStat = {
+    const normalizerOptions: IOptions<IMedSalesInfo> = { requiredProps: [ 'drug' ] };
+    const defaultMedSalesStat: IMedSalesInfo = {
         medId: null,
         money: null,
         amount: null
@@ -14,7 +15,7 @@ export const localeSalesStatNormalizer = ({ data: { data }}: any) => {
         amount: 'amount'
     };
 
-    const res: ILocaleSalesStat[] = [];
+    const res: ISalesStat[] = [];
 
     for (const regionId in data) {
         const id = +regionId;

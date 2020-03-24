@@ -3,10 +3,10 @@ import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
-import { ISalesStat } from '../../../interfaces/ISalesStat';
 import ListHeader from './ListHeader';
 import List from './List';
 import { observable } from 'mobx';
+import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -21,7 +21,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    medsSalesStat: ISalesStat[];
+    medsSalesStat: IMedsSalesStat[];
 }
 
 @observer

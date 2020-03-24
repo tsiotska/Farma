@@ -1,6 +1,6 @@
-import { ISalesStat, IPeriodSalesStat } from './../../interfaces/ISalesStat';
+import { IMedsSalesStat } from '../../interfaces/ISalesStat';
 
-export const mockSales: ISalesStat[] = [
+export const mockSales: IMedsSalesStat[] = [
     {
         medId: 1,
         money: 12,

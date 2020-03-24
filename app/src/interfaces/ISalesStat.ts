@@ -17,8 +17,16 @@ export interface IYearSalesStat extends ICommonStat {
 
 export type IPeriodSalesStat = IDaySalesStat | IMonthSalesStat | IYearSalesStat;
 
-export interface ISalesStat extends ICommonStat {
+export interface IMedSalesInfo extends ICommonStat {
     medId: number;
+}
+
+export interface ISalesStat {
+    id: number;
+    stat: IMedSalesInfo[];
+}
+
+export interface IMedsSalesStat extends IMedSalesInfo {
     kpd: number;
     periods: IPeriodSalesStat[];
 }

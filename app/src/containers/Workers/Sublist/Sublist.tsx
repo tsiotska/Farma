@@ -44,7 +44,7 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             expandedWorker,
             getAsyncStatus,
-            retryLoadSubworkers
+            loadSubworkers: retryLoadSubworkers
         }
     }
 }) => ({
@@ -61,7 +61,7 @@ class Sublist extends Component<IProps> {
     getList = () => {
         const { expandedWorker, positions } = this.props;
 
-        if (expandedWorker === null) return;
+        if (expandedWorker === null || expandedWorker.subworkers === null) return;
 
         return expandedWorker.subworkers.length
         ? expandedWorker.subworkers.map(x => (

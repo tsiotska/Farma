@@ -16,12 +16,12 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../interfaces/IMedicine';
 import HeaderItem from './HeaderItem';
-import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IRegion } from '../../interfaces/IRegion';
 import cx from 'classnames';
+import { ISalesStat } from '../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -68,10 +68,10 @@ interface IProps extends WithStyles<typeof styles> {
     setSalesHeaderHeight?: (value: number) => void;
     displayMode?: DisplayMode;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    regions?: Map<number, IRegion>;
+    // regions?: Map<number, IRegion>;
 
     meds?: Map<number, IMedicine>;
-    medsStat?: ILocaleSalesStat[];
+    medsStat?: ISalesStat[];
     medsDisplayStatuses?: Map<number, boolean>;
 }
 
@@ -155,7 +155,7 @@ class DrugsTable extends Component<IProps> {
             medsDisplayStatuses,
             medsStat,
             displayMode,
-            regions
+            // regions
         } = this.props;
 
         return (
@@ -198,7 +198,7 @@ class DrugsTable extends Component<IProps> {
                                 salesStat={medsStat}
                                 displayStatuses={medsDisplayStatuses}
                                 displayMode={displayMode}
-                                regions={regions}
+                                 // regions={regions}
                               />
                         }
                     </TableBody>

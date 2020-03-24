@@ -3,10 +3,9 @@ import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action, reaction } from 'mobx';
 import { IDepartment } from '../interfaces/IDepartment';
-import { ISalesStat } from '../interfaces/ISalesStat';
 import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
 import { stringify } from 'query-string';
-import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
+import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 
 export type DisplayMode = 'pack' | 'currency';
 
@@ -17,8 +16,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable dateFrom: Date;
     @observable dateTo: Date;
     @observable displayMode: DisplayMode = 'pack';
-    @observable medsSalesStat: ISalesStat[] = [];
-    @observable localeSalesStat: ILocaleSalesStat[] = [];
+    @observable medsSalesStat: IMedsSalesStat[] = [];
+    // @observable medsSalesStat: ISalesStat[] = [];
+    @observable localeSalesStat: ISalesStat[] = [];
+    // @observable localeSalesStat: ILocaleSalesStat[] = [];
     @observable needSalesStat: boolean = false;
     @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();

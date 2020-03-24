@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { ILocaleSalesStat } from '../../../interfaces/ILocaleSalesStat';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { USER_ROLE } from '../../../constants/Roles';
+import { ISalesStat } from '../../../interfaces/ISalesStat';
 
 interface IProps {
-    role: USER_ROLE;
-    localeSalesStat?: ILocaleSalesStat[];
+    role?: USER_ROLE;
+    localeSalesStat?: ISalesStat[];
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 }
