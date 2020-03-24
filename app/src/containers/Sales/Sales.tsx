@@ -81,7 +81,7 @@ class Sales extends Component<IProps> {
                     {/* <DrugsTable
                         meds={meds}
                         medsDisplayStatuses={medsDisplayStatus}
-                        medsStat={localeSalesStat}
+                        medsStat={salesStat}
                     /> */}
                     <DateRangeModal />
                 </Grid>

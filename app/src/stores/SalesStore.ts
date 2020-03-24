@@ -17,9 +17,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable dateTo: Date;
     @observable displayMode: DisplayMode = 'pack';
     @observable medsSalesStat: IMedsSalesStat[] = [];
-    // @observable medsSalesStat: ISalesStat[] = [];
-    @observable localeSalesStat: ISalesStat[] = [];
-    // @observable localeSalesStat: ILocaleSalesStat[] = [];
+    @observable salesStat: ISalesStat[] = [];
     @observable needSalesStat: boolean = false;
     @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
@@ -39,7 +37,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
                 if (this.currentDepartmentId !== newDepartmentId) {
                     this.medsSalesStat = [];
-                    this.localeSalesStat = [];
+                    this.salesStat = [];
                 }
 
                 this.currentDepartmentId = newDepartmentId;
@@ -68,7 +66,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.displayMode = 'pack';
         this.medsSalesStat = [];
-        this.localeSalesStat = [];
+        this.salesStat = [];
         this.needSalesStat = false;
         this.currentDepartmentId = null;
         this.medsDisplayStatus = new Map();
@@ -163,7 +161,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         callback(requestName);
         this.clearParams(requestName);
 
-        this.localeSalesStat = res;
+        this.salesStat = res;
     }
 
     @action.bound

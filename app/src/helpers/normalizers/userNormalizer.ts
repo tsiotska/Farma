@@ -27,7 +27,7 @@ const valuesMap: IValuesMap = {
 };
 
 export const userNormalizer = ({ data: { data }}: any) => {
-    const requiredProps = [ 'id', 'full_name',  'position', 'avatar' ];
+    const requiredProps = [ 'id', 'full_name',  'position' ];
     const hasRequiredProps = requiredProps.every(prop => prop in data);
 
     return hasRequiredProps

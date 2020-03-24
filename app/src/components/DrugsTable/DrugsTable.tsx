@@ -22,6 +22,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IRegion } from '../../interfaces/IRegion';
 import cx from 'classnames';
 import { ISalesStat } from '../../interfaces/ISalesStat';
+import { toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -68,11 +69,14 @@ interface IProps extends WithStyles<typeof styles> {
     setSalesHeaderHeight?: (value: number) => void;
     displayMode?: DisplayMode;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    // regions?: Map<number, IRegion>;
-
     meds?: Map<number, IMedicine>;
-    medsStat?: ISalesStat[];
-    medsDisplayStatuses?: Map<number, boolean>;
+    salesStat?: ISalesStat[];
+    medsDisplayStatus?: Map<number, boolean>;
+
+    headerPrepend: any;
+    rowPrepend: any;
+
+    // regions?: Map<number, IRegion>;
 }
 
 @inject(({
@@ -83,10 +87,13 @@ interface IProps extends WithStyles<typeof styles> {
         },
         salesStore: {
             displayMode,
-            getAsyncStatus
+            getAsyncStatus,
+            salesStat,
+            medsDisplayStatus
         },
         departmentsStore: {
-            regions
+            regions,
+            meds
         }
     }
 }) => ({
@@ -94,7 +101,10 @@ interface IProps extends WithStyles<typeof styles> {
     setSalesHeaderHeight,
     displayMode,
     getAsyncStatus,
-    regions
+    regions,
+    meds,
+    salesStat,
+    medsDisplayStatus
 }))
 @observer
 class DrugsTable extends Component<IProps> {
@@ -110,11 +120,17 @@ class DrugsTable extends Component<IProps> {
 
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
-            .filter(({ id }) => this.props.medsDisplayStatuses.get(id) === true);
+            .filter(({ id }) => this.props.medsDisplayStatus.get(id) === true);
     }
 
     get marginTop(): number {
         return this.props.salesHeaderHeight || this.headerHeight;
+    }
+
+    get showLoader(): boolean {
+        const { salesStat } = this.props;
+        const statIsAbsent = !salesStat || !salesStat.length;
+        return this.isLoading && statIsAbsent;
     }
 
     calculateTopMargin = () => {
@@ -152,9 +168,11 @@ class DrugsTable extends Component<IProps> {
         const {
             classes,
             meds,
-            medsDisplayStatuses,
-            medsStat,
+            medsDisplayStatus,
+            salesStat,
             displayMode,
+            headerPrepend: HeaderPrepend,
+            rowPrepend
             // regions
         } = this.props;
 
@@ -164,7 +182,8 @@ class DrugsTable extends Component<IProps> {
                     <TableHead className={classes.th}>
                         <TableRow className={classes.thRow}>
                             <TableCell colSpan={2} className={classes.thCell}>
-                                регион
+                                {/* регион */}
+                                <HeaderPrepend />
                             </TableCell>
 
                             {
@@ -187,7 +206,7 @@ class DrugsTable extends Component<IProps> {
                     </TableHead>
                     <TableBody className={classes.body}>
                         {
-                            (this.isLoading && !medsStat.length)
+                            this.showLoader
                             ? <TableRow>
                                 <TableCell colSpan={this.medsArray.length + 1}>
                                     <LinearProgress />
@@ -195,9 +214,10 @@ class DrugsTable extends Component<IProps> {
                               </TableRow>
                             : <Body
                                 meds={meds}
-                                salesStat={medsStat}
-                                displayStatuses={medsDisplayStatuses}
+                                salesStat={salesStat}
+                                displayStatuses={medsDisplayStatus}
                                 displayMode={displayMode}
+                                rowPrepend={rowPrepend}
                                  // regions={regions}
                               />
                         }

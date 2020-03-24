@@ -11,6 +11,7 @@ interface IProps {
     salesStat: ISalesStat[];
     displayStatuses: Map<number, boolean>;
     displayMode: DisplayMode;
+    rowPrepend: any;
     // regions: Map<number, IRegion>;
 }
 
@@ -36,6 +37,7 @@ class Body extends Component<IProps> {
         const {
             salesStat,
             displayMode,
+            rowPrepend: PrependComponent
             // regions
         } = this.props;
 
@@ -50,6 +52,8 @@ class Body extends Component<IProps> {
                 medStat={stat.stat}
                 targetProperty={targetProperty}
                 rowEndAddornment={this.endAddornment}
+                rowStartAddornment={<PrependComponent statItem={stat} />}
+                /*
                 rowStartAddornment={
                     <>
                         {
@@ -60,6 +64,7 @@ class Body extends Component<IProps> {
                         }
                     </>
                 }
+                */
             />
         ));
     }
