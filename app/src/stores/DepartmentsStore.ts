@@ -9,7 +9,7 @@ import { IPosition } from '../interfaces/IPosition';
 import Config from '../../Config';
 import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
-import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../constants/Roles';
+import { USER_ROLE } from '../constants/Roles';
 import { IRegion } from '../interfaces/IRegion';
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
@@ -206,10 +206,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     private getWorkersApiUrl(fired?: boolean): string {
-        const { userStore: { user, role } } = this.rootStore;
+        const { userStore: { previewUser, role } } = this.rootStore;
 
-        const userId = user
-            ? user.id
+        const userId = previewUser
+            ? previewUser.id
             : null;
 
         const departmentId = this.currentDepartment
@@ -223,10 +223,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (userId === null || departmentId === null) return null;
 
         switch (role) {
-            case ADMIN: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
-            case FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
-            case REGIONAL_MANAGER: return `api/branch/${this.currentDepartment.id}/rm/${userId}/worker${queryParam}`;
-            case MEDICAL_AGENT: return `api/branch/${this.currentDepartment.id}/mp/${userId}/worker${queryParam}`;
+            case USER_ROLE.ADMIN: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
+            case USER_ROLE.REGIONAL_MANAGER: return `api/branch/${this.currentDepartment.id}/rm/${userId}/worker${queryParam}`;
+            case USER_ROLE.MEDICAL_AGENT: return `api/branch/${this.currentDepartment.id}/mp/${userId}/worker${queryParam}`;
             default: return null;
         }
     }

@@ -7,13 +7,13 @@ import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import { ROOT_ROUTE, LOGIN_ROUTE } from '../../constants/Router';
 
 import { IRoleContent, adminContent, FFMContent, RMContent, MAContent } from './RolesPresets';
-import { ADMIN, FIELD_FORCE_MANAGER, MEDICAL_AGENT, REGIONAL_MANAGER } from '../../constants/Roles';
+import { USER_ROLE } from '../../constants/Roles';
 import PrivateRoute from '../../components/PrivateRoute';
 
 const styles = (theme: any) => createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
-    role?: string;
+    role?: USER_ROLE;
 }
 
 @inject(({
@@ -29,10 +29,10 @@ interface IProps extends WithStyles<typeof styles> {
 class DepartmentContent extends Component<IProps> {
     get userContent(): IRoleContent[] {
         switch (this.props.role) {
-            case ADMIN: return adminContent;
-            case FIELD_FORCE_MANAGER: return FFMContent;
-            case REGIONAL_MANAGER: return RMContent;
-            case MEDICAL_AGENT: return MAContent;
+            case USER_ROLE.ADMIN: return adminContent;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return FFMContent;
+            case USER_ROLE.REGIONAL_MANAGER: return RMContent;
+            case USER_ROLE.MEDICAL_AGENT: return MAContent;
             default: return [];
         }
     }

@@ -153,4 +153,10 @@ export class APIRequester {
             .then(regionNormalizer)
             .catch(this.defaultErrorHandler());
     }
+
+    // getRegionAgents(branchId: number, positionId: number): Promise<any> {
+    //     return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
+    //     .then()
+    //     .catch(this.defaultErrorHandler());
+    // }
 }

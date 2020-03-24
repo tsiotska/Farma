@@ -5,17 +5,13 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
-import {
-    UNKNOWN,
-    FIELD_FORCE_MANAGER,
-    ADMIN,
-    REGIONAL_MANAGER,
-    MEDICAL_AGENT
-} from '../constants/Roles';
+import { USER_ROLE } from '../constants/Roles';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
+    // used for nav
+    @observable navHistory: IUser[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
@@ -35,18 +31,34 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @computed
-    get role(): string {
-        const position = this.user
-        ? this.user.position
+    get previewUser(): IUser {
+        return this.navHistory[this.navHistory.length - 1] || null;
+    }
+
+    @computed
+    get role(): USER_ROLE {
+        const position = this.previewUser
+        ? this.previewUser.position
         : -1;
 
         switch (position) {
-            case 1: return ADMIN;
-            case 2: return FIELD_FORCE_MANAGER;
-            case 3: return REGIONAL_MANAGER;
-            case 4: return MEDICAL_AGENT;
-            default: return UNKNOWN;
+            case 1: return USER_ROLE.ADMIN;
+            case 2: return USER_ROLE.FIELD_FORCE_MANAGER;
+            case 3: return USER_ROLE.REGIONAL_MANAGER;
+            case 4: return USER_ROLE.MEDICAL_AGENT;
+            default: return USER_ROLE.UNKNOWN;
         }
+    }
+
+    @action.bound
+    historyPush(newUser: IUser) {
+        this.navHistory.push(newUser);
+    }
+
+    @action.bound
+    historyGoTo(userId: number) {
+        const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
+        this.navHistory.splice(userIndex);
     }
 
     @action.bound
@@ -54,17 +66,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const requestName = 'loadUserProfile';
         const { api } = this.rootStore;
 
-        this.setLoading(requestName);
-        const user = await api.getUser();
+        this.user = await this.dispatchRequest(api.getUser(), requestName);
+        if (this.user) this.navHistory.push(this.user);
 
-        if (user) {
-            this.user = user;
-            this.setError(requestName);
-        } else {
-            this.setSuccess(requestName);
-        }
-
-        return !!user;
+        return !!this.user;
     }
 
     @action.bound
@@ -78,6 +83,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         this.dispatchRequest(api.logout(), requestName);
         this.user = null;
+        this.navHistory = [];
         resetDepartmentsStore();
         resetSalesStore();
     }

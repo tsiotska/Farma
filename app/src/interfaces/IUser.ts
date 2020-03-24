@@ -8,8 +8,8 @@ export interface IUser {
     name: string;
     position: number;
     avatar: string;
-    doctorsCount: number;
-    pharmacyCount: number;
+    doctorsCount?: number;
+    pharmacyCount?: number;
 
     region?: string[];
     level?: string;

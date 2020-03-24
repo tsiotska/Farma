@@ -38,10 +38,7 @@ interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
     medsSalesStat?: ISalesStat[];
-    localeSalesStat?: ILocaleSalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
-    meds?: Map<number, IMedicine>;
-    medsDisplayStatus?: Map<number, boolean>;
 }
 
 @inject(({
@@ -52,20 +49,12 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             setSalesStatDemand,
             medsSalesStat,
-            medsDisplayStatus,
-            localeSalesStat
-        },
-        departmentsStore: {
-            meds
         }
     }
 }) => ({
     openedModal,
     setSalesStatDemand,
-    medsSalesStat,
-    medsDisplayStatus,
-    meds,
-    localeSalesStat
+    medsSalesStat
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -81,9 +70,9 @@ class Sales extends Component<IProps> {
         const {
             classes,
             medsSalesStat,
-            meds,
-            medsDisplayStatus,
-            localeSalesStat
+            // meds,
+            // medsDisplayStatus,
+            // localeSalesStat
         } = this.props;
 
         return (
@@ -93,11 +82,11 @@ class Sales extends Component<IProps> {
                         <Plot medsSalesStat={medsSalesStat} />
                         <Statistic medsSalesStat={medsSalesStat} />
                     </Grid>
-                    <DrugsTable
+                    {/* <DrugsTable
                         meds={meds}
                         medsDisplayStatuses={medsDisplayStatus}
                         medsStat={localeSalesStat}
-                    />
+                    /> */}
                     <DateRangeModal />
                 </Grid>
             </MuiPickersUtilsProvider>

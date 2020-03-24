@@ -20,7 +20,6 @@ import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { toJS } from 'mobx';
 import { IRegion } from '../../interfaces/IRegion';
 import cx from 'classnames';
 
@@ -67,20 +66,13 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     salesHeaderHeight?: number;
     setSalesHeaderHeight?: (value: number) => void;
-
-    meds?: Map<number, IMedicine>;
-    medsStat?: ILocaleSalesStat[];
-    medsDisplayStatuses?: Map<number, boolean>;
     displayMode?: DisplayMode;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     regions?: Map<number, IRegion>;
 
-    rowStartAddornment?: React.Component;
-    rowEndAddornment?: React.Component;
-    rowPrepend?: React.Component;
-    rowAppend?: React.Component;
-    headerPrepend?: React.Component;
-    headerAppend?: React.Component;
+    meds?: Map<number, IMedicine>;
+    medsStat?: ILocaleSalesStat[];
+    medsDisplayStatuses?: Map<number, boolean>;
 }
 
 @inject(({
@@ -160,8 +152,6 @@ class DrugsTable extends Component<IProps> {
         const {
             classes,
             meds,
-            headerAppend,
-            headerPrepend,
             medsDisplayStatuses,
             medsStat,
             displayMode,
@@ -173,8 +163,6 @@ class DrugsTable extends Component<IProps> {
                 <Table padding='none' className={classes.table}>
                     <TableHead className={classes.th}>
                         <TableRow className={classes.thRow}>
-                            {headerPrepend}
-
                             <TableCell colSpan={2} className={classes.thCell}>
                                 регион
                             </TableCell>
@@ -195,8 +183,6 @@ class DrugsTable extends Component<IProps> {
                                     total
                                 </TableCell>
                             }
-
-                            {headerAppend}
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.body}>
