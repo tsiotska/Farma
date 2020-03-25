@@ -18,11 +18,8 @@ import { IMedicine } from '../../interfaces/IMedicine';
 import HeaderItem from './HeaderItem';
 import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
-import { IAsyncStatus } from '../../stores/AsyncStore';
-import { IRegion } from '../../interfaces/IRegion';
 import cx from 'classnames';
 import { ISalesStat } from '../../interfaces/ISalesStat';
-import { toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -68,10 +65,10 @@ interface IProps extends WithStyles<typeof styles> {
     salesHeaderHeight?: number;
     setSalesHeaderHeight?: (value: number) => void;
     displayMode?: DisplayMode;
-    getAsyncStatus?: (key: string) => IAsyncStatus;
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
+    isLoading: boolean;
     salesStat: ISalesStat[];
     headerPrepend: any;
     rowPrepend: any;
@@ -87,7 +84,6 @@ interface IProps extends WithStyles<typeof styles> {
         },
         salesStore: {
             displayMode,
-            getAsyncStatus,
             medsDisplayStatus
         },
         departmentsStore: {
@@ -99,7 +95,6 @@ interface IProps extends WithStyles<typeof styles> {
     salesHeaderHeight,
     setSalesHeaderHeight,
     displayMode,
-    getAsyncStatus,
     regions,
     meds,
     medsDisplayStatus
@@ -108,13 +103,6 @@ interface IProps extends WithStyles<typeof styles> {
 class DrugsTable extends Component<IProps> {
     readonly headerHeight: number = 20;
     headerRefs: any = {};
-
-    get isLoading(): boolean {
-        const { getAsyncStatus } = this.props;
-        const s1 = getAsyncStatus('loadLocaleSalesStat');
-        const s2 = getAsyncStatus('loadMedsStat');
-        return s1.loading || s2.loading;
-    }
 
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
@@ -126,9 +114,9 @@ class DrugsTable extends Component<IProps> {
     }
 
     get showLoader(): boolean {
-        const { salesStat } = this.props;
+        const { salesStat, isLoading } = this.props;
         const statIsAbsent = !salesStat || !salesStat.length;
-        return this.isLoading && statIsAbsent;
+        return isLoading && statIsAbsent;
     }
 
     calculateTopMargin = () => {
@@ -206,13 +194,13 @@ class DrugsTable extends Component<IProps> {
                         {
                             this.showLoader
                             ? <TableRow>
-                                <TableCell colSpan={this.medsArray.length + 1}>
+                                <TableCell colSpan={this.medsArray.length + 3}>
                                     <LinearProgress />
                                 </TableCell>
                               </TableRow>
                             : <Body
                                 meds={meds}
-                                salesStat={salesStat}
+                                salesStat={salesStat || []}
                                 displayStatuses={medsDisplayStatus}
                                 displayMode={displayMode}
                                 rowPrepend={rowPrepend}

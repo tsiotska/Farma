@@ -45,7 +45,7 @@ class Body extends Component<IProps> {
         ? 'money'
         : 'amount';
 
-        return salesStat !== null && salesStat.map(stat => (
+        return salesStat.map(stat => (
             <TableRow
                 key={stat.id}
                 medsIds={this.medsIds}

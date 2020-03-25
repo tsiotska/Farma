@@ -3,9 +3,14 @@ import { observer, inject } from 'mobx-react';
 import { USER_ROLE } from '../../../constants/Roles';
 import { ITablePreset, FFM_PRESET, MR_PRESET, MA_PRESET } from './presets';
 import DrugsTable from '../../../components/DrugsTable';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
+import { ISalesStat } from '../../../interfaces/ISalesStat';
 
 interface IProps {
     role?: USER_ROLE;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
+    locationSalesStat?: ISalesStat[];
+    agentSalesStat?: ISalesStat[];
 }
 
 @inject(({
@@ -13,9 +18,17 @@ interface IProps {
         userStore: {
             role
         },
+        salesStore: {
+            getAsyncStatus,
+            locationSalesStat,
+            agentSalesStat
+        }
     }
 }) => ({
     role,
+    getAsyncStatus,
+    locationSalesStat,
+    agentSalesStat
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -27,14 +40,23 @@ class TableStat extends Component<IProps> {
             default: return null;
         }
     }
+
+    get showLoader(): boolean {
+        const { getAsyncStatus } = this.props;
+        const s1 = getAsyncStatus('loadLocaleSalesStat');
+        const s2 = getAsyncStatus('loadMedsStat');
+        return s1.loading || s2.loading;
+    }
+
     render() {
 
         if (this.tablePreset === null) return null;
 
-        return this.tablePreset.map(({ rowPrepend, headerPrepend }, i) => (
+        return this.tablePreset.map(({ rowPrepend, headerPrepend, propName }, i) => (
             <DrugsTable
                 key={i}
-                salesStat={[]}
+                isLoading={this.showLoader}
+                salesStat={this.props[propName]}
                 rowPrepend={
                     rowPrepend === null
                     ? (): any => null
