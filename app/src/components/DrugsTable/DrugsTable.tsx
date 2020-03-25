@@ -70,9 +70,9 @@ interface IProps extends WithStyles<typeof styles> {
     displayMode?: DisplayMode;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     meds?: Map<number, IMedicine>;
-    salesStat?: ISalesStat[];
     medsDisplayStatus?: Map<number, boolean>;
 
+    salesStat: ISalesStat[];
     headerPrepend: any;
     rowPrepend: any;
 
@@ -88,7 +88,6 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             displayMode,
             getAsyncStatus,
-            salesStat,
             medsDisplayStatus
         },
         departmentsStore: {
@@ -103,7 +102,6 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus,
     regions,
     meds,
-    salesStat,
     medsDisplayStatus
 }))
 @observer

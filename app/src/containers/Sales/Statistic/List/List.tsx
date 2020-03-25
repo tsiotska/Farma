@@ -7,7 +7,7 @@ import ListItem from '../ListItem';
 import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
 
 interface IProps {
-    medsSalesStat: IMedsSalesStat[];
+    chartSalesStat: IMedsSalesStat[];
     meds?: Map<number, IMedicine>;
     displayMode?: DisplayMode;
     medsDisplayStatus?: Map<number, boolean>;
@@ -55,7 +55,7 @@ class List extends Component<IProps> {
 
     render() {
         const {
-            medsSalesStat,
+            chartSalesStat,
             meds,
             displayMode,
             medsDisplayStatus,
@@ -63,10 +63,10 @@ class List extends Component<IProps> {
             rootRef
         } = this.props;
 
-        if (!medsSalesStat || !meds) return null;
+        if (!chartSalesStat || !meds) return null;
 
         const usedIds: number[] = [];
-        const listItemsWithStat = medsSalesStat.map(stat => {
+        const listItemsWithStat = chartSalesStat.map(stat => {
             usedIds.push(stat.medId);
             return <ListItem
                 key={stat.medId}

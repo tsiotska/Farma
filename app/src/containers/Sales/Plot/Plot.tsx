@@ -42,7 +42,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    medsSalesStat: IMedsSalesStat[];
+    chartSalesStat: IMedsSalesStat[];
     dateFrom?: Date;
     dateTo?: Date;
     meds?: Map<number, IMedicine>;
@@ -102,11 +102,11 @@ class Plot extends Component<IProps> {
     }
 
     get labelType(): LabelType {
-        const { medsSalesStat } = this.props;
+        const { chartSalesStat } = this.props;
 
-        if (medsSalesStat === null) return 'unknown';
+        if (chartSalesStat === null) return 'unknown';
 
-        for (const saleStat of medsSalesStat) {
+        for (const saleStat of chartSalesStat) {
             for (const timeSpanStat of saleStat.periods) {
                 const { day, year, month } = (timeSpanStat as any);
                 if (day !== undefined) return 'day';
@@ -131,20 +131,20 @@ class Plot extends Component<IProps> {
 
     getDataSets = (): any[] => {
         const {
-            medsSalesStat,
+            chartSalesStat,
             meds,
             displayMode,
             medsDisplayStatus
         } = this.props;
 
-        if (!medsSalesStat || !meds || this.labelType === 'unknown') return [];
+        if (!chartSalesStat || !meds || this.labelType === 'unknown') return [];
 
         const comparer = this.getDateComparer();
         const propName = displayMode === 'currency'
         ? 'money'
         : 'amount';
 
-        return medsSalesStat.map(x => {
+        return chartSalesStat.map(x => {
             const medicine = meds.get(x.medId);
 
             if (!medicine || !medsDisplayStatus.get(x.medId)) return;

@@ -1,6 +1,6 @@
 import { workersNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
-import { salesNormalizer } from './../helpers/normalizers/salesNormalizer';
+import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer';
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
 import { mockDrugs } from './mock/mockDrugs';
@@ -16,7 +16,7 @@ import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
 import { mockSales } from './mock/mockSales';
-import { localeSalesStatNormalizer } from '../helpers/normalizers/localeSalesStatNormalizer';
+import { salesStatNormalizer } from '../helpers/normalizers/salesStatNormalizer';
 import { mockRegionSalesState } from './mock/mockRegionSalesStat';
 import { IWorker } from '../interfaces/IWorker';
 import { IRegion } from '../interfaces/IRegion';
@@ -129,15 +129,16 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(mockMedicalDepartments));
     }
 
-    getSalesStat(url: string): Promise<IMedsSalesStat[]> {
+    getMedsSalesStat(url: string): Promise<IMedsSalesStat[]> {
         return this.instance.get(url)
-            .then(salesNormalizer)
+            .then(medsStatNormalizer)
             .catch(this.defaultErrorHandler());
     }
 
-    getLocaleSalesStat(url: string): Promise<ISalesStat[]> {
+    getSalesStat(url: string): Promise<ISalesStat[]> {
         return this.instance.get(url)
-            .then(localeSalesStatNormalizer)
+            .then(salesStatNormalizer)
+            // .then(localeSalesStatNormalizer)
             .catch(this.defaultErrorHandler());
     }
 

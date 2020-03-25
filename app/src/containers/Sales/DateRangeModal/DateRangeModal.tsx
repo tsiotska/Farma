@@ -29,6 +29,7 @@ interface IProps extends WithStyles<typeof styles> {
     setDateFrom?: (newDate: Date) => void;
     loadMedsStat?: () => void;
     loadLocaleSalesStat?: () => void;
+    loadAgentSalesStat?: () => void;
 }
 
 @inject(({
@@ -78,7 +79,8 @@ class DateRangeModal extends Component<IProps> {
             dateFrom,
             dateTo,
             loadMedsStat,
-            loadLocaleSalesStat
+            loadLocaleSalesStat,
+            loadAgentSalesStat
         } = this.props;
 
         const isDateToChanged = this.localDateTo
@@ -95,6 +97,7 @@ class DateRangeModal extends Component<IProps> {
         if (isDateToChanged || isDateFromChanged) {
             loadMedsStat();
             loadLocaleSalesStat();
+            loadAgentSalesStat();
         }
     }
 

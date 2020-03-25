@@ -34,6 +34,7 @@ class TableStat extends Component<IProps> {
         return this.tablePreset.map(({ rowPrepend, headerPrepend }, i) => (
             <DrugsTable
                 key={i}
+                salesStat={[]}
                 rowPrepend={
                     rowPrepend === null
                     ? (): any => null
@@ -42,7 +43,8 @@ class TableStat extends Component<IProps> {
                 headerPrepend={
                     headerPrepend === null
                     ? (): any => null
-                    : headerPrepend}
+                    : headerPrepend
+                }
             />
         ));
     }
