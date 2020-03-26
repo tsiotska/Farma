@@ -11,6 +11,8 @@ interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     locationSalesStat?: ISalesStat[];
     agentSalesStat?: ISalesStat[];
+    loadLocaleSalesStat?: () => void;
+    loadAgentSalesStat?: () => void;
 }
 
 @inject(({
@@ -21,14 +23,18 @@ interface IProps {
         salesStore: {
             getAsyncStatus,
             locationSalesStat,
-            agentSalesStat
+            agentSalesStat,
+            loadLocaleSalesStat,
+            loadAgentSalesStat
         }
     }
 }) => ({
     role,
     getAsyncStatus,
     locationSalesStat,
-    agentSalesStat
+    agentSalesStat,
+    loadLocaleSalesStat,
+    loadAgentSalesStat
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -49,8 +55,10 @@ class TableStat extends Component<IProps> {
         return s1.loading || s2.loading || s3.loading;
     }
 
-    retryClickHandler = (key: number) => () => {
-        // TODO:
+    retryClickHandler = () => {
+        const { getAsyncStatus, loadLocaleSalesStat, loadAgentSalesStat } = this.props;
+        if (getAsyncStatus('loadAgentSalesStat').error) loadAgentSalesStat();
+        if (getAsyncStatus('loadLocaleSalesStat').error) loadLocaleSalesStat();
     }
 
     render() {
@@ -61,7 +69,7 @@ class TableStat extends Component<IProps> {
                 key={i}
                 isLoading={this.showLoader}
                 salesStat={this.props[propName]}
-                onRetry={this.retryClickHandler(i)}
+                onRetry={this.retryClickHandler}
                 title={title}
                 rowPrepend={rowPrepend}
                 headerPrepend={headerPrepend}

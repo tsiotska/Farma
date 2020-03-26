@@ -22,9 +22,9 @@ import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
 import cx from 'classnames';
 import { ISalesStat } from '../../interfaces/ISalesStat';
-import { toJS } from 'mobx';
 
 import SummaryRow from './SummaryRow';
+import InfoTableRow from './InfoTableRow';
 
 const styles = (theme: any) => createStyles({
     td: {},
@@ -61,10 +61,10 @@ const styles = (theme: any) => createStyles({
         marginBottom: '2vh'
     },
     retryButton: {
-        margin: '10px 0'
+        marginBottom: 10
     },
     errorText: {
-        marginTop: 10
+        margin: '10px 0'
     },
     prepend: {},
     append: {},
@@ -85,8 +85,6 @@ interface IProps extends WithStyles<typeof styles> {
     headerPrepend: any;
     rowPrepend: any;
     onRetry: () => void;
-
-    // regions?: Map<number, IRegion>;
 }
 
 interface ISettings {
@@ -177,15 +175,13 @@ class DrugsTable extends Component<IProps> {
             meds,
             medsDisplayStatus,
             salesStat,
-            displayMode,
             headerPrepend: HeaderPrepend,
             rowPrepend,
             isLoading,
             onRetry,
             title
-            // regions
         } = this.props;
-        // console.log(toJS(salesStat), isLoading, this.getTotalSalesStat());
+
         return (
             <TableContainer
                 style={{ paddingTop: this.marginTop }}
@@ -218,45 +214,45 @@ class DrugsTable extends Component<IProps> {
                     </TableHead>
                     <TableBody className={classes.body}>
                         {
-                            (salesStat === null)
-                            ? <TableRow>
-                                <TableCell align='center' colSpan={this.medsArray.length + 3}>
-                                    {
-                                        isLoading
-                                        ? <LinearProgress />
-                                        : <>
-                                            <Typography className={classes.errorText} align='center'>
-                                                Не удалось получить данные
-                                            </Typography>
-                                            <Button
-                                                className={classes.retryButton}
-                                                onClick={onRetry}
-                                                variant='outlined'>
-                                                Повторить Запрос
-                                            </Button>
-                                          </>
-                                    }
-                                </TableCell>
-                              </TableRow>
-                            : <>
+                            Array.isArray(salesStat) && salesStat.length
+                            ? <>
                                 <Body
                                     meds={meds}
                                     salesStat={salesStat || []}
                                     displayStatuses={medsDisplayStatus}
-                                    // displayMode={displayMode}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
                                     rowPrepend={rowPrepend}
                                 />
                                 <SummaryRow
                                     stat={salesStat}
-                                    // mode={displayMode}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
                                     meds={meds}
                                     displayStatus={medsDisplayStatus}
                                 />
                               </>
+                            : <InfoTableRow colSpan={this.medsArray.length + 3}>
+                                {
+                                    isLoading
+                                        ? <LinearProgress />
+                                        : salesStat === null
+                                            ? <>
+                                                <Typography className={classes.errorText} align='center'>
+                                                    Не удалось получить данные
+                                                </Typography>
+                                                <Button
+                                                    className={classes.retryButton}
+                                                    onClick={onRetry}
+                                                    variant='outlined'>
+                                                    Повторить Запрос
+                                                </Button>
+                                            </>
+                                            : <Typography className={classes.errorText}>
+                                                Нету данных
+                                            </Typography>
+                                }
+                              </InfoTableRow>
                         }
                     </TableBody>
                 </Table>
