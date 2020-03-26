@@ -37,7 +37,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get role(): USER_ROLE {
-        console.log(toJS(this.previewUser));
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;

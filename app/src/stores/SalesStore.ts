@@ -32,6 +32,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         super();
         this.rootStore = rootStore;
         this.resetStore();
+
         reaction(
             () => [
                 this.needSalesStat,
@@ -40,8 +41,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             ],
             ([ isSalesStatNeeded ]: [ number ]) => {
                 if (!isSalesStatNeeded) return;
-                const { departmentsStore: { loadLocationsAgents }} = this.rootStore;
+                const { departmentsStore: { loadLocationsAgents, loadLocations }} = this.rootStore;
                 loadLocationsAgents();
+                loadLocations();
                 this.loadAllStat();
             }
         );

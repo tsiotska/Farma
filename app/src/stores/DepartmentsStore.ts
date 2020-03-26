@@ -59,7 +59,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     initializeStore() {
         this.loadDepartments();
-        this.loadRegions(true);
         this.loadPositions(true);
         this.loadLPUs(true);
     }
@@ -202,61 +201,30 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadRegions(isInitial: boolean = false) {
-        const requestName = 'loadRegions';
+    async loadLocations(isInitial: boolean = false) {
+        const requestName = 'loadLocations';
         const { api, userStore: { role } } = this.rootStore;
 
         let url: string;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) url = 'api/region';
         else if (role === USER_ROLE.REGIONAL_MANAGER) url = 'api/city';
 
-        if (!url) return;
+        if (!url || url === window.sessionStorage.getItem(requestName)) return;
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
-
         const res = await this.dispatchRequest(
             api.getLocations(url),
             requestName
         );
 
         if (res) {
+            window.sessionStorage.setItem(requestName, url);
             const mapped: Array<[number, ILocation]> = res.map(x => ([ x.id, x ]));
             this.locations = new Map(mapped);
             return;
         }
 
-        this.retryPolicy(this.loadRegions, requestName);
-    }
-
-    @action.bound
-    async loadDoctors() {
-        console.log('load doctors');
-    }
-
-    @action.bound
-    async loadSubworkers() {
-        const requestName = 'loadSubworkers';
-        const { api } = this.rootStore;
-
-        const workerId = this.expandedWorker
-        ? this.expandedWorker.id
-        : null;
-
-        if (this.currentDepartmentId === null || workerId === null) return;
-        this.setLoading(requestName, this.currentDepartmentId);
-        const res = await api.getWorkers(`/api/branch/${this.currentDepartmentId}/rm/${workerId}/worker`);
-
-        const isRelevant = this.getRequestParams(requestName) === this.currentDepartmentId
-        && workerId === (this.expandedWorker && this.expandedWorker.id);
-        if (!isRelevant) return;
-
-        this.expandedWorker.subworkers = res;
-
-        const callback = res
-        ? this.setSuccess
-        : this.setError;
-
-        callback(requestName);
+        this.retryPolicy(this.loadLocations, requestName);
     }
 
     @action.bound
@@ -283,6 +251,37 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const mapped: Array<[number, IUserCommonInfo]> = res.map(x => ([ x.id, x ]));
             this.locationsAgents = new Map(mapped);
         }
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
+    }
+
+    @action.bound
+    async loadDoctors() {
+        console.log('load doctors');
+    }
+
+    @action.bound
+    async loadSubworkers() {
+        const requestName = 'loadSubworkers';
+        const { api } = this.rootStore;
+
+        const workerId = this.expandedWorker
+        ? this.expandedWorker.id
+        : null;
+
+        if (this.currentDepartmentId === null || workerId === null) return;
+        this.setLoading(requestName, this.currentDepartmentId);
+        const res = await api.getWorkers(`/api/branch/${this.currentDepartmentId}/rm/${workerId}/worker`);
+
+        const isRelevant = this.getRequestParams(requestName) === this.currentDepartmentId
+        && workerId === (this.expandedWorker && this.expandedWorker.id);
+        if (!isRelevant) return;
+
+        this.expandedWorker.subworkers = res;
 
         const callback = res
         ? this.setSuccess

@@ -8,5 +8,6 @@ export interface IDepartmentsStore {
     resetStore: () => void;
     initializeStore: () => void;
     loadLocationsAgents: () => void;
+    loadLocations: () => void;
     meds: Map<number, IMedicine>;
 }
