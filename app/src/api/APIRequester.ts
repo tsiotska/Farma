@@ -1,5 +1,5 @@
 import { workersNormalizer } from './../helpers/workersNormalizer';
-import { IUserCredentials } from './../interfaces/IUser';
+import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
 import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer';
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
@@ -19,9 +19,10 @@ import { mockSales } from './mock/mockSales';
 import { salesStatNormalizer } from '../helpers/normalizers/salesStatNormalizer';
 import { mockRegionSalesState } from './mock/mockRegionSalesStat';
 import { IWorker } from '../interfaces/IWorker';
-import { IRegion } from '../interfaces/IRegion';
-import { regionNormalizer } from '../helpers/normalizers/regionNormalizer';
+import { ILocation } from '../interfaces/ILocation';
+import { locationsNormalizer } from '../helpers/normalizers/locationsNormalizer';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
+import { agentNormalizer } from '../helpers/normalizers/agentNormalizer';
 
 /**
  * Class representing API requester
@@ -138,7 +139,6 @@ export class APIRequester {
     getSalesStat(url: string): Promise<ISalesStat[]> {
         return this.instance.get(url)
             .then(salesStatNormalizer)
-            // .then(localeSalesStatNormalizer)
             .catch(this.defaultErrorHandler());
     }
 
@@ -148,15 +148,15 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getRegions(): Promise<IRegion[]> {
-        return this.instance.get('api/region')
-            .then(regionNormalizer)
+    getLocations(url: string): Promise<ILocation[]> {
+        return this.instance.get(url)
+            .then(locationsNormalizer)
             .catch(this.defaultErrorHandler());
     }
 
-    // getRegionAgents(branchId: number, positionId: number): Promise<any> {
-    //     return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
-    //     .then()
-    //     .catch(this.defaultErrorHandler());
-    // }
+    getLocationAgents(branchId: number, positionId: number): Promise<IUserCommonInfo[]> {
+        return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
+        .then(agentNormalizer)
+        .catch(this.defaultErrorHandler());
+    }
 }

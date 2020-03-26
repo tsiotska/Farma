@@ -5,13 +5,13 @@ import { ITablePreset, FFM_PRESET, MR_PRESET, MA_PRESET } from './presets';
 import DrugsTable from '../../../components/DrugsTable';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { ISalesStat } from '../../../interfaces/ISalesStat';
-import { IRegion } from '../../../interfaces/IRegion';
+import { ILocation } from '../../../interfaces/ILocation';
 import { IUser } from '../../../interfaces';
 
 interface IProps {
     role?: USER_ROLE;
     previewUser?: IUser;
-    regions?: Map<number, IRegion>;
+    locations?: Map<number, ILocation>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     locationSalesStat?: ISalesStat[];
     agentSalesStat?: ISalesStat[];
@@ -30,17 +30,21 @@ interface IProps {
             locationSalesStat,
             agentSalesStat,
             loadLocaleSalesStat,
-            loadAgentSalesStat
+            loadAgentSalesStat,
+        },
+        departmentsStore: {
+            locations
         }
     }
 }) => ({
+    locations,
     role,
     previewUser,
     getAsyncStatus,
     locationSalesStat,
     agentSalesStat,
     loadLocaleSalesStat,
-    loadAgentSalesStat
+    loadAgentSalesStat,
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -68,14 +72,14 @@ class TableStat extends Component<IProps> {
     }
 
     getTitle(): string {
-        const { role, regions, previewUser } = this.props;
+        const { role, locations, previewUser } = this.props;
 
         if (role === USER_ROLE.REGIONAL_MANAGER) {
             const region = previewUser
             ? previewUser.region
             : null;
 
-            const userRegion = regions.get(region);
+            const userRegion = locations.get(region);
 
             return userRegion
             ? userRegion.name

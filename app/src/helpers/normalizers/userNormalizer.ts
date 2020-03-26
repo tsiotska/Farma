@@ -1,5 +1,6 @@
 import { IValuesMap, defaultObjectNormalizer } from './normalizer';
 import { IUser } from '../../interfaces';
+import { USER_ROLE } from '../../constants/Roles';
 
 const defaultUser: IUser = {
     id: null,
@@ -33,6 +34,22 @@ export const userNormalizer = ({ data: { data }}: any) => {
     const hasRequiredProps = requiredProps.every(prop => prop in data);
 
     return hasRequiredProps
-    ? defaultObjectNormalizer(data, defaultUser, valuesMap)
+    ? defaultObjectNormalizer(
+        data,
+        defaultUser,
+        valuesMap,
+        {
+            position: (position: number) => {
+                switch (position) {
+                    case USER_ROLE.ADMIN: return USER_ROLE.ADMIN;
+                    case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.FIELD_FORCE_MANAGER;
+                    case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
+                    case USER_ROLE.MEDICAL_AGENT: return USER_ROLE.MEDICAL_AGENT;
+                    case USER_ROLE.SUPER_ADMIN: return USER_ROLE.SUPER_ADMIN;
+                    case USER_ROLE.PRODUCT_MANAGER: return USER_ROLE.PRODUCT_MANAGER;
+                    default: return USER_ROLE.UNKNOWN;
+                }
+            }
+        })
     : null;
 };

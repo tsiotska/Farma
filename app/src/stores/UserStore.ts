@@ -1,5 +1,5 @@
 import { IUserCredentials } from './../interfaces/IUser';
-import { computed, action, observable } from 'mobx';
+import { computed, action, observable, toJS } from 'mobx';
 
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
@@ -37,17 +37,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get role(): USER_ROLE {
-        const position = this.previewUser
+        console.log(toJS(this.previewUser));
+        return this.previewUser
         ? this.previewUser.position
-        : -1;
-
-        switch (position) {
-            case 1: return USER_ROLE.ADMIN;
-            case 2: return USER_ROLE.FIELD_FORCE_MANAGER;
-            case 3: return USER_ROLE.REGIONAL_MANAGER;
-            case 4: return USER_ROLE.MEDICAL_AGENT;
-            default: return USER_ROLE.UNKNOWN;
-        }
+        : USER_ROLE.UNKNOWN;
     }
 
     @action.bound

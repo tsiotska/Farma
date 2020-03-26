@@ -1,4 +1,4 @@
-export interface IRegion {
+export interface ILocation {
     id: number;
     name: string;
 }

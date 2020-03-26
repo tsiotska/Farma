@@ -103,7 +103,6 @@ interface ISettings {
             medsDisplayStatus
         },
         departmentsStore: {
-            regions,
             meds
         }
     }
@@ -111,7 +110,6 @@ interface ISettings {
     salesHeaderHeight,
     setSalesHeaderHeight,
     displayMode,
-    regions,
     meds,
     medsDisplayStatus
 }))

@@ -78,11 +78,6 @@ class Sales extends Component<IProps> {
                         <Statistic chartSalesStat={chartSalesStat} />
                     </Grid>
                     <TableStat />
-                    {/* <DrugsTable
-                        meds={meds}
-                        medsDisplayStatuses={medsDisplayStatus}
-                        medsStat={salesStat}
-                    /> */}
                     <DateRangeModal />
                 </Grid>
             </MuiPickersUtilsProvider>

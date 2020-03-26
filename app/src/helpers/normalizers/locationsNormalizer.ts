@@ -1,7 +1,7 @@
 import { objectArrayNormalizer, IValuesMap } from './normalizer';
-import { IRegion } from '../../interfaces/IRegion';
+import { ILocation } from '../../interfaces/ILocation';
 
-const defaultRegion: IRegion = {
+const defaultRegion: ILocation = {
     id: null,
     name: null
 };
@@ -11,7 +11,7 @@ const valuesMap: IValuesMap = {
     name: 'name'
 };
 
-export const regionNormalizer = ({ data: { data } }: any) => objectArrayNormalizer(
+export const locationsNormalizer = ({ data: { data } }: any) => objectArrayNormalizer(
     data,
     defaultRegion,
     valuesMap,

@@ -2,7 +2,6 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action, reaction } from 'mobx';
-import { IDepartment } from '../interfaces/IDepartment';
 import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
@@ -19,7 +18,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable displayMode: DisplayMode = 'pack';
 
     @observable needSalesStat: boolean = false;
-    @observable currentDepartmentId: number;
+    // @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
 
     // data for chart
@@ -34,26 +33,35 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.rootStore = rootStore;
         this.resetStore();
         reaction(
-            () => [this.rootStore.departmentsStore.currentDepartment, this.needSalesStat],
-            async ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
+            () => [
+                this.needSalesStat,
+                this.rootStore.departmentsStore.currentDepartmentId,
+                this.rootStore.userStore.previewUser
+            ],
+            ([ isSalesStatNeeded ]: [ number ]) => {
                 if (!isSalesStatNeeded) return;
-
-                const newDepartmentId: number = currentDepartment
-                ? currentDepartment.id
-                : -1;
-
-                if (this.currentDepartmentId !== newDepartmentId) {
-                    this.chartSalesStat = null;
-                    this.locationSalesStat = null;
-                    this.agentSalesStat = null;
-                }
-
-                this.currentDepartmentId = newDepartmentId;
-                await this.loadMedsStat();
-                await this.loadLocaleSalesStat();
-                await this.loadAgentSalesStat();
+                const { departmentsStore: { loadLocationsAgents }} = this.rootStore;
+                loadLocationsAgents();
+                this.loadAllStat();
             }
         );
+    }
+
+    @action.bound
+    async loadAllStat(withReset: boolean = true) {
+        const { userStore: { role }} = this.rootStore;
+
+        if (withReset) {
+            this.chartSalesStat = null;
+            this.locationSalesStat = null;
+            this.agentSalesStat = null;
+        }
+
+        await this.loadMedsStat();
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER || role === USER_ROLE.REGIONAL_MANAGER) {
+            await this.loadAgentSalesStat();
+        }
+        await this.loadLocaleSalesStat();
     }
 
     @action.bound
@@ -78,7 +86,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.locationSalesStat = null;
         this.agentSalesStat = null;
         this.needSalesStat = false;
-        this.currentDepartmentId = null;
         this.medsDisplayStatus = new Map();
     }
 
@@ -132,17 +139,17 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadMedsStat() {
         const requestName = 'loadMedsStat';
-        const { api } = this.rootStore;
-        const url = this.getMedsStatUrl(this.currentDepartmentId);
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getMedsStatUrl(currentDepartmentId);
 
-        if (this.currentDepartmentId === -1 || !url) return;
+        if (currentDepartmentId === -1 || !url) return;
 
-        this.setLoading(requestName, this.currentDepartmentId);
+        this.setLoading(requestName, currentDepartmentId);
         const res = await api.getMedsSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
-        if (storedId !== this.currentDepartmentId) return;
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
         this.chartSalesStat = res;
 
         // if fetched data is relevant we process it
@@ -157,16 +164,16 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadLocaleSalesStat() {
         const requestName = 'loadLocaleSalesStat';
-        const { api } = this.rootStore;
-        const url = this.getLocationStatUrl(this.currentDepartmentId);
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getLocationStatUrl(currentDepartmentId);
 
-        if (this.currentDepartmentId === -1 || !url) return;
+        if (currentDepartmentId === -1 || !url) return;
 
-        this.setLoading(requestName, this.currentDepartmentId);
+        this.setLoading(requestName, currentDepartmentId);
         const res = await api.getSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
-        if (storedId !== this.currentDepartmentId) return;
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
         this.locationSalesStat = res;
 
         const callback = res
@@ -180,16 +187,16 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadAgentSalesStat() {
         const requestName = 'loadAgentSalesStat';
-        const { api } = this.rootStore;
-        const url = this.getAgentStatUrl(this.currentDepartmentId);
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getAgentStatUrl(currentDepartmentId);
 
-        if (this.currentDepartmentId === -1 || !url) return;
+        if (currentDepartmentId === -1 || !url) return;
 
-        this.setLoading(requestName, this.currentDepartmentId);
+        this.setLoading(requestName, currentDepartmentId);
         const res = await api.getSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
-        if (storedId !== this.currentDepartmentId) return;
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
         this.agentSalesStat = res;
 
         const callback = res
