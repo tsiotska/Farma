@@ -1,22 +1,22 @@
-import TextCell from '../../../components/DrugsTable/TextCell';
-
 export interface ITablePreset {
-    rowPrepend: any;
-    headerPrepend: any;
-    propName: 'locationSalesStat' | 'agentSalesStat';
-    title?: string;
+    groupBy: GROUP_BY;
+}
+
+export enum GROUP_BY {
+    LOCATION,
+    AGENT
 }
 
 export const FFM_PRESET: ITablePreset[] = [
-    { rowPrepend: TextCell, headerPrepend: TextCell, propName: 'agentSalesStat', title: 'Региональные менеджеры' },
-    { rowPrepend: TextCell, headerPrepend: TextCell, propName: 'locationSalesStat', title: 'Регионы' },
+    { groupBy: GROUP_BY.AGENT },
+    { groupBy: GROUP_BY.LOCATION },
 ];
 
 export const MR_PRESET: ITablePreset[] = [
-    { rowPrepend: null, headerPrepend: null, propName: 'agentSalesStat', title: 'Медицинские представители' },
-    { rowPrepend: null, headerPrepend: null, propName: 'locationSalesStat' },
+    { groupBy: GROUP_BY.AGENT },
+    { groupBy: GROUP_BY.LOCATION },
 ];
 
 export const MA_PRESET: ITablePreset[] = [
-    { rowPrepend: null, headerPrepend: null, propName: 'locationSalesStat', title: 'ЛПУ / Аптека' },
+    { groupBy: GROUP_BY.LOCATION }
 ];

@@ -4,7 +4,6 @@ import {
     WithStyles,
     TableContainer,
     Table,
-    Paper,
     TableHead,
     TableBody,
     TableRow,
@@ -25,31 +24,28 @@ import { ISalesStat } from '../../interfaces/ISalesStat';
 
 import SummaryRow from './SummaryRow';
 import InfoTableRow from './InfoTableRow';
+import { ILocation } from '../../interfaces/ILocation';
+import { IUserCommonInfo } from '../../interfaces/IUser';
 
 const styles = (theme: any) => createStyles({
-    td: {},
-    th: {},
-    thRow: {},
     thCell: {
         height: 48,
         '&:first-of-type': {
             paddingLeft: 5,
+            '& *': {
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+            },
             [theme.breakpoints.up('md')]: {
                 width: 220,
             }
         },
         '&:last-of-type': {
             width: 100,
+            color: theme.palette.primary.gray.light
         },
         '&.alignBottom': {
             verticalAlign: 'bottom'
-        }
-    },
-    tr: {},
-    cell: {
-        paddingLeft: 5,
-        '&:last-of-type': {
-            backgroundColor: 'red'
         }
     },
     table: {
@@ -66,10 +62,9 @@ const styles = (theme: any) => createStyles({
     errorText: {
         margin: '10px 0'
     },
-    prepend: {},
-    append: {},
-    body: {},
-
+    body: {
+        background: 'white'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -79,11 +74,11 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
-    title: string;
     isLoading: boolean;
     salesStat: ISalesStat[];
     headerPrepend: any;
     rowPrepend: any;
+    labelData: Map<number, ILocation | IUserCommonInfo>;
     onRetry: () => void;
 }
 
@@ -173,23 +168,22 @@ class DrugsTable extends Component<IProps> {
             meds,
             medsDisplayStatus,
             salesStat,
-            headerPrepend: HeaderPrepend,
+            headerPrepend,
             rowPrepend,
             isLoading,
             onRetry,
-            title
+             labelData
         } = this.props;
 
         return (
             <TableContainer
                 style={{ paddingTop: this.marginTop }}
-                className={classes.container}
-                component={Paper}>
+                className={classes.container}>
                 <Table padding='none' className={classes.table}>
-                    <TableHead className={classes.th}>
-                        <TableRow className={classes.thRow}>
+                    <TableHead>
+                        <TableRow>
                             <TableCell colSpan={2} className={classes.thCell}>
-                                <HeaderPrepend value={title} />
+                                { headerPrepend }
                             </TableCell>
 
                             {
@@ -216,6 +210,7 @@ class DrugsTable extends Component<IProps> {
                             ? <>
                                 <Body
                                     meds={meds}
+                                    labelData={labelData}
                                     salesStat={salesStat || []}
                                     displayStatuses={medsDisplayStatus}
                                     targetProp={this.modeSettings.propName}

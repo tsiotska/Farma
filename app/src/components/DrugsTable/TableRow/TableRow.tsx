@@ -12,7 +12,12 @@ const styles = (theme: any) => createStyles({
         textOverflow: 'ellipsis',
         height: 48,
         '&:first-of-type': {
-            paddingLeft: 5
+            paddingLeft: 5,
+            '& img': {
+                width: 32,
+                height: 32,
+                marginRight: 5
+            }
         }
     }
 });
@@ -56,8 +61,8 @@ class TableRow extends Component<IProps> {
                         <TableCell key={i} className={classes.cell}>
                             {
                                 x
-                                    ? '-'
-                                    : x.toFixed(mantisLength)
+                                ? '-'
+                                : x.toFixed(mantisLength)
                             }
                         </TableCell>
                     ))

@@ -69,7 +69,7 @@ class ListItem extends Component<IProps> {
                 <ImageLoader
                     className={classes.image}
                     loadPlaceholder={<p className={classes.image} />}
-                    src={`http://167.172.37.102/static${image}`}
+                    src={`${Config.ASSETS_URL}/${image}`}
                 />
 
                 <Grid xs container item zeroMinWidth>

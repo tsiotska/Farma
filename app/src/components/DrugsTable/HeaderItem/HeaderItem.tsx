@@ -12,6 +12,7 @@ const styles = (theme: any) => createStyles({
         textOverflow: 'ellipsis',
         display: 'flex',
         alignItems: 'center',
+        color: theme.palette.primary.gray.light,
         '&::before': {
             content: '""',
             width: 10,

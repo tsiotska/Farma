@@ -4,6 +4,7 @@ export default class Config {
     public static BASE_PATH: string = process.env.BASE_PATH || '/';
     public static IS_TEST: boolean = (process.env.NODE_ENV === 'test');
     public static API_URL: string = process.env.API_URL.trim();
+    public static ASSETS_URL: string = 'http://167.172.37.102/static';
     public static RENEW_INTERVAL: number = 30000;
     public static SECTION_MAX_COUNT: number = 253;
     public static MAX_RENEW_COUNT: number = 5;

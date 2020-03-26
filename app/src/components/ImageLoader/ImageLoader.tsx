@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import cx from 'classnames';
-import axios from 'axios';
 
 const styles = (theme: any) => createStyles({
     invisible: {
@@ -12,7 +11,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles>, ImgHTMLAttributes<HTMLImageElement> {
-    className: string;
+    className?: string;
     loadPlaceholder?: JSX.Element;
     component?: any;
 }

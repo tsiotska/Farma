@@ -3,11 +3,14 @@ import { observer } from 'mobx-react';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import TableRow from '../TableRow';
 import { ISalesStat, IMedSalesInfo } from '../../../interfaces/ISalesStat';
+import { IUserCommonInfo } from '../../../interfaces/IUser';
+import { ILocation } from '../../../interfaces/ILocation';
 
 interface IProps {
     meds: Map<number, IMedicine>;
     salesStat: ISalesStat[];
     displayStatuses: Map<number, boolean>;
+    labelData: Map<number, ILocation | IUserCommonInfo>;
     targetProp: 'money' | 'amount';
     mantisLength: number;
     rowPrepend: any;
@@ -31,7 +34,7 @@ class Body extends Component<IProps> {
         ).toFixed(this.props.mantisLength)
 
     render() {
-        const { salesStat, rowPrepend: PrependComponent } = this.props;
+        const { salesStat, labelData, rowPrepend: PrependComponent } = this.props;
 
         return salesStat.map(stat => (
             <TableRow
@@ -40,7 +43,11 @@ class Body extends Component<IProps> {
                 data={this.getDataObject(stat.stat)}
                 mantisLength={this.props.mantisLength}
                 rowEndAddornment={this.endAddornment}
-                rowStartAddornment={<PrependComponent value={stat} />}
+                rowStartAddornment={
+                    <PrependComponent
+                        label={labelData.get(stat.id)}
+                    />
+                }
             />
         ));
     }
