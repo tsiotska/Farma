@@ -2,17 +2,15 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import TableRow from '../TableRow';
-import { DisplayMode } from '../../../stores/SalesStore';
-import { IRegion } from '../../../interfaces/IRegion';
-import { ISalesStat } from '../../../interfaces/ISalesStat';
+import { ISalesStat, IMedSalesInfo } from '../../../interfaces/ISalesStat';
 
 interface IProps {
     meds: Map<number, IMedicine>;
     salesStat: ISalesStat[];
     displayStatuses: Map<number, boolean>;
-    displayMode: DisplayMode;
+    targetProp: 'money' | 'amount';
+    mantisLength: number;
     rowPrepend: any;
-    // regions: Map<number, IRegion>;
 }
 
 @observer
@@ -22,49 +20,27 @@ class Body extends Component<IProps> {
         .filter(x => this.props.displayStatuses.get(x) === true);
     }
 
-    endAddornment = (data: number[]) => {
-        const mantisLength = this.props.displayMode === 'currency'
-        ? 2
-        : 0;
+    getDataObject = (stat: IMedSalesInfo[]): any => stat.reduce(
+        (total, { medId, [this.props.targetProp]: value}) => ({ ...total, [medId]: value}),
+        {}
+    )
 
-        return data.reduce(
+    endAddornment = (data: number[]) => data.reduce(
             (total, current) => total + current,
             0
-        ).toFixed(mantisLength);
-    }
+        ).toFixed(this.props.mantisLength)
 
     render() {
-        const {
-            salesStat,
-            displayMode,
-            rowPrepend: PrependComponent
-            // regions
-        } = this.props;
-
-        const targetProperty = displayMode === 'currency'
-        ? 'money'
-        : 'amount';
+        const { salesStat, rowPrepend: PrependComponent } = this.props;
 
         return salesStat.map(stat => (
             <TableRow
                 key={stat.id}
                 medsIds={this.medsIds}
-                medStat={stat.stat}
-                targetProperty={targetProperty}
+                data={this.getDataObject(stat.stat)}
+                mantisLength={this.props.mantisLength}
                 rowEndAddornment={this.endAddornment}
-                rowStartAddornment={<PrependComponent statItem={stat} />}
-                /*
-                rowStartAddornment={
-                    <>
-                        {
-                            null
-                            // regions.has(stat.id)
-                            // ? regions.get(stat.id).name
-                            // : null
-                        }
-                    </>
-                }
-                */
+                rowStartAddornment={<PrependComponent value={stat} />}
             />
         ));
     }

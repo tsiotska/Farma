@@ -113,7 +113,8 @@ class SideNav extends Component<IProps> {
                                         classes.iconWrapper,
                                         { active: this.isActive(name) }
                                     )}>
-                                    <img src={image} className={classes.iconSm} />
+                                    {/* <img src={image} className={classes.iconSm} /> */}
+                                    <img src='/static/cardio_icon.svg' className={classes.iconSm} />
                                 </Button>
                             </Tooltip>
                         ))

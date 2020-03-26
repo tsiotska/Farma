@@ -10,7 +10,9 @@ import {
     TableRow,
     TableCell,
     Grid,
-    LinearProgress
+    LinearProgress,
+    Typography,
+    Button
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -20,12 +22,14 @@ import Body from './Body';
 import { DisplayMode } from '../../stores/SalesStore';
 import cx from 'classnames';
 import { ISalesStat } from '../../interfaces/ISalesStat';
+import { toJS } from 'mobx';
+
+import SummaryRow from './SummaryRow';
 
 const styles = (theme: any) => createStyles({
     td: {},
     th: {},
-    thRow: {
-    },
+    thRow: {},
     thCell: {
         height: 48,
         '&:first-of-type': {
@@ -54,6 +58,13 @@ const styles = (theme: any) => createStyles({
     container: {
         overflowY: 'hidden',
         transition: '0.3s',
+        marginBottom: '2vh'
+    },
+    retryButton: {
+        margin: '10px 0'
+    },
+    errorText: {
+        marginTop: 10
     },
     prepend: {},
     append: {},
@@ -68,12 +79,19 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
+    title: string;
     isLoading: boolean;
     salesStat: ISalesStat[];
     headerPrepend: any;
     rowPrepend: any;
+    onRetry: () => void;
 
     // regions?: Map<number, IRegion>;
+}
+
+interface ISettings {
+    mantisLength: number;
+    propName: 'money' | 'amount';
 }
 
 @inject(({
@@ -101,6 +119,10 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class DrugsTable extends Component<IProps> {
+    readonly modePressets: Record<DisplayMode, ISettings> = {
+        currency: { mantisLength: 2, propName: 'money' },
+        pack: { mantisLength: 0, propName: 'amount' }
+    };
     readonly headerHeight: number = 20;
     headerRefs: any = {};
 
@@ -113,10 +135,8 @@ class DrugsTable extends Component<IProps> {
         return this.props.salesHeaderHeight || this.headerHeight;
     }
 
-    get showLoader(): boolean {
-        const { salesStat, isLoading } = this.props;
-        const statIsAbsent = !salesStat || !salesStat.length;
-        return isLoading && statIsAbsent;
+    get modeSettings(): ISettings {
+        return this.modePressets[this.props.displayMode];
     }
 
     calculateTopMargin = () => {
@@ -134,7 +154,8 @@ class DrugsTable extends Component<IProps> {
         const { meds: prevMeds } = prevProps;
         const { meds: actualMeds } = this.props;
 
-        const medsIsChanged = prevMeds !== actualMeds || prevMeds.size !== actualMeds.size;
+        const medsIsChanged = prevMeds !== actualMeds
+        || prevMeds.size !== actualMeds.size;
 
         if (medsIsChanged) {
             this.headerRefs = [...prevMeds.values()].reduce(
@@ -158,18 +179,23 @@ class DrugsTable extends Component<IProps> {
             salesStat,
             displayMode,
             headerPrepend: HeaderPrepend,
-            rowPrepend
+            rowPrepend,
+            isLoading,
+            onRetry,
+            title
             // regions
         } = this.props;
-
+        // console.log(toJS(salesStat), isLoading, this.getTotalSalesStat());
         return (
-            <TableContainer style={{ paddingTop: this.marginTop }} component={Paper} className={classes.container} >
+            <TableContainer
+                style={{ paddingTop: this.marginTop }}
+                className={classes.container}
+                component={Paper}>
                 <Table padding='none' className={classes.table}>
                     <TableHead className={classes.th}>
                         <TableRow className={classes.thRow}>
                             <TableCell colSpan={2} className={classes.thCell}>
-                                {/* регион */}
-                                <HeaderPrepend />
+                                <HeaderPrepend value={title} />
                             </TableCell>
 
                             {
@@ -192,20 +218,45 @@ class DrugsTable extends Component<IProps> {
                     </TableHead>
                     <TableBody className={classes.body}>
                         {
-                            this.showLoader
+                            (salesStat === null)
                             ? <TableRow>
-                                <TableCell colSpan={this.medsArray.length + 3}>
-                                    <LinearProgress />
+                                <TableCell align='center' colSpan={this.medsArray.length + 3}>
+                                    {
+                                        isLoading
+                                        ? <LinearProgress />
+                                        : <>
+                                            <Typography className={classes.errorText} align='center'>
+                                                Не удалось получить данные
+                                            </Typography>
+                                            <Button
+                                                className={classes.retryButton}
+                                                onClick={onRetry}
+                                                variant='outlined'>
+                                                Повторить Запрос
+                                            </Button>
+                                          </>
+                                    }
                                 </TableCell>
                               </TableRow>
-                            : <Body
-                                meds={meds}
-                                salesStat={salesStat || []}
-                                displayStatuses={medsDisplayStatus}
-                                displayMode={displayMode}
-                                rowPrepend={rowPrepend}
-                                 // regions={regions}
-                              />
+                            : <>
+                                <Body
+                                    meds={meds}
+                                    salesStat={salesStat || []}
+                                    displayStatuses={medsDisplayStatus}
+                                    // displayMode={displayMode}
+                                    targetProp={this.modeSettings.propName}
+                                    mantisLength={this.modeSettings.mantisLength}
+                                    rowPrepend={rowPrepend}
+                                />
+                                <SummaryRow
+                                    stat={salesStat}
+                                    // mode={displayMode}
+                                    targetProp={this.modeSettings.propName}
+                                    mantisLength={this.modeSettings.mantisLength}
+                                    meds={meds}
+                                    displayStatus={medsDisplayStatus}
+                                />
+                              </>
                         }
                     </TableBody>
                 </Table>

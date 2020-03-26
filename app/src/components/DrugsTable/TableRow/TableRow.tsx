@@ -19,65 +19,52 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     medsIds: number[];
-    medStat: IMedSalesInfo[];
-    targetProperty: 'amount' | 'money';
+    mantisLength: number;
     rowEndAddornment?: (data: number[]) => number | string;
     rowStartAddornment?: JSX.Element;
+    data: any;
 }
 
 @observer
 class TableRow extends Component<IProps> {
     get data(): number[] {
-        const { medsIds, medStat, targetProperty } = this.props;
-        const ids = medStat.map(x => x.medId);
+        const { medsIds, data } = this.props;
 
-        let i: number = 0;
-        return medsIds.map(x => {
-            const ind = ids.indexOf(x, i);
-
-            if (ind !== -1) i = ind;
-
-            const value = ind === -1
-                ? null
-                : medStat[ind][targetProperty];
-
-            return value;
-        });
+        return medsIds.map(x => (
+            x in data
+            ? data[x]
+            : null
+        ));
     }
 
     render() {
-        const { classes, rowEndAddornment, rowStartAddornment, targetProperty } = this.props;
-        const mantisLength = targetProperty === 'money'
-        ? 2
-        : 0;
-
-        if (!this.data.length) return null;
+        const {
+            classes,
+            rowEndAddornment,
+            rowStartAddornment,
+            mantisLength
+        } = this.props;
 
         return (
             <MuiTableRow className={classes.row}>
-                {
-                    rowStartAddornment &&
-                    <TableCell colSpan={2} className={classes.cell}>
-                        { rowStartAddornment }
-                    </TableCell>
-                }
+                <TableCell colSpan={2} className={classes.cell}>
+                    { rowStartAddornment }
+                </TableCell>
+
                 {
                     this.data.map((x, i) => (
                         <TableCell key={i} className={classes.cell}>
                             {
-                                x === null
+                                x
                                     ? '-'
                                     : x.toFixed(mantisLength)
                             }
                         </TableCell>
                     ))
                 }
-                {
-                    rowEndAddornment &&
-                    <TableCell className={classes.cell}>
-                        { rowEndAddornment(this.data) }
-                    </TableCell>
-                }
+                <TableCell className={classes.cell}>
+                    { rowEndAddornment && rowEndAddornment(this.data) }
+                </TableCell>
             </MuiTableRow>
         );
     }

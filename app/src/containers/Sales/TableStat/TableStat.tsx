@@ -45,28 +45,26 @@ class TableStat extends Component<IProps> {
         const { getAsyncStatus } = this.props;
         const s1 = getAsyncStatus('loadLocaleSalesStat');
         const s2 = getAsyncStatus('loadMedsStat');
-        return s1.loading || s2.loading;
+        const s3 = getAsyncStatus('loadAgentSalesStat');
+        return s1.loading || s2.loading || s3.loading;
+    }
+
+    retryClickHandler = (key: number) => () => {
+        // TODO:
     }
 
     render() {
-
         if (this.tablePreset === null) return null;
 
-        return this.tablePreset.map(({ rowPrepend, headerPrepend, propName }, i) => (
+        return this.tablePreset.map(({ rowPrepend, headerPrepend, title, propName }, i) => (
             <DrugsTable
                 key={i}
                 isLoading={this.showLoader}
                 salesStat={this.props[propName]}
-                rowPrepend={
-                    rowPrepend === null
-                    ? (): any => null
-                    : rowPrepend
-                }
-                headerPrepend={
-                    headerPrepend === null
-                    ? (): any => null
-                    : headerPrepend
-                }
+                onRetry={this.retryClickHandler(i)}
+                title={title}
+                rowPrepend={rowPrepend}
+                headerPrepend={headerPrepend}
             />
         ));
     }

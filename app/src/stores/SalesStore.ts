@@ -23,11 +23,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
 
     // data for chart
-    @observable chartSalesStat: IMedsSalesStat[] = [];
+    @observable chartSalesStat: IMedsSalesStat[] = null;
     // data for drugsTable
-    @observable locationSalesStat: ISalesStat[] = [];
+    @observable locationSalesStat: ISalesStat[] = null;
     // data for drugsTable
-    @observable agentSalesStat: ISalesStat[] = [];
+    @observable agentSalesStat: ISalesStat[] = null;
 
     constructor(rootStore: IRootStore) {
         super();
@@ -43,9 +43,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 : -1;
 
                 if (this.currentDepartmentId !== newDepartmentId) {
-                    this.chartSalesStat = [];
-                    this.locationSalesStat = [];
-                    this.agentSalesStat = [];
+                    this.chartSalesStat = null;
+                    this.locationSalesStat = null;
+                    this.agentSalesStat = null;
                 }
 
                 this.currentDepartmentId = newDepartmentId;
@@ -74,9 +74,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         );
 
         this.displayMode = 'pack';
-        this.chartSalesStat = [];
-        this.locationSalesStat = [];
-        this.agentSalesStat = [];
+        this.chartSalesStat = null;
+        this.locationSalesStat = null;
+        this.agentSalesStat = null;
         this.needSalesStat = false;
         this.currentDepartmentId = null;
         this.medsDisplayStatus = new Map();
@@ -143,6 +143,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const storedId = this.getRequestParams(requestName);
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
         if (storedId !== this.currentDepartmentId) return;
+        this.chartSalesStat = res;
 
         // if fetched data is relevant we process it
         const callback = res
@@ -151,7 +152,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         callback(requestName);
         this.clearParams(requestName);
-        this.chartSalesStat = res;
     }
 
     @action.bound
@@ -167,6 +167,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         const storedId = this.getRequestParams(requestName);
         if (storedId !== this.currentDepartmentId) return;
+        this.locationSalesStat = res;
 
         const callback = res
         ? this.setSuccess
@@ -174,7 +175,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         callback(requestName);
         this.clearParams(requestName);
-        this.locationSalesStat = res;
     }
 
     @action.bound
@@ -190,6 +190,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         const storedId = this.getRequestParams(requestName);
         if (storedId !== this.currentDepartmentId) return;
+        this.agentSalesStat = res;
 
         const callback = res
         ? this.setSuccess
@@ -197,7 +198,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         callback(requestName);
         this.clearParams(requestName);
-        this.agentSalesStat = res;
     }
 
     private getAgentStatUrl(departmentId: number) {
