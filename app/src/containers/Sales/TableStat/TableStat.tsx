@@ -5,9 +5,13 @@ import { ITablePreset, FFM_PRESET, MR_PRESET, MA_PRESET } from './presets';
 import DrugsTable from '../../../components/DrugsTable';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { ISalesStat } from '../../../interfaces/ISalesStat';
+import { IRegion } from '../../../interfaces/IRegion';
+import { IUser } from '../../../interfaces';
 
 interface IProps {
     role?: USER_ROLE;
+    previewUser?: IUser;
+    regions?: Map<number, IRegion>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     locationSalesStat?: ISalesStat[];
     agentSalesStat?: ISalesStat[];
@@ -18,7 +22,8 @@ interface IProps {
 @inject(({
     appState: {
         userStore: {
-            role
+            role,
+            previewUser
         },
         salesStore: {
             getAsyncStatus,
@@ -30,6 +35,7 @@ interface IProps {
     }
 }) => ({
     role,
+    previewUser,
     getAsyncStatus,
     locationSalesStat,
     agentSalesStat,
@@ -61,6 +67,24 @@ class TableStat extends Component<IProps> {
         if (getAsyncStatus('loadLocaleSalesStat').error) loadLocaleSalesStat();
     }
 
+    getTitle(): string {
+        const { role, regions, previewUser } = this.props;
+
+        if (role === USER_ROLE.REGIONAL_MANAGER) {
+            const region = previewUser
+            ? previewUser.region
+            : null;
+
+            const userRegion = regions.get(region);
+
+            return userRegion
+            ? userRegion.name
+            : '';
+        }
+
+        return '';
+    }
+
     render() {
         if (this.tablePreset === null) return null;
 
@@ -70,7 +94,7 @@ class TableStat extends Component<IProps> {
                 isLoading={this.showLoader}
                 salesStat={this.props[propName]}
                 onRetry={this.retryClickHandler}
-                title={title}
+                title={title || this.getTitle()}
                 rowPrepend={rowPrepend}
                 headerPrepend={headerPrepend}
             />

@@ -11,7 +11,9 @@ export interface IUser {
     doctorsCount?: number;
     pharmacyCount?: number;
 
-    region?: string[];
     level?: string;
-    city?: string;
+
+    branch?: number;
+    region?: number;
+    city?: number;
 }
