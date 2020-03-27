@@ -6,6 +6,7 @@ import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'da
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
+import { IUser } from '../interfaces';
 
 export type DisplayMode = 'pack' | 'currency';
 
@@ -36,14 +37,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         reaction(
             () => [
                 this.needSalesStat,
+                this.rootStore.userStore.previewUser,
                 this.rootStore.departmentsStore.currentDepartmentId,
-                this.rootStore.userStore.previewUser
             ],
-            ([ isSalesStatNeeded ]: [ number ]) => {
-                if (!isSalesStatNeeded) return;
-                const { departmentsStore: { loadLocationsAgents, loadLocations }} = this.rootStore;
-                loadLocationsAgents();
-                loadLocations();
+            ([ isSalesStatNeeded, user ]: [ number, IUser ]) => {
+                if (!isSalesStatNeeded || !user) return;
                 this.loadAllStat();
             }
         );

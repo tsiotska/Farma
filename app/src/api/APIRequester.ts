@@ -15,9 +15,7 @@ import { userNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
-import { mockSales } from './mock/mockSales';
 import { salesStatNormalizer } from '../helpers/normalizers/salesStatNormalizer';
-import { mockRegionSalesState } from './mock/mockRegionSalesStat';
 import { IWorker } from '../interfaces/IWorker';
 import { ILocation } from '../interfaces/ILocation';
 import { locationsNormalizer } from '../helpers/normalizers/locationsNormalizer';
@@ -60,74 +58,33 @@ export class APIRequester {
     }
 
     getBranches(): Promise<IDepartment[]> {
-        const mockDepartments: IDepartment[] = [
-            {
-                id: 1,
-                name: 'urology',
-                image: null,
-            },
-            {
-                id: 2,
-                name: 'cardiology',
-                image: null,
-            },
-        ];
-
         return this.instance.get('/api/branch')
             .then(branchesNormalizer)
-            .catch(this.defaultErrorHandler(mockDepartments));
+            .catch(this.defaultErrorHandler());
     }
 
     getUser(): Promise<IUser> {
-        const mockUser: IUser = {
-            id: 1,
-            name: 'Мушастикова Ольга Владимировна',
-            position: 1,
-            avatar: null,
-            doctorsCount: null,
-            pharmacyCount: null,
-            region: null,
-            level: null,
-            city: null,
-        };
-
         return this.instance.get('api/profile')
             .then(userNormalizer)
             .catch(this.defaultErrorHandler());
-        // .catch(this.defaultErrorHandler(mockUser));
     }
 
     getMeds(departmentId: number): Promise<IMedicine[]> {
         return this.instance.get(`api/branch/${departmentId}/drug`)
             .then(medsNormalizer)
-            .catch(this.defaultErrorHandler(mockDrugs));
+            .catch(this.defaultErrorHandler());
     }
 
     getPositions(): Promise<IPosition[]> {
-        const mockPositions: IPosition[] = [
-            {
-                id: 1,
-                name: 'admin',
-                alias: 'adm'
-            }
-        ];
-
         return this.instance.get('api/position')
             .then(positionsNormalizer)
-            .catch(this.defaultErrorHandler(mockPositions));
+            .catch(this.defaultErrorHandler());
     }
 
     getMedicalDepartments(): Promise<ILPU[]> {
-        const mockMedicalDepartments: ILPU[] = [
-            {
-                id: 1,
-                name: 'test lpu'
-            }
-        ];
-
         return this.instance.get('api/lpu')
             .then(lpuNormalizer)
-            .catch(this.defaultErrorHandler(mockMedicalDepartments));
+            .catch(this.defaultErrorHandler());
     }
 
     getMedsSalesStat(url: string): Promise<IMedsSalesStat[]> {
@@ -156,7 +113,7 @@ export class APIRequester {
 
     getLocationAgents(branchId: number, positionId: number): Promise<IUserCommonInfo[]> {
         return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
-        .then(agentNormalizer)
-        .catch(this.defaultErrorHandler());
+            .then(agentNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 }

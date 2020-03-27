@@ -4,10 +4,12 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { History, Location } from 'history';
-import { matchPath, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { NotificationsNoneOutlined } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
-import { toJS } from 'mobx';
+import Config from '../../../../Config';
+import { IUser } from '../../../interfaces';
+import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -57,17 +59,19 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    user?: IUser;
     history?: History;
     location?: Location;
     logout?: () => void;
     departments?: IDepartment[];
     currentDepartment?: IDepartment;
-    setCurrentDepartment?: (departmentName: string) => void;
+    setCurrentDepartment?: (value: string | IDepartment) => void;
 }
 
 @inject(({
     appState: {
         userStore: {
+            user,
             logout
         },
         departmentsStore: {
@@ -77,6 +81,7 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
+    user,
     logout,
     departments,
     setCurrentDepartment,
@@ -85,6 +90,29 @@ interface IProps extends WithStyles<typeof styles> {
 @withRouter
 @observer
 class SideNav extends Component<IProps> {
+    get userRole(): USER_ROLE {
+        const { user } = this.props;
+        return user
+        ? user.position
+        : USER_ROLE.UNKNOWN;
+    }
+
+    get userDepartments(): IDepartment[] {
+        const { departments, user } = this.props;
+
+        const userDep = user
+        ? user.department
+        : null;
+
+        if (multiDepartmentRoles.includes(this.userRole)) {
+            return departments;
+        }
+        if (singleDepartmentRoles.includes(this.userRole)) {
+            return departments.filter(({ id }) => id === userDep);
+        }
+        return [];
+    }
+
     get notificationsCount(): number {
         return 2;
     }
@@ -99,13 +127,21 @@ class SideNav extends Component<IProps> {
 
     departmentClickHandler = (name: string) => () => this.props.setCurrentDepartment(name);
 
+    componentDidUpdate() {
+        const { currentDepartment, setCurrentDepartment } = this.props;
+
+        if (currentDepartment || !this.userDepartments.length) return;
+
+        setCurrentDepartment(this.userDepartments[0]);
+    }
+
     render() {
-        const { classes, logout, departments } = this.props;
+        const { classes, logout } = this.props;
 
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
                     {
-                        departments.map(({ id, name, image }) => (
+                        this.userDepartments.map(({ id, name, image }) => (
                             <Tooltip key={id} placement='right' title={name}>
                                 <Button
                                     onClick={this.departmentClickHandler(name)}
@@ -113,8 +149,7 @@ class SideNav extends Component<IProps> {
                                         classes.iconWrapper,
                                         { active: this.isActive(name) }
                                     )}>
-                                    {/* <img src={image} className={classes.iconSm} /> */}
-                                    <img src='/static/cardio_icon.svg' className={classes.iconSm} />
+                                    <img src={`${Config.ASSETS_URL}/${image}`} className={classes.iconSm} />
                                 </Button>
                             </Tooltip>
                         ))

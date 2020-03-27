@@ -12,7 +12,7 @@ const defaultUser: IUser = {
     region: null,
     level: null,
     city: null,
-    branch: null
+    department: null
 };
 
 const valuesMap: IValuesMap = {
@@ -24,7 +24,7 @@ const valuesMap: IValuesMap = {
     count_pharmacy: 'pharmacyCount',
     region: 'region',
 
-    branch: 'branch',
+    branch: 'department',
     level: 'level',
     city: 'city',
 };

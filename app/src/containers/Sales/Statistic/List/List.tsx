@@ -5,6 +5,7 @@ import { IMedicine } from '../../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../../stores/SalesStore';
 import ListItem from '../ListItem';
 import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
+import { toJS } from 'mobx';
 
 interface IProps {
     chartSalesStat: IMedsSalesStat[];
@@ -63,10 +64,8 @@ class List extends Component<IProps> {
             rootRef
         } = this.props;
 
-        if (!chartSalesStat || !meds) return null;
-
         const usedIds: number[] = [];
-        const listItemsWithStat = chartSalesStat.map(stat => {
+        const listItemsWithStat = (chartSalesStat || []).map(stat => {
             usedIds.push(stat.medId);
             return <ListItem
                 key={stat.medId}

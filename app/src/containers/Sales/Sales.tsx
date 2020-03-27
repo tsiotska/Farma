@@ -10,6 +10,8 @@ import DateTimeUtils from './DateTimeUtils';
 import { IDepartment } from '../../interfaces/IDepartment';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
+import { IUser } from '../../interfaces';
+import { reaction } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,6 +39,10 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartment?: IDepartment;
     chartSalesStat?: IMedsSalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
+    currentDepartmentId?: number;
+    role?: IUser;
+    loadLocationsAgents?: () => void;
+    loadLocations?: () => void;
 }
 
 @inject(({
@@ -47,28 +53,57 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             setSalesStatDemand,
             chartSalesStat,
+        },
+        userStore: {
+            role
+        },
+        departmentsStore: {
+            currentDepartmentId,
+            loadLocationsAgents,
+            loadLocations
         }
     }
 }) => ({
     openedModal,
     setSalesStatDemand,
-    chartSalesStat
+    chartSalesStat,
+    role,
+    currentDepartmentId,
+    loadLocationsAgents,
+    loadLocations
 }))
 @observer
 class Sales extends Component<IProps> {
+    disposeRoleReaction: any;
+    disposeDepartmentReaction: any;
+
     componentDidMount() {
         this.props.setSalesStatDemand(true);
+        this.disposeDepartmentReaction = reaction(
+            () => this.props.currentDepartmentId,
+            this.props.loadLocationsAgents,
+            { fireImmediately: true }
+        );
+        this.disposeRoleReaction = reaction(
+            () => this.props.role,
+            this.roleChangeHandler,
+            { fireImmediately: true }
+        );
+    }
+
+    roleChangeHandler = () => {
+        this.props.loadLocationsAgents();
+        this.props.loadLocations();
     }
 
     componentWillUnmount() {
         this.props.setSalesStatDemand(false);
+        this.disposeRoleReaction();
+        this.disposeDepartmentReaction();
     }
 
     render() {
-        const {
-            classes,
-            chartSalesStat,
-        } = this.props;
+        const { classes, chartSalesStat } = this.props;
 
         return (
             <MuiPickersUtilsProvider utils={DateTimeUtils}>

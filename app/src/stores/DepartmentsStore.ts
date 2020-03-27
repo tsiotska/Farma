@@ -133,7 +133,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.departments = res;
 
-        if (!this.currentDepartment) this.setCurrentDepartment(res[0]);
+        // if (!this.currentDepartment) {
+        //     const { userStore: { user } } = this.rootStore;
+
+        //     const userDepartment = user
+        //     ? user.department
+        //     : null;
+
+        //     this.setCurrentDepartment(res[0]);
+        // }
     }
 
     @action.bound
@@ -208,8 +216,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let url: string;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) url = 'api/region';
         else if (role === USER_ROLE.REGIONAL_MANAGER) url = 'api/city';
-
-        if (!url || url === window.sessionStorage.getItem(requestName)) return;
+        if (!url) return;
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
         const res = await this.dispatchRequest(
@@ -218,7 +225,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (res) {
-            window.sessionStorage.setItem(requestName, url);
             const mapped: Array<[number, ILocation]> = res.map(x => ([ x.id, x ]));
             this.locations = new Map(mapped);
             return;
@@ -238,7 +244,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let loadPositionsId: USER_ROLE;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
         if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
-
         if (!branchId || !loadPositionsId) return;
 
         this.locationsAgents.clear();

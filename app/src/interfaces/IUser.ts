@@ -20,5 +20,5 @@ export interface IUser extends IUserCommonInfo {
 
     level?: string;
 
-    branch?: number;
+    department?: number;
 }
