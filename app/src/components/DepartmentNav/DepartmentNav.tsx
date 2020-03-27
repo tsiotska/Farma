@@ -4,9 +4,14 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { NavLink, withRouter } from 'react-router-dom';
 import { match as Match } from 'react-router';
-import { SALES_ROUTE, MARKS_ROUTE, SALARY_ROUTE, WORKERS_ROUTE, MEDICINES_ROUTE, PHARMACY_ROUTE } from '../../constants/Router';
-import { IRoleContent, adminContent, FFMContent, RMContent, MAContent } from '../../containers/DepartmentContent/RolesPresets';
-import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../../constants/Roles';
+import {
+    IRoleContent,
+    adminContent,
+    FFMContent,
+    RMContent,
+    MAContent
+} from '../../containers/DepartmentContent/RolesPresets';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,7 +42,7 @@ interface ILink {
 
 interface IProps extends WithStyles<typeof styles> {
     match?: Match<any>;
-    role?: string;
+    role?: USER_ROLE;
 }
 
 @inject(({
@@ -54,10 +59,10 @@ interface IProps extends WithStyles<typeof styles> {
 class DepartmentNav extends Component<IProps> {
     get userLinks(): IRoleContent[] {
         switch (this.props.role) {
-            case ADMIN: return adminContent;
-            case FIELD_FORCE_MANAGER: return FFMContent;
-            case REGIONAL_MANAGER: return RMContent;
-            case MEDICAL_AGENT: return MAContent;
+            case USER_ROLE.ADMIN: return adminContent;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return FFMContent;
+            case USER_ROLE.REGIONAL_MANAGER: return RMContent;
+            case USER_ROLE.MEDICAL_AGENT: return MAContent;
             default: return [];
         }
     }

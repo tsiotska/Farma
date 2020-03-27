@@ -2,11 +2,11 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action, reaction } from 'mobx';
-import { IDepartment } from '../interfaces/IDepartment';
-import { ISalesStat } from '../interfaces/ISalesStat';
 import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
 import { stringify } from 'query-string';
-import { ILocaleSalesStat } from '../interfaces/ILocaleSalesStat';
+import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
+import { USER_ROLE } from '../constants/Roles';
+import { IUser } from '../interfaces';
 
 export type DisplayMode = 'pack' | 'currency';
 
@@ -17,35 +17,51 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable dateFrom: Date;
     @observable dateTo: Date;
     @observable displayMode: DisplayMode = 'pack';
-    @observable medsSalesStat: ISalesStat[] = [];
-    @observable localeSalesStat: ILocaleSalesStat[] = [];
+
     @observable needSalesStat: boolean = false;
-    @observable currentDepartmentId: number;
+    // @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
+
+    // data for chart
+    @observable chartSalesStat: IMedsSalesStat[] = null;
+    // data for drugsTable
+    @observable locationSalesStat: ISalesStat[] = null;
+    // data for drugsTable
+    @observable agentSalesStat: ISalesStat[] = null;
 
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
         this.resetStore();
+
         reaction(
-            () => [this.rootStore.departmentsStore.currentDepartment, this.needSalesStat],
-            async ([ currentDepartment, isSalesStatNeeded]: [ IDepartment, boolean ]) => {
-                if (!isSalesStatNeeded) return;
-
-                const newDepartmentId: number = currentDepartment
-                ? currentDepartment.id
-                : -1;
-
-                if (this.currentDepartmentId !== newDepartmentId) {
-                    this.medsSalesStat = [];
-                    this.localeSalesStat = [];
-                }
-
-                this.currentDepartmentId = newDepartmentId;
-                await this.loadMedsStat();
-                await this.loadLocaleSalesStat();
+            () => [
+                this.needSalesStat,
+                this.rootStore.userStore.previewUser,
+                this.rootStore.departmentsStore.currentDepartmentId,
+            ],
+            ([ isSalesStatNeeded, user ]: [ number, IUser ]) => {
+                if (!isSalesStatNeeded || !user) return;
+                this.loadAllStat();
             }
         );
+    }
+
+    @action.bound
+    async loadAllStat(withReset: boolean = true) {
+        const { userStore: { role }} = this.rootStore;
+
+        if (withReset) {
+            this.chartSalesStat = null;
+            this.locationSalesStat = null;
+            this.agentSalesStat = null;
+        }
+
+        await this.loadMedsStat();
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER || role === USER_ROLE.REGIONAL_MANAGER) {
+            await this.loadAgentSalesStat();
+        }
+        await this.loadLocaleSalesStat();
     }
 
     @action.bound
@@ -66,10 +82,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         );
 
         this.displayMode = 'pack';
-        this.medsSalesStat = [];
-        this.localeSalesStat = [];
+        this.chartSalesStat = null;
+        this.locationSalesStat = null;
+        this.agentSalesStat = null;
         this.needSalesStat = false;
-        this.currentDepartmentId = null;
         this.medsDisplayStatus = new Map();
     }
 
@@ -100,6 +116,13 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
+    initMedsDisplayStatuses() {
+        const { departmentsStore: { meds }} = this.rootStore;
+        const values: Array<[number, boolean]> = [...meds.keys()].map(id => ([ id, true ]));
+        this.medsDisplayStatus = new Map(values);
+    }
+
+    @action.bound
     toggleAllMedsDisplayStatus() {
         const values = [...this.medsDisplayStatus.entries()];
         const shouldDisplayAll = values.some(x => x[1] === false);
@@ -116,18 +139,18 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadMedsStat() {
         const requestName = 'loadMedsStat';
-        const { api } = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getMedsStatUrl(currentDepartmentId);
 
-        if (this.currentDepartmentId === -1) return;
+        if (currentDepartmentId === -1 || !url) return;
 
-        this.setLoading(requestName, this.currentDepartmentId);
-        const url = this.getLoadStatUrl(this.currentDepartmentId);
-        const res = await api.getSalesStat(url);
+        this.setLoading(requestName, currentDepartmentId);
+        const res = await api.getMedsSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
-
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
-        if (storedId !== this.currentDepartmentId) return;
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
+        this.chartSalesStat = res;
 
         // if fetched data is relevant we process it
         const callback = res
@@ -136,24 +159,22 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         callback(requestName);
         this.clearParams(requestName);
-
-        this.medsSalesStat = res;
     }
 
     @action.bound
     async loadLocaleSalesStat() {
         const requestName = 'loadLocaleSalesStat';
-        const { api } = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getLocationStatUrl(currentDepartmentId);
 
-        if (this.currentDepartmentId === -1) return;
+        if (currentDepartmentId === -1 || !url) return;
 
-        this.setLoading(requestName, this.currentDepartmentId);
-        const url = this.getLocaleSalesStatUrl(this.currentDepartmentId);
-        const res = await api.getLocaleSalesStat(url);
+        this.setLoading(requestName, currentDepartmentId);
+        const res = await api.getSalesStat(url);
 
         const storedId = this.getRequestParams(requestName);
-
-        if (storedId !== this.currentDepartmentId) return;
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
+        this.locationSalesStat = res;
 
         const callback = res
         ? this.setSuccess
@@ -161,45 +182,100 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         callback(requestName);
         this.clearParams(requestName);
-
-        this.localeSalesStat = res;
     }
 
     @action.bound
-    initMedsDisplayStatuses() {
-        const { departmentsStore: { meds }} = this.rootStore;
-        const values: Array<[number, boolean]> = [...meds.keys()].map(id => ([ id, true ]));
-        this.medsDisplayStatus = new Map(values);
+    async loadAgentSalesStat() {
+        const requestName = 'loadAgentSalesStat';
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getAgentStatUrl(currentDepartmentId);
+
+        if (currentDepartmentId === -1 || !url) return;
+
+        this.setLoading(requestName, currentDepartmentId);
+        const res = await api.getSalesStat(url);
+
+        const storedId = this.getRequestParams(requestName);
+        if (storedId !== this.rootStore.departmentsStore.currentDepartmentId) return;
+        this.agentSalesStat = res;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
+        this.clearParams(requestName);
     }
 
-    private getLocaleSalesStatUrl(departmentId: number): string {
-        const apiUrl = `api/branch/${departmentId}/ffm/sales/region`;
+    private getAgentStatUrl(departmentId: number) {
+        const { userStore: { role, previewUser }} = this.rootStore;
 
-        const urlParamsObject = {
+        const userId = previewUser
+        ? previewUser.id
+        : -1;
+
+        const urlParams = stringify({
             from: format(this.dateFrom, this.apiDateMask),
             to: format(this.dateTo, this.apiDateMask),
-        };
+        });
 
-        const urlParams = stringify(urlParamsObject);
-
-        return `${apiUrl}?${urlParams}`;
+        switch (role) {
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `/api/branch/${departmentId}/ffm/sales/rm?${urlParams}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `/api/branch/${departmentId}/rm/${userId}/sales/mp?${urlParams}`;
+            default: return null;
+        }
     }
 
-    private getLoadStatUrl(departmentId: number): string {
-        const apiUrl = `api/branch/${departmentId}/ffm/sales`;
+    private getLocationStatUrl(departmentId: number): string {
+        const { userStore: { role, previewUser }} = this.rootStore;
+
+        const userId = previewUser
+        ? previewUser.id
+        : -1;
+
+        const urlParams = stringify({
+            from: format(this.dateFrom, this.apiDateMask),
+            to: format(this.dateTo, this.apiDateMask),
+        });
+
+        switch (role) {
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `api/branch/${departmentId}/ffm/sales/region?${urlParams}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `/api/branch/${departmentId}/rm/${userId}/sales/city?${urlParams}`;
+            case USER_ROLE.MEDICAL_AGENT:
+                return `/api/branch/${departmentId}/mp/${userId}/sales/pharmacy?${urlParams}`;
+            default: return null;
+        }
+    }
+
+    private getMedsStatUrl(departmentId: number): string {
+        const { userStore: { role, previewUser } } = this.rootStore;
+
+        const userId = previewUser
+        ? previewUser.id
+        : -1;
 
         let group_by: string = 'year';
         if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
         else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
 
-        const urlParamsObject = {
+        const urlParams = stringify({
             from: format(this.dateFrom, this.apiDateMask),
             to: format(this.dateTo, this.apiDateMask),
             group_by
-        };
+        });
 
-        const urlParams = stringify(urlParamsObject);
-
-        return `${apiUrl}?${urlParams}`;
+        switch (role) {
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `api/branch/${departmentId}/ffm/sales?${urlParams}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `/api/branch/${departmentId}/rm/${userId}/sales?${urlParams}`;
+            case USER_ROLE.MEDICAL_AGENT:
+                return `/api/branch/${departmentId}/mp/${userId}/sales?${urlParams}`;
+            default: return null;
+        }
     }
 }

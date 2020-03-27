@@ -9,9 +9,9 @@ import {
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 
-import { ISalesStat } from '../../../../interfaces/ISalesStat';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../../stores/SalesStore';
+import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -44,7 +44,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    stat: ISalesStat;
+    stat: IMedsSalesStat;
     medicament: IMedicine;
     displayMode: DisplayMode;
     displayed: boolean;

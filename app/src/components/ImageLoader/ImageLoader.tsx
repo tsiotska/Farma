@@ -11,7 +11,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles>, ImgHTMLAttributes<HTMLImageElement> {
-    className: string;
+    className?: string;
     loadPlaceholder?: JSX.Element;
     component?: any;
 }

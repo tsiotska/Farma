@@ -1,4 +1,4 @@
-import { observable, action, reaction, toJS } from 'mobx';
+import { observable, action, reaction, toJS, computed } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -9,34 +9,58 @@ import { IPosition } from '../interfaces/IPosition';
 import Config from '../../Config';
 import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
-import { ADMIN, FIELD_FORCE_MANAGER, REGIONAL_MANAGER, MEDICAL_AGENT } from '../constants/Roles';
-import { IRegion } from '../interfaces/IRegion';
+import { USER_ROLE } from '../constants/Roles';
+import { ILocation } from '../interfaces/ILocation';
+import { IUserCommonInfo } from '../interfaces/IUser';
+
+export interface IExpandedWorker {
+    id: number;
+    subworkers: IWorker[];
+}
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
-    @observable departments: IDepartment[] = [];
-    @observable currentDepartment: IDepartment = null;
+    // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
-    @observable medicalDepartments: Map<number, ILPU> = new Map();
+    @observable LPUs: Map<number, ILPU> = new Map();
+    @observable locations: Map<number, ILocation> = new Map();
+    @observable locationsAgents: Map<number, IUserCommonInfo> = new Map();
+
+    @observable departments: IDepartment[] = [];
+    @observable currentDepartment: IDepartment = null;
+
     @observable workers: IWorker[] = [];
+    @observable expandedWorker: IExpandedWorker = null;
     @observable firedWorkers: IWorker[] = [];
-    @observable regions: Map<number, IRegion> = new Map();
 
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
-        reaction(() => this.currentDepartment, this.loadMeds);
+        reaction(() => this.currentDepartment, this.departmentChangeHandler);
         this.initializeStore();
+    }
+
+    private departmentChangeHandler = () => {
+        this.loadMeds();
+        this.expandedWorker = null;
+        this.workers = [];
+        this.firedWorkers = [];
+    }
+
+    @computed
+    get currentDepartmentId(): number {
+        return this.currentDepartment
+        ? this.currentDepartment.id
+        : null;
     }
 
     @action.bound
     initializeStore() {
         this.loadDepartments();
-        this.loadRegions(true);
         this.loadPositions(true);
-        this.loadMedicalDepartments(true);
+        this.loadLPUs(true);
     }
 
     @action.bound
@@ -44,6 +68,23 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.meds = new Map();
         this.workers = [];
         this.firedWorkers = [];
+    }
+
+    @action.bound
+    setExpandedWorker = (workerId: number | null) => {
+        if (workerId === null) {
+            this.expandedWorker = null;
+            return;
+        }
+
+        this.expandedWorker = {
+            id: workerId,
+            subworkers: null
+        };
+        window.setTimeout(
+            this.loadSubworkers,
+            500
+        );
     }
 
     @action.bound
@@ -92,7 +133,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.departments = res;
 
-        if (!this.currentDepartment) this.setCurrentDepartment(res[0]);
+        // if (!this.currentDepartment) {
+        //     const { userStore: { user } } = this.rootStore;
+
+        //     const userDepartment = user
+        //     ? user.department
+        //     : null;
+
+        //     this.setCurrentDepartment(res[0]);
+        // }
     }
 
     @action.bound
@@ -100,11 +149,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const requestName = 'loadMeds';
         const { api, salesStore: { initMedsDisplayStatuses } } = this.rootStore;
 
-        if (!this.currentDepartment) return;
+        if (!this.currentDepartmentId) return;
 
         this.meds.clear();
 
-        const request = api.getMeds(this.currentDepartment.id);
+        const request = api.getMeds(this.currentDepartmentId);
 
         const res = await this.dispatchRequest(request, requestName);
 
@@ -139,8 +188,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadMedicalDepartments(isInitial: boolean = false) {
-        const requestName = 'loadMedicalDepartments';
+    async loadLPUs(isInitial: boolean = false) {
+        const requestName = 'loadLPUs';
         const { api } = this.rootStore;
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
@@ -152,32 +201,67 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res) {
             const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
-            this.medicalDepartments = new Map(mapped);
+            this.LPUs = new Map(mapped);
             return;
         }
 
-        this.retryPolicy(this.loadMedicalDepartments, requestName);
+        this.retryPolicy(this.loadLPUs, requestName);
     }
 
     @action.bound
-    async loadRegions(isInitial: boolean = false) {
-        const requestName = 'loadRegions';
-        const { api } = this.rootStore;
+    async loadLocations(isInitial: boolean = false) {
+        const requestName = 'loadLocations';
+        const { api, userStore: { role } } = this.rootStore;
+
+        let url: string;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) url = 'api/region';
+        else if (role === USER_ROLE.REGIONAL_MANAGER) url = 'api/city';
+        if (!url) return;
 
         if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
-
         const res = await this.dispatchRequest(
-            api.getRegions(),
+            api.getLocations(url),
             requestName
         );
 
         if (res) {
-            const mapped: Array<[number, IRegion]> = res.map(x => ([ x.id, x ]));
-            this.regions = new Map(mapped);
+            const mapped: Array<[number, ILocation]> = res.map(x => ([ x.id, x ]));
+            this.locations = new Map(mapped);
             return;
         }
 
-        this.retryPolicy(this.loadRegions, requestName);
+        this.retryPolicy(this.loadLocations, requestName);
+    }
+
+    @action.bound
+    async loadLocationsAgents() {
+        const requestName = 'loadLocationsAgents';
+        const { api, userStore: { role } } = this.rootStore;
+
+        const branchId = this.currentDepartmentId;
+        const userRole = role;
+
+        let loadPositionsId: USER_ROLE;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
+        if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
+        if (!branchId || !loadPositionsId) return;
+
+        this.locationsAgents.clear();
+        this.setLoading(requestName);
+        const res = await api.getLocationAgents(branchId, loadPositionsId);
+
+        if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
+
+        if (res) {
+            const mapped: Array<[number, IUserCommonInfo]> = res.map(x => ([ x.id, x ]));
+            this.locationsAgents = new Map(mapped);
+        }
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
     }
 
     @action.bound
@@ -186,10 +270,29 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadSubWorkers(rmId: number) {
+    async loadSubworkers() {
+        const requestName = 'loadSubworkers';
         const { api } = this.rootStore;
-        const url = `/api/branch/${this.currentDepartment.id}/rm/${rmId}/worker`;
-        return api.getWorkers(url);
+
+        const workerId = this.expandedWorker
+        ? this.expandedWorker.id
+        : null;
+
+        if (this.currentDepartmentId === null || workerId === null) return;
+        this.setLoading(requestName, this.currentDepartmentId);
+        const res = await api.getWorkers(`/api/branch/${this.currentDepartmentId}/rm/${workerId}/worker`);
+
+        const isRelevant = this.getRequestParams(requestName) === this.currentDepartmentId
+        && workerId === (this.expandedWorker && this.expandedWorker.id);
+        if (!isRelevant) return;
+
+        this.expandedWorker.subworkers = res;
+
+        const callback = res
+        ? this.setSuccess
+        : this.setError;
+
+        callback(requestName);
     }
 
     private retryPolicy(requestMethod: () => any, requestName: string) {
@@ -206,27 +309,23 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     private getWorkersApiUrl(fired?: boolean): string {
-        const { userStore: { user, role } } = this.rootStore;
+        const { userStore: { previewUser, role } } = this.rootStore;
 
-        const userId = user
-            ? user.id
-            : null;
-
-        const departmentId = this.currentDepartment
-            ? this.currentDepartment.id
+        const userId = previewUser
+            ? previewUser.id
             : null;
 
         const queryParam = fired
             ? '?fired=1'
             : '';
 
-        if (userId === null || departmentId === null) return null;
+        if (userId === null || this.currentDepartmentId === null) return null;
 
         switch (role) {
-            case ADMIN: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
-            case FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartment.id}/ffm/worker${queryParam}`;
-            case REGIONAL_MANAGER: return `api/branch/${this.currentDepartment.id}/rm/${userId}/worker${queryParam}`;
-            case MEDICAL_AGENT: return `api/branch/${this.currentDepartment.id}/mp/${userId}/worker${queryParam}`;
+            case USER_ROLE.ADMIN: return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
+            case USER_ROLE.REGIONAL_MANAGER: return `api/branch/${this.currentDepartmentId}/rm/${userId}/worker${queryParam}`;
+            case USER_ROLE.MEDICAL_AGENT: return `api/branch/${this.currentDepartmentId}/mp/${userId}/worker${queryParam}`;
             default: return null;
         }
     }

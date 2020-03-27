@@ -11,7 +11,7 @@ import { IPosition } from '../../interfaces/IPosition';
 import { IWorker } from '../../interfaces/IWorker';
 import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { FIELD_FORCE_MANAGER } from '../../constants/Roles';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -37,7 +37,7 @@ interface IProps extends WithStyles<typeof styles> {
     workers?: IWorker[];
     firedWorkers?: IWorker[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    role?: string;
+    role?: USER_ROLE;
 }
 
 type TabValue = 'all' | 'fired';
@@ -73,7 +73,7 @@ class Workers extends Component<IProps> {
     @observable tab: TabValue = 'all';
 
     get isFFM(): boolean {
-        return this.props.role === FIELD_FORCE_MANAGER;
+        return this.props.role === USER_ROLE.FIELD_FORCE_MANAGER;
     }
 
     loadData = () => {

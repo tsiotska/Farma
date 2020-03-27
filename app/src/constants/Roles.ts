@@ -1,5 +1,21 @@
-export const ADMIN: string = 'ADMIN';
-export const FIELD_FORCE_MANAGER: string = 'FIELD_FORCE_MANAGER';
-export const REGIONAL_MANAGER: string = 'REGIONAL_MANAGER';
-export const MEDICAL_AGENT: string = 'MEDICAL_AGENT';
-export const UNKNOWN: string = 'UNKNOWN';
+export enum USER_ROLE {
+    UNKNOWN,
+    ADMIN = 1,
+    FIELD_FORCE_MANAGER,
+    REGIONAL_MANAGER,
+    MEDICAL_AGENT,
+    SUPER_ADMIN,
+    PRODUCT_MANAGER
+}
+
+export const singleDepartmentRoles: USER_ROLE[] = [
+    USER_ROLE.PRODUCT_MANAGER,
+    USER_ROLE.MEDICAL_AGENT,
+    USER_ROLE.REGIONAL_MANAGER,
+    USER_ROLE.FIELD_FORCE_MANAGER,
+];
+
+export const multiDepartmentRoles: USER_ROLE[] = [
+    USER_ROLE.ADMIN,
+    USER_ROLE.SUPER_ADMIN
+];

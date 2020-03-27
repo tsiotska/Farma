@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IMedicine } from '../../../interfaces/IMedicine';
-import { ILocaleSalesStat } from '../../../interfaces/ILocaleSalesStat';
 import TableRow from '../TableRow';
-import { DisplayMode } from '../../../stores/SalesStore';
-import { IRegion } from '../../../interfaces/IRegion';
-import { TableCell } from '@material-ui/core';
-import { toJS } from 'mobx';
+import { ISalesStat, IMedSalesInfo } from '../../../interfaces/ISalesStat';
+import { IUserCommonInfo } from '../../../interfaces/IUser';
+import { ILocation } from '../../../interfaces/ILocation';
 
 interface IProps {
     meds: Map<number, IMedicine>;
-    salesStat: ILocaleSalesStat[];
+    salesStat: ISalesStat[];
     displayStatuses: Map<number, boolean>;
-    displayMode: DisplayMode;
-    regions: Map<number, IRegion>;
+    labelData: Map<number, ILocation | IUserCommonInfo>;
+    targetProp: 'money' | 'amount';
+    mantisLength: number;
+    rowPrepend: any;
 }
 
 @observer
@@ -23,39 +23,30 @@ class Body extends Component<IProps> {
         .filter(x => this.props.displayStatuses.get(x) === true);
     }
 
-    endAddornment = (data: number[]) => {
-        const mantisLength = this.props.displayMode === 'currency'
-        ? 2
-        : 0;
+    getDataObject = (stat: IMedSalesInfo[]): any => stat.reduce(
+        (total, { medId, [this.props.targetProp]: value}) => ({ ...total, [medId]: value}),
+        {}
+    )
 
-        return data.reduce(
+    endAddornment = (data: number[]) => data.reduce(
             (total, current) => total + current,
             0
-        ).toFixed(mantisLength);
-    }
+        ).toFixed(this.props.mantisLength)
 
     render() {
-        const { salesStat, displayMode, regions } = this.props;
+        const { salesStat, labelData, rowPrepend: PrependComponent } = this.props;
 
-        const targetProperty = displayMode === 'currency'
-        ? 'money'
-        : 'amount';
-
-        return salesStat !== null && salesStat.map(stat => (
+        return salesStat.map(stat => (
             <TableRow
                 key={stat.id}
                 medsIds={this.medsIds}
-                medStat={stat.stat}
-                targetProperty={targetProperty}
+                data={this.getDataObject(stat.stat)}
+                mantisLength={this.props.mantisLength}
                 rowEndAddornment={this.endAddornment}
                 rowStartAddornment={
-                    <>
-                        {
-                            regions.has(stat.id)
-                            ? regions.get(stat.id).name
-                            : null
-                        }
-                    </>
+                    <PrependComponent
+                        label={labelData.get(stat.id)}
+                    />
                 }
             />
         ));

@@ -1,21 +1,17 @@
 import { IUserCredentials } from './../interfaces/IUser';
-import { computed, action, observable } from 'mobx';
+import { computed, action, observable, toJS } from 'mobx';
 
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
-import {
-    UNKNOWN,
-    FIELD_FORCE_MANAGER,
-    ADMIN,
-    REGIONAL_MANAGER,
-    MEDICAL_AGENT
-} from '../constants/Roles';
+import { USER_ROLE } from '../constants/Roles';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
+    // used for nav
+    @observable navHistory: IUser[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
@@ -35,18 +31,26 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @computed
-    get role(): string {
-        const position = this.user
-        ? this.user.position
-        : -1;
+    get previewUser(): IUser {
+        return this.navHistory[this.navHistory.length - 1] || null;
+    }
 
-        switch (position) {
-            case 1: return ADMIN;
-            case 2: return FIELD_FORCE_MANAGER;
-            case 3: return REGIONAL_MANAGER;
-            case 4: return MEDICAL_AGENT;
-            default: return UNKNOWN;
-        }
+    @computed
+    get role(): USER_ROLE {
+        return this.previewUser
+        ? this.previewUser.position
+        : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    historyPush(newUser: IUser) {
+        this.navHistory.push(newUser);
+    }
+
+    @action.bound
+    historyGoTo(userId: number) {
+        const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
+        this.navHistory.splice(userIndex);
     }
 
     @action.bound
@@ -55,16 +59,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api } = this.rootStore;
 
         this.setLoading(requestName);
-        const user = await api.getUser();
+        this.user = await api.getUser();
+        if (this.user) this.navHistory.push(this.user);
 
-        if (user) {
-            this.user = user;
-            this.setError(requestName);
-        } else {
-            this.setSuccess(requestName);
-        }
+        const callback = this.user
+        ? this.setSuccess
+        : this.setError;
 
-        return !!user;
+        callback(requestName);
+
+        return !!this.user;
     }
 
     @action.bound
@@ -78,6 +82,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         this.dispatchRequest(api.logout(), requestName);
         this.user = null;
+        this.navHistory = [];
         resetDepartmentsStore();
         resetSalesStore();
     }
@@ -90,13 +95,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.setLoading(requestName);
         const loggedIn: boolean = await api.login(credentials);
 
-        if (!loggedIn) {
+        if (loggedIn) {
+            const userFetched = await this.loadUserProfile();
+
+            const callback = userFetched
+            ? this.setSuccess
+            : this.setError;
+            callback(requestName);
+
+            return userFetched;
+        } else {
             this.setError(requestName);
             return false;
         }
-
-        const userFetched = await this.loadUserProfile();
-        this.setSuccess(requestName);
-        return userFetched;
     }
 }

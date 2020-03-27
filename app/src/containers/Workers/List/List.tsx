@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
 import { observable } from 'mobx';
+import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -34,17 +35,32 @@ interface IProps extends WithStyles<typeof styles> {
     fired: boolean;
     positions: Map<number, IPosition>;
     expandable: boolean;
+
+    expandedWorker?: IExpandedWorker;
+    setExpandedWorker?: (workerId: number | null) => void;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            expandedWorker,
+            setExpandedWorker
+        }
+    }
+}) => ({
+    expandedWorker,
+    setExpandedWorker
+}))
 @observer
 class List extends Component<IProps> {
-    @observable expanded: number = null;
-
     expandChangeHandler = (workerId: number) => (event: any, expanded: boolean) => {
-        if (this.props.expandable === false) return;
-        this.expanded = expanded
-            ? workerId
-            : null;
+        const { setExpandedWorker, expandable } = this.props;
+        if (expandable === false) return;
+        setExpandedWorker(
+            expanded
+                ? workerId
+                : null
+        );
     }
 
     render() {
@@ -53,7 +69,8 @@ class List extends Component<IProps> {
             workers,
             positions,
             fired,
-            expandable
+            expandable,
+            expandedWorker
         } = this.props;
 
         return (
@@ -113,7 +130,11 @@ class List extends Component<IProps> {
                             worker={x}
                             fired={fired}
                             expandable={expandable}
-                            isExpanded={this.expanded === x.id}
+                            isExpanded={
+                                expandedWorker
+                                ? expandedWorker.id === x.id
+                                : false
+                            }
                             expandChangeHandler={this.expandChangeHandler(x.id)}
                             position={positions.get(x.position)}
                             children={expandable && <Sublist rmId={x.id} positions={positions} />}

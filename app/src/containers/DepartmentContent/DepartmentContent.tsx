@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { History } from 'history';
 
-import { ROOT_ROUTE, LOGIN_ROUTE } from '../../constants/Router';
+import {
+    IRoleContent,
+    adminContent,
+    FFMContent,
+    RMContent,
+    MAContent
+} from './RolesPresets';
+import { USER_ROLE } from '../../constants/Roles';
 
-import { IRoleContent, adminContent, FFMContent, RMContent, MAContent } from './RolesPresets';
-import { ADMIN, FIELD_FORCE_MANAGER, MEDICAL_AGENT, REGIONAL_MANAGER } from '../../constants/Roles';
-import PrivateRoute from '../../components/PrivateRoute';
-
-const styles = (theme: any) => createStyles({});
-
-interface IProps extends WithStyles<typeof styles> {
-    role?: string;
+interface IProps {
+    role?: USER_ROLE;
+    history?: History;
 }
 
 @inject(({
@@ -29,18 +30,18 @@ interface IProps extends WithStyles<typeof styles> {
 class DepartmentContent extends Component<IProps> {
     get userContent(): IRoleContent[] {
         switch (this.props.role) {
-            case ADMIN: return adminContent;
-            case FIELD_FORCE_MANAGER: return FFMContent;
-            case REGIONAL_MANAGER: return RMContent;
-            case MEDICAL_AGENT: return MAContent;
+            case USER_ROLE.ADMIN: return adminContent;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return FFMContent;
+            case USER_ROLE.REGIONAL_MANAGER: return RMContent;
+            case USER_ROLE.MEDICAL_AGENT: return MAContent;
             default: return [];
         }
     }
 
     get redirectPath(): string {
-        return this.userContent[0]
+        return this.userContent.length
         ? this.userContent[0].path
-        : LOGIN_ROUTE;
+        : null;
     }
 
     render() {
@@ -48,19 +49,16 @@ class DepartmentContent extends Component<IProps> {
             <Switch>
                 {
                     this.userContent.map(({ path, component }) => (
-                        <PrivateRoute
-                            key={path}
-                            path={path}
-                            component={component}
-                        />
+                        <Route key={path} path={path} component={component} />
                     ))
                 }
-                <PrivateRoute path={ROOT_ROUTE}>
+                {
+                    this.redirectPath &&
                     <Redirect to={this.redirectPath} />
-                </PrivateRoute>
+                }
             </Switch>
         );
     }
 }
 
-export default withStyles(styles)(DepartmentContent);
+export default DepartmentContent;

@@ -3,15 +3,15 @@ import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DrugsTable from '../../components/DrugsTable';
 import Statistic from './Statistic';
 import Plot from './Plot';
 import DateRangeModal from './DateRangeModal';
 import DateTimeUtils from './DateTimeUtils';
 import { IDepartment } from '../../interfaces/IDepartment';
-import { ISalesStat } from '../../interfaces/ISalesStat';
-import { IMedicine } from '../../interfaces/IMedicine';
-import { ILocaleSalesStat } from '../../interfaces/ILocaleSalesStat';
+import TableStat from './TableStat';
+import { IMedsSalesStat } from '../../interfaces/ISalesStat';
+import { IUser } from '../../interfaces';
+import { reaction } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,11 +37,12 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
-    medsSalesStat?: ISalesStat[];
-    localeSalesStat?: ILocaleSalesStat[];
+    chartSalesStat?: IMedsSalesStat[];
     setSalesStatDemand?: (value: boolean) => void;
-    meds?: Map<number, IMedicine>;
-    medsDisplayStatus?: Map<number, boolean>;
+    currentDepartmentId?: number;
+    role?: IUser;
+    loadLocationsAgents?: () => void;
+    loadLocations?: () => void;
 }
 
 @inject(({
@@ -51,53 +52,67 @@ interface IProps extends WithStyles<typeof styles> {
         },
         salesStore: {
             setSalesStatDemand,
-            medsSalesStat,
-            medsDisplayStatus,
-            localeSalesStat
+            chartSalesStat,
+        },
+        userStore: {
+            role
         },
         departmentsStore: {
-            meds
+            currentDepartmentId,
+            loadLocationsAgents,
+            loadLocations
         }
     }
 }) => ({
     openedModal,
     setSalesStatDemand,
-    medsSalesStat,
-    medsDisplayStatus,
-    meds,
-    localeSalesStat
+    chartSalesStat,
+    role,
+    currentDepartmentId,
+    loadLocationsAgents,
+    loadLocations
 }))
 @observer
 class Sales extends Component<IProps> {
+    disposeRoleReaction: any;
+    disposeDepartmentReaction: any;
+
     componentDidMount() {
         this.props.setSalesStatDemand(true);
+        this.disposeDepartmentReaction = reaction(
+            () => this.props.currentDepartmentId,
+            this.props.loadLocationsAgents,
+            { fireImmediately: true }
+        );
+        this.disposeRoleReaction = reaction(
+            () => this.props.role,
+            this.roleChangeHandler,
+            { fireImmediately: true }
+        );
+    }
+
+    roleChangeHandler = () => {
+        this.props.loadLocationsAgents();
+        this.props.loadLocations();
     }
 
     componentWillUnmount() {
         this.props.setSalesStatDemand(false);
+        this.disposeRoleReaction();
+        this.disposeDepartmentReaction();
     }
 
     render() {
-        const {
-            classes,
-            medsSalesStat,
-            meds,
-            medsDisplayStatus,
-            localeSalesStat
-        } = this.props;
+        const { classes, chartSalesStat } = this.props;
 
         return (
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
-                        <Plot medsSalesStat={medsSalesStat} />
-                        <Statistic medsSalesStat={medsSalesStat} />
+                        <Plot chartSalesStat={chartSalesStat} />
+                        <Statistic chartSalesStat={chartSalesStat} />
                     </Grid>
-                    <DrugsTable
-                        meds={meds}
-                        medsDisplayStatuses={medsDisplayStatus}
-                        medsStat={localeSalesStat}
-                    />
+                    <TableStat />
                     <DateRangeModal />
                 </Grid>
             </MuiPickersUtilsProvider>

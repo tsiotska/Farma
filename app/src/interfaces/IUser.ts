@@ -1,17 +1,24 @@
+import { USER_ROLE } from '../constants/Roles';
+
 export interface IUserCredentials {
     email: string;
     password: string;
 }
 
-export interface IUser {
+export interface IUserCommonInfo {
     id: number;
     name: string;
-    position: number;
     avatar: string;
-    doctorsCount: number;
-    pharmacyCount: number;
+    region?: number;
+    city?: number;
+}
 
-    region?: string[];
+export interface IUser extends IUserCommonInfo {
+    position: USER_ROLE;
+    doctorsCount?: number;
+    pharmacyCount?: number;
+
     level?: string;
-    city?: string;
+
+    department?: number;
 }

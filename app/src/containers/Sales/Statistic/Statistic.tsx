@@ -3,10 +3,10 @@ import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
-import { ISalesStat } from '../../../interfaces/ISalesStat';
 import ListHeader from './ListHeader';
 import List from './List';
 import { observable } from 'mobx';
+import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -21,7 +21,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    medsSalesStat: ISalesStat[];
+    chartSalesStat: IMedsSalesStat[];
 }
 
 @observer
@@ -30,7 +30,7 @@ class Statistic extends Component<IProps> {
     ref: React.RefObject<HTMLInputElement> = React.createRef();
 
     updScrollbar = () => {
-        if (!this.ref) return;
+        if (!this.ref || !this.ref.current) return;
         const { offsetWidth, clientWidth } = this.ref.current;
         this.scrollBarWidth = offsetWidth - clientWidth;
     }
@@ -48,7 +48,7 @@ class Statistic extends Component<IProps> {
     }
 
     render() {
-        const { classes, medsSalesStat } = this.props;
+        const { classes, chartSalesStat } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
@@ -57,7 +57,7 @@ class Statistic extends Component<IProps> {
                 <List
                     rootRef={this.ref}
                     className={classes.list}
-                    medsSalesStat={medsSalesStat} />
+                    chartSalesStat={chartSalesStat} />
             </Grid>
         );
     }

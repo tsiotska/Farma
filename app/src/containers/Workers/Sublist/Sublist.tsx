@@ -14,6 +14,7 @@ import { IWorker } from '../../../interfaces/IWorker';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
+import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 
 const styles = (theme: any) => createStyles({
     title: {
@@ -31,65 +32,39 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     rmId: number;
-    loadSubWorkers?: (rmId: number) => Promise<IWorker[]>;
     positions: Map<number, IPosition>;
+
+    expandedWorker?: IExpandedWorker;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
+    retryLoadSubworkers?: () => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
-            loadSubWorkers
+            expandedWorker,
+            getAsyncStatus,
+            loadSubworkers: retryLoadSubworkers
         }
     }
 }) => ({
-    loadSubWorkers
+    retryLoadSubworkers,
+    getAsyncStatus,
+    expandedWorker
 }))
 @observer
 class Sublist extends Component<IProps> {
-    @observable workers: IWorker[] = null;
-    @observable asyncStatus: IAsyncStatus = {
-        error: false,
-        loading: true,
-        success: false
-    };
-    timeout: any = null;
-    isUnmounted: boolean = false;
-
-    loadWorkers = async () => {
-        const { rmId, loadSubWorkers } = this.props;
-
-        this.asyncStatus.loading = true;
-        this.asyncStatus.error = false;
-        const res = await loadSubWorkers(rmId);
-
-        if (this.isUnmounted) return;
-
-        this.workers = res;
-
-        this.asyncStatus.loading = false;
-        if (Array.isArray(this.workers)) this.asyncStatus.success = true;
-        else this.asyncStatus.error = true;
-    }
-
-    componentDidMount() {
-        this.timeout = setTimeout(
-            this.loadWorkers,
-            500
-        );
-    }
-
-    componentWillUnmount() {
-        window.clearInterval(this.timeout);
-        this.isUnmounted = true;
+    get asyncStatus(): IAsyncStatus {
+        return this.props.getAsyncStatus('loadSubworkers');
     }
 
     getList = () => {
-        if (!Array.isArray(this.workers)) return;
+        const { expandedWorker, positions } = this.props;
 
-        const { positions } = this.props;
+        if (expandedWorker === null || expandedWorker.subworkers === null) return;
 
-        return this.workers.length
-        ? this.workers.map(x => (
+        return expandedWorker.subworkers.length
+        ? expandedWorker.subworkers.map(x => (
             <ListItem
                 key={x.id}
                 position={positions.get(x.position)}
@@ -104,7 +79,7 @@ class Sublist extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, retryLoadSubworkers } = this.props;
 
         return (
             <Grid direction='column' container>
@@ -122,7 +97,7 @@ class Sublist extends Component<IProps> {
                         Не удалось получить список сотрудников
                         <Button
                             variant='outlined'
-                            onClick={this.loadWorkers}
+                            onClick={retryLoadSubworkers}
                             className={classes.retryButton}>
                             Повторить Запрос
                         </Button>

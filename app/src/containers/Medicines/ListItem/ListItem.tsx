@@ -12,6 +12,7 @@ import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { Delete, Edit } from '@material-ui/icons';
 import ImageLoader from '../../../components/ImageLoader';
+import Config from '../../../../Config';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -33,7 +34,7 @@ const styles = (theme: any) => createStyles({
     },
     image: {
         width: 80,
-        height: 80,
+        maxHeight: 80,
         margin: '0 10px 0 0',
     },
     bold: {
@@ -68,7 +69,7 @@ class ListItem extends Component<IProps> {
                 <ImageLoader
                     className={classes.image}
                     loadPlaceholder={<p className={classes.image} />}
-                    src={image}
+                    src={`${Config.ASSETS_URL}/${image}`}
                 />
 
                 <Grid xs container item zeroMinWidth>
