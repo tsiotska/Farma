@@ -3,6 +3,8 @@ import { createStyles, WithStyles, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { DATA_RANGE_MODAL } from '../../../constants/Modals';
+import { lightFormat } from 'date-fns';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -33,16 +35,21 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class DataRangeButton extends Component<IProps> {
-    readonly locale: string = 'ru';
+    readonly locale: string = 'ua';
     readonly dateOptions: any = { day: 'numeric', month: 'short' };
 
     get title(): string {
         const { dateFrom, dateTo } = this.props;
 
         if (!dateFrom || !dateTo) return '-';
+        const m1 = uaMonthsNames[dateFrom.getMonth()].slice(0, 3);
+        const m2 = uaMonthsNames[dateTo.getMonth()].slice(0, 3);
 
-        const d1 = dateFrom.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
-        const d2 = dateTo.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
+        const d1 = lightFormat(dateFrom, `dd '${m1}'`);
+        const d2 = lightFormat(dateTo, `dd '${m2}'`);
+
+        // const d1 = dateFrom.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
+        // const d2 = dateTo.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
 
         const year1 = dateFrom.getFullYear() === dateTo.getFullYear()
         ? ''

@@ -146,8 +146,8 @@ class Workers extends Component<IProps> {
                         }}
                         onChange={this.tabChangeHandler}
                         value={this.tab}>
-                        <Tab className={classes.tab} value='all' label='Сотрудники' />
-                        <Tab className={classes.tab} value='fired' label='Уволеные сотрудники' />
+                        <Tab className={classes.tab} value='all' label='Працівники' />
+                        <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
                     </Tabs>
                 }
                 <List

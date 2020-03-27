@@ -232,17 +232,17 @@ class DrugsTable extends Component<IProps> {
                                         : salesStat === null
                                             ? <>
                                                 <Typography className={classes.errorText} align='center'>
-                                                    Не удалось получить данные
+                                                    Не вдалося отримати дані
                                                 </Typography>
                                                 <Button
                                                     className={classes.retryButton}
                                                     onClick={onRetry}
                                                     variant='outlined'>
-                                                    Повторить Запрос
+                                                    Повторити запит
                                                 </Button>
                                             </>
                                             : <Typography className={classes.errorText}>
-                                                Нету данных
+                                                Дані відсутні
                                             </Typography>
                                 }
                               </InfoTableRow>

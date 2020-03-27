@@ -62,17 +62,17 @@ class ListHeader extends Component<IProps> {
 
                 <Grid xs={6} container item>
                     <Typography variant='subtitle1' color='textSecondary'>
-                        Препараты
+                        Препарати
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='subtitle1' color='textSecondary'>
-                        КПД, %
+                        ККД, %
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='subtitle1' color='textSecondary'>
-                        Всего
+                        Всього
                     </Typography>
                 </Grid>
             </Grid>

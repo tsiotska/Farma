@@ -16,7 +16,8 @@ const styles = (theme: any) => createStyles({
             '& img': {
                 width: 32,
                 height: 32,
-                marginRight: 5
+                marginRight: 5,
+                marginLeft: 5
             }
         }
     }
@@ -61,8 +62,8 @@ class TableRow extends Component<IProps> {
                         <TableCell key={i} className={classes.cell}>
                             {
                                 x
-                                ? '-'
-                                : x.toFixed(mantisLength)
+                                ? x.toFixed(mantisLength)
+                                : '-'
                             }
                         </TableCell>
                     ))

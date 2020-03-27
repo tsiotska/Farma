@@ -58,7 +58,7 @@ class SummaryRow extends Component<IProps> {
                 rowEndAddornment={this.calculateTotal}
                 rowStartAddornment={
                     <Typography>
-                        В сумме
+                        В суммі
                     </Typography>
                 }
             />

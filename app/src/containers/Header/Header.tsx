@@ -17,7 +17,8 @@ const styles = (theme: any) => createStyles({
         height: 70,
         display: 'flex',
         alignItems: 'center',
-        padding: 20
+        padding: 20,
+        textTransform: 'capitalize'
     },
 });
 

@@ -17,9 +17,10 @@ const styles = (theme: any) => createStyles({
             ? 0
             : 34,
         '& > *:last-of-type': {
-            marginRight: ({ fired }: any) => fired
-                ? 0
-                : 90
+            // marginRight: ({ fired }: any) => fired
+            //     ? 0
+            //     : 88
+            marginRight: 88
         },
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
@@ -27,7 +28,7 @@ const styles = (theme: any) => createStyles({
             textOverflow: 'ellipsis',
             overflow: 'hidden'
         }
-    },
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -80,7 +81,7 @@ class List extends Component<IProps> {
                         {
                             fired !== true &&
                             <Typography variant='body2'>
-                                Региональные менеджеры
+                                Регіональні менеджери
                             </Typography>
                         }
                     </Grid>
@@ -88,8 +89,8 @@ class List extends Component<IProps> {
                         <Typography variant='body2'>
                             {
                                 fired
-                                    ? 'Регион'
-                                    : 'Должность'
+                                    ? 'Регіон'
+                                    : 'Посада'
                             }
                         </Typography>
                     </Grid>
@@ -100,8 +101,8 @@ class List extends Component<IProps> {
                         <Typography variant='body2'>
                             {
                                 fired
-                                    ? 'Начало-завершение роботы'
-                                    : 'Начало роботы'
+                                    ? 'Початок-завершеня роботи'
+                                    : 'Початок роботи'
                             }
 
                         </Typography>
@@ -118,7 +119,7 @@ class List extends Component<IProps> {
                     </Grid>
                     <Grid xs item zeroMinWidth>
                         <Typography variant='body2'>
-                            № карты
+                            № карти
                         </Typography>
                     </Grid>
                 </Grid>

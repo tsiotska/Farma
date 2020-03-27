@@ -164,7 +164,7 @@ class Login extends Component<IProps> {
             <>
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.header}>
-                    Вход
+                    Вхід
                 </Typography>
 
                 <FormControl className={classes.formControl}  error={this.showErrors.email && !this.validityStatuses.email}>
@@ -204,7 +204,7 @@ class Login extends Component<IProps> {
                     variant='contained'
                     color='primary'
                     className={classes.submitButton}>
-                    Войти
+                    Увійти
                 </Button>
 
             </Grid>
@@ -215,7 +215,7 @@ class Login extends Component<IProps> {
                 open={this.openSnackbar}
                 onClose={this.snackbarCloseHandler}>
                 <Alert onClose={this.snackbarCloseHandler} severity='error'>
-                    Неверный логин или пароль
+                    Неправильний логін або пароль
                 </Alert>
             </Snackbar>
             </>

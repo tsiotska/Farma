@@ -170,7 +170,7 @@ class ProfilePreview extends Component<IProps> {
                         zeroMinWidth
                         item>
                         <Typography className={classes.realizationTitle} variant='body2'>
-                            Реализация препаратов
+                            Реалізація препаратів
                         </Typography>
                         <Grid  wrap='nowrap' alignItems='center' container>
                             <Typography className={classes.colorGreen} variant='body2'>

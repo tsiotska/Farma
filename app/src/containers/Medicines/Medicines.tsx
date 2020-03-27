@@ -69,13 +69,13 @@ class Medicines extends Component<IProps> {
             <Grid className={classes.root} direction='column' container>
                 <Grid className={classes.header} alignItems='center' justify='space-between' container>
                     <Typography variant='h5' color='textPrimary'>
-                        Препараты
+                        Препарати
                     </Typography>
                     <Button
                         onClick={this.addMedsClickHandler}
                         className={classes.addButton}
                         variant='contained'>
-                        Добавить препарат
+                        Додати препарат
                     </Button>
                 </Grid>
 

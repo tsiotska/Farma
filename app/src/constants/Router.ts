@@ -8,6 +8,7 @@ export const SALARY_ROUTE: string = '/salary';
 export const WORKERS_ROUTE: string = '/workers';
 export const MEDICINES_ROUTE: string = '/medicines';
 export const PHARMACY_ROUTE: string = '/pharmacy';
+export const LPU_ROUTE: string = '/lpu';
 
 // routes, where navigation is resolved
 export const NAVIGATION_ROUTES: string[] = [
@@ -17,6 +18,7 @@ export const NAVIGATION_ROUTES: string[] = [
     WORKERS_ROUTE,
     MEDICINES_ROUTE,
     PHARMACY_ROUTE,
+    LPU_ROUTE
 ];
 
 export const AUTH_ROUTES: string[] = [

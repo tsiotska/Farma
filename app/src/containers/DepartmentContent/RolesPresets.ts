@@ -4,7 +4,8 @@ import {
     SALARY_ROUTE,
     WORKERS_ROUTE,
     MEDICINES_ROUTE,
-    PHARMACY_ROUTE
+    PHARMACY_ROUTE,
+    LPU_ROUTE
 } from './../../constants/Router';
 
 import Sales from '../Sales';
@@ -13,6 +14,7 @@ import Salary from '../Salary';
 import Workers from '../Workers';
 import Pharmacy from '../Pharmacy';
 import Medicines from '../Medicines';
+import Lpu from '../Lpu';
 
 export interface IRoleContent {
     path: string;
@@ -20,12 +22,13 @@ export interface IRoleContent {
     title: string;
 }
 
-const sales = { title: 'Продажи', path: SALES_ROUTE, component: Sales };
-const marks = { title: 'Баллы', path: MARKS_ROUTE, component: Marks };
-const salary = { title: 'Заработная  плата', path: SALARY_ROUTE, component: Salary };
-const workers = { title: 'Сотрудники', path: WORKERS_ROUTE, component: Workers };
-const meds = { title: 'Препараты', path: MEDICINES_ROUTE, component: Medicines };
-const pharmacy = { title: 'ЛПУ/Аптеки', path: PHARMACY_ROUTE, component: Pharmacy };
+const sales = { title: 'Продажі', path: SALES_ROUTE, component: Sales };
+const marks = { title: 'Бали', path: MARKS_ROUTE, component: Marks };
+const salary = { title: 'Заробітня плата', path: SALARY_ROUTE, component: Salary };
+const workers = { title: 'Працівники', path: WORKERS_ROUTE, component: Workers };
+const meds = { title: 'Препарати', path: MEDICINES_ROUTE, component: Medicines };
+const pharmacy = { title: 'Аптеки', path: PHARMACY_ROUTE, component: Pharmacy };
+const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
 
 export const adminContent: IRoleContent[] = [
     sales,
@@ -34,6 +37,7 @@ export const adminContent: IRoleContent[] = [
     workers,
     meds,
     pharmacy,
+    lpu
 ];
 
 export const FFMContent: IRoleContent[] = [
@@ -43,6 +47,7 @@ export const FFMContent: IRoleContent[] = [
     workers,
     meds,
     pharmacy,
+    lpu
 ];
 
 export const RMContent: IRoleContent[] = [
@@ -55,5 +60,6 @@ export const MAContent: IRoleContent[] = [
     sales,
     marks,
     workers,
-    pharmacy
+    pharmacy,
+    lpu
 ];

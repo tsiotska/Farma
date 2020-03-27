@@ -22,7 +22,7 @@ import {
 } from '../../../interfaces/ISalesStat';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { DisplayMode } from '../../../stores/SalesStore';
-import { ruMonthsNames } from '../DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import LoadingMask from '../../../components/LoadingMask';
 
@@ -228,7 +228,7 @@ class Plot extends Component<IProps> {
         const actualMonthNumber = monthNumber === 0
         ? 11
         : monthNumber - 1;
-        return ruMonthsNames[actualMonthNumber] || initialLabel;
+        return uaMonthsNames[actualMonthNumber] || initialLabel;
     }
 
     render() {
@@ -237,7 +237,7 @@ class Plot extends Component<IProps> {
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
                 <Typography className={classes.header} variant='h5'>
-                    Реализация препаратов за
+                    Реализація препаратів за
                     <DataRangeButton />
                 </Typography>
                 {

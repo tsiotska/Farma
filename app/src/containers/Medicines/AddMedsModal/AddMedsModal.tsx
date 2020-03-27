@@ -73,7 +73,7 @@ class AddMedsModal extends Component<IProps> {
                 open={openedModal === ADD_MEDICINE_MODAL}
                 onClose={this.closeHandler}
                 maxWidth='md'
-                title='Добавить препарат'>
+                title='Додати препарат'>
                     <PhotoDropzone
                         removeFile={this.removeImage}
                         file={this.image}
