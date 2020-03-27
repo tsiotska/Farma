@@ -61,8 +61,8 @@ class TableRow extends Component<IProps> {
                         <TableCell key={i} className={classes.cell}>
                             {
                                 x
-                                ? '-'
-                                : x.toFixed(mantisLength)
+                                ? x.toFixed(mantisLength)
+                                : '-'
                             }
                         </TableCell>
                     ))
