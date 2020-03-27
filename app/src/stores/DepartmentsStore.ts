@@ -68,6 +68,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.meds = new Map();
         this.workers = [];
         this.firedWorkers = [];
+        this.currentDepartment = null;
     }
 
     @action.bound

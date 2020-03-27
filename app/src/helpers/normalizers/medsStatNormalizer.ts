@@ -26,10 +26,14 @@ export const medsStatNormalizer = ({ data: { data }}: any): IMedsSalesStat[] => 
                 else return;
             }
 
+            const periodValue = period === 'year'
+            ? x[period]
+            : x[period] - 1;
+
             return {
                 money: x.money,
                 amount: x.amount,
-                [period]: x[period]
+                [period]: periodValue
             };
         });
 

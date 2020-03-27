@@ -2,7 +2,7 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
 import { observable, action, reaction } from 'mobx';
-import { format, differenceInCalendarDays, differenceInCalendarMonths } from 'date-fns';
+import { endOfMonth, format, differenceInCalendarDays, differenceInCalendarMonths, subMonths } from 'date-fns';
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
@@ -66,20 +66,13 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     resetStore() {
-        const currentDate = new Date(Date.now());
-        this.dateTo = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth()
-        );
+        this.dateTo = endOfMonth(subMonths(new Date(), 1));
 
-        const fromYear = currentDate.getMonth() === 0
-        ? currentDate.getFullYear() - 1
-        : currentDate.getFullYear();
+        const fromYear = this.dateTo.getMonth() === 0
+        ? this.dateTo.getFullYear() - 1
+        : this.dateTo.getFullYear();
 
-        this.dateFrom = new Date(
-            fromYear,
-            0
-        );
+        this.dateFrom = new Date(fromYear, 0);
 
         this.displayMode = 'pack';
         this.chartSalesStat = null;
@@ -142,7 +135,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
         const url = this.getMedsStatUrl(currentDepartmentId);
 
-        if (currentDepartmentId === -1 || !url) return;
+        if (currentDepartmentId === null || !url) return;
 
         this.setLoading(requestName, currentDepartmentId);
         const res = await api.getMedsSalesStat(url);
