@@ -138,7 +138,7 @@ class DateRangeModal extends Component<IProps> {
                     />
                 </Grid>
                 <Button onClick={this.submitHandler} className={classes.submitButton}>
-                    Применить
+                    Застосувати
                 </Button>
             </Dialog>
         );

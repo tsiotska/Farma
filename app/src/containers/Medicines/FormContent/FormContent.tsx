@@ -40,9 +40,9 @@ interface IValidatorSettings {
 @observer
 class FormContent extends Component<IProps> {
     readonly validatorSettings: Record<InputType, IValidatorSettings> = {
-        string: { validator: stringValidator, text: 'Пустые значения недопустимы' },
-        money: { validator: moneyValidator, text: 'Неверное числовое значение' },
-        number: { validator: numberValidator, text: 'Неверное числовое значение'},
+        string: { validator: stringValidator, text: 'Пусті значення недопустимі' },
+        money: { validator: moneyValidator, text: 'Неправильне числове значення' },
+        number: { validator: numberValidator, text: 'Неправильне числове значення'},
     };
     readonly values: any = {
         name: 'name',
@@ -81,7 +81,7 @@ class FormContent extends Component<IProps> {
             } else {
                 this.fieldsErrorStatuses[propName] = value.length
                 ? validatorSetting.text
-                : 'Пустые значения недопустимы';
+                : 'Пусті значення недопустимі';
             }
         }
 
@@ -117,13 +117,13 @@ class FormContent extends Component<IProps> {
                 <Grid className={classes.fieldsContainer} container>
                     <Grid direction='column' className={classes.columnFirst} xs container item>
                         <FormRow
-                            label='Название'
+                            label='Назва'
                             value={this.formValues[this.values.name] || ''}
                             onChange={this.changeHandler(this.values.name)}
                             error={this.fieldsErrorStatuses[this.values.name]}
                         />
                         <FormRow
-                            label='Дозировка, мг'
+                            label='Дозування, мг'
                             value={this.formValues[this.values.dosage] || ''}
                             onChange={this.changeHandler(this.values.dosage, 'number')}
                             error={this.fieldsErrorStatuses[this.values.dosage]}
@@ -137,19 +137,19 @@ class FormContent extends Component<IProps> {
                     </Grid>
                     <Grid direction='column' xs container item>
                         <FormRow
-                            label='Форма выпуска'
+                            label='Форма выпуску'
                             value={this.formValues[this.values.releaseForm] || ''}
                             onChange={this.changeHandler(this.values.releaseForm)}
                             error={this.fieldsErrorStatuses[this.values.releaseForm]}
                         />
                         <FormRow
-                            label='Производитель'
+                            label='Виробник'
                             value={this.formValues[this.values.manufacturer] || ''}
                             onChange={this.changeHandler(this.values.manufacturer)}
                             error={this.fieldsErrorStatuses[this.values.manufacturer]}
                         />
                         <FormRow
-                            label='Цена, грн'
+                            label='Ціна, грн'
                             value={this.formValues[this.values.price] || ''}
                             onChange={this.changeHandler(this.values.price, 'money')}
                             error={this.fieldsErrorStatuses[this.values.price]}
@@ -162,7 +162,7 @@ class FormContent extends Component<IProps> {
                     variant='contained'
                     color='primary'
                     onClick={this.submitHandler}>
-                    Добавить
+                    Додати
                 </Button>
             </>
         );

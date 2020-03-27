@@ -78,7 +78,7 @@ class DoctorListItem extends Component<IProps> {
                 {
                     allowConfirm &&
                     <Button className={classes.confirmButton} variant='outlined'>
-                        Подтвердить
+                        Підтвердити
                     </Button>
                 }
 

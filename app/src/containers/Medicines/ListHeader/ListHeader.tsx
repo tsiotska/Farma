@@ -34,25 +34,25 @@ class ListHeader extends Component<IProps> {
 
                 <Grid xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Название
+                        Назва
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Форма выпуска
+                        Форма выпуску
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Дозировка, мг
+                        Дозування, мг
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Производитель
+                        Виробник
                     </Typography>
                 </Grid>
 
@@ -64,7 +64,7 @@ class ListHeader extends Component<IProps> {
 
                 <Grid className={classes.lastItem} xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Цена, грн
+                        Ціна, грн
                     </Typography>
                 </Grid>
             </Grid>

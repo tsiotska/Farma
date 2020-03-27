@@ -10,16 +10,18 @@ import {
     Avatar,
     Typography
 } from '@material-ui/core';
-import { KeyboardArrowDown } from '@material-ui/icons';
+import { KeyboardArrowDown, PermIdentity } from '@material-ui/icons';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
 import { NotInterested, Edit } from '@material-ui/icons';
 import { observable } from 'mobx';
-import { format, isValid } from 'date-fns';
+import { format, isValid, lightFormat } from 'date-fns';
 import ru from 'date-fns/locale/ru';
 import ImageLoader from '../../../components/ImageLoader';
 import { IPosition } from '../../../interfaces/IPosition';
+import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
+import vacancyIcon from '../../../../assets/icons/vacancyIcon.png';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -43,6 +45,10 @@ const styles = (theme: any) => createStyles({
         width: 32,
         height: 32
     },
+    image: {
+        width: 20,
+        height: 20
+    },
     summaryContent: {
         alignItems: 'center',
         margin: 0,
@@ -60,7 +66,7 @@ const styles = (theme: any) => createStyles({
         cursor: ({ children }: any) => children ? 'initial' : 'default !important',
         padding: 0,
         minHeight: '48px !important',
-        // border: '1px solid #ddd',
+        border: ({ worker: { isVacancy }}: any) => isVacancy ? '1px solid #f3ca47' : '1px solid transparent',
     },
     iconButton: {
         borderRadius: 2
@@ -74,6 +80,9 @@ const styles = (theme: any) => createStyles({
     },
     actions: {
         width: 88
+    },
+    placeholderImage: {
+        margin: '8px 6px 8px 10px'
     }
 });
 
@@ -93,7 +102,9 @@ class ListItem extends Component<IProps> {
 
     get position(): string {
         const { position } = this.props;
-        return position ? position.alias : '-';
+        return position
+            ? position.alias
+            : '-';
     }
 
     get region(): string {
@@ -112,13 +123,21 @@ class ListItem extends Component<IProps> {
             ? '...'
             : '-';
 
-        const from = isValid(hired)
-            ? format(hired, this.dateFormat, { locale: ru })
+        const isHiredDateValid = isValid(hired);
+        const monthOfHiring = isHiredDateValid
+            ? `${uaMonthsNames[hired.getMonth()].slice(0, 3)} `
+            : '';
+        const from = isHiredDateValid
+            ? lightFormat(hired, `dd '${monthOfHiring}'yyyy`)
             : emptyPlaceholder;
 
         if (isFired) {
-            const to = isValid(fired)
-                ? format(fired, this.dateFormat, { locale: ru })
+            const isFiredDateValid = isValid(fired);
+            const monthOfFired = isFiredDateValid
+                ? `${uaMonthsNames[fired.getMonth()].slice(0, 3)} `
+                : '';
+            const to = isFiredDateValid
+                ? lightFormat(fired, `dd '${monthOfFired}'yyyy`)
                 : emptyPlaceholder;
 
             return `${from} - ${to}`;
@@ -166,43 +185,56 @@ class ListItem extends Component<IProps> {
                         root: classes.summaryRoot,
                         expandIcon: classes.expandIcon
                     }}>
-                    <Grid xs={3} className={classes.gridItem} wrap='nowrap' zeroMinWidth container item>
+                    <Grid xs={3} className={classes.gridItem} wrap='nowrap' alignItems='center' zeroMinWidth container item>
                         <ImageLoader
                             className={classes.avatar}
                             component={Avatar}
-                            src={avatar}
+                            componentProps={{
+                                classes: {
+                                    root: classes.avatar,
+                                    img: (isVacancy
+                                    ? classes.image
+                                    : classes.avatar)
+                                }
+                            }}
+                            src={
+                                isVacancy
+                                    ? vacancyIcon
+                                    : avatar
+                            }
+                            loadPlaceholder={<PermIdentity className={classes.placeholderImage} fontSize='small' />}
                         />
                         <Typography variant='body2'>
                             {name}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} container zeroMinWidth item>
+                    <Grid xs className={classes.gridItem} alignItems='center' container zeroMinWidth item>
                         <Typography variant='body2'>
                             {fired ? this.region : this.position}
                         </Typography>
                     </Grid>
-                    <Grid xs={fired ? 2 : true} className={classes.gridItem} zeroMinWidth container item>
+                    <Grid xs={fired ? 2 : true} className={classes.gridItem} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {this.date}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
+                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {email}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
+                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {phone}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} zeroMinWidth container item>
+                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {card}
                         </Typography>
                     </Grid>
 
-                    <Grid justify='flex-end' className={classes.actions} container>
+                    <Grid justify='flex-end' className={classes.actions} alignItems='center' container>
                         {
                             fired === false &&
                             <>

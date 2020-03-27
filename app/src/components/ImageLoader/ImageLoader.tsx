@@ -14,6 +14,7 @@ interface IProps extends WithStyles<typeof styles>, ImgHTMLAttributes<HTMLImageE
     className?: string;
     loadPlaceholder?: JSX.Element;
     component?: any;
+    componentProps?: any;
 }
 
 @observer
@@ -29,6 +30,7 @@ class ImageLoader extends Component<IProps> {
             className,
             loadPlaceholder,
             classes,
+            componentProps,
             component: CustomComponent,
             ...imageProps
         } = this.props;
@@ -37,6 +39,7 @@ class ImageLoader extends Component<IProps> {
             {
                 CustomComponent
                 ? <CustomComponent
+                    {...componentProps}
                     className={cx(className, { [classes.invisible]: !this.imageLoaded })}
                     onLoad={this.imageLoadHandler}
                     {...imageProps}

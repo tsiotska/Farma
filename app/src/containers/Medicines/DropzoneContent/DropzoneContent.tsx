@@ -67,8 +67,8 @@ class DropzoneContent extends Component<IProps> {
                         onClick={onButtonClick}>
                             {
                                 fileAppended
-                                ? 'Изменить фото'
-                                : 'Добавить фото'
+                                ? 'Змінити фото'
+                                : 'Добавити фото'
                             }
                       </Button>
 
@@ -76,10 +76,10 @@ class DropzoneContent extends Component<IProps> {
                 {
                     fileAppended
                     ? <Button className={classes.removeButton} onClick={removeFile}>
-                        Удалить файл
+                        Видалити файл
                       </Button>
                     : <Typography className={cx(classes.helperText, { white: colorTheme === 'white', black: colorTheme === 'black'})} variant='subtitle1'>
-                        Выберите или добавьте фотографию
+                        Виберіть або перетягніть фотографію
                       </Typography>
                 }
             </>

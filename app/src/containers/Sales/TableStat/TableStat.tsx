@@ -58,8 +58,8 @@ interface IProps {
 class TableStat extends Component<IProps> {
     readonly staticTableTitles: any = {
         [USER_ROLE.FIELD_FORCE_MANAGER]: {
-            [GROUP_BY.AGENT]: 'Региональные менеджеры',
-            [GROUP_BY.LOCATION]: 'Регионы',
+            [GROUP_BY.AGENT]: 'Регіональні менеджери',
+            [GROUP_BY.LOCATION]: 'Регіони',
         },
         [USER_ROLE.MEDICAL_AGENT]: {
             [GROUP_BY.LOCATION]: 'ЛПУ / Аптека',
@@ -71,7 +71,7 @@ class TableStat extends Component<IProps> {
         return {
             ...this.staticTableTitles,
             [USER_ROLE.REGIONAL_MANAGER]: {
-                [GROUP_BY.AGENT]: 'Медицинские представители',
+                [GROUP_BY.AGENT]: 'Медицинські представники',
                 [GROUP_BY.LOCATION]: this.getTitle(),
             }
         };

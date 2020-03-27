@@ -48,7 +48,7 @@ class Header extends Component<IProps> {
         return (
             <Grid className={classes.root} alignItems='center' container>
                 <Typography variant='body2' className={classes.text}>
-                    Измерения:
+                    Зміни:
                 </Typography>
                 <FormControlLabel
                     control={
@@ -70,7 +70,7 @@ class Header extends Component<IProps> {
                         checked={displayMode === 'currency'}
                         onChange={this.checkboxChangeHandler('currency')}
                     />}
-                    label='Гривны'
+                    label='Гривні'
                     classes={{ label:  classes.label }}
                 />
             </Grid>

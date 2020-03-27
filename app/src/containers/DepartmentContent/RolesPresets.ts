@@ -20,11 +20,11 @@ export interface IRoleContent {
     title: string;
 }
 
-const sales = { title: 'Продажи', path: SALES_ROUTE, component: Sales };
-const marks = { title: 'Баллы', path: MARKS_ROUTE, component: Marks };
-const salary = { title: 'Заработная  плата', path: SALARY_ROUTE, component: Salary };
-const workers = { title: 'Сотрудники', path: WORKERS_ROUTE, component: Workers };
-const meds = { title: 'Препараты', path: MEDICINES_ROUTE, component: Medicines };
+const sales = { title: 'Продажі', path: SALES_ROUTE, component: Sales };
+const marks = { title: 'Бали', path: MARKS_ROUTE, component: Marks };
+const salary = { title: 'Заробітня плата', path: SALARY_ROUTE, component: Salary };
+const workers = { title: 'Працівники', path: WORKERS_ROUTE, component: Workers };
+const meds = { title: 'Препарати', path: MEDICINES_ROUTE, component: Medicines };
 const pharmacy = { title: 'ЛПУ/Аптеки', path: PHARMACY_ROUTE, component: Pharmacy };
 
 export const adminContent: IRoleContent[] = [

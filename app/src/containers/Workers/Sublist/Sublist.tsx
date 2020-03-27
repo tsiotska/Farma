@@ -27,6 +27,9 @@ const styles = (theme: any) => createStyles({
     },
     retryButton: {
         marginLeft: theme.spacing(2)
+    },
+    avatar: {
+        marginLeft: 5
     }
 });
 
@@ -59,7 +62,7 @@ class Sublist extends Component<IProps> {
     }
 
     getList = () => {
-        const { expandedWorker, positions } = this.props;
+        const { expandedWorker, positions, classes } = this.props;
 
         if (expandedWorker === null || expandedWorker.subworkers === null) return;
 
@@ -71,10 +74,13 @@ class Sublist extends Component<IProps> {
                 worker={x}
                 fired={false}
                 isExpanded={false}
+                classes={{
+                    avatar: classes.avatar
+                }}
             />
           ))
         : <Typography>
-            Список сотрудников пуст
+            Список працівників пустий
           </Typography>;
     }
 
@@ -84,7 +90,7 @@ class Sublist extends Component<IProps> {
         return (
             <Grid direction='column' container>
                 <Typography className={classes.title} color='textSecondary'>
-                    Медицинские представители
+                    Медицинські представники
                 </Typography>
                 {
                     this.asyncStatus.loading &&
@@ -94,12 +100,12 @@ class Sublist extends Component<IProps> {
                 {
                     this.asyncStatus.error &&
                     <Typography className={classes.errorMessage} variant='body2'>
-                        Не удалось получить список сотрудников
+                        Не вдалось отримати список працівників
                         <Button
                             variant='outlined'
                             onClick={retryLoadSubworkers}
                             className={classes.retryButton}>
-                            Повторить Запрос
+                            Повторити запит
                         </Button>
                     </Typography>
                 }
