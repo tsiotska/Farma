@@ -74,7 +74,6 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Login extends Component<IProps> {
-    lengthValidator: Validator;
     @observable showPassword: boolean = false;
     @observable openSnackbar: boolean = false;
     @observable credentials: IUserCredentials = {
@@ -95,7 +94,6 @@ class Login extends Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
-        this.lengthValidator = lengthValidator.bind(this, 6);
     }
 
     changeHandler = ({ target: { type, value } }: any) => {
@@ -117,7 +115,6 @@ class Login extends Component<IProps> {
         this.showErrors.password = true;
 
         this.validityStatuses.email = emailValidator(preparedCreds.email);
-        this.validityStatuses.password = this.lengthValidator(preparedCreds.password);
 
         const isValid = this.validityStatuses.email && this.validityStatuses.password;
 

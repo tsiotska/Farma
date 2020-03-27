@@ -199,7 +199,7 @@ class DrugsTable extends Component<IProps> {
                             {
                                 !!this.medsArray.length &&
                                 <TableCell className={classes.thCell}>
-                                    total
+                                    Сума
                                 </TableCell>
                             }
                         </TableRow>
