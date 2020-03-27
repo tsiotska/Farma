@@ -7,6 +7,7 @@ import Config from '../../../../Config';
 
 interface IProps {
     label: IUserCommonInfo;
+    classes?: Partial<Record<'typography'|'image', string>>;
 }
 
 @observer
@@ -26,13 +27,16 @@ class AgentTextCell extends Component<IProps> {
     }
 
     render() {
-        const { label } = this.props;
+        const { classes } = this.props;
 
         return (
-            <Typography>
+            <Typography className={classes && classes.typography} variant='body2'>
                 {
                     this.avatar &&
-                    <ImageLoader src={`${Config.ASSETS_URL}/${this.avatar}`} />
+                    <ImageLoader
+                        className={classes && classes.image}
+                        src={`${Config.ASSETS_URL}/${this.avatar}`}
+                    />
                 }
                 { this.name }
             </Typography>

@@ -5,15 +5,16 @@ import { Typography } from '@material-ui/core';
 
 interface IProps {
     label: ILocation;
+    classes?: Partial<Record<'typography', string>>;
 }
 
 @observer
 class LocationTextCell extends Component<IProps> {
     render() {
-        const { label } = this.props;
+        const { label, classes } = this.props;
 
         return (
-            <Typography>
+            <Typography className={classes && classes.typography} variant='body2'>
                 {
                     label
                     ? label.name
