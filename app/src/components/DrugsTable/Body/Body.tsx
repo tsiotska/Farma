@@ -14,6 +14,7 @@ interface IProps {
     targetProp: 'money' | 'amount';
     mantisLength: number;
     rowPrepend: any;
+    scrollBarWidth: number;
 }
 
 @observer
@@ -34,11 +35,12 @@ class Body extends Component<IProps> {
         ).toFixed(this.props.mantisLength)
 
     render() {
-        const { salesStat, labelData, rowPrepend: PrependComponent } = this.props;
+        const { salesStat, labelData, scrollBarWidth, rowPrepend: PrependComponent } = this.props;
 
         return salesStat.map(stat => (
             <TableRow
                 key={stat.id}
+                scrollBarWidth={scrollBarWidth}
                 medsIds={this.medsIds}
                 data={this.getDataObject(stat.stat)}
                 mantisLength={this.props.mantisLength}

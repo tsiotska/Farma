@@ -13,12 +13,18 @@ const styles = (theme: any) => createStyles({
         height: 48,
         '&:first-of-type': {
             paddingLeft: 5,
+            [theme.breakpoints.up('md')]: {
+                width: 220,
+            },
             '& img': {
                 width: 32,
                 height: 32,
                 marginRight: 5,
                 marginLeft: 5
             }
+        },
+        '&:last-of-type': {
+            width: ({ scrollBarWidth = 0}: any) => 100 - scrollBarWidth
         }
     }
 });
@@ -29,6 +35,7 @@ interface IProps extends WithStyles<typeof styles> {
     rowEndAddornment?: (data: number[]) => number | string;
     rowStartAddornment?: JSX.Element;
     data: any;
+    scrollBarWidth?: number;
 }
 
 @observer

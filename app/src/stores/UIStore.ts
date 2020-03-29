@@ -1,7 +1,6 @@
 import AsyncStore from './AsyncStore';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action } from 'mobx';
-import { IUser } from '../interfaces';
 
 export class UIStore extends AsyncStore implements IUIStore {
     @observable salesHeaderHeight: number;

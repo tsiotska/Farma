@@ -26,6 +26,7 @@ import SummaryRow from './SummaryRow';
 import InfoTableRow from './InfoTableRow';
 import { ILocation } from '../../interfaces/ILocation';
 import { IUserCommonInfo } from '../../interfaces/IUser';
+import { observable } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     thCell: {
@@ -52,9 +53,8 @@ const styles = (theme: any) => createStyles({
         tableLayout: 'fixed'
     },
     container: {
-        overflowY: 'hidden',
+        maxHeight: '33vw',
         transition: '0.3s',
-        marginBottom: '2vh'
     },
     retryButton: {
         marginBottom: 10
@@ -64,6 +64,10 @@ const styles = (theme: any) => createStyles({
     },
     body: {
         background: 'white'
+    },
+    marginBottom: {
+        minHeight: 350,
+        marginBottom: 40
     }
 });
 
@@ -116,6 +120,8 @@ class DrugsTable extends Component<IProps> {
     };
     readonly headerHeight: number = 20;
     headerRefs: any = {};
+    ref: any = React.createRef();
+    @observable scrollBarWidth: number = 0;
 
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
@@ -130,15 +136,22 @@ class DrugsTable extends Component<IProps> {
         return this.modePressets[this.props.displayMode];
     }
 
+    updScrollbar = () => {
+        if (!this.ref || !this.ref.current) return;
+        const { offsetWidth, clientWidth } = this.ref.current;
+        this.scrollBarWidth = offsetWidth - clientWidth;
+    }
+
     calculateTopMargin = () => {
         const refs = [...Object.values(this.headerRefs)];
         const heights = refs.map((current: any) => current && current.getBoundingClientRect().height);
         const newValue = Math.max(...heights);
-        this.props.setSalesHeaderHeight(newValue);
+        this.props.setSalesHeaderHeight(newValue - 48);
     }
 
     componentDidMount() {
         this.calculateTopMargin();
+        window.addEventListener('resize', this.updScrollbar);
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -160,6 +173,11 @@ class DrugsTable extends Component<IProps> {
         }
 
         this.calculateTopMargin();
+        this.updScrollbar();
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updScrollbar);
     }
 
     render() {
@@ -176,34 +194,40 @@ class DrugsTable extends Component<IProps> {
         } = this.props;
 
         return (
+            <>
+            {/* hack to make table head sticky */}
             <TableContainer
                 style={{ paddingTop: this.marginTop }}
                 className={classes.container}>
-                <Table padding='none' className={classes.table}>
+                    <Table padding='none' className={classes.table}>
                     <TableHead>
-                        <TableRow>
-                            <TableCell colSpan={2} className={classes.thCell}>
-                                { headerPrepend }
-                            </TableCell>
-
-                            {
-                                this.medsArray.map(medicine =>
-                                    <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
-                                        <Grid container>
-                                            <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
-                                        </Grid>
-                                    </TableCell>
-                                )
-                            }
-
-                            {
-                                !!this.medsArray.length &&
-                                <TableCell className={classes.thCell}>
-                                    Сума
+                        <TableRow >
+                                <TableCell colSpan={2} className={classes.thCell}>
+                                    { headerPrepend }
                                 </TableCell>
-                            }
-                        </TableRow>
+
+                                {
+                                    this.medsArray.map(medicine =>
+                                        <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
+                                            <Grid container>
+                                                <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
+                                            </Grid>
+                                        </TableCell>
+                                    )
+                                }
+
+                                {
+                                    !!this.medsArray.length &&
+                                    <TableCell className={classes.thCell}>
+                                        Сума
+                                    </TableCell>
+                                }
+                            </TableRow>
                     </TableHead>
+                </Table>
+            </TableContainer>
+            <TableContainer ref={this.ref} className={cx(classes.container, classes.marginBottom)}>
+                <Table padding='none' className={classes.table}>
                     <TableBody className={classes.body}>
                         {
                             Array.isArray(salesStat) && salesStat.length
@@ -215,6 +239,7 @@ class DrugsTable extends Component<IProps> {
                                     displayStatuses={medsDisplayStatus}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
+                                    scrollBarWidth={this.scrollBarWidth}
                                     rowPrepend={rowPrepend}
                                 />
                                 <SummaryRow
@@ -250,6 +275,7 @@ class DrugsTable extends Component<IProps> {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </>
         );
     }
 }
