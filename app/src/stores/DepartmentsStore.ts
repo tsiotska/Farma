@@ -1,4 +1,4 @@
-import { observable, action, reaction, toJS, computed } from 'mobx';
+import { observable, action, reaction, toJS, computed, when } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -57,10 +57,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    initializeStore() {
+    async initializeStore() {
+        await when(() => !!this.rootStore.userStore.user);
         this.loadDepartments();
         this.loadPositions(true);
-        this.loadLPUs(true);
+        // this.loadLPUs(true);
     }
 
     @action.bound

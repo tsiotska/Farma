@@ -40,8 +40,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 this.rootStore.userStore.previewUser,
                 this.rootStore.departmentsStore.currentDepartmentId,
             ],
-            ([ isSalesStatNeeded, user ]: [ number, IUser ]) => {
-                if (!isSalesStatNeeded || !user) return;
+            ([ isSalesStatNeeded, user, departmentId ]: [ number, IUser, number ]) => {
+                if (!isSalesStatNeeded || !user || !departmentId) return;
                 this.loadAllStat();
             }
         );
