@@ -15,6 +15,7 @@ interface IProps {
     mantisLength: number;
     rowPrepend: any;
     scrollBarWidth: number;
+    ignoredItems: Set<number>;
 }
 
 @observer
@@ -35,7 +36,13 @@ class Body extends Component<IProps> {
         ).toFixed(this.props.mantisLength)
 
     render() {
-        const { salesStat, labelData, scrollBarWidth, rowPrepend: PrependComponent } = this.props;
+        const {
+            salesStat,
+            labelData,
+            ignoredItems,
+            scrollBarWidth,
+            rowPrepend: PrependComponent
+        } = this.props;
 
         return salesStat.map(stat => (
             <TableRow
@@ -48,6 +55,7 @@ class Body extends Component<IProps> {
                 rowStartAddornment={
                     <PrependComponent
                         label={labelData.get(stat.id)}
+                        isIgnored={ignoredItems.has(stat.id)}
                     />
                 }
             />

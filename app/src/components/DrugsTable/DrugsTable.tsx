@@ -78,6 +78,7 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
+    ignoredItems: Set<number>;
     isLoading: boolean;
     salesStat: ISalesStat[];
     headerPrepend: any;
@@ -190,7 +191,8 @@ class DrugsTable extends Component<IProps> {
             rowPrepend,
             isLoading,
             onRetry,
-             labelData
+            labelData,
+            ignoredItems
         } = this.props;
 
         return (
@@ -241,6 +243,7 @@ class DrugsTable extends Component<IProps> {
                                     mantisLength={this.modeSettings.mantisLength}
                                     scrollBarWidth={this.scrollBarWidth}
                                     rowPrepend={rowPrepend}
+                                    ignoredItems={ignoredItems}
                                 />
                                 <SummaryRow
                                     stat={salesStat}

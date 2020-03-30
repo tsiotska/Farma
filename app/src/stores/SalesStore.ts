@@ -1,14 +1,22 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, reaction } from 'mobx';
-import { endOfMonth, format, differenceInCalendarDays, differenceInCalendarMonths, subMonths } from 'date-fns';
+import { observable, action, reaction, computed } from 'mobx';
+import {
+    endOfMonth,
+    format,
+    differenceInCalendarDays,
+    differenceInCalendarMonths,
+    subMonths
+} from 'date-fns';
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
 import { IUser } from '../interfaces';
+import { IUserCommonInfo } from '../interfaces/IUser';
 
 export type DisplayMode = 'pack' | 'currency';
+type AgentTargetProperty = 'city' | 'region' | null;
 
 export default class SalesStore extends AsyncStore implements ISalesStore {
     readonly rootStore: IRootStore;
@@ -26,8 +34,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable chartSalesStat: IMedsSalesStat[] = null;
     // data for drugsTable
     @observable locationSalesStat: ISalesStat[] = null;
+    @observable ignoredLocations: Set<number> = new Set();
     // data for drugsTable
     @observable agentSalesStat: ISalesStat[] = null;
+    @observable ignoredAgents: Set<number> = new Set();
 
     constructor(rootStore: IRootStore) {
         super();
@@ -47,6 +57,27 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         );
     }
 
+    @computed
+    get isAnyAgentIgnored(): boolean {
+        return !!this.ignoredAgents.size;
+    }
+
+    @computed
+    get isAnyLocationIgnored(): boolean {
+        return !!this.ignoredLocations.size;
+    }
+
+    @action.bound
+    get agentsTargetProperty(): AgentTargetProperty {
+        const { departmentsStore: { locationsAgents } } = this.rootStore;
+        for (const [, agent] of locationsAgents) {
+            const { city, region } = agent;
+            if (region !== null) return 'region';
+            if (city !== null) return 'city';
+        }
+        return null;
+    }
+
     @action.bound
     async loadAllStat(withReset: boolean = true) {
         const { userStore: { role }} = this.rootStore;
@@ -56,6 +87,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             this.locationSalesStat = null;
             this.agentSalesStat = null;
         }
+
+        this.ignoredAgents.clear();
+        this.ignoredLocations.clear();
 
         await this.loadMedsStat();
         if (role === USER_ROLE.FIELD_FORCE_MANAGER || role === USER_ROLE.REGIONAL_MANAGER) {
@@ -80,6 +114,72 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.agentSalesStat = null;
         this.needSalesStat = false;
         this.medsDisplayStatus = new Map();
+    }
+
+    @action.bound
+    toggleIgnoredLocation = (locationId: number) => {
+        const { departmentsStore: { locationsAgents }} = this.rootStore;
+
+        if (this.ignoredLocations.has(locationId)) this.ignoredLocations.delete(locationId);
+        else this.ignoredLocations.add(locationId);
+
+        if (this.agentsTargetProperty === null) return;
+
+        locationsAgents.forEach(agent => {
+            const { id, [this.agentsTargetProperty]: location} = agent;
+            if (location === locationId) this.ignoredAgents.add(id);
+        });
+    }
+
+    @action.bound
+    toggleIgnoredAgents = (targetAgent: IUserCommonInfo) => {
+        const { id, [this.agentsTargetProperty]: targetLocation } = targetAgent;
+        const { departmentsStore: { locationsAgents }} = this.rootStore;
+
+        if (this.ignoredAgents.has(id)) {
+            this.ignoredAgents.delete(id);
+            this.ignoredLocations.delete(targetLocation);
+        } else {
+            this.ignoredAgents.add(id);
+
+            if (!Number.isInteger(targetLocation)) return;
+
+            const agentsWithSameLocation: number[] = [];
+            for (const [, agent] of locationsAgents) {
+                const { id: agentId, [this.agentsTargetProperty]: location } = agent;
+                if (location === targetLocation) agentsWithSameLocation.push(agentId);
+            }
+
+            if (agentsWithSameLocation.every(agentId => this.ignoredAgents.has(agentId))) {
+                this.ignoredLocations.add(targetLocation);
+            }
+        }
+    }
+
+    @action.bound
+    toggleAllIgnoredLocations() {
+        const { departmentsStore: { locations, locationsAgents }} = this.rootStore;
+
+        if (this.ignoredLocations.size) {
+            this.ignoredLocations.clear();
+            this.ignoredAgents.clear();
+        } else {
+            this.ignoredLocations = new Set([...locations.keys()]);
+            this.ignoredAgents = new Set([...locationsAgents.keys()]);
+        }
+    }
+
+    @action.bound
+    toggleAllIgnoredAgents() {
+        const { departmentsStore: { locations, locationsAgents }} = this.rootStore;
+
+        if (this.ignoredAgents.size) {
+            this.ignoredLocations.clear();
+            this.ignoredAgents.clear();
+        } else {
+            this.ignoredLocations = new Set([...locations.keys()]);
+            this.ignoredAgents = new Set([...locationsAgents.keys()]);
+        }
     }
 
     @action.bound

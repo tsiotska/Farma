@@ -23,6 +23,8 @@ interface IProps {
     agentSalesStat?: ISalesStat[];
     loadLocaleSalesStat?: () => void;
     loadAgentSalesStat?: () => void;
+    ignoredLocations?: Set<number>;
+    ignoredAgents?: Set<number>;
 }
 
 @inject(({
@@ -37,6 +39,8 @@ interface IProps {
             agentSalesStat,
             loadLocaleSalesStat,
             loadAgentSalesStat,
+            ignoredLocations,
+            ignoredAgents
         },
         departmentsStore: {
             locations,
@@ -53,6 +57,8 @@ interface IProps {
     agentSalesStat,
     loadLocaleSalesStat,
     loadAgentSalesStat,
+    ignoredLocations,
+    ignoredAgents
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -75,12 +81,6 @@ class TableStat extends Component<IProps> {
                 [GROUP_BY.LOCATION]: this.getTitle(),
             }
         };
-    }
-
-    getCurrentTableTitle(groupBy: GROUP_BY): any {
-        return this.tableTitles[this.props.role]
-        ? this.tableTitles[this.props.role][groupBy]
-        : '-';
     }
 
     @computed
@@ -140,6 +140,20 @@ class TableStat extends Component<IProps> {
         return new Map();
     }
 
+    getCurrentTableTitle = (groupBy: GROUP_BY): string => {
+        return this.tableTitles[this.props.role]
+        ? this.tableTitles[this.props.role][groupBy]
+        : '-';
+    }
+
+    getIgnoredItems = (groupBy: GROUP_BY): Set<number> => {
+        const { ignoredAgents, ignoredLocations } = this.props;
+
+        return groupBy === GROUP_BY.AGENT
+        ? ignoredAgents
+        : ignoredLocations;
+    }
+
     render() {
         return this.tablePreset.map(({ groupBy }, i) => (
             <DrugsTable
@@ -148,6 +162,7 @@ class TableStat extends Component<IProps> {
                 salesStat={this.getSalesStat(groupBy)}
                 onRetry={this.retryClickHandler}
                 labelData={this.getLabelData(groupBy)}
+                ignoredItems={this.getIgnoredItems(groupBy)}
                 headerPrepend={
                     <HeaderCell
                         value={this.getCurrentTableTitle(groupBy)}
