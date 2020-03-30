@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Typography, createStyles, WithStyles, withStyles, FormControlLabel, Checkbox } from '@material-ui/core';
+import {
+    Typography,
+    createStyles,
+    WithStyles,
+    withStyles,
+    FormControlLabel,
+    Checkbox
+} from '@material-ui/core';
 import { IUserCommonInfo } from '../../../interfaces/IUser';
 import ImageLoader from '../../ImageLoader';
 import Config from '../../../../Config';
@@ -19,16 +26,21 @@ interface IProps extends WithStyles<typeof styles> {
     label: IUserCommonInfo;
     isIgnored: boolean;
     toggleIgnoredAgents?: (agent: IUserCommonInfo) => void;
+    loadUserInfo?: (agent: IUserCommonInfo) => void;
 }
 
 @inject(({
     appState: {
         salesStore: {
             toggleIgnoredAgents
+        },
+        userStore: {
+            loadUserInfo
         }
     }
 }) => ({
-    toggleIgnoredAgents
+    toggleIgnoredAgents,
+    loadUserInfo
 }))
 @observer
 class AgentTextCell extends Component<IProps> {
@@ -52,6 +64,12 @@ class AgentTextCell extends Component<IProps> {
         toggleIgnoredAgents(label);
     }
 
+    onClick = (e: any) => {
+        e.preventDefault();
+        const { label, loadUserInfo } = this.props;
+        loadUserInfo(label);
+    }
+
     render() {
         const { classes, isIgnored } = this.props;
 
@@ -68,7 +86,7 @@ class AgentTextCell extends Component<IProps> {
                     />
                 }
                 label={
-                    <Typography variant='body2'>
+                    <Typography onClick={this.onClick} variant='body2'>
                         {
                             this.avatar &&
                             <ImageLoader src={`${Config.ASSETS_URL}/${this.avatar}`} />
@@ -78,18 +96,6 @@ class AgentTextCell extends Component<IProps> {
                 }
             />
         );
-
-        // return (
-        //     <Typography variant='body2'>
-        //         {
-        //             this.avatar &&
-        //             <ImageLoader
-        //                 src={`${Config.ASSETS_URL}/${this.avatar}`}
-        //             />
-        //         }
-        //         { this.name }
-        //     </Typography>
-        // );
     }
 }
 

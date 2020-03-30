@@ -11,7 +11,7 @@ import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
-import { IUserCommonInfo } from '../interfaces/IUser';
+import { IUserCommonInfo, IUser } from '../interfaces/IUser';
 
 export interface IExpandedWorker {
     id: number;
@@ -26,7 +26,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable positions: Map<number, IPosition> = new Map();
     @observable LPUs: Map<number, ILPU> = new Map();
     @observable locations: Map<number, ILocation> = new Map();
-    @observable locationsAgents: Map<number, IUserCommonInfo> = new Map();
+    @observable locationsAgents: Map<number, IUser> = new Map();
 
     @observable departments: IDepartment[] = [];
     @observable currentDepartment: IDepartment = null;
@@ -255,7 +255,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
 
         if (res) {
-            const mapped: Array<[number, IUserCommonInfo]> = res.map(x => ([ x.id, x ]));
+            const mapped: Array<[number, IUser]> = res.map(x => ([ x.id, x ]));
             this.locationsAgents = new Map(mapped);
         }
 

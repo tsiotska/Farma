@@ -11,7 +11,7 @@ import Config from '../../Config';
 import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
-import { userNormalizer } from '../helpers/normalizers/userNormalizer';
+import { userNormalizer, multipleUserNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
 import { lpuNormalizer } from '../helpers/normalizers/lpuNormalizer';
@@ -63,8 +63,11 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getUser(): Promise<IUser> {
-        return this.instance.get('api/profile')
+    getUser(userId?: number): Promise<IUser> {
+        const url = userId
+        ? `api/profile/${userId}`
+        : `api/profile`;
+        return this.instance.get(url)
             .then(userNormalizer)
             .catch(this.defaultErrorHandler());
     }
@@ -111,9 +114,10 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getLocationAgents(branchId: number, positionId: number): Promise<IUserCommonInfo[]> {
+    getLocationAgents(branchId: number, positionId: number): Promise<IUser[]> {
         return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
-            .then(agentNormalizer)
+            // .then(agentNormalizer)
+            .then(multipleUserNormalizer)
             .catch(this.defaultErrorHandler());
     }
 }

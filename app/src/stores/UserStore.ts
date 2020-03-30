@@ -1,16 +1,16 @@
-import { IUserCredentials } from './../interfaces/IUser';
 import { computed, action, observable, toJS } from 'mobx';
 
+import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
 import { USER_ROLE } from '../constants/Roles';
+import { defaultUser } from '../helpers/normalizers/userNormalizer';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
-    // used for nav
     @observable navHistory: IUser[] = [];
 
     constructor(rootStore: IRootStore) {
@@ -51,6 +51,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
     historyGoTo(userId: number) {
         const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
         this.navHistory.splice(userIndex);
+    }
+
+    @action.bound
+    async loadUserInfo(agentInfo: IUserCommonInfo, role?: USER_ROLE) {
+        const position = role || this.getNextRole();
+        this.navHistory.push({ ...defaultUser, ...agentInfo, position });
+        const res = await this.rootStore.api.getUser(agentInfo.id);
+        if (!res) return;
+        const i = this.navHistory.findIndex(({ id }) => id === res.id);
+        if (i !== -1) this.navHistory[i] = { ...this.navHistory[i], ...res };
     }
 
     @action.bound
@@ -107,6 +117,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
         } else {
             this.setError(requestName);
             return false;
+        }
+    }
+
+    private getNextRole(): USER_ROLE {
+        switch (this.role) {
+            case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.FIELD_FORCE_MANAGER;
+            case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
+            default: return USER_ROLE.UNKNOWN;
         }
     }
 }

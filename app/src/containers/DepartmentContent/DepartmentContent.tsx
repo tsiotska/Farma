@@ -11,6 +11,7 @@ import {
     MAContent
 } from './RolesPresets';
 import { USER_ROLE } from '../../constants/Roles';
+import { toJS } from 'mobx';
 
 interface IProps {
     role?: USER_ROLE;
