@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, reaction, computed, toJS } from 'mobx';
+import { observable, action, reaction, computed } from 'mobx';
 import {
     endOfMonth,
     format,

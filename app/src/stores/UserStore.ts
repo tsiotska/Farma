@@ -50,7 +50,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     historyGoTo(userId: number) {
         const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
-        this.navHistory.splice(userIndex);
+        this.navHistory = this.navHistory.filter((_, i) => i <= userIndex);
     }
 
     @action.bound

@@ -26,7 +26,7 @@ import SummaryRow from './SummaryRow';
 import InfoTableRow from './InfoTableRow';
 import { ILocation } from '../../interfaces/ILocation';
 import { IUserCommonInfo } from '../../interfaces/IUser';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     thCell: {
@@ -128,15 +128,18 @@ class DrugsTable extends Component<IProps> {
     ref: any = React.createRef();
     @observable scrollBarWidth: number = 0;
 
+    @computed
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
             .filter(({ id }) => this.props.medsDisplayStatus.get(id) === true);
     }
 
+    @computed
     get marginTop(): number {
         return this.props.salesHeaderHeight || this.headerHeight;
     }
 
+    @computed
     get modeSettings(): ISettings {
         return this.modePressets[this.props.displayMode];
     }

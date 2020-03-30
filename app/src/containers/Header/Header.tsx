@@ -10,6 +10,7 @@ import { History } from 'history';
 import ProfilePreview from '../../components/ProfilePreview';
 import DepartmentNav from '../../components/DepartmentNav';
 import { IDepartment } from '../../interfaces/IDepartment';
+import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -20,12 +21,17 @@ const styles = (theme: any) => createStyles({
         padding: 20,
         textTransform: 'capitalize'
     },
+    navContainer: {
+        height: 128,
+        position: 'relative'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     t?: (key: string) => string;
     history?: History;
     currentDepartment?: IDepartment;
+    navHistory?: IUser[];
 }
 
 @withTranslation
@@ -33,10 +39,14 @@ interface IProps extends WithStyles<typeof styles> {
     appState: {
         departmentsStore: {
             currentDepartment
+        },
+        userStore: {
+            navHistory
         }
     }
 }) => ({
-    currentDepartment
+    currentDepartment,
+    navHistory
 }))
 @observer
 export class Header extends Component<IProps, {}> {
@@ -49,18 +59,33 @@ export class Header extends Component<IProps, {}> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, navHistory } = this.props;
 
         return (
             <>
-                <Paper>
-                    <AppBar elevation={0} color='primary' position='relative' className={classes.root}>
+                {/* <Paper variant='outlined'> */}
+                    <AppBar
+                        elevation={0}
+                        color='primary'
+                        position='relative'
+                        className={classes.root}>
                         <Typography variant='h5'>
                             { this.title }
                         </Typography>
                     </AppBar>
-                    <ProfilePreview />
-                </Paper>
+                    <div className={classes.navContainer}>
+                        {
+                            navHistory.map((user, i, arr) => (
+                                <ProfilePreview
+                                    key={user.id}
+                                    user={user}
+                                    index={i}
+                                    scaleIndex={arr.length - i - 1}
+                                />
+                            ))
+                        }
+                    </div>
+                {/* </Paper> */}
                 <DepartmentNav />
             </>
         );
