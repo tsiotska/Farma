@@ -59,8 +59,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
         if (!res) return;
-        const i = this.navHistory.findIndex(({ id }) => id === res.id);
-        if (i !== -1) this.navHistory[i] = { ...this.navHistory[i], ...res };
+        const agent = this.navHistory.find(({ id }) => id === res.id);
+        if (agent) {
+            for (const prop in res) {
+                const agentValue = agent[prop];
+                const newValue = res[prop];
+                if (agentValue !== newValue && newValue) {
+                    agent[prop] = newValue;
+                }
+            }
+        }
     }
 
     @action.bound

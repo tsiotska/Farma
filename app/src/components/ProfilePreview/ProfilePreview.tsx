@@ -71,21 +71,21 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    user?: IUser;
+    previewUser?: IUser;
     positions?: Map<number, IPosition>;
 }
 
 @inject(({
     appState: {
         userStore: {
-            user
+            previewUser
         },
         departmentsStore: {
             positions
         }
     }
 }) => ({
-    user,
+    previewUser,
     positions
 }))
 @observer
@@ -95,16 +95,16 @@ class ProfilePreview extends Component<IProps> {
     }
 
     get userName(): string {
-        return this.props.user
-        ? this.props.user.name
+        return this.props.previewUser
+        ? this.props.previewUser.name
         : '';
     }
 
     get userPosition(): string {
-        const { positions, user } = this.props;
+        const { positions, previewUser } = this.props;
 
-        const userPosition = user
-        ? user.position
+        const userPosition = previewUser
+        ? previewUser.position
         : -1;
 
         const pos = positions.get(userPosition);
@@ -115,12 +115,12 @@ class ProfilePreview extends Component<IProps> {
     }
 
     get avatarProps(): any {
-        const { user } = this.props;
+        const { previewUser } = this.props;
 
-        if (!user) return {};
+        if (!previewUser) return {};
 
-        return user.avatar
-        ? { src: user.avatar }
+        return previewUser.avatar
+        ? { src: previewUser.avatar }
         : { children: this.userName[0] };
     }
 
