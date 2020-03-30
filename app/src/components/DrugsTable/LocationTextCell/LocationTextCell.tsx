@@ -1,11 +1,27 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import {
+    Typography,
+    createStyles,
+    WithStyles,
+    withStyles,
+    FormControlLabel,
+    Checkbox
+} from '@material-ui/core';
 import { ILocation } from '../../../interfaces/ILocation';
-import { Typography } from '@material-ui/core';
 
-interface IProps {
+const styles = createStyles({
+    label: {
+        margin: 0
+    },
+    checkbox: {
+        padding: 0,
+        marginRight: 5
+    }
+});
+
+interface IProps extends WithStyles<typeof styles> {
     label: ILocation;
-    classes?: Partial<Record<'typography', string>>;
     isIgnored: boolean;
     toggleIgnoredLocation?: (locationId: number) => void;
 }
@@ -22,25 +38,35 @@ interface IProps {
 }))
 @observer
 class LocationTextCell extends Component<IProps> {
-    onChange = () => {
+    changeHandler = () => {
         const { toggleIgnoredLocation, label } = this.props;
         if (!label) return;
         toggleIgnoredLocation(label.id);
     }
 
     render() {
-        const { label, classes } = this.props;
+        const { label, classes, isIgnored } = this.props;
 
         return (
-            <Typography className={classes && classes.typography} variant='body2'>
-                {
-                    label
-                    ? label.name
-                    : '-'
+            <FormControlLabel
+                className={classes.label}
+                control={
+                    <Checkbox
+                        className={classes.checkbox}
+                        checked={!isIgnored}
+                        onChange={this.changeHandler}
+                        size='small'
+                        color='default'
+                    />
                 }
-            </Typography>
+                label={
+                    <Typography variant='body2'>
+                        { label ? label.name : '-' }
+                    </Typography>
+                }
+            />
         );
     }
 }
 
-export default LocationTextCell;
+export default withStyles(styles)(LocationTextCell);

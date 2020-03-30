@@ -233,7 +233,7 @@ class Plot extends Component<IProps> {
 
     render() {
         const { classes, chartSalesStat, meds } = this.props;
-        console.log('data: ', this.data, toJS(chartSalesStat), toJS(meds));
+
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
                 <Typography className={classes.header} variant='h5'>

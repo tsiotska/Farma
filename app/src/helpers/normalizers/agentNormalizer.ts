@@ -13,8 +13,8 @@ const namesMap: IValuesMap = {
     id: 'id',
     full_name: 'name',
     avatar: 'avatar',
-    region_id: 'region',
-    city_id: 'city'
+    region: 'region',
+    city: 'city'
 };
 
 export const agentNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(

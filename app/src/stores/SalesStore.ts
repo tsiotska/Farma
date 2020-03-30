@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, reaction, computed } from 'mobx';
+import { observable, action, reaction, computed, toJS } from 'mobx';
 import {
     endOfMonth,
     format,
@@ -67,7 +67,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         return !!this.ignoredLocations.size;
     }
 
-    @action.bound
+    @computed
     get agentsTargetProperty(): AgentTargetProperty {
         const { departmentsStore: { locationsAgents } } = this.rootStore;
         for (const [, agent] of locationsAgents) {
@@ -133,6 +133,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleIgnoredAgents = (targetAgent: IUserCommonInfo) => {
+        if (this.agentsTargetProperty === null) return;
         const { id, [this.agentsTargetProperty]: targetLocation } = targetAgent;
         const { departmentsStore: { locationsAgents }} = this.rootStore;
 

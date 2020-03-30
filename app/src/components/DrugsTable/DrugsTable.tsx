@@ -31,8 +31,10 @@ import { observable } from 'mobx';
 const styles = (theme: any) => createStyles({
     thCell: {
         height: 48,
+        textOverflow: 'hidden',
         '&:first-of-type': {
             paddingLeft: 5,
+            overflow: 'hidden',
             '& *': {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -55,6 +57,8 @@ const styles = (theme: any) => createStyles({
     container: {
         maxHeight: '33vw',
         transition: '0.3s',
+        overflowX: 'visible',
+        overflowY: 'auto'
     },
     retryButton: {
         marginBottom: 10
@@ -66,7 +70,7 @@ const styles = (theme: any) => createStyles({
         background: 'white'
     },
     marginBottom: {
-        minHeight: 350,
+        // minHeight: 350,
         marginBottom: 40
     }
 });

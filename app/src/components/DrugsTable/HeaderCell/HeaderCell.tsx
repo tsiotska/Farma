@@ -1,9 +1,22 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { GROUP_BY } from '../../../containers/Sales/TableStat/presets';
-import { Typography } from '@material-ui/core';
+import { FormControlLabel, Checkbox, createStyles, WithStyles, withStyles, Typography } from '@material-ui/core';
 
-interface IProps {
+const styles = createStyles({
+    label: {
+        margin: 0
+    },
+    checkbox: {
+        padding: 0,
+        marginRight: 5
+    },
+    text: {
+        fontFamily: 'Source Sans Pro SemiBold',
+    }
+});
+
+interface IProps extends WithStyles<typeof styles> {
     value: string;
     groupBy: GROUP_BY;
 
@@ -49,14 +62,28 @@ class HeaderCell extends Component<IProps> {
     }
 
     render() {
-        const { value } = this.props;
+        const { value, classes } = this.props;
 
         return (
-            <Typography color='textSecondary'>
-                { value }
-            </Typography>
+            <FormControlLabel
+                className={classes.label}
+                control={
+                    <Checkbox
+                        className={classes.checkbox}
+                        checked={this.isChecked}
+                        onChange={this.changeHandler}
+                        size='small'
+                        color='default'
+                    />
+                }
+                label={
+                    <Typography className={classes.text} color='textSecondary'>
+                        {value}
+                    </Typography>
+                }
+            />
         );
     }
 }
 
-export default HeaderCell;
+export default withStyles(styles)(HeaderCell);
