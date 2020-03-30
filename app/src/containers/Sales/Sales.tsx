@@ -43,6 +43,7 @@ interface IProps extends WithStyles<typeof styles> {
     role?: IUser;
     loadLocationsAgents?: () => void;
     loadLocations?: () => void;
+    loadAllStat?: () => void;
 }
 
 @inject(({
@@ -53,6 +54,7 @@ interface IProps extends WithStyles<typeof styles> {
         salesStore: {
             setSalesStatDemand,
             chartSalesStat,
+            loadAllStat
         },
         userStore: {
             role
@@ -70,7 +72,8 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     currentDepartmentId,
     loadLocationsAgents,
-    loadLocations
+    loadLocations,
+    loadAllStat
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -81,7 +84,7 @@ class Sales extends Component<IProps> {
         this.props.setSalesStatDemand(true);
         this.disposeDepartmentReaction = reaction(
             () => this.props.currentDepartmentId,
-            this.props.loadLocationsAgents,
+            this.departmentChangeHandler,
             { fireImmediately: true }
         );
         this.disposeRoleReaction = reaction(
@@ -91,9 +94,15 @@ class Sales extends Component<IProps> {
         );
     }
 
+    departmentChangeHandler = () => {
+        this.props.loadLocationsAgents();
+        this.props.loadAllStat();
+    }
+
     roleChangeHandler = () => {
         this.props.loadLocationsAgents();
         this.props.loadLocations();
+        this.props.loadAllStat();
     }
 
     componentWillUnmount() {

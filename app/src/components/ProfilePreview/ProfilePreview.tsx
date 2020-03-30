@@ -12,27 +12,31 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import { observable, computed } from 'mobx';
 import cx from 'classnames';
 import { IUser } from '../../interfaces';
 import { IPosition } from '../../interfaces/IPosition';
-import { observable, computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     backface: {
-        zIndex: ({ index }: any) => 100 * index,
-        transform: ({ scaleIndex }: any) => `scale(${1 - scaleIndex / 10}, ${1 - scaleIndex / 10})`,
-        left: ({ index }: any) => index * 50,
         position: 'absolute',
         width: '100%',
         transformOrigin: 'left',
         transition: '0.3s',
-        backgroundColor: ({ scaleIndex }: any) => scaleIndex ? theme.palette.primary.white : 'transparent',
+        zIndex: ({ index }: any) => 100 * index,
+        transform: ({ scaleIndex }: any) => `scale(${1 - scaleIndex / 10}, ${1 - scaleIndex / 10})`,
+        left: ({ index }: any) => index * 50,
+        cursor: ({ scaleIndex }: any) => scaleIndex ? 'pointer' : 'auto',
+        backgroundColor: ({ scaleIndex }: any) => scaleIndex
+            ? theme.palette.primary.white
+            : 'transparent',
+        '& > *': {
+            opacity: ({ scaleIndex }: any) => 1 - 2 * scaleIndex / 10,
+        },
     },
     container: {
         padding: '14px 20px',
         maxHeight: 128,
-        opacity: ({ scaleIndex }: any) => 1 - 2 * scaleIndex / 10,
-        cursor: ({ scaleIndex }: any) => scaleIndex ? 'pointer' : 'auto',
         '&:hover': {
             opacity: 1
         }

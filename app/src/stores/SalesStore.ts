@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, reaction, computed } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import {
     endOfMonth,
     format,
@@ -12,7 +12,6 @@ import {
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
-import { IUser } from '../interfaces';
 import { IUserCommonInfo } from '../interfaces/IUser';
 
 export type DisplayMode = 'pack' | 'currency';
@@ -43,18 +42,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         super();
         this.rootStore = rootStore;
         this.resetStore();
-
-        reaction(
-            () => [
-                this.needSalesStat,
-                this.rootStore.userStore.previewUser,
-                this.rootStore.departmentsStore.currentDepartmentId,
-            ],
-            ([ isSalesStatNeeded, user, departmentId ]: [ number, IUser, number ]) => {
-                if (!isSalesStatNeeded || !user || !departmentId) return;
-                this.loadAllStat();
-            }
-        );
     }
 
     @computed

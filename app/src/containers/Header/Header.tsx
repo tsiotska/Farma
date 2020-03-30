@@ -23,7 +23,8 @@ const styles = (theme: any) => createStyles({
     },
     navContainer: {
         height: 128,
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
     }
 });
 
@@ -63,29 +64,27 @@ export class Header extends Component<IProps, {}> {
 
         return (
             <>
-                {/* <Paper variant='outlined'> */}
-                    <AppBar
-                        elevation={0}
-                        color='primary'
-                        position='relative'
-                        className={classes.root}>
-                        <Typography variant='h5'>
-                            { this.title }
-                        </Typography>
-                    </AppBar>
-                    <div className={classes.navContainer}>
-                        {
-                            navHistory.map((user, i, arr) => (
-                                <ProfilePreview
-                                    key={user.id}
-                                    user={user}
-                                    index={i}
-                                    scaleIndex={arr.length - i - 1}
-                                />
-                            ))
-                        }
-                    </div>
-                {/* </Paper> */}
+                <AppBar
+                    elevation={0}
+                    color='primary'
+                    position='relative'
+                    className={classes.root}>
+                    <Typography variant='h5'>
+                        { this.title }
+                    </Typography>
+                </AppBar>
+                <div className={classes.navContainer}>
+                    {
+                        navHistory.map((user, i, arr) => (
+                            <ProfilePreview
+                                key={user.id}
+                                user={user}
+                                index={i}
+                                scaleIndex={arr.length - i - 1}
+                            />
+                        ))
+                    }
+                </div>
                 <DepartmentNav />
             </>
         );
