@@ -23,7 +23,7 @@ const valuesMap: IValuesMap = {
     price: 'price',
 };
 
-export const medsNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
+export const medsNormalizer = ({ data }: any) => objectArrayNormalizer(
     data,
     defaultMedicine,
     valuesMap,

@@ -11,7 +11,8 @@ import { IDepartment } from '../../interfaces/IDepartment';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
 import { IUser } from '../../interfaces';
-import { reaction } from 'mobx';
+import { reaction, observable } from 'mobx';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -38,9 +39,8 @@ interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     currentDepartment?: IDepartment;
     chartSalesStat?: IMedsSalesStat[];
-    setSalesStatDemand?: (value: boolean) => void;
     currentDepartmentId?: number;
-    role?: IUser;
+    role?: USER_ROLE;
     loadLocationsAgents?: () => void;
     loadLocations?: () => void;
     loadAllStat?: () => void;
@@ -52,7 +52,6 @@ interface IProps extends WithStyles<typeof styles> {
             openedModal,
         },
         salesStore: {
-            setSalesStatDemand,
             chartSalesStat,
             loadAllStat
         },
@@ -67,7 +66,6 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     openedModal,
-    setSalesStatDemand,
     chartSalesStat,
     role,
     currentDepartmentId,
@@ -77,11 +75,12 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Sales extends Component<IProps> {
+    @observable fetchedRole: USER_ROLE;
+    @observable fetchedDepartmentId: number;
     disposeRoleReaction: any;
     disposeDepartmentReaction: any;
 
     componentDidMount() {
-        this.props.setSalesStatDemand(true);
         this.disposeDepartmentReaction = reaction(
             () => this.props.currentDepartmentId,
             this.departmentChangeHandler,
@@ -94,19 +93,24 @@ class Sales extends Component<IProps> {
         );
     }
 
-    departmentChangeHandler = () => {
+    departmentChangeHandler = (departmentId: number) => {
+        if (this.fetchedRole === this.props.role && this.fetchedDepartmentId === departmentId) return;
         this.props.loadLocationsAgents();
         this.props.loadAllStat();
+        this.fetchedDepartmentId = departmentId;
+        this.fetchedRole = this.props.role;
     }
 
-    roleChangeHandler = () => {
-        this.props.loadLocationsAgents();
+    roleChangeHandler = (role: USER_ROLE) => {
         this.props.loadLocations();
+        if (this.fetchedRole === role && this.fetchedDepartmentId === this.props.currentDepartmentId) return;
+        this.props.loadLocationsAgents();
         this.props.loadAllStat();
+        this.fetchedRole = role;
+        this.fetchedDepartmentId = this.props.currentDepartmentId;
     }
 
     componentWillUnmount() {
-        this.props.setSalesStatDemand(false);
         this.disposeRoleReaction();
         this.disposeDepartmentReaction();
     }

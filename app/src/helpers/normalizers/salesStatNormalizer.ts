@@ -1,7 +1,7 @@
 import { objectArrayNormalizer, IValuesMap, IOptions } from './normalizer';
 import { ISalesStat, IMedSalesInfo } from '../../interfaces/ISalesStat';
 
-export const salesStatNormalizer = ({ data: { data }}: any) => {
+export const salesStatNormalizer = ({ data }: any) => {
     const normalizerOptions: IOptions<IMedSalesInfo> = {
         requiredProps: [ 'id' ]
     };

@@ -1,6 +1,6 @@
 import { IMedsSalesStat, IPeriodSalesStat } from './../../interfaces/ISalesStat';
 
-export const medsStatNormalizer = ({ data: { data }}: any): IMedsSalesStat[] => {
+export const medsStatNormalizer = ({ data }: any): IMedsSalesStat[] => {
     const res: IMedsSalesStat[] = [];
 
     let period: string;

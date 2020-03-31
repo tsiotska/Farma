@@ -134,38 +134,38 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (!res || !res.length) return;
 
         this.departments = res;
-
-        // if (!this.currentDepartment) {
-        //     const { userStore: { user } } = this.rootStore;
-
-        //     const userDepartment = user
-        //     ? user.department
-        //     : null;
-
-        //     this.setCurrentDepartment(res[0]);
-        // }
     }
 
     @action.bound
     async loadMeds() {
         const requestName = 'loadMeds';
-        const { api, salesStore: { initMedsDisplayStatuses } } = this.rootStore;
+        const { api } = this.rootStore;
 
         if (!this.currentDepartmentId) return;
 
         this.meds.clear();
 
-        const request = api.getMeds(this.currentDepartmentId);
+        this.setLoading(requestName);
+        const { cache, promise } = api.getMeds(this.currentDepartmentId);
+        if (cache) this.medsHandler(cache);
 
-        const res = await this.dispatchRequest(request, requestName);
+        const requestResult = await promise;
 
-        if (res) {
-            const mapped: Array<[number, IMedicine]> = res.map(x => (
-                [x.id, { ...x, color: getRandomColor() }]
-            ));
-            this.meds = new Map(mapped);
-            initMedsDisplayStatuses();
+        if (requestResult) {
+            this.medsHandler(requestResult);
+            this.setSuccess(requestName);
+        } else {
+            this.setError(requestName);
         }
+    }
+
+    private medsHandler = (meds: IMedicine[]) => {
+        const { salesStore: { initMedsDisplayStatuses } } = this.rootStore;
+        const mapped: Array<[number, IMedicine]> = meds.map(x => (
+            [x.id, { ...x, color: getRandomColor() }]
+        ));
+        this.meds = new Map(mapped);
+        initMedsDisplayStatuses();
     }
 
     @action.bound

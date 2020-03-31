@@ -1,9 +1,8 @@
 import { workersNormalizer } from './../helpers/workersNormalizer';
-import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
+import { IUserCredentials } from './../interfaces/IUser';
 import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer';
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
-import { mockDrugs } from './mock/mockDrugs';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
 
@@ -20,15 +19,23 @@ import { IWorker } from '../interfaces/IWorker';
 import { ILocation } from '../interfaces/ILocation';
 import { locationsNormalizer } from '../helpers/normalizers/locationsNormalizer';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
-import { agentNormalizer } from '../helpers/normalizers/agentNormalizer';
+import { ICacheStore } from '../interfaces/ICacheStore';
+import { CacheStore } from '../stores/CacheStore';
+
+export interface ICachedPromise <T> {
+    promise: Promise<T>;
+    cache: any;
+}
 
 /**
  * Class representing API requester
  * @class APIRequester
  */
 export class APIRequester {
+    protected cacheStore: ICacheStore;
     protected instance: AxiosInstance;
     constructor() {
+        this.cacheStore = new CacheStore();
         this.instance = axios.create({
             baseURL: Config.API_URL.trim(),
             withCredentials: true
@@ -72,10 +79,16 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getMeds(departmentId: number): Promise<IMedicine[]> {
-        return this.instance.get(`api/branch/${departmentId}/drug`)
-            .then(medsNormalizer)
+    getMeds(departmentId: number): ICachedPromise<IMedicine[]> {
+        const url = `api/branch/${departmentId}/drug`;
+        const cache = this.cacheStore.getCachedData(url, medsNormalizer);
+        const promise =  this.instance.get(url)
+            .then(({ data, request: { response }}) => {
+                this.cacheStore.setCachedData(url, response);
+                return medsNormalizer(data);
+            })
             .catch(this.defaultErrorHandler());
+        return { cache, promise };
     }
 
     getPositions(): Promise<IPosition[]> {
@@ -90,16 +103,26 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getMedsSalesStat(url: string): Promise<IMedsSalesStat[]> {
-        return this.instance.get(url)
-            .then(medsStatNormalizer)
+    getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
+        const cache = this.cacheStore.getCachedData(url, medsStatNormalizer);
+        const promise = this.instance.get(url)
+            .then(({ data, request: { response }}) => {
+                this.cacheStore.setCachedData(url, response);
+                return medsStatNormalizer(data);
+            })
             .catch(this.defaultErrorHandler());
+        return { cache, promise };
     }
 
-    getSalesStat(url: string): Promise<ISalesStat[]> {
-        return this.instance.get(url)
-            .then(salesStatNormalizer)
+    getSalesStat(url: string): ICachedPromise<ISalesStat[]> {
+        const cache = this.cacheStore.getCachedData(url, salesStatNormalizer);
+        const promise = this.instance.get(url)
+            .then(({ data, request: { response }}) => {
+                this.cacheStore.setCachedData(url, response);
+                return salesStatNormalizer(data);
+            })
             .catch(this.defaultErrorHandler());
+        return { cache, promise };
     }
 
     getWorkers(url: string): Promise<IWorker[]> {
@@ -116,7 +139,6 @@ export class APIRequester {
 
     getLocationAgents(branchId: number, positionId: number): Promise<IUser[]> {
         return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
-            // .then(agentNormalizer)
             .then(multipleUserNormalizer)
             .catch(this.defaultErrorHandler());
     }
