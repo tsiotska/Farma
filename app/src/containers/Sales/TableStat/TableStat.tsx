@@ -10,6 +10,7 @@ import HeaderCell from '../../../components/DrugsTable/HeaderCell';
 import { USER_ROLE } from '../../../constants/Roles';
 import { computed } from 'mobx';
 import LocationTextCell from '../../../components/DrugsTable/LocationTextCell';
+import { ILPU } from '../../../interfaces/ILPU';
 
 interface IProps {
     role?: USER_ROLE;
@@ -21,6 +22,7 @@ interface IProps {
     agentSalesStat?: ISalesStat[];
     locations?: Map<number, ILocation>;
     locationsAgents?: Map<number, IUserCommonInfo>;
+    pharmacies?: Map<number, ILPU>;
     ignoredLocations?: Set<number>;
     ignoredAgents?: Set<number>;
 }
@@ -48,6 +50,7 @@ export enum GROUP_BY {
         departmentsStore: {
             locations,
             locationsAgents,
+            pharmacies
         }
     }
 }) => ({
@@ -62,6 +65,7 @@ export enum GROUP_BY {
     ignoredAgents,
     loadLocaleSalesStat,
     loadAgentSalesStat,
+    pharmacies
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -103,6 +107,14 @@ class TableStat extends Component<IProps> {
     get showAgentStat(): boolean {
         const { role } = this.props;
         return this.agentStatRoles.includes(role);
+    }
+
+    @computed
+    get locationsLabels(): Map<number, ILocation | ILPU> {
+        const { role, locations, pharmacies } = this.props;
+        return role === USER_ROLE.MEDICAL_AGENT
+        ? pharmacies
+        : locations;
     }
 
     getTitle(): string {
@@ -172,7 +184,7 @@ class TableStat extends Component<IProps> {
                 <DrugsTable
                     isLoading={this.isLoading}
                     salesStat={locationSalesStat}
-                    labelData={locations}
+                    labelData={this.locationsLabels}
                     onRetry={this.retryClickHandler}
                     ignoredItems={ignoredLocations}
                     headerPrepend={

@@ -142,4 +142,10 @@ export class APIRequester {
             .then(multipleUserNormalizer)
             .catch(this.defaultErrorHandler());
     }
+
+    getPharmacies(): Promise<ILPU[]> {
+        return this.instance.get(`/api/pharmacy`)
+            .then(lpuNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
 }

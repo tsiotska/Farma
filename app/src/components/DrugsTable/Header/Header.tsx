@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     createStyles,
     WithStyles,
-    withStyles,
     TableContainer,
     Table,
     TableHead,
@@ -113,8 +112,8 @@ class Header extends Component<IProps> {
         const { classes, headerPrepend } = this.props;
         return(
             <TableContainer
-            style={{ paddingTop: this.marginTop }}
-            className={classes.container}>
+                style={{ paddingTop: this.marginTop }}
+                className={classes.container}>
                 <Table padding='none' className={classes.table}>
                 <TableHead>
                     <TableRow >

@@ -25,6 +25,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
     @observable LPUs: Map<number, ILPU> = new Map();
+    @observable pharmacies: Map<number, ILPU> = new Map();
     @observable locations: Map<number, ILocation> = new Map();
     @observable locationsAgents: Map<number, IUser> = new Map();
 
@@ -61,7 +62,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         await when(() => !!this.rootStore.userStore.user);
         this.loadDepartments();
         this.loadPositions(true);
-        this.loadLPUs(true);
     }
 
     @action.bound
@@ -96,6 +96,27 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         } else {
             this.currentDepartment = department;
         }
+    }
+
+    @action.bound
+    async loadPharmacies(isInitial: boolean = false) {
+        const requestName = 'loadPharmacies';
+        const { api } = this.rootStore;
+
+        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
+
+        const res = await this.dispatchRequest(
+            api.getPharmacies(),
+            requestName
+        );
+
+        if (res) {
+            const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
+            this.pharmacies = new Map(mapped);
+            return;
+        }
+
+        this.retryPolicy(this.loadPharmacies, requestName);
     }
 
     @action.bound

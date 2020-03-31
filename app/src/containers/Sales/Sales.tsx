@@ -13,6 +13,7 @@ import { IMedsSalesStat } from '../../interfaces/ISalesStat';
 import { IUser } from '../../interfaces';
 import { reaction, observable } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
+import { IAsyncStatus } from '../../stores/AsyncStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -42,6 +43,8 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents?: () => void;
     loadLocations?: () => void;
     loadAllStat?: () => void;
+    loadPharmacies?: (isInitial: boolean) => void;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
 @inject(({
@@ -56,7 +59,9 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             currentDepartmentId,
             loadLocationsAgents,
-            loadLocations
+            loadLocations,
+            loadPharmacies,
+            getAsyncStatus
         }
     }
 }) => ({
@@ -65,7 +70,9 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadLocationsAgents,
     loadLocations,
-    loadAllStat
+    loadAllStat,
+    loadPharmacies,
+    getAsyncStatus
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -88,20 +95,42 @@ class Sales extends Component<IProps> {
     }
 
     departmentChangeHandler = (departmentId: number) => {
-        if (this.fetchedRole === this.props.role && this.fetchedDepartmentId === departmentId) return;
-        this.props.loadLocationsAgents();
-        this.props.loadAllStat();
+        const {
+            role,
+            loadLocationsAgents,
+            loadAllStat
+        } = this.props;
+
+        if (this.fetchedRole === role && this.fetchedDepartmentId === departmentId) return;
+
+        loadLocationsAgents();
+        loadAllStat();
         this.fetchedDepartmentId = departmentId;
-        this.fetchedRole = this.props.role;
+        this.fetchedRole = role;
     }
 
     roleChangeHandler = (role: USER_ROLE) => {
-        this.props.loadLocations();
-        if (this.fetchedRole === role && this.fetchedDepartmentId === this.props.currentDepartmentId) return;
-        this.props.loadLocationsAgents();
-        this.props.loadAllStat();
+        const {
+            currentDepartmentId,
+            loadLocations,
+            loadLocationsAgents,
+            loadAllStat,
+            getAsyncStatus,
+            loadPharmacies
+        } = this.props;
+
+        loadLocations();
+
+        const { success, loading } = getAsyncStatus('loadPharmacies');
+        const shouldLoadPharmacies = success === false && loading === false;
+        if (shouldLoadPharmacies) loadPharmacies(true);
+
+        if (this.fetchedRole === role && this.fetchedDepartmentId === currentDepartmentId) return;
+
+        loadLocationsAgents();
+        loadAllStat();
         this.fetchedRole = role;
-        this.fetchedDepartmentId = this.props.currentDepartmentId;
+        this.fetchedDepartmentId = currentDepartmentId;
     }
 
     componentWillUnmount() {
