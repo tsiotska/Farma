@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Typography, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAsyncStatus } from '../../stores/AsyncStore';
+import UncommitedPharmacies from './UncommitedPharmacies';
+import PharmaciesList from './PharmaciesList';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    root: {
+        padding: '0 20px'
+    },
+});
 
 interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -32,10 +38,21 @@ class Pharmacy extends Component<IProps> {
     }
 
     render() {
+        const { classes } = this.props;
+
         return (
-            <div>
-                Pharmacy
-            </div>
+            <Grid direction='column' className={classes.root} container>
+                <UncommitedPharmacies />
+                <Grid justify='space-between' alignItems='center' container>
+                    <Typography>
+                        Аптеки
+                    </Typography>
+                    <Button>
+                        Додати Аптеку
+                    </Button>
+                </Grid>
+                <PharmaciesList />
+            </Grid>
         );
     }
 }
