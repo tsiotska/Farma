@@ -59,7 +59,7 @@ export class APIRequester {
     }
 
     logout(): Promise<any> {
-        return this.instance.delete('/api/signout')
+        return this.instance.post('/api/signout')
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
