@@ -98,7 +98,7 @@ export class APIRequester {
     }
 
     getMedicalDepartments(): Promise<ILPU[]> {
-        return this.instance.get('api/lpu')
+        return this.instance.get('api/hcf')
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
     }

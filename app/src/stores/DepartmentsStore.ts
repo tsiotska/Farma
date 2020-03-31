@@ -61,7 +61,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         await when(() => !!this.rootStore.userStore.user);
         this.loadDepartments();
         this.loadPositions(true);
-        // this.loadLPUs(true);
+        this.loadLPUs(true);
     }
 
     @action.bound

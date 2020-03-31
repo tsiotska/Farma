@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { GROUP_BY } from '../../../containers/Sales/TableStat/presets';
 import { FormControlLabel, Checkbox, createStyles, WithStyles, withStyles, Typography } from '@material-ui/core';
+import { GROUP_BY } from '../../../containers/Sales/TableStat/TableStat';
 
 const styles = createStyles({
     label: {

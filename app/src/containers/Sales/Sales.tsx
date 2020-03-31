@@ -36,8 +36,6 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    openedModal?: string;
-    currentDepartment?: IDepartment;
     chartSalesStat?: IMedsSalesStat[];
     currentDepartmentId?: number;
     role?: USER_ROLE;
@@ -48,9 +46,6 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        uiStore: {
-            openedModal,
-        },
         salesStore: {
             chartSalesStat,
             loadAllStat
@@ -65,7 +60,6 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
-    openedModal,
     chartSalesStat,
     role,
     currentDepartmentId,

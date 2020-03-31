@@ -27,6 +27,7 @@ import InfoTableRow from './InfoTableRow';
 import { ILocation } from '../../interfaces/ILocation';
 import { IUserCommonInfo } from '../../interfaces/IUser';
 import { observable, computed } from 'mobx';
+import Header from './Header';
 
 const styles = (theme: any) => createStyles({
     thCell: {
@@ -76,12 +77,11 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    salesHeaderHeight?: number;
-    setSalesHeaderHeight?: (value: number) => void;
     displayMode?: DisplayMode;
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
+    shouldCalculateOffset?: boolean;
     ignoredItems: Set<number>;
     isLoading: boolean;
     salesStat: ISalesStat[];
@@ -98,10 +98,7 @@ interface ISettings {
 
 @inject(({
     appState: {
-        uiStore: {
-            salesHeaderHeight,
-            setSalesHeaderHeight,
-        },
+
         salesStore: {
             displayMode,
             medsDisplayStatus
@@ -111,8 +108,6 @@ interface ISettings {
         }
     }
 }) => ({
-    salesHeaderHeight,
-    setSalesHeaderHeight,
     displayMode,
     meds,
     medsDisplayStatus
@@ -123,8 +118,6 @@ class DrugsTable extends Component<IProps> {
         currency: { mantisLength: 2, propName: 'money' },
         pack: { mantisLength: 0, propName: 'amount' }
     };
-    readonly headerHeight: number = 20;
-    headerRefs: any = {};
     ref: any = React.createRef();
     @observable scrollBarWidth: number = 0;
 
@@ -132,11 +125,6 @@ class DrugsTable extends Component<IProps> {
     get medsArray(): IMedicine[] {
         return [...this.props.meds.values()]
             .filter(({ id }) => this.props.medsDisplayStatus.get(id) === true);
-    }
-
-    @computed
-    get marginTop(): number {
-        return this.props.salesHeaderHeight || this.headerHeight;
     }
 
     @computed
@@ -150,37 +138,11 @@ class DrugsTable extends Component<IProps> {
         this.scrollBarWidth = offsetWidth - clientWidth;
     }
 
-    calculateTopMargin = () => {
-        const refs = [...Object.values(this.headerRefs)];
-        const heights = refs.map((current: any) => current && current.getBoundingClientRect().height);
-        const newValue = Math.max(...heights);
-        this.props.setSalesHeaderHeight(newValue - 48);
-    }
-
     componentDidMount() {
-        this.calculateTopMargin();
         window.addEventListener('resize', this.updScrollbar);
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { meds: prevMeds } = prevProps;
-        const { meds: actualMeds } = this.props;
-
-        const medsIsChanged = prevMeds !== actualMeds
-        || prevMeds.size !== actualMeds.size;
-
-        if (medsIsChanged) {
-            this.headerRefs = [...prevMeds.values()].reduce(
-                (refs, meds) => {
-                    if (actualMeds.has(meds.id)) return refs;
-                    const { [meds.id]: omitted, ...rest } = refs;
-                    return rest;
-                },
-                this.headerRefs
-            );
-        }
-
-        this.calculateTopMargin();
         this.updScrollbar();
     }
 
@@ -199,42 +161,23 @@ class DrugsTable extends Component<IProps> {
             isLoading,
             onRetry,
             labelData,
-            ignoredItems
+            ignoredItems,
+            shouldCalculateOffset
         } = this.props;
 
         return (
             <>
             {/* hack to make table head sticky */}
-            <TableContainer
-                style={{ paddingTop: this.marginTop }}
-                className={classes.container}>
-                    <Table padding='none' className={classes.table}>
-                    <TableHead>
-                        <TableRow >
-                                <TableCell colSpan={2} className={classes.thCell}>
-                                    { headerPrepend }
-                                </TableCell>
-
-                                {
-                                    this.medsArray.map(medicine =>
-                                        <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
-                                            <Grid container>
-                                                <HeaderItem medicine={medicine} componentRef={(el: any) => this.headerRefs[medicine.id] = el} />
-                                            </Grid>
-                                        </TableCell>
-                                    )
-                                }
-
-                                {
-                                    !!this.medsArray.length &&
-                                    <TableCell className={classes.thCell}>
-                                        Сума
-                                    </TableCell>
-                                }
-                            </TableRow>
-                    </TableHead>
-                </Table>
-            </TableContainer>
+            <Header
+                headerPrepend={headerPrepend}
+                medsArray={this.medsArray}
+                shouldCalculateHeight={shouldCalculateOffset}
+                classes={{
+                    container: classes.container,
+                    table: classes.table,
+                    thCell: classes.thCell
+                }}
+            />
             <TableContainer ref={this.ref} className={cx(classes.container, classes.marginBottom)}>
                 <Table padding='none' className={classes.table}>
                     <TableBody className={classes.body}>

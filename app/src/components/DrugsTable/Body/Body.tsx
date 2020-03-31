@@ -45,20 +45,23 @@ class Body extends Component<IProps> {
         } = this.props;
 
         return salesStat.map(stat => (
-            <TableRow
-                key={stat.id}
-                scrollBarWidth={scrollBarWidth}
-                medsIds={this.medsIds}
-                data={this.getDataObject(stat.stat)}
-                mantisLength={this.props.mantisLength}
-                rowEndAddornment={this.endAddornment}
-                rowStartAddornment={
-                    <PrependComponent
-                        label={labelData.get(stat.id)}
-                        isIgnored={ignoredItems.has(stat.id)}
-                    />
-                }
-            />
+            // labelData.has(stat.id)
+            true
+            ? <TableRow
+                    key={stat.id}
+                    scrollBarWidth={scrollBarWidth}
+                    medsIds={this.medsIds}
+                    data={this.getDataObject(stat.stat)}
+                    mantisLength={this.props.mantisLength}
+                    rowEndAddornment={this.endAddornment}
+                    rowStartAddornment={
+                        <PrependComponent
+                            label={labelData.get(stat.id)}
+                            isIgnored={ignoredItems.has(stat.id)}
+                        />
+                    }
+                />
+            : null
         ));
     }
 }

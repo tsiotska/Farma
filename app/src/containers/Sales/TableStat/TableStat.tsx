@@ -1,30 +1,33 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { USER_ROLE } from '../../../constants/Roles';
-import { ITablePreset, FFM_PRESET, MR_PRESET, MA_PRESET, GROUP_BY } from './presets';
 import DrugsTable from '../../../components/DrugsTable';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { ISalesStat } from '../../../interfaces/ISalesStat';
+import { IUserCommonInfo, IUser } from '../../../interfaces/IUser';
 import { ILocation } from '../../../interfaces/ILocation';
-import { IUser } from '../../../interfaces';
-import { IUserCommonInfo } from '../../../interfaces/IUser';
-import HeaderCell from '../../../components/DrugsTable/HeaderCell';
-import LocationTextCell from '../../../components/DrugsTable/LocationTextCell';
 import AgentTextCell from '../../../components/DrugsTable/AgentTextCell';
+import HeaderCell from '../../../components/DrugsTable/HeaderCell';
+import { USER_ROLE } from '../../../constants/Roles';
 import { computed } from 'mobx';
+import LocationTextCell from '../../../components/DrugsTable/LocationTextCell';
 
 interface IProps {
     role?: USER_ROLE;
     previewUser?: IUser;
-    locations?: Map<number, ILocation>;
-    locationsAgents?: Map<number, IUserCommonInfo>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    locationSalesStat?: ISalesStat[];
-    agentSalesStat?: ISalesStat[];
     loadLocaleSalesStat?: () => void;
     loadAgentSalesStat?: () => void;
+    locationSalesStat?: ISalesStat[];
+    agentSalesStat?: ISalesStat[];
+    locations?: Map<number, ILocation>;
+    locationsAgents?: Map<number, IUserCommonInfo>;
     ignoredLocations?: Set<number>;
     ignoredAgents?: Set<number>;
+}
+
+export enum GROUP_BY {
+    LOCATION,
+    AGENT
 }
 
 @inject(({
@@ -37,31 +40,35 @@ interface IProps {
             getAsyncStatus,
             locationSalesStat,
             agentSalesStat,
+            ignoredLocations,
+            ignoredAgents,
             loadLocaleSalesStat,
             loadAgentSalesStat,
-            ignoredLocations,
-            ignoredAgents
         },
         departmentsStore: {
             locations,
-            locationsAgents
+            locationsAgents,
         }
     }
 }) => ({
-    locations,
-    locationsAgents,
     role,
     previewUser,
     getAsyncStatus,
     locationSalesStat,
     agentSalesStat,
+    locations,
+    locationsAgents,
+    ignoredLocations,
+    ignoredAgents,
     loadLocaleSalesStat,
     loadAgentSalesStat,
-    ignoredLocations,
-    ignoredAgents
 }))
 @observer
 class TableStat extends Component<IProps> {
+    readonly agentStatRoles: USER_ROLE[] = [
+        USER_ROLE.FIELD_FORCE_MANAGER,
+        USER_ROLE.REGIONAL_MANAGER
+    ];
     readonly staticTableTitles: any = {
         [USER_ROLE.FIELD_FORCE_MANAGER]: {
             [GROUP_BY.AGENT]: 'Регіональні менеджери',
@@ -84,17 +91,7 @@ class TableStat extends Component<IProps> {
     }
 
     @computed
-    get tablePreset(): ITablePreset[] {
-        switch (this.props.role) {
-            case USER_ROLE.FIELD_FORCE_MANAGER: return FFM_PRESET;
-            case USER_ROLE.REGIONAL_MANAGER: return MR_PRESET;
-            case USER_ROLE.MEDICAL_AGENT: return MA_PRESET;
-            default: return [];
-        }
-    }
-
-    @computed
-    get showLoader(): boolean {
+    get isLoading(): boolean {
         const { getAsyncStatus } = this.props;
         const s1 = getAsyncStatus('loadLocaleSalesStat');
         const s2 = getAsyncStatus('loadMedsStat');
@@ -102,10 +99,10 @@ class TableStat extends Component<IProps> {
         return s1.loading || s2.loading || s3.loading;
     }
 
-    retryClickHandler = () => {
-        const { getAsyncStatus, loadLocaleSalesStat, loadAgentSalesStat } = this.props;
-        if (getAsyncStatus('loadAgentSalesStat').error) loadAgentSalesStat();
-        if (getAsyncStatus('loadLocaleSalesStat').error) loadLocaleSalesStat();
+    @computed
+    get showAgentStat(): boolean {
+        const { role } = this.props;
+        return this.agentStatRoles.includes(role);
     }
 
     getTitle(): string {
@@ -126,56 +123,69 @@ class TableStat extends Component<IProps> {
         return '';
     }
 
-    getSalesStat = (groupBy: GROUP_BY): ISalesStat[] => {
-        const { locationSalesStat, agentSalesStat } = this.props;
-        if (groupBy === GROUP_BY.AGENT) return agentSalesStat;
-        if (groupBy === GROUP_BY.LOCATION) return locationSalesStat;
-        return [];
-    }
-
-    getLabelData = (groupBy: GROUP_BY): Map<number, ILocation | IUserCommonInfo> => {
-        const { locations, locationsAgents } = this.props;
-        if (groupBy === GROUP_BY.AGENT) return locationsAgents;
-        if (groupBy === GROUP_BY.LOCATION) return locations;
-        return new Map();
-    }
-
     getCurrentTableTitle = (groupBy: GROUP_BY): string => {
         return this.tableTitles[this.props.role]
         ? this.tableTitles[this.props.role][groupBy]
         : '-';
     }
 
-    getIgnoredItems = (groupBy: GROUP_BY): Set<number> => {
-        const { ignoredAgents, ignoredLocations } = this.props;
+    retryClickHandler = () => {
+        const {
+            getAsyncStatus,
+            loadLocaleSalesStat,
+            loadAgentSalesStat
+        } = this.props;
 
-        return groupBy === GROUP_BY.AGENT
-        ? ignoredAgents
-        : ignoredLocations;
+        if (getAsyncStatus('loadAgentSalesStat').error && this.showAgentStat) loadAgentSalesStat();
+        if (getAsyncStatus('loadLocaleSalesStat').error) loadLocaleSalesStat();
     }
 
     render() {
-        return this.tablePreset.map(({ groupBy }, i) => (
-            <DrugsTable
-                key={i}
-                isLoading={this.showLoader}
-                salesStat={this.getSalesStat(groupBy)}
-                onRetry={this.retryClickHandler}
-                labelData={this.getLabelData(groupBy)}
-                ignoredItems={this.getIgnoredItems(groupBy)}
-                headerPrepend={
-                    <HeaderCell
-                        value={this.getCurrentTableTitle(groupBy)}
-                        groupBy={groupBy}
+        const {
+            agentSalesStat,
+            locationSalesStat,
+            locationsAgents,
+            locations,
+            ignoredAgents,
+            ignoredLocations
+        } = this.props;
+
+        return (
+            <>
+                {
+                    this.showAgentStat &&
+                    <DrugsTable
+                        isLoading={this.isLoading}
+                        salesStat={agentSalesStat}
+                        labelData={locationsAgents}
+                        onRetry={this.retryClickHandler}
+                        ignoredItems={ignoredAgents}
+                        headerPrepend={
+                            <HeaderCell
+                                value={this.getCurrentTableTitle(GROUP_BY.AGENT)}
+                                groupBy={GROUP_BY.AGENT}
+                            />
+                        }
+                        rowPrepend={AgentTextCell}
                     />
                 }
-                rowPrepend={
-                    groupBy === GROUP_BY.LOCATION
-                    ? LocationTextCell
-                    : AgentTextCell
-                }
-            />
-        ));
+                <DrugsTable
+                    isLoading={this.isLoading}
+                    salesStat={locationSalesStat}
+                    labelData={locations}
+                    onRetry={this.retryClickHandler}
+                    ignoredItems={ignoredLocations}
+                    headerPrepend={
+                        <HeaderCell
+                            value={this.getCurrentTableTitle(GROUP_BY.LOCATION)}
+                            groupBy={GROUP_BY.LOCATION}
+                        />
+                    }
+                    rowPrepend={LocationTextCell}
+                    shouldCalculateOffset
+                />
+            </>
+        );
     }
 }
 
