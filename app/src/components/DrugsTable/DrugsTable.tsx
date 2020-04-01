@@ -4,11 +4,7 @@ import {
     WithStyles,
     TableContainer,
     Table,
-    TableHead,
     TableBody,
-    TableRow,
-    TableCell,
-    Grid,
     LinearProgress,
     Typography,
     Button
@@ -71,7 +67,6 @@ const styles = (theme: any) => createStyles({
         background: 'white'
     },
     marginBottom: {
-        // minHeight: 350,
         marginBottom: 40
     }
 });

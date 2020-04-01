@@ -24,11 +24,18 @@ const styles = (theme: any) => createStyles({
     },
     pagination: {
         margin: '16px 0 60px auto'
+    },
+    retryButton: {
+        margin: '10px auto'
+    },
+    errorText: {
+        marginTop: 10,
+        textAlign: 'center'
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    loadPharmacies?: (isInitial: boolean) => void;
+    loadPharmacies?: () => void;
     pharmacies?: ILPU[];
 
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -61,8 +68,18 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class Pharmacy extends Component<IProps> {
     @computed
-    get isLoading(): boolean {
-        return this.props.getAsyncStatus('loadPharmacies').loading;
+    get requestStatus(): IAsyncStatus {
+        return this.props.getAsyncStatus('loadPharmacies');
+    }
+
+    @computed
+    get hasNoData(): boolean {
+        const { pharmacies } = this.props;
+        const { loading, error, success } = this.requestStatus;
+        return loading === false
+            && error === false
+            && success === false
+            && (!pharmacies || !pharmacies.length);
     }
 
     @computed
@@ -74,11 +91,15 @@ class Pharmacy extends Component<IProps> {
         : [];
     }
 
+    retryClickHandler = () => {
+        this.props.loadPharmacies();
+    }
+
     componentDidMount() {
         const { getAsyncStatus, loadPharmacies } = this.props;
         const { loading, success } = getAsyncStatus('loadPharmacies');
         const shouldLoadPharmacies = loading === false && success === false;
-        if (shouldLoadPharmacies) loadPharmacies(true);
+        if (shouldLoadPharmacies) loadPharmacies();
     }
 
     componentWillUnmount() {
@@ -109,7 +130,27 @@ class Pharmacy extends Component<IProps> {
                         Додати Аптеку
                     </Button>
                 </Grid>
-                <HCFList isLoading={this.isLoading} data={this.preparedPharmacies} />
+                <HCFList isLoading={this.requestStatus.loading} data={this.preparedPharmacies} />
+                {
+                    this.requestStatus.error &&
+                    <>
+                        <Typography className={classes.errorText} variant='body2'>
+                            Під час виконання запиту трапилась помилка
+                        </Typography>
+                        <Button
+                            variant='outlined'
+                            onClick={this.retryClickHandler}
+                            className={classes.retryButton}>
+                            Повторити запит
+                        </Button>
+                    </>
+                }
+                {
+                    this.hasNoData &&
+                    <Typography className={classes.errorText} variant='body2'>
+                        Список аптек пустий
+                    </Typography>
+                }
                 <Pagination
                     currentPage={currentPage}
                     dataLength={pharmacies ? pharmacies.length : null}

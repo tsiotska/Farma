@@ -24,6 +24,13 @@ const styles = (theme: any) => createStyles({
     },
     pagination: {
         margin: '16px 0 60px auto'
+    },
+    retryButton: {
+        margin: '10px auto'
+    },
+    errorText: {
+        marginTop: 10,
+        textAlign: 'center'
     }
 });
 
@@ -60,9 +67,22 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Lpu extends Component<IProps> {
+    // @computed
+    // get isLoading(): boolean {
+    //     return this.props.getAsyncStatus('loadLPUs').loading;
+    // }
+    get requestStatus(): IAsyncStatus {
+        return this.props.getAsyncStatus('loadLPUs');
+    }
+
     @computed
-    get isLoading(): boolean {
-        return this.props.getAsyncStatus('loadLPUs').loading;
+    get hasNoData(): boolean {
+        const { LPUs } = this.props;
+        const { loading, error, success } = this.requestStatus;
+        return loading === false
+            && error === false
+            && success === false
+            && (!LPUs || !LPUs.length);
     }
 
     @computed
@@ -73,6 +93,8 @@ class Lpu extends Component<IProps> {
         ? LPUs.filter((x, i) => (i > begin && i < begin + itemsPerPage))
         : [];
     }
+
+    retryClickHandler = () => this.props.loadLPUs();
 
     componentDidMount() {
         const { getAsyncStatus, loadLPUs } = this.props;
@@ -109,7 +131,27 @@ class Lpu extends Component<IProps> {
                         Додати ЛПУ
                     </Button>
                 </Grid>
-                <HCFList isLoading={this.isLoading} data={this.preparedLPUs} />
+                <HCFList isLoading={this.requestStatus.loading} data={this.preparedLPUs} />
+                {
+                    this.requestStatus.error &&
+                    <>
+                        <Typography className={classes.errorText} variant='body2'>
+                            Під час виконання запиту трапилась помилка
+                        </Typography>
+                        <Button
+                            variant='outlined'
+                            onClick={this.retryClickHandler}
+                            className={classes.retryButton}>
+                            Повторити запит
+                        </Button>
+                    </>
+                }
+                {
+                    this.hasNoData &&
+                    <Typography className={classes.errorText} variant='body2'>
+                        Список ЛПУ пустий
+                    </Typography>
+                }
                 <Pagination
                     currentPage={currentPage}
                     dataLength={LPUs ? LPUs.length : null}
