@@ -1,38 +1,21 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Pagination as MuiPagination } from '@material-ui/lab';
-import { ILPU } from '../../interfaces/ILPU';
 
 interface IProps {
-    className?: string;
-    data?: ILPU[];
-
-    currentPage?: number;
-    itemsPerPage?: number;
-    setCurrentPage?: (page: number) => void;
+    className: string;
+    dataLength: number;
+    currentPage: number;
+    itemsPerPage: number;
+    setCurrentPage: (page: number) => void;
 }
 
-@inject(({
-    appState: {
-        uiStore: {
-            currentPage,
-            itemsPerPage,
-            setCurrentPage
-        }
-    }
-}) => ({
-    currentPage,
-    itemsPerPage,
-    setCurrentPage
-}))
 @observer
 class Pagination extends Component<IProps> {
     get count(): number {
-        const { data, itemsPerPage } = this.props;
-        const l = data
-        ? data.length
-        : 0;
-        return 1 + Math.floor(l / itemsPerPage);
+        const { dataLength, itemsPerPage } = this.props;
+        const length = dataLength || 0;
+        return 1 + Math.floor(length / itemsPerPage);
     }
 
     changeHandler = (e: any, page: number) => {
@@ -40,9 +23,9 @@ class Pagination extends Component<IProps> {
     }
 
     render() {
-        const { data, currentPage, className } = this.props;
+        const { dataLength, currentPage, className } = this.props;
 
-        if (!data) return null;
+        if (dataLength === null) return null;
         return (
             <MuiPagination
                 classes={{ root: className }}

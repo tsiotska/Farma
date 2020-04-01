@@ -13,6 +13,7 @@ import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
 import UncommitedLpus from './UncommitedLpus';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -27,11 +28,13 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    getAsyncStatus?: (key: string) => IAsyncStatus;
     loadLPUs?: () => void;
     LPUs?: ILPU[];
-    preparedLPUs?: ILPU[];
+
+    getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
+    currentPage?: number;
+    itemsPerPage?: number;
 }
 
 @inject(({
@@ -40,23 +43,35 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             LPUs,
-            preparedLPUs
         },
         uiStore: {
-            setCurrentPage
+            setCurrentPage,
+            currentPage,
+            itemsPerPage
         }
     }
 }) => ({
     getAsyncStatus,
     loadLPUs,
     LPUs,
-    preparedLPUs,
-    setCurrentPage
+    setCurrentPage,
+    currentPage,
+    itemsPerPage
 }))
 @observer
 class Lpu extends Component<IProps> {
+    @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('loadLPUs').loading;
+    }
+
+    @computed
+    get preparedLPUs(): ILPU[] {
+        const { LPUs, itemsPerPage, currentPage } = this.props;
+        const begin = itemsPerPage * currentPage;
+        return Array.isArray(LPUs)
+        ? LPUs.filter((x, i) => (i > begin && i < begin + itemsPerPage))
+        : [];
     }
 
     componentDidMount() {
@@ -71,7 +86,13 @@ class Lpu extends Component<IProps> {
     }
 
     render() {
-        const { classes, preparedLPUs, LPUs } = this.props;
+        const {
+            classes,
+            LPUs,
+            currentPage,
+            itemsPerPage,
+            setCurrentPage
+        } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
@@ -88,8 +109,14 @@ class Lpu extends Component<IProps> {
                         Додати ЛПУ
                     </Button>
                 </Grid>
-                <HCFList isLoading={this.isLoading} data={preparedLPUs} />
-                <Pagination data={LPUs} className={classes.pagination} />
+                <HCFList isLoading={this.isLoading} data={this.preparedLPUs} />
+                <Pagination
+                    currentPage={currentPage}
+                    dataLength={LPUs ? LPUs.length : null}
+                    itemsPerPage={itemsPerPage}
+                    setCurrentPage={setCurrentPage}
+                    className={classes.pagination}
+                />
             </Grid>
         );
     }

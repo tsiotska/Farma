@@ -57,15 +57,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : null;
     }
 
-    @computed
-    get preparedPharmacies(): ILPU[] {
-        const { uiStore: { itemsPerPage, currentPage }} = this.rootStore;
-        const begin = itemsPerPage * currentPage;
-        return Array.isArray(this.pharmacies)
-        ? this.pharmacies.filter((x, i) => (i > begin && i < begin + itemsPerPage))
-        : [];
-    }
-
     @action.bound
     async initializeStore() {
         await when(() => !!this.rootStore.userStore.user);
