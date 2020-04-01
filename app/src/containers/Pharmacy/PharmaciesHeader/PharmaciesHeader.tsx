@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { WithStyles, createStyles, Grid, Typography } from '@material-ui/core';
+import { WithStyles, createStyles, Grid, Typography, withStyles } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import cx from 'classnames';
+import { gridStyles } from '../gridStyles';
 
-export const pharmaciesHeaderStyles = createStyles({
-    text: {},
-    cell: {},
-    name: {},
-    region: {},
-    oblast: {},
-    city: {},
-    address: {},
-    phone: {}
+export const pharmaciesHeaderStyles = (theme: any) => createStyles({
+    ...gridStyles(theme),
+    root: {
+        marginBottom: 12
+    },
+    text: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        color: theme.palette.primary.gray.light
+    },
 });
 
 export interface IPharmaciesHeaderProps extends WithStyles<typeof pharmaciesHeaderStyles> {}
@@ -22,7 +23,7 @@ class PharmaciesHeader extends Component<IPharmaciesHeaderProps> {
         const { classes } = this.props;
 
         return (
-            <Grid container alignItems='center'>
+            <Grid className={classes.root} container alignItems='center'>
                 <Grid className={cx(classes.cell, classes.name)} xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
                         Назва
@@ -58,4 +59,4 @@ class PharmaciesHeader extends Component<IPharmaciesHeaderProps> {
     }
 }
 
-export default PharmaciesHeader;
+export default withStyles(pharmaciesHeaderStyles)(PharmaciesHeader);

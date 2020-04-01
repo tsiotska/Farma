@@ -20,6 +20,8 @@ export interface IExpandedWorker {
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
+    @observable itemsPerPage: Readonly<number> = 50;
+    @observable currentPage: number = 0;
     // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
@@ -57,6 +59,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : null;
     }
 
+    @computed
+    get preparedPharmacies(): ILPU[] {
+        const begin = this.itemsPerPage * this.currentPage;
+        return Array.isArray(this.pharmacies)
+        ? this.pharmacies.filter((x, i) => (i > begin && i < begin + this.itemsPerPage))
+        : [];
+    }
+
     @action.bound
     async initializeStore() {
         await when(() => !!this.rootStore.userStore.user);
@@ -73,7 +83,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    setExpandedWorker = (workerId: number | null) => {
+    setCurrentPage(value: number) {
+        this.currentPage = value;
+    }
+
+    @action.bound
+    setExpandedWorker(workerId: number | null) {
         if (workerId === null) {
             this.expandedWorker = null;
             return;

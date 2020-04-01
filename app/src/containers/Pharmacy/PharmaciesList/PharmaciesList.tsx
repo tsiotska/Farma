@@ -1,35 +1,50 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { withStyles, WithStyles, createStyles, Grid } from '@material-ui/core';
+import { withStyles, WithStyles, createStyles, Grid, LinearProgress } from '@material-ui/core';
 import { ILPU } from '../../../interfaces/ILPU';
 import { toJS } from 'mobx';
+import ListItem from '../ListItem';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
 
 const styles = createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
-    pharmacies?: Map<number, ILPU>;
+    preparedPharmacies?: ILPU[];
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
-            pharmacies
+            preparedPharmacies,
+            getAsyncStatus
         }
     }
 }) => ({
-    pharmacies
+    preparedPharmacies,
+    getAsyncStatus
 }))
 @observer
 class PharmaciesList extends Component<IProps> {
     // TODO: pagination, sort, search
+    get isLoading(): boolean {
+        return this.props.getAsyncStatus('loadPharmacies').loading;
+    }
+
     render() {
-        const { pharmacies } = this.props;
+        const { preparedPharmacies } = this.props;
+
         return (
-            <Grid direction='column' container>
-                <Grid>
-                    list
+            <>
+                { this.isLoading && <LinearProgress /> }
+                <Grid direction='column' container>
+                    {
+                        preparedPharmacies.map(pharmacy => (
+                            <ListItem key={pharmacy.id} pharmacy={pharmacy} />
+                        ))
+                    }
                 </Grid>
-            </Grid>
+            </>
         );
     }
 }

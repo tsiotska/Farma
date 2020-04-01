@@ -6,6 +6,7 @@ const defaultLPU: ILPU = {
     name: null,
     type: null,
     region: null,
+    oblast: null,
     city: null,
     address: null,
     phone: null
@@ -15,10 +16,11 @@ const valuesMap: IValuesMap = {
     id: 'id',
     name: 'name',
     hcf_type: 'type',
-    oblast: 'region',
+    region: 'region',
     city: 'city',
     address: 'address',
     phone: 'phone',
+    oblast: 'oblast'
 };
 
 export const lpuNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
