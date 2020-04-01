@@ -23,8 +23,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
-    @observable LPUs: ILPU[] = null;
 
+    @observable LPUs: ILPU[] = null;
+    @observable unconfirmedPLUs: ILPU[] = null;
+
+    @observable unconfirmedPharmacies: ILPU[] = null;
     @observable pharmacies: ILPU[] = null;
     @observable pharmacyDemand: boolean = false;
     @observable loadedPharmacyUrl: string = null;
@@ -108,6 +111,25 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadUnconfirmedPharmacies() {
+        const requestName = 'loadUnconfirmedPharmacies';
+        const { api } = this.rootStore;
+        const url = this.getPharmacyApiUrl(true);
+
+        if (url === null || url === this.loadedPharmacyUrl) return;
+
+        this.unconfirmedPharmacies = null;
+        const res = await this.dispatchRequest(
+            api.getPharmacies(url),
+            requestName
+        );
+
+        if (res && url === this.getPharmacyApiUrl(true)) {
+            this.unconfirmedPharmacies = res;
+        }
+    }
+
+    @action.bound
     async loadPharmacies(isNeeded: boolean) {
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
@@ -129,6 +151,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             this.loadedPharmacyUrl = url;
             this.pharmacies = res;
         }
+    }
+
+    @action.bound
+    async loadUnconfirmedPLUs() {
+        const requestName = 'loadUnconfirmedPLUs';
+        const { api } = this.rootStore;
+
+        const res = await this.dispatchRequest(
+            api.getMedicalDepartments(true),
+            requestName
+        );
+
+        if (res) this.unconfirmedPLUs = res;
     }
 
     @action.bound

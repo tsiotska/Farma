@@ -148,8 +148,12 @@ export class APIRequester {
         );
     }
 
-    getMedicalDepartments(): Promise<ILPU[]> {
-        return this.instance.get('api/hcf')
+    getMedicalDepartments(unconfirmed: boolean = false): Promise<ILPU[]> {
+        const url = unconfirmed
+        ? 'api/hcf?unconfirmed=1'
+        : 'api/hcf';
+
+        return this.instance.get(url)
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
     }
