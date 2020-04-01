@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { withStyles, WithStyles, createStyles } from '@material-ui/core';
+import { withStyles, WithStyles, createStyles, Grid } from '@material-ui/core';
 import { ILPU } from '../../../interfaces/ILPU';
 import { toJS } from 'mobx';
 
@@ -25,7 +25,11 @@ class PharmaciesList extends Component<IProps> {
     render() {
         const { pharmacies } = this.props;
         return (
-            <p>pharmacies list</p>
+            <Grid direction='column' container>
+                <Grid>
+                    list
+                </Grid>
+            </Grid>
         );
     }
 }
