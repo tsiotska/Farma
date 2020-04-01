@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import cx from 'classnames';
 import { gridStyles } from '../gridStyles';
 
-export const pharmaciesHeaderStyles = (theme: any) => createStyles({
+const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
     root: {
         marginBottom: 12
@@ -15,10 +15,10 @@ export const pharmaciesHeaderStyles = (theme: any) => createStyles({
     },
 });
 
-export interface IPharmaciesHeaderProps extends WithStyles<typeof pharmaciesHeaderStyles> {}
+interface IProps extends WithStyles<typeof styles> {}
 
 @observer
-class PharmaciesHeader extends Component<IPharmaciesHeaderProps> {
+class Header extends Component<IProps> {
     render() {
         const { classes } = this.props;
 
@@ -59,4 +59,4 @@ class PharmaciesHeader extends Component<IPharmaciesHeaderProps> {
     }
 }
 
-export default withStyles(pharmaciesHeaderStyles)(PharmaciesHeader);
+export default withStyles(styles)(Header);
