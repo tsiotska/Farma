@@ -21,6 +21,9 @@ const styles = (theme: any) => createStyles({
     header: {
         margin: '24px 0'
     },
+    pagination: {
+        margin: '16px 0 60px auto'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -68,7 +71,7 @@ class Pharmacy extends Component<IProps> {
                 </Grid>
                 <PharmaciesHeader />
                 <PharmaciesList />
-                <Pagination />
+                <Pagination className={classes.pagination} />
             </Grid>
         );
     }
