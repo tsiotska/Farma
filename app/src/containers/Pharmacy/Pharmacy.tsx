@@ -35,13 +35,14 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    loadPharmacies?: () => void;
+    loadPharmacies?: (isNeeded: boolean) => void;
     pharmacies?: ILPU[];
 
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
     itemsPerPage?: number;
+    setPharmacyDemand?: (value: boolean) => void;
 }
 
 @inject(({
@@ -50,6 +51,7 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadPharmacies,
             pharmacies,
+            setPharmacyDemand
         },
         uiStore: {
             setCurrentPage,
@@ -63,7 +65,8 @@ interface IProps extends WithStyles<typeof styles> {
     pharmacies,
     setCurrentPage,
     currentPage,
-    itemsPerPage
+    itemsPerPage,
+    setPharmacyDemand
 }))
 @observer
 class Pharmacy extends Component<IProps> {
@@ -92,17 +95,15 @@ class Pharmacy extends Component<IProps> {
     }
 
     retryClickHandler = () => {
-        this.props.loadPharmacies();
+        this.props.loadPharmacies(true);
     }
 
     componentDidMount() {
-        const { getAsyncStatus, loadPharmacies } = this.props;
-        const { loading, success } = getAsyncStatus('loadPharmacies');
-        const shouldLoadPharmacies = loading === false && success === false;
-        if (shouldLoadPharmacies) loadPharmacies();
+        this.props.setPharmacyDemand(true);
     }
 
     componentWillUnmount() {
+        this.props.setPharmacyDemand(false);
         this.props.setCurrentPage(0);
     }
 

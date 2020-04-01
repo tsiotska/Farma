@@ -43,8 +43,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents?: () => void;
     loadLocations?: () => void;
     loadAllStat?: () => void;
-    loadPharmacies?: (isInitial: boolean) => void;
-    getAsyncStatus?: (key: string) => IAsyncStatus;
+    setPharmacyDemand?: (demand: boolean) => void;
 }
 
 @inject(({
@@ -60,8 +59,7 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentId,
             loadLocationsAgents,
             loadLocations,
-            loadPharmacies,
-            getAsyncStatus
+            setPharmacyDemand
         }
     }
 }) => ({
@@ -71,8 +69,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents,
     loadLocations,
     loadAllStat,
-    loadPharmacies,
-    getAsyncStatus
+    setPharmacyDemand
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -115,17 +112,15 @@ class Sales extends Component<IProps> {
             loadLocations,
             loadLocationsAgents,
             loadAllStat,
-            getAsyncStatus,
-            loadPharmacies
+            setPharmacyDemand
         } = this.props;
 
         loadLocations();
 
-        const { success, loading } = getAsyncStatus('loadPharmacies');
-        const shouldLoadPharmacies = success === false && loading === false;
-        if (shouldLoadPharmacies) loadPharmacies(true);
-
         if (this.fetchedRole === role && this.fetchedDepartmentId === currentDepartmentId) return;
+
+        const shouldLoadPharmacies = role === USER_ROLE.MEDICAL_AGENT;
+        setPharmacyDemand(shouldLoadPharmacies);
 
         loadLocationsAgents();
         loadAllStat();

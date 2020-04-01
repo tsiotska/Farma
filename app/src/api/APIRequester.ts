@@ -198,8 +198,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getPharmacies(): Promise<ILPU[]> {
-        return this.instance.get(`/api/pharmacy`)
+    getPharmacies(url: string): Promise<ILPU[]> {
+        return this.instance.get(url)
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
     }

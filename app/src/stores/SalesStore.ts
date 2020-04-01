@@ -66,7 +66,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         let data: Array<[number, ILPU]> = [];
 
-        if (statExist && shouldReturnData) {
+        if (statExist && shouldReturnData && pharmacies) {
             const ids = this.locationSalesStat.map(({ id }) => id);
             data = pharmacies
                 .filter(({ id }) => ids.includes(id))

@@ -24,7 +24,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
     @observable LPUs: ILPU[] = null;
+
     @observable pharmacies: ILPU[] = null;
+    @observable pharmacyDemand: boolean = false;
+    @observable loadedPharmacyUrl: string = null;
 
     @observable locations: Map<number, ILocation> = new Map();
     @observable locationsAgents: Map<number, IUser> = new Map();
@@ -40,6 +43,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         super();
         this.rootStore = rootStore;
         reaction(() => this.currentDepartment, this.departmentChangeHandler);
+        reaction(() => this.pharmacyDemand, this.loadPharmacies);
         this.initializeStore();
     }
 
@@ -90,6 +94,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    setPharmacyDemand(value: boolean) {
+        this.pharmacyDemand = value;
+    }
+
+    @action.bound
     setCurrentDepartment(department: string | IDepartment) {
         if (typeof department === 'string') {
             this.currentDepartment = this.departments.find(({ name }) => name === department);
@@ -99,18 +108,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadPharmacies() {
+    async loadPharmacies(isNeeded: boolean) {
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
+        const url = this.getPharmacyApiUrl();
 
+        const shouldAbort = isNeeded === false ||
+            url === null ||
+            url === this.loadedPharmacyUrl;
+
+        if (shouldAbort) return;
+
+        this.pharmacies = null;
         const res = await this.dispatchRequest(
-            api.getPharmacies(),
+            api.getPharmacies(url),
             requestName
         );
 
-        if (res) {
+        if (res && url === this.getPharmacyApiUrl()) {
+            this.loadedPharmacyUrl = url;
             this.pharmacies = res;
-            return;
         }
     }
 
@@ -296,6 +313,27 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : this.setError;
 
         callback(requestName);
+    }
+
+    private getPharmacyApiUrl(unconfirmed: boolean = false): string {
+        const { userStore: { role, previewUser }} = this.rootStore;
+
+        const userId = previewUser
+        ? previewUser.id
+        : null;
+
+        if (this.currentDepartmentId === null || userId === null) return null;
+
+        const queryParam = unconfirmed
+        ? '?unconfirmed=1'
+        : '';
+
+        switch (role) {
+            case USER_ROLE.FIELD_FORCE_MANAGER: return `/api/branch/${this.currentDepartmentId}/ffm/pharmacy${queryParam}`;
+            case USER_ROLE.REGIONAL_MANAGER: return `/api/branch/${this.currentDepartmentId}/rm/${userId}/pharmacy${queryParam}`;
+            case USER_ROLE.MEDICAL_AGENT: return `/api/branch/${this.currentDepartmentId}/mp/${userId}/pharmacy${queryParam}`;
+            default: return null;
+        }
     }
 
     private getWorkersApiUrl(fired?: boolean): string {
