@@ -6,12 +6,11 @@ import AsyncStore from './AsyncStore';
 import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
-import Config from '../../Config';
 import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
-import { IUserCommonInfo, IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/IUser';
 
 export interface IExpandedWorker {
     id: number;
@@ -24,8 +23,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
-    @observable LPUs: Map<number, ILPU> = new Map();
-    @observable pharmacies: Map<number, ILPU> = new Map();
+    @observable LPUs: ILPU[] = null;
+    @observable pharmacies: ILPU[] = null;
+
     @observable locations: Map<number, ILocation> = new Map();
     @observable locationsAgents: Map<number, IUser> = new Map();
 
@@ -99,11 +99,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadPharmacies(isInitial: boolean = false) {
+    async loadPharmacies() {
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
-
-        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
 
         const res = await this.dispatchRequest(
             api.getPharmacies(),
@@ -111,12 +109,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (res) {
-            const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
-            this.pharmacies = new Map(mapped);
+            this.pharmacies = res;
             return;
         }
+    }
 
-        this.retryPolicy(this.loadPharmacies, requestName);
+    @action.bound
+    async loadLPUs() {
+        const requestName = 'loadLPUs';
+        const { api } = this.rootStore;
+
+        const res = await this.dispatchRequest(
+            api.getMedicalDepartments(),
+            requestName
+        );
+
+        if (res) this.LPUs = res;
     }
 
     @action.bound
@@ -194,8 +202,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const requestName = 'loadPositions';
         const { api } = this.rootStore;
 
-        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
-
         const res = await this.dispatchRequest(
             api.getPositions(),
             requestName
@@ -206,29 +212,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             this.positions = new Map(mapped);
             return;
         }
-
-        this.retryPolicy(this.loadPositions, requestName);
-    }
-
-    @action.bound
-    async loadLPUs(isInitial: boolean = false) {
-        const requestName = 'loadLPUs';
-        const { api } = this.rootStore;
-
-        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
-
-        const res = await this.dispatchRequest(
-            api.getMedicalDepartments(),
-            requestName
-        );
-
-        if (res) {
-            const mapped: Array<[number, ILPU]> = res.map(x => ([x.id, x]));
-            this.LPUs = new Map(mapped);
-            return;
-        }
-
-        this.retryPolicy(this.loadLPUs, requestName);
     }
 
     @action.bound
@@ -241,7 +224,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         else if (role === USER_ROLE.REGIONAL_MANAGER) url = 'api/city';
         if (!url) return;
 
-        if (isInitial) this.setRetryCount(requestName, Config.MAX_RENEW_COUNT);
         const res = await this.dispatchRequest(
             api.getLocations(url),
             requestName
@@ -252,8 +234,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             this.locations = new Map(mapped);
             return;
         }
-
-        this.retryPolicy(this.loadLocations, requestName);
     }
 
     @action.bound
@@ -316,19 +296,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : this.setError;
 
         callback(requestName);
-    }
-
-    private retryPolicy(requestMethod: () => any, requestName: string) {
-        const currentRetryCount = this.getRetryCount(requestName);
-
-        const newRetryCount = currentRetryCount > 1
-            ? currentRetryCount - 1
-            : 0;
-
-        if (newRetryCount) {
-            this.setRetryCount(requestName, newRetryCount);
-            setTimeout(requestMethod, Config.RETRY_INTERVAL);
-        }
     }
 
     private getWorkersApiUrl(fired?: boolean): string {

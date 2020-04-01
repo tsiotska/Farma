@@ -8,7 +8,7 @@ import { ILocation } from '../../../interfaces/ILocation';
 import AgentTextCell from '../../../components/DrugsTable/AgentTextCell';
 import HeaderCell from '../../../components/DrugsTable/HeaderCell';
 import { USER_ROLE } from '../../../constants/Roles';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import LocationTextCell from '../../../components/DrugsTable/LocationTextCell';
 import { ILPU } from '../../../interfaces/ILPU';
 
@@ -22,7 +22,7 @@ interface IProps {
     agentSalesStat?: ISalesStat[];
     locations?: Map<number, ILocation>;
     locationsAgents?: Map<number, IUserCommonInfo>;
-    pharmacies?: Map<number, ILPU>;
+    pharmaciesMap?: Map<number, ILPU>;
     ignoredLocations?: Set<number>;
     ignoredAgents?: Set<number>;
 }
@@ -46,11 +46,11 @@ export enum GROUP_BY {
             ignoredAgents,
             loadLocaleSalesStat,
             loadAgentSalesStat,
+            pharmaciesMap
         },
         departmentsStore: {
             locations,
-            locationsAgents,
-            pharmacies
+            locationsAgents
         }
     }
 }) => ({
@@ -65,7 +65,7 @@ export enum GROUP_BY {
     ignoredAgents,
     loadLocaleSalesStat,
     loadAgentSalesStat,
-    pharmacies
+    pharmaciesMap
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -111,9 +111,9 @@ class TableStat extends Component<IProps> {
 
     @computed
     get locationsLabels(): Map<number, ILocation | ILPU> {
-        const { role, locations, pharmacies } = this.props;
+        const { role, locations, pharmaciesMap } = this.props;
         return role === USER_ROLE.MEDICAL_AGENT
-        ? pharmacies
+        ? pharmaciesMap
         : locations;
     }
 
@@ -157,7 +157,6 @@ class TableStat extends Component<IProps> {
             agentSalesStat,
             locationSalesStat,
             locationsAgents,
-            locations,
             ignoredAgents,
             ignoredLocations
         } = this.props;

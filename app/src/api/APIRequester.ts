@@ -6,7 +6,6 @@ import { positionsNormalizer } from './../helpers/normalizers/positionsNormalize
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
 
-import Config from '../../Config';
 import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
@@ -21,6 +20,8 @@ import { locationsNormalizer } from '../helpers/normalizers/locationsNormalizer'
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { ICacheStore } from '../interfaces/ICacheStore';
 import { CacheStore } from '../stores/CacheStore';
+import Config from '../../Config';
+import delay from 'lodash/delay';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -38,13 +39,58 @@ export class APIRequester {
         this.cacheStore = new CacheStore();
         this.instance = axios.create({
             baseURL: Config.API_URL.trim(),
-            withCredentials: true
+            withCredentials: true,
         });
+
+        // request logger
+        // this.instance.interceptors.request.use(request => {
+        //     console.trace('Starting Request', request)
+        //     return request
+        //   })
     }
 
     defaultErrorHandler = (response: any = null) => (e: any) => {
         console.error('error: ', e);
         return response;
+    }
+
+    requestRepeater = async <T>(
+        promise: Promise<any>,
+        successCallback: (data: any) => T,
+        errorCallback: (data: any) => T,
+        retryCount: number,
+        retryInterval: number
+    ): Promise<T> => {
+        const { hasError, request } = await promise
+            .then(r => ({ hasError: false, request: r }))
+            .catch(r => ({ hasError: true, request: r }));
+
+        if (retryCount === 0) {
+            return hasError
+            ? errorCallback(request)
+            : successCallback(request);
+        }
+
+        if (hasError) {
+            return (request.response && request.response.config)
+            ? new Promise<T>(async (resolve) => {
+                setTimeout(
+                    () => resolve(
+                        this.requestRepeater(
+                            axios(request.response.config),
+                            successCallback,
+                            errorCallback,
+                            retryCount - 1,
+                            retryInterval
+                            )
+                        ),
+                    retryInterval
+                );
+              })
+            : errorCallback(request);
+        } else {
+            return successCallback(request);
+        }
     }
 
     login({ email, password }: IUserCredentials): Promise<boolean> {
@@ -74,6 +120,7 @@ export class APIRequester {
         const url = userId
         ? `api/profile/${userId}`
         : `api/profile`;
+
         return this.instance.get(url)
             .then(userNormalizer)
             .catch(this.defaultErrorHandler());
@@ -92,9 +139,13 @@ export class APIRequester {
     }
 
     getPositions(): Promise<IPosition[]> {
-        return this.instance.get('api/position')
-            .then(positionsNormalizer)
-            .catch(this.defaultErrorHandler());
+        return this.requestRepeater(
+            this.instance.get('api/position'),
+            positionsNormalizer,
+            this.defaultErrorHandler(),
+            5,
+            1500
+        );
     }
 
     getMedicalDepartments(): Promise<ILPU[]> {
@@ -132,9 +183,13 @@ export class APIRequester {
     }
 
     getLocations(url: string): Promise<ILocation[]> {
-        return this.instance.get(url)
-            .then(locationsNormalizer)
-            .catch(this.defaultErrorHandler());
+        return this.requestRepeater(
+            this.instance.get(url),
+            locationsNormalizer,
+            this.defaultErrorHandler(),
+            3,
+            1500
+        );
     }
 
     getLocationAgents(branchId: number, positionId: number): Promise<IUser[]> {

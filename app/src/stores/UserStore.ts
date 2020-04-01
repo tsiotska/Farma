@@ -59,6 +59,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
         if (!res) return;
+        console.log('loaded agent: ', res);
         const agent = this.navHistory.find(({ id }) => id === res.id);
         if (agent) {
             for (const prop in res) {

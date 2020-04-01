@@ -13,6 +13,7 @@ import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
+import { ILPU } from '../interfaces/ILPU';
 
 export type DisplayMode = 'pack' | 'currency';
 type AgentTargetProperty = 'city' | 'region' | null;
@@ -51,6 +52,28 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @computed
     get isAnyLocationIgnored(): boolean {
         return !!this.ignoredLocations.size;
+    }
+
+    @computed
+    get pharmaciesMap(): Map<number, ILPU> {
+        const {
+            departmentsStore: { pharmacies },
+            userStore: { role }
+        } = this.rootStore;
+
+        const statExist = Array.isArray(this.locationSalesStat);
+        const shouldReturnData = role === USER_ROLE.MEDICAL_AGENT;
+
+        let data: Array<[number, ILPU]> = [];
+
+        if (statExist && shouldReturnData) {
+            const ids = this.locationSalesStat.map(({ id }) => id);
+            data = pharmacies
+                .filter(({ id }) => ids.includes(id))
+                .map(x => ([ x.id, x ]));
+        }
+
+        return new Map(data);
     }
 
     @computed
