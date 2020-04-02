@@ -6,5 +6,6 @@ export interface ILPU {
     oblast: string;
     city: number;
     address: string;
-    phone: string;
+    phone1: string;
+    phone2: string;
 }

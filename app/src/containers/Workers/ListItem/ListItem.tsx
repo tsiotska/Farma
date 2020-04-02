@@ -160,7 +160,8 @@ class ListItem extends Component<IProps> {
                 name,
                 hired,
                 email,
-                phone,
+                mobilePhone,
+                workPhone,
                 card,
                 isVacancy
             }
@@ -223,10 +224,19 @@ class ListItem extends Component<IProps> {
                             {email}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
-                        <Typography variant='body2'>
-                            {phone}
-                        </Typography>
+                    <Grid xs className={classes.gridItem} direction='column' alignItems='flex-start' zeroMinWidth container item>
+                        {
+                            workPhone &&
+                            <Typography variant='body2'>
+                                {workPhone}
+                            </Typography>
+                        }
+                        {
+                            mobilePhone &&
+                            <Typography variant='body2'>
+                                {mobilePhone}
+                            </Typography>
+                        }
                     </Grid>
                     <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>

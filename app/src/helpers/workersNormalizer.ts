@@ -10,7 +10,8 @@ const defaultWorker: IWorker = {
     hired: null,
     created: null,
     email: null,
-    phone: null,
+    workPhone: null,
+    mobilePhone: null,
     card: null,
     isVacancy: false
 };
@@ -24,7 +25,8 @@ const valuesMap: IValuesMap = {
     hired: 'hired',
     created: 'created',
     email: 'email',
-    phone: 'phone',
+    mobile_phone: 'mobilePhone',
+    work_phone: 'workPhone',
     bank_card: 'card',
     vacancy: 'isVacancy'
 };

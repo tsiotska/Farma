@@ -46,7 +46,8 @@ class ListItem extends Component<IProps> {
                 oblast,
                 city,
                 address,
-                phone,
+                phone1,
+                phone2,
             }
         } = this.props;
 
@@ -85,7 +86,7 @@ class ListItem extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        { phone }
+                        { phone1 } { phone2 }
                     </Typography>
                     <IconButton className={classes.iconButton}>
                         <Edit className={classes.icon} />

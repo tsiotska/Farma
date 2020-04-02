@@ -9,7 +9,8 @@ export interface IWorker {
     created?: Date;
 
     email: string;
-    phone: string;
+    mobilePhone: string;
+    workPhone: string;
     card: string;
     isVacancy: boolean;
 }
