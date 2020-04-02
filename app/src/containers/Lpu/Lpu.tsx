@@ -4,7 +4,8 @@ import {
     WithStyles,
     Grid,
     Typography,
-    Button
+    Button,
+    LinearProgress
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -12,7 +13,6 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import UncommitedLpus from './UncommitedLpus';
 import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
@@ -20,7 +20,7 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     header: {
-        margin: '24px 0'
+        margin: '0 0 24px'
     },
     pagination: {
         margin: '16px 0 60px auto'
@@ -31,17 +31,26 @@ const styles = (theme: any) => createStyles({
     errorText: {
         marginTop: 10,
         textAlign: 'center'
+    },
+    unconfirmedList: {
+        marginBottom: 20
+    },
+    unconfirmedText: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        paddingBottom: 18
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
+    unconfirmedLPUs?: ILPU[];
     currentDepartmentId: number;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
     itemsPerPage?: number;
+    loadUnconfirmedLPUs?: () => void;
 }
 
 @inject(({
@@ -50,7 +59,9 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             LPUs,
-            currentDepartmentId
+            currentDepartmentId,
+            loadUnconfirmedLPUs,
+            unconfirmedLPUs
         },
         uiStore: {
             setCurrentPage,
@@ -65,10 +76,18 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage,
     currentPage,
     itemsPerPage,
-    currentDepartmentId
+    currentDepartmentId,
+    loadUnconfirmedLPUs,
+    unconfirmedLPUs
 }))
 @observer
 class Lpu extends Component<IProps> {
+    @computed
+    get isUnconfirmedLPUsLoading(): boolean {
+        return this.props.getAsyncStatus('loadUnconfirmedLPUs').loading;
+    }
+
+    @computed
     get requestStatus(): IAsyncStatus {
         return this.props.getAsyncStatus('loadLPUs');
     }
@@ -94,16 +113,21 @@ class Lpu extends Component<IProps> {
 
     retryClickHandler = () => this.props.loadLPUs();
 
+    loadData = async () => {
+        const { loadLPUs, loadUnconfirmedLPUs } = this.props;
+        await loadUnconfirmedLPUs();
+        await loadLPUs();
+    }
+
     componentDidMount() {
-        const { getAsyncStatus, loadLPUs } = this.props;
-        const { loading, success } = getAsyncStatus('loadLPUs');
+        const { loading, success } = this.requestStatus;
         const shouldLoadLPUs = loading === false && success === false;
-        if (shouldLoadLPUs) loadLPUs();
+        if (shouldLoadLPUs) this.loadData();
     }
 
     componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
-        const { currentDepartmentId: actualId, loadLPUs } = this.props;
-        if (prevId !== actualId) loadLPUs();
+        const { currentDepartmentId: actualId } = this.props;
+        if (prevId !== actualId) this.loadData();
     }
 
     componentWillUnmount() {
@@ -116,12 +140,22 @@ class Lpu extends Component<IProps> {
             LPUs,
             currentPage,
             itemsPerPage,
-            setCurrentPage
+            setCurrentPage,
+            unconfirmedLPUs
         } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
-                <UncommitedLpus />
+                {
+                    (Array.isArray(unconfirmedLPUs) && unconfirmedLPUs.length !== 0) &&
+                      <Grid className={classes.unconfirmedList} direction='column' container>
+                        <Typography className={classes.unconfirmedText} color='textSecondary'>
+                            Додані ЛПУ
+                        </Typography>
+                        <HCFList data={unconfirmedLPUs} />
+                      </Grid>
+                }
+                { this.isUnconfirmedLPUsLoading && <LinearProgress /> }
                 <Grid
                     className={classes.header}
                     justify='space-between'
@@ -134,7 +168,11 @@ class Lpu extends Component<IProps> {
                         Додати ЛПУ
                     </Button>
                 </Grid>
-                <HCFList isLoading={this.requestStatus.loading} data={this.preparedLPUs} />
+                {
+                    this.requestStatus.loading
+                    ? <LinearProgress />
+                    : <HCFList data={this.preparedLPUs} showHeader />
+                }
                 {
                     this.requestStatus.error &&
                     <>

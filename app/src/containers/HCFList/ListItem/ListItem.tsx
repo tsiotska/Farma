@@ -9,10 +9,15 @@ import { gridStyles } from '../gridStyles';
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
     root: {
-        backgroundColor: theme.palette.primary.white,
         marginBottom: 1,
         minHeight: 48,
-        padding: '6px 0'
+        padding: '6px 0',
+        backgroundColor: ({ unconfirmed }: any) => unconfirmed
+            ? theme.palette.primary.blue
+            : theme.palette.primary.white,
+        color: ({ unconfirmed }: any) => unconfirmed
+        ? theme.palette.primary.white
+        : theme.palette.primary.gray.main,
     },
     text: {
         lineHeight: 1.5,
@@ -26,12 +31,16 @@ const styles = (theme: any) => createStyles({
         borderRadius: 2
     },
     icon: {
-        fontSize: '1rem'
+        fontSize: '1rem',
+        color: ({ unconfirmed }: any) => unconfirmed
+            ? theme.palette.primary.white
+            : ''
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     pharmacy: ILPU;
+    unconfirmed: boolean;
 }
 
 @observer

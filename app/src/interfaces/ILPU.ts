@@ -8,4 +8,6 @@ export interface ILPU {
     address: string;
     phone1: string;
     phone2: string;
+    ffmConfirm?: boolean;
+    rmConfirm?: boolean;
 }

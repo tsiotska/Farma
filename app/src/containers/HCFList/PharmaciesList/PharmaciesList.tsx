@@ -7,23 +7,26 @@ import ListItem from '../ListItem';
 const styles = createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
-    isLoading: boolean;
     data: ILPU[];
+    unconfirmed: boolean;
 }
 
 @observer
 class PharmaciesList extends Component<IProps> {
     // TODO: pagination, sort, search
     render() {
-        const { data, isLoading } = this.props;
+        const { data, unconfirmed } = this.props;
 
         return (
             <>
-                { isLoading && <LinearProgress /> }
                 <Grid direction='column' container>
                     {
                         data.map(pharmacy => (
-                            <ListItem key={pharmacy.id} pharmacy={pharmacy} />
+                            <ListItem
+                                key={pharmacy.id}
+                                pharmacy={pharmacy}
+                                unconfirmed={unconfirmed}
+                            />
                         ))
                     }
                 </Grid>

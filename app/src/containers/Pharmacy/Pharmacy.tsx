@@ -4,7 +4,8 @@ import {
     WithStyles,
     Grid,
     Typography,
-    Button
+    Button,
+    LinearProgress
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -20,7 +21,7 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     header: {
-        margin: '24px 0'
+        margin: '0 0 24px'
     },
     pagination: {
         margin: '16px 0 60px auto'
@@ -31,13 +32,21 @@ const styles = (theme: any) => createStyles({
     errorText: {
         marginTop: 10,
         textAlign: 'center'
+    },
+    unconfirmedList: {
+        marginBottom: 20
+    },
+    unconfirmedText: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        paddingBottom: 18
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     loadPharmacies?: (isNeeded: boolean) => void;
+    loadUnconfirmedPharmacies?: () => void;
     pharmacies?: ILPU[];
-
+    unconfirmedPharmacies?: ILPU[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
@@ -51,7 +60,9 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadPharmacies,
             pharmacies,
-            setPharmacyDemand
+            setPharmacyDemand,
+            unconfirmedPharmacies,
+            loadUnconfirmedPharmacies
         },
         uiStore: {
             setCurrentPage,
@@ -66,10 +77,17 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage,
     currentPage,
     itemsPerPage,
-    setPharmacyDemand
+    setPharmacyDemand,
+    unconfirmedPharmacies,
+    loadUnconfirmedPharmacies
 }))
 @observer
 class Pharmacy extends Component<IProps> {
+    @computed
+    get isUnconfirmedPharmaciesLoading(): boolean {
+        return this.props.getAsyncStatus('loadUnconfirmedPharmacies').loading;
+    }
+
     @computed
     get requestStatus(): IAsyncStatus {
         return this.props.getAsyncStatus('loadPharmacies');
@@ -100,6 +118,7 @@ class Pharmacy extends Component<IProps> {
 
     componentDidMount() {
         this.props.setPharmacyDemand(true);
+        this.props.loadUnconfirmedPharmacies();
     }
 
     componentWillUnmount() {
@@ -113,12 +132,24 @@ class Pharmacy extends Component<IProps> {
             pharmacies,
             currentPage,
             itemsPerPage,
-            setCurrentPage
+            setCurrentPage,
+            unconfirmedPharmacies
         } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
-                <UncommitedPharmacies />
+                {
+                    (Array.isArray(unconfirmedPharmacies) && unconfirmedPharmacies.length !== 0) &&
+                    <Grid className={classes.unconfirmedList} direction='column' container>
+                        <Typography className={classes.unconfirmedText} color='textSecondary'>
+                            Додані аптеки
+                        </Typography>
+                        <HCFList data={unconfirmedPharmacies} />
+                    </Grid>
+                }
+                {
+                    this.isUnconfirmedPharmaciesLoading && <LinearProgress />
+                }
                 <Grid
                     className={classes.header}
                     justify='space-between'
@@ -131,7 +162,11 @@ class Pharmacy extends Component<IProps> {
                         Додати Аптеку
                     </Button>
                 </Grid>
-                <HCFList isLoading={this.requestStatus.loading} data={this.preparedPharmacies} />
+                {
+                    this.requestStatus.loading
+                    ? <LinearProgress />
+                    : <HCFList data={this.preparedPharmacies} showHeader />
+                }
                 {
                     this.requestStatus.error &&
                     <>

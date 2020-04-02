@@ -25,7 +25,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable positions: Map<number, IPosition> = new Map();
 
     @observable LPUs: ILPU[] = null;
-    @observable unconfirmedPLUs: ILPU[] = null;
+    @observable unconfirmedLPUs: ILPU[] = null;
 
     @observable unconfirmedPharmacies: ILPU[] = null;
     @observable pharmacies: ILPU[] = null;
@@ -156,8 +156,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadUnconfirmedPLUs() {
-        const requestName = 'loadUnconfirmedPLUs';
+    async loadUnconfirmedLPUs() {
+        const requestName = 'loadUnconfirmedLPUs';
         const { api, userStore: { previewUser } } = this.rootStore;
 
         if (this.currentDepartmentId === null || previewUser === null) return;
@@ -167,7 +167,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             requestName
         );
 
-        if (res) this.unconfirmedPLUs = res;
+        if (res) this.unconfirmedLPUs = res;
     }
 
     @action.bound

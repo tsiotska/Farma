@@ -8,7 +8,6 @@ import { ILPU } from '../../interfaces/ILPU';
 
 const styles = (theme: any) => createStyles({
     root: {
-        padding: '0 20px'
     },
     pagination: {
         margin: '16px 0 60px auto'
@@ -16,19 +15,20 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    isLoading: boolean;
     data?: ILPU[];
+    showHeader?: boolean;
+    unconfirmed?: boolean;
 }
 
 @observer
 class HCFList extends Component<IProps> {
     render() {
-        const { classes, data, isLoading } = this.props;
+        const { classes, data, showHeader, unconfirmed } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
-                <Header />
-                <PharmaciesList data={data} isLoading={isLoading} />
+                { showHeader && <Header />}
+                <PharmaciesList data={data} unconfirmed={unconfirmed} />
             </Grid>
         );
     }
