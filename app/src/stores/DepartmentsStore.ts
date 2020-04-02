@@ -66,9 +66,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async initializeStore() {
-        await when(() => !!this.rootStore.userStore.user);
-        this.loadDepartments();
-        this.loadPositions(true);
+        // await when(() => !!this.rootStore.userStore.user);
+        // this.loadDepartments();
+        // this.loadPositions();
     }
 
     @action.bound
@@ -102,9 +102,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    setCurrentDepartment(department: string | IDepartment) {
+    setCurrentDepartment(department: number | string | IDepartment) {
         if (typeof department === 'string') {
             this.currentDepartment = this.departments.find(({ name }) => name === department);
+        } else if (typeof department === 'number') {
+            this.currentDepartment = this.departments.find(({ id }) => id === department);
         } else {
             this.currentDepartment = department;
         }
@@ -211,10 +213,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         const res = await this.dispatchRequest(api.getBranches(), requestName);
-
-        if (!res || !res.length) return;
-
-        this.departments = res;
+        if (Array.isArray(res)) this.departments = res;
     }
 
     @action.bound
@@ -250,7 +249,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadPositions(isInitial: boolean = false) {
+    async loadPositions() {
         const requestName = 'loadPositions';
         const { api } = this.rootStore;
 
@@ -267,7 +266,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadLocations(isInitial: boolean = false) {
+    async loadLocations() {
         const requestName = 'loadLocations';
         const { api, userStore: { role } } = this.rootStore;
 

@@ -5,7 +5,7 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
-import { USER_ROLE } from '../constants/Roles';
+import { USER_ROLE, singleDepartmentRoles } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
 
 export default class UserStore extends AsyncStore implements IUserStore {
@@ -59,7 +59,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
         if (!res) return;
-        console.log('loaded agent: ', res);
+
         const agent = this.navHistory.find(({ id }) => id === res.id);
         if (agent) {
             for (const prop in res) {
@@ -75,19 +75,28 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadUserProfile() {
         const requestName = 'loadUserProfile';
-        const { api } = this.rootStore;
+        const { api, departmentsStore: { loadPositions, loadDepartments, setCurrentDepartment } } = this.rootStore;
 
         this.setLoading(requestName);
-        this.user = await api.getUser();
-        if (this.user) this.navHistory.push(this.user);
+        const user = await api.getUser();
 
-        const callback = this.user
-        ? this.setSuccess
-        : this.setError;
+        if (!user) {
+            this.setError(requestName);
+            return false;
+        }
 
-        callback(requestName);
+        await Promise.all([
+            loadPositions(),
+            loadDepartments()
+        ]);
 
-        return !!this.user;
+        setCurrentDepartment(user.department);
+        this.user = user;
+        if (singleDepartmentRoles.includes(this.user.position)) {
+            this.navHistory.push(this.user);
+        }
+        this.setSuccess(requestName);
+        return true;
     }
 
     @action.bound

@@ -64,7 +64,7 @@ interface IProps extends WithStyles<typeof styles> {
     location?: Location;
     logout?: () => void;
     departments?: IDepartment[];
-    currentDepartment?: IDepartment;
+    currentDepartmentId?: number;
     setCurrentDepartment?: (value: string | IDepartment) => void;
 }
 
@@ -77,7 +77,7 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             departments,
             setCurrentDepartment,
-            currentDepartment
+            currentDepartmentId
         }
     }
 }) => ({
@@ -85,7 +85,7 @@ interface IProps extends WithStyles<typeof styles> {
     logout,
     departments,
     setCurrentDepartment,
-    currentDepartment
+    currentDepartmentId
 }))
 @withRouter
 @observer
@@ -117,23 +117,13 @@ class SideNav extends Component<IProps> {
         return 2;
     }
 
-    isActive = (name: string): boolean => {
-        const { currentDepartment } = this.props;
+    isActive = (id: number): boolean => {
+        const { currentDepartmentId } = this.props;
 
-        return currentDepartment
-        ? currentDepartment.name === name
-        : false;
+        return currentDepartmentId === id;
     }
 
     departmentClickHandler = (name: string) => () => this.props.setCurrentDepartment(name);
-
-    componentDidUpdate() {
-        const { currentDepartment, setCurrentDepartment } = this.props;
-
-        if (currentDepartment || !this.userDepartments.length) return;
-
-        setCurrentDepartment(this.userDepartments[0]);
-    }
 
     render() {
         const { classes, logout } = this.props;
@@ -147,7 +137,7 @@ class SideNav extends Component<IProps> {
                                     onClick={this.departmentClickHandler(name)}
                                     className={cx(
                                         classes.iconWrapper,
-                                        { active: this.isActive(name) }
+                                        { active: this.isActive(id) }
                                     )}>
                                     <img src={`${Config.ASSETS_URL}/${image}`} className={classes.iconSm} />
                                 </Button>

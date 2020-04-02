@@ -37,7 +37,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
-
+    currentDepartmentId: number;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
@@ -50,6 +50,7 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             LPUs,
+            currentDepartmentId
         },
         uiStore: {
             setCurrentPage,
@@ -63,14 +64,11 @@ interface IProps extends WithStyles<typeof styles> {
     LPUs,
     setCurrentPage,
     currentPage,
-    itemsPerPage
+    itemsPerPage,
+    currentDepartmentId
 }))
 @observer
 class Lpu extends Component<IProps> {
-    // @computed
-    // get isLoading(): boolean {
-    //     return this.props.getAsyncStatus('loadLPUs').loading;
-    // }
     get requestStatus(): IAsyncStatus {
         return this.props.getAsyncStatus('loadLPUs');
     }
@@ -101,6 +99,11 @@ class Lpu extends Component<IProps> {
         const { loading, success } = getAsyncStatus('loadLPUs');
         const shouldLoadLPUs = loading === false && success === false;
         if (shouldLoadLPUs) loadLPUs();
+    }
+
+    componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
+        const { currentDepartmentId: actualId, loadLPUs } = this.props;
+        if (prevId !== actualId) loadLPUs();
     }
 
     componentWillUnmount() {

@@ -13,7 +13,9 @@ export interface IDepartmentsStore {
     locationsAgents: Map<number, IUserCommonInfo>;
     meds: Map<number, IMedicine>;
     resetStore: () => void;
-    initializeStore: () => void;
     loadLocationsAgents: () => void;
     loadLocations: () => void;
+    loadDepartments: () => void;
+    loadPositions: () => void;
+    setCurrentDepartment?: (value: number | string | IDepartment) => void;
 }

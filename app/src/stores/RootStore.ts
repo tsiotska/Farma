@@ -26,8 +26,8 @@ export default class RootStore implements IRootStore {
     constructor() {
         this.api = new APIRequester();
         this.localizationStore = new LocalizationStore();
-        this.userStore = new UserStore(this);
         this.departmentsStore = new DepartmentsStore(this);
+        this.userStore = new UserStore(this);
         this.salesStore = new SalesStore(this);
         this.uiStore = new UIStore();
     }

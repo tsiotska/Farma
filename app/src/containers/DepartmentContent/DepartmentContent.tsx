@@ -10,25 +10,37 @@ import {
     RMContent,
     MAContent
 } from './RolesPresets';
-import { USER_ROLE } from '../../constants/Roles';
-import { toJS } from 'mobx';
+import { USER_ROLE, singleDepartmentRoles } from '../../constants/Roles';
+import { toJS, computed } from 'mobx';
 
 interface IProps {
     role?: USER_ROLE;
     history?: History;
+    currentDepartmentId: number;
 }
 
 @inject(({
     appState: {
         userStore: {
             role
+        },
+        departmentsStore: {
+            currentDepartmentId
         }
     }
 }) => ({
-    role
+    role,
+    currentDepartmentId
+
 }))
 @observer
 class DepartmentContent extends Component<IProps> {
+    @computed
+    get isDepartmentRequired(): boolean {
+        return singleDepartmentRoles.includes(this.props.role);
+    }
+
+    @computed
     get userContent(): IRoleContent[] {
         switch (this.props.role) {
             case USER_ROLE.ADMIN: return adminContent;
@@ -39,6 +51,7 @@ class DepartmentContent extends Component<IProps> {
         }
     }
 
+    @computed
     get redirectPath(): string {
         return this.userContent.length
         ? this.userContent[0].path
@@ -46,6 +59,10 @@ class DepartmentContent extends Component<IProps> {
     }
 
     render() {
+        const { currentDepartmentId } = this.props;
+
+        if (currentDepartmentId === null && this.isDepartmentRequired) return null;
+
         return (
             <Switch>
                 {
