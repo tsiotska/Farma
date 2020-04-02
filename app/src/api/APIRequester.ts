@@ -22,6 +22,7 @@ import { ICacheStore } from '../interfaces/ICacheStore';
 import { CacheStore } from '../stores/CacheStore';
 import Config from '../../Config';
 import delay from 'lodash/delay';
+import { USER_ROLE } from '../constants/Roles';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -148,10 +149,18 @@ export class APIRequester {
         );
     }
 
-    getMedicalDepartments(unconfirmed: boolean = false): Promise<ILPU[]> {
-        const url = unconfirmed
-        ? 'api/hcf?unconfirmed=1'
-        : 'api/hcf';
+    getMedicalDepartments(departmentId: number, user: IUser, unconfirmed: boolean = false): Promise<ILPU[]> {
+        const { position, id } = user;
+
+        const urlParam = unconfirmed
+        ? '?unconfirmed=1'
+        : '';
+
+        let url: string;
+        if (position === USER_ROLE.FIELD_FORCE_MANAGER) url = `/api/branch/${departmentId}/ffm/hcf${urlParam}`;
+        else if (position === USER_ROLE.REGIONAL_MANAGER) url = `/api/branch/${departmentId}/rm/${id}/hcf${urlParam}`;
+
+        if (!url) return;
 
         return this.instance.get(url)
             .then(lpuNormalizer)

@@ -158,10 +158,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadUnconfirmedPLUs() {
         const requestName = 'loadUnconfirmedPLUs';
-        const { api } = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
+
+        if (this.currentDepartmentId === null || previewUser === null) return;
 
         const res = await this.dispatchRequest(
-            api.getMedicalDepartments(true),
+            api.getMedicalDepartments(this.currentDepartmentId, previewUser, true),
             requestName
         );
 
@@ -171,10 +173,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLPUs() {
         const requestName = 'loadLPUs';
-        const { api } = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
+
+        if (this.currentDepartmentId === null || previewUser === null) return;
 
         const res = await this.dispatchRequest(
-            api.getMedicalDepartments(),
+            api.getMedicalDepartments(this.currentDepartmentId, previewUser),
             requestName
         );
 
