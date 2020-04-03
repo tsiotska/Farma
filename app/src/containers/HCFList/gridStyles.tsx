@@ -22,5 +22,8 @@ export const gridStyles = (theme: any) => createStyles({
     address: {},
     phone: {
         minWidth: 170,
+        '&.widder': {
+            minWidth: 220
+        }
     },
 });

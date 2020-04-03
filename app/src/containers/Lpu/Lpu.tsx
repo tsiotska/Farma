@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -143,7 +143,7 @@ class Lpu extends Component<IProps> {
             setCurrentPage,
             unconfirmedLPUs
         } = this.props;
-
+        console.log(toJS(unconfirmedLPUs));
         return (
             <Grid direction='column' className={classes.root} container>
                 {
@@ -152,7 +152,7 @@ class Lpu extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
-                        <HCFList data={unconfirmedLPUs} />
+                        <HCFList data={unconfirmedLPUs} unconfirmed />
                       </Grid>
                 }
                 { this.isUnconfirmedLPUsLoading && <LinearProgress /> }
