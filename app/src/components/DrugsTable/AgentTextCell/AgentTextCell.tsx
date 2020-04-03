@@ -11,6 +11,7 @@ import {
 import { IUserCommonInfo } from '../../../interfaces/IUser';
 import ImageLoader from '../../ImageLoader';
 import Config from '../../../../Config';
+import { toJS } from 'mobx';
 
 const styles = createStyles({
     label: {
@@ -67,6 +68,7 @@ class AgentTextCell extends Component<IProps> {
     onClick = (e: any) => {
         e.preventDefault();
         const { label, loadUserInfo } = this.props;
+        console.log(toJS(label));
         loadUserInfo(label);
     }
 

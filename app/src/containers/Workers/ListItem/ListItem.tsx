@@ -11,17 +11,17 @@ import {
     Typography
 } from '@material-ui/core';
 import { KeyboardArrowDown, PermIdentity } from '@material-ui/icons';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
 import { NotInterested, Edit } from '@material-ui/icons';
-import { observable } from 'mobx';
-import { format, isValid, lightFormat } from 'date-fns';
-import ru from 'date-fns/locale/ru';
+import { isValid, lightFormat } from 'date-fns';
 import ImageLoader from '../../../components/ImageLoader';
 import { IPosition } from '../../../interfaces/IPosition';
 import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
 import vacancyIcon from '../../../../assets/icons/vacancyIcon.png';
+import { IUserCommonInfo } from '../../../interfaces/IUser';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -31,7 +31,7 @@ const styles = (theme: any) => createStyles({
             content: 'none'
         },
         '& p': {
-            cursor: 'text !important',
+            // cursor: 'text !important',
             userSelect: 'all',
             paddingLeft: 5,
             textOverflow: 'ellipsis',
@@ -50,7 +50,7 @@ const styles = (theme: any) => createStyles({
         height: 20
     },
     summaryContent: {
-        alignItems: 'center',
+        alignItems: 'stretch',
         margin: 0,
         order: 1,
         '&.Mui-expanded': {
@@ -63,16 +63,28 @@ const styles = (theme: any) => createStyles({
         margin: 0
     },
     summaryRoot: {
-        cursor: ({ children }: any) => children ? 'initial' : 'default !important',
         padding: 0,
         minHeight: '48px !important',
-        border: ({ worker: { isVacancy }}: any) => isVacancy ? '1px solid #f3ca47' : '1px solid transparent',
+        // cursor: ({ children }: any) => children
+        //     ? 'initial'
+        //     : 'default !important',
+        border: ({ worker: { isVacancy }}: any) => isVacancy
+            ? '1px solid #f3ca47'
+            : '1px solid transparent',
     },
     iconButton: {
         borderRadius: 2
     },
     gridItem: {
-        overflow: 'hidden'
+        overflow: 'hidden',
+        borderRadius: 2,
+        transition: '0.3s',
+        '&:first-of-type:hover': {
+            backgroundColor: ( {worker: { isVacancy }}: any) => isVacancy
+                ? 'transparent'
+                : '#f1f1f1'
+            // pointer: 'cursor !important'
+        }
     },
     details: {
         padding: '8px 0 24px 32px',
@@ -94,8 +106,18 @@ interface IProps extends WithStyles<typeof styles> {
     children?: any;
     isExpanded?: boolean;
     expandChangeHandler?: (e: any, expanded: boolean) => void;
+    loadUserInfo?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            loadUserInfo
+        }
+    }
+}) => ({
+    loadUserInfo
+}))
 @observer
 class ListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
@@ -146,6 +168,19 @@ class ListItem extends Component<IProps> {
         return from;
     }
 
+    workerClickHandler = (e: any) => {
+        const { loadUserInfo, worker : { id, name, avatar, position, isVacancy }} = this.props;
+        if (isVacancy) return;
+        e.stopPropagation();
+        loadUserInfo({
+            id,
+            name,
+            avatar,
+            region: null,
+            city: null
+        }, position);
+    }
+
     render() {
         const {
             classes,
@@ -169,13 +204,14 @@ class ListItem extends Component<IProps> {
 
         return (
             <ExpansionPanel
+                onChange={expandChangeHandler}
+                expanded={isExpanded}
+                elevation={0}
                 TransitionProps={{
                     mountOnEnter: true,
                     unmountOnExit: true
                 }}
-                onChange={expandChangeHandler}
-                expanded={isExpanded}
-                elevation={0} classes={{
+                classes={{
                     root: classes.root,
                     expanded: classes.expanded
                 }}>
@@ -186,7 +222,15 @@ class ListItem extends Component<IProps> {
                         root: classes.summaryRoot,
                         expandIcon: classes.expandIcon
                     }}>
-                    <Grid xs={3} className={classes.gridItem} wrap='nowrap' alignItems='center' zeroMinWidth container item>
+                    <Grid
+                        xs={3}
+                        onClick={this.workerClickHandler}
+                        className={classes.gridItem}
+                        wrap='nowrap'
+                        alignItems='center'
+                        zeroMinWidth
+                        container
+                        item>
                         <ImageLoader
                             className={classes.avatar}
                             component={Avatar}
@@ -224,7 +268,7 @@ class ListItem extends Component<IProps> {
                             {email}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} direction='column' alignItems='flex-start' zeroMinWidth container item>
+                    <Grid xs className={classes.gridItem} direction='column' justify='center' alignItems='flex-start' zeroMinWidth container item>
                         {
                             workPhone &&
                             <Typography variant='body2'>
