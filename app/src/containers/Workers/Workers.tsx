@@ -100,8 +100,8 @@ class Workers extends Component<IProps> {
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { currentDepartment: actualDep, getAsyncStatus } = this.props;
-        const { currentDepartment: prevDep } = prevProps;
+        const { role, currentDepartment: actualDep, getAsyncStatus } = this.props;
+        const { role: prevRole, currentDepartment: prevDep } = prevProps;
 
         const requestName = this.tab === 'all'
             ? 'loadWorkers'
@@ -111,7 +111,8 @@ class Workers extends Component<IProps> {
 
         const shouldLoadData = loading === false
             && success === false
-            || actualDep !== prevDep;
+            || actualDep !== prevDep
+            || role !== prevRole;
 
         if (shouldLoadData) this.loadData();
     }

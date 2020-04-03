@@ -7,13 +7,10 @@ import Statistic from './Statistic';
 import Plot from './Plot';
 import DateRangeModal from './DateRangeModal';
 import DateTimeUtils from './DateTimeUtils';
-import { IDepartment } from '../../interfaces/IDepartment';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
-import { IUser } from '../../interfaces';
-import { reaction, observable } from 'mobx';
+import { reaction, observable, action } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
-import { IAsyncStatus } from '../../stores/AsyncStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -75,62 +72,44 @@ interface IProps extends WithStyles<typeof styles> {
 class Sales extends Component<IProps> {
     @observable fetchedRole: USER_ROLE;
     @observable fetchedDepartmentId: number;
-    disposeRoleReaction: any;
-    disposeDepartmentReaction: any;
+    reactionDisposer: any;
 
     componentDidMount() {
-        this.disposeDepartmentReaction = reaction(
-            () => this.props.currentDepartmentId,
-            this.departmentChangeHandler,
-            { fireImmediately: true }
-        );
-        this.disposeRoleReaction = reaction(
-            () => this.props.role,
-            this.roleChangeHandler,
+        this.reactionDisposer = reaction(
+            () => [this.props.role, this.props.currentDepartmentId],
+            this.updateData,
             { fireImmediately: true }
         );
     }
 
-    departmentChangeHandler = (departmentId: number) => {
+    @action.bound
+    updateData = ([role, departmentId]: [USER_ROLE, number]) => {
         const {
-            role,
-            loadLocationsAgents,
-            loadAllStat
-        } = this.props;
-
-        if (this.fetchedRole === role && this.fetchedDepartmentId === departmentId) return;
-
-        loadLocationsAgents();
-        loadAllStat();
-        this.fetchedDepartmentId = departmentId;
-        this.fetchedRole = role;
-    }
-
-    roleChangeHandler = (role: USER_ROLE) => {
-        const {
-            currentDepartmentId,
             loadLocations,
             loadLocationsAgents,
             loadAllStat,
             setPharmacyDemand
         } = this.props;
 
-        loadLocations();
+        const roleChanged = role !== this.fetchedRole;
+        const departmentIdChanged = departmentId !== this.fetchedDepartmentId;
 
-        if (this.fetchedRole === role && this.fetchedDepartmentId === currentDepartmentId) return;
+        if (roleChanged) {
+            loadLocations();
+            setPharmacyDemand(role === USER_ROLE.MEDICAL_AGENT);
+            loadLocationsAgents();
+            loadAllStat();
+        } else if (departmentIdChanged) {
+            loadLocationsAgents();
+            loadAllStat();
+        }
 
-        const shouldLoadPharmacies = role === USER_ROLE.MEDICAL_AGENT;
-        setPharmacyDemand(shouldLoadPharmacies);
-
-        loadLocationsAgents();
-        loadAllStat();
+        this.fetchedDepartmentId = departmentId;
         this.fetchedRole = role;
-        this.fetchedDepartmentId = currentDepartmentId;
     }
 
     componentWillUnmount() {
-        this.disposeRoleReaction();
-        this.disposeDepartmentReaction();
+        this.reactionDisposer();
     }
 
     render() {

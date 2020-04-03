@@ -68,7 +68,6 @@ class AgentTextCell extends Component<IProps> {
     onClick = (e: any) => {
         e.preventDefault();
         const { label, loadUserInfo } = this.props;
-        console.log(toJS(label));
         loadUserInfo(label);
     }
 

@@ -59,7 +59,6 @@ export const RMContent: IRoleContent[] = [
 export const MAContent: IRoleContent[] = [
     sales,
     marks,
-    workers,
     pharmacy,
     lpu
 ];

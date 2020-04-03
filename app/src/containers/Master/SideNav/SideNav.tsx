@@ -99,7 +99,6 @@ class SideNav extends Component<IProps> {
 
     get userDepartments(): IDepartment[] {
         const { departments, user } = this.props;
-        return departments;
         const userDep = user
         ? user.department
         : null;

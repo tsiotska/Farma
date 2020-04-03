@@ -143,7 +143,7 @@ class Lpu extends Component<IProps> {
             setCurrentPage,
             unconfirmedLPUs
         } = this.props;
-        console.log(toJS(unconfirmedLPUs));
+
         return (
             <Grid direction='column' className={classes.root} container>
                 {
