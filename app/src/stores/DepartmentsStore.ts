@@ -11,6 +11,7 @@ import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
+import flattenDeep from 'lodash/flattenDeep';
 
 export interface IExpandedWorker {
     id: number;
@@ -47,7 +48,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.rootStore = rootStore;
         reaction(() => this.currentDepartment, this.departmentChangeHandler);
         reaction(() => this.pharmacyDemand, this.loadPharmacies);
-        this.initializeStore();
     }
 
     private departmentChangeHandler = () => {
@@ -62,13 +62,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return this.currentDepartment
         ? this.currentDepartment.id
         : null;
-    }
-
-    @action.bound
-    async initializeStore() {
-        // await when(() => !!this.rootStore.userStore.user);
-        // this.loadDepartments();
-        // this.loadPositions();
     }
 
     @action.bound
@@ -110,6 +103,25 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         } else {
             this.currentDepartment = department;
         }
+    }
+
+    @action.bound
+    async loadFFMs() {
+        const requestName = 'loadFFMs';
+        const { api } = this.rootStore;
+
+        this.setLoading(requestName);
+        const departmentIds = this.departments.map(({ id }) => id);
+        const promises = departmentIds.map(id => api.getAgents(id, USER_ROLE.FIELD_FORCE_MANAGER));
+        const requestResult = await Promise.all(promises);
+        const ffms = flattenDeep(requestResult);
+        this.setSuccess(requestName);
+        departmentIds.forEach((depId, i) => {
+            const department = this.departments.find(({ id }) => id === depId);
+            if (department) {
+                department.ffm = ffms[i];
+            }
+        });
     }
 
     @action.bound
@@ -306,7 +318,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.locationsAgents.clear();
         this.setLoading(requestName);
-        const res = await api.getLocationAgents(branchId, loadPositionsId);
+        const res = await api.getAgents(branchId, loadPositionsId);
 
         if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
 

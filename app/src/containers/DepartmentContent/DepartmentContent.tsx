@@ -10,11 +10,16 @@ import {
     RMContent,
     MAContent
 } from './RolesPresets';
-import { USER_ROLE, singleDepartmentRoles } from '../../constants/Roles';
+import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../constants/Roles';
 import { toJS, computed } from 'mobx';
+import { IUser } from '../../interfaces';
+import { ADMIN_ROUTE } from '../../constants/Router';
+import AdminPage from '../AdminPage';
 
 interface IProps {
+    user?: IUser;
     role?: USER_ROLE;
+    isAdmin?: boolean;
     history?: History;
     currentDepartmentId: number;
 }
@@ -22,14 +27,18 @@ interface IProps {
 @inject(({
     appState: {
         userStore: {
-            role
+            role,
+            isAdmin,
+            user
         },
         departmentsStore: {
             currentDepartmentId
         }
     }
 }) => ({
+    user,
     role,
+    isAdmin,
     currentDepartmentId
 
 }))
@@ -42,7 +51,9 @@ class DepartmentContent extends Component<IProps> {
 
     @computed
     get userContent(): IRoleContent[] {
-        switch (this.props.role) {
+        const { role } = this.props;
+
+        switch (role) {
             case USER_ROLE.ADMIN: return adminContent;
             case USER_ROLE.FIELD_FORCE_MANAGER: return FFMContent;
             case USER_ROLE.REGIONAL_MANAGER: return RMContent;
@@ -55,13 +66,15 @@ class DepartmentContent extends Component<IProps> {
     get redirectPath(): string {
         return this.userContent.length
         ? this.userContent[0].path
-        : null;
+        : this.props.isAdmin
+            ? ADMIN_ROUTE
+            : null;
     }
 
     render() {
-        const { currentDepartmentId } = this.props;
+        const { currentDepartmentId, isAdmin } = this.props;
 
-        if (currentDepartmentId === null && this.isDepartmentRequired) return null;
+        if (this.isDepartmentRequired && currentDepartmentId === null) return null;
 
         return (
             <Switch>
@@ -69,6 +82,10 @@ class DepartmentContent extends Component<IProps> {
                     this.userContent.map(({ path, component }) => (
                         <Route key={path} path={path} component={component} />
                     ))
+                }
+                {
+                    isAdmin &&
+                    <Route path={ADMIN_ROUTE} component={AdminPage} />
                 }
                 {
                     this.redirectPath &&

@@ -33,6 +33,7 @@ interface IProps extends WithStyles<typeof styles> {
     history?: History;
     currentDepartment?: IDepartment;
     navHistory?: IUser[];
+    isAdmin?: boolean;
 }
 
 @withTranslation
@@ -42,21 +43,30 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartment
         },
         userStore: {
-            navHistory
+            navHistory,
+            isAdmin
         }
     }
 }) => ({
     currentDepartment,
-    navHistory
+    navHistory,
+    isAdmin
 }))
 @observer
 export class Header extends Component<IProps, {}> {
-    get title(): string {
+    get departmentName(): string {
         const { currentDepartment } = this.props;
-
         return currentDepartment
         ? currentDepartment.name
         : null;
+    }
+
+    get title(): string {
+        const { isAdmin } = this.props;
+
+        return isAdmin
+        ? 'Адмін панель'
+        : this.departmentName;
     }
 
     render() {
@@ -73,7 +83,9 @@ export class Header extends Component<IProps, {}> {
                         { this.title }
                     </Typography>
                 </AppBar>
-                <div className={classes.navContainer}>
+                {
+                    navHistory.length !== 0 &&
+                    <div className={classes.navContainer}>
                     {
                         navHistory.map((user, i, arr) => (
                             <ProfilePreview
@@ -84,7 +96,8 @@ export class Header extends Component<IProps, {}> {
                             />
                         ))
                     }
-                </div>
+                    </div>
+                }
                 <DepartmentNav />
             </>
         );

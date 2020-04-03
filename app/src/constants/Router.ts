@@ -2,6 +2,7 @@ export const ROOT_ROUTE: string = '/';
 
 export const LOGIN_ROUTE: string = '/login';
 
+export const ADMIN_ROUTE: string = '/admin';
 export const SALES_ROUTE: string = '/sales';
 export const MARKS_ROUTE: string = '/marks';
 export const SALARY_ROUTE: string = '/salary';
@@ -19,6 +20,11 @@ export const NAVIGATION_ROUTES: string[] = [
     MEDICINES_ROUTE,
     PHARMACY_ROUTE,
     LPU_ROUTE
+];
+
+export const ADMIN_ROUTES: string[] = [
+    ...NAVIGATION_ROUTES,
+    ADMIN_ROUTE
 ];
 
 export const AUTH_ROUTES: string[] = [

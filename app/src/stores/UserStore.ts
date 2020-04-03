@@ -5,7 +5,7 @@ import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
-import { USER_ROLE, singleDepartmentRoles } from '../constants/Roles';
+import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
 
 export default class UserStore extends AsyncStore implements IUserStore {
@@ -23,6 +23,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
     get isUserFetched(): boolean {
         const { success, error } = this.getAsyncStatus('loadUserProfile');
         return success || error;
+    }
+
+    @computed
+    get isAdmin(): boolean {
+        return this.user
+        ? multiDepartmentRoles.includes(this.user.position)
+        : false;
     }
 
     @computed
@@ -73,9 +80,27 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    async renewHistory(ffm?: IUser) {
+        this.clearHistory();
+        this.loadUserInfo(ffm, USER_ROLE.FIELD_FORCE_MANAGER);
+    }
+
+    @action.bound
+    clearHistory() {
+        this.navHistory = [];
+    }
+
+    @action.bound
     async loadUserProfile() {
         const requestName = 'loadUserProfile';
-        const { api, departmentsStore: { loadPositions, loadDepartments, setCurrentDepartment } } = this.rootStore;
+        const {
+            api,
+            departmentsStore: {
+                loadPositions,
+                loadDepartments,
+                setCurrentDepartment,
+                loadFFMs
+        } } = this.rootStore;
 
         this.setLoading(requestName);
         const user = await api.getUser();
@@ -90,11 +115,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
             loadDepartments()
         ]);
 
-        setCurrentDepartment(user.department);
-        this.user = user;
-        if (singleDepartmentRoles.includes(this.user.position)) {
-            this.navHistory.push(this.user);
+        if (singleDepartmentRoles.includes(user.position)) {
+            setCurrentDepartment(user.department);
+            this.navHistory.push(user);
+        } else if (multiDepartmentRoles.includes(user.position)) {
+            loadFFMs();
         }
+        this.user = user;
         this.setSuccess(requestName);
         return true;
     }

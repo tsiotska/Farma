@@ -78,11 +78,11 @@ export class APIRequester {
                 setTimeout(
                     () => resolve(
                         this.requestRepeater(
-                            axios(request.response.config),
-                            successCallback,
-                            errorCallback,
-                            retryCount - 1,
-                            retryInterval
+                                axios(request.response.config),
+                                successCallback,
+                                errorCallback,
+                                retryCount - 1,
+                                retryInterval
                             )
                         ),
                     retryInterval
@@ -112,9 +112,13 @@ export class APIRequester {
     }
 
     getBranches(): Promise<IDepartment[]> {
-        return this.instance.get('/api/branch')
-            .then(branchesNormalizer)
-            .catch(this.defaultErrorHandler());
+        return this.requestRepeater(
+            this.instance.get('/api/branch'),
+            branchesNormalizer,
+            this.defaultErrorHandler(),
+            5,
+            1500
+        );
     }
 
     getUser(userId?: number): Promise<IUser> {
@@ -205,7 +209,7 @@ export class APIRequester {
         );
     }
 
-    getLocationAgents(branchId: number, positionId: number): Promise<IUser[]> {
+    getAgents(branchId: number, positionId: number): Promise<IUser[]> {
         return this.instance.get(`/api/branch/${branchId}/user/${positionId}`)
             .then(multipleUserNormalizer)
             .catch(this.defaultErrorHandler());

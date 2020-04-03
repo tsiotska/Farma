@@ -5,7 +5,7 @@ import { Router, Route, Switch } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import { NAVIGATION_ROUTES, LOGIN_ROUTE, ROOT_ROUTE } from '../../constants/Router';
+import { NAVIGATION_ROUTES, LOGIN_ROUTE, ROOT_ROUTE, ADMIN_ROUTE, ADMIN_ROUTES } from '../../constants/Router';
 
 import Header from '../Header';
 import SideNav from './SideNav';
@@ -53,7 +53,7 @@ export class Master extends Component<IProps, null> {
                             <PrivateRoute path={ROOT_ROUTE} component={DepartmentContent} />
                         </Switch>
                     </div>
-                    <PrivateRoute path={NAVIGATION_ROUTES} component={SideNav} />
+                    <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
                 </Router>
             </main>
         );

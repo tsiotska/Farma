@@ -5,7 +5,8 @@ import {
     WORKERS_ROUTE,
     MEDICINES_ROUTE,
     PHARMACY_ROUTE,
-    LPU_ROUTE
+    LPU_ROUTE,
+    ADMIN_ROUTE
 } from './../../constants/Router';
 
 import Sales from '../Sales';
@@ -15,6 +16,7 @@ import Workers from '../Workers';
 import Pharmacy from '../Pharmacy';
 import Medicines from '../Medicines';
 import Lpu from '../Lpu';
+import AdminPage from '../AdminPage';
 
 export interface IRoleContent {
     path: string;
@@ -22,6 +24,7 @@ export interface IRoleContent {
     title: string;
 }
 
+const adminPage = { title: 'qewr', path: ADMIN_ROUTE, component: AdminPage };
 const sales = { title: 'Продажі', path: SALES_ROUTE, component: Sales };
 const marks = { title: 'Бали', path: MARKS_ROUTE, component: Marks };
 const salary = { title: 'Заробітня плата', path: SALARY_ROUTE, component: Salary };
@@ -31,13 +34,7 @@ const pharmacy = { title: 'Аптеки', path: PHARMACY_ROUTE, component: Pharm
 const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
 
 export const adminContent: IRoleContent[] = [
-    sales,
-    marks,
-    salary,
-    workers,
-    meds,
-    pharmacy,
-    lpu
+    adminPage
 ];
 
 export const FFMContent: IRoleContent[] = [

@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Drawer, Button, Avatar, Badge, Tooltip } from '@material-ui/core';
+import { createStyles, WithStyles, Drawer, Button, Avatar, Badge } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { History, Location } from 'history';
 import { withRouter } from 'react-router-dom';
-import { NotificationsNoneOutlined } from '@material-ui/icons';
+import { NotificationsNoneOutlined, HomeOutlined } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import Config from '../../../../Config';
 import { IUser } from '../../../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../../constants/Roles';
+import { toJS } from 'mobx';
+import SideNavButton from '../SideNavButton';
+import { ADMIN_ROUTE, SALES_ROUTE } from '../../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -60,19 +63,25 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     user?: IUser;
+    isAdmin?: boolean;
     history?: History;
     location?: Location;
     logout?: () => void;
     departments?: IDepartment[];
     currentDepartmentId?: number;
-    setCurrentDepartment?: (value: string | IDepartment) => void;
+    setCurrentDepartment?: (value: number | string | IDepartment) => void;
+    renewHistory?: (ffm: IUser) => void;
+    clearHistory?: () => void;
 }
 
 @inject(({
     appState: {
         userStore: {
             user,
-            logout
+            logout,
+            isAdmin,
+            renewHistory,
+            clearHistory
         },
         departmentsStore: {
             departments,
@@ -83,9 +92,12 @@ interface IProps extends WithStyles<typeof styles> {
 }) => ({
     user,
     logout,
+    isAdmin,
     departments,
     setCurrentDepartment,
-    currentDepartmentId
+    currentDepartmentId,
+    renewHistory,
+    clearHistory
 }))
 @withRouter
 @observer
@@ -99,6 +111,7 @@ class SideNav extends Component<IProps> {
 
     get userDepartments(): IDepartment[] {
         const { departments, user } = this.props;
+
         const userDep = user
         ? user.department
         : null;
@@ -112,6 +125,11 @@ class SideNav extends Component<IProps> {
         return [];
     }
 
+    get isHomeRouteActive(): boolean {
+        const { history: { location: { pathname }} } = this.props;
+        return false;
+    }
+
     get notificationsCount(): number {
         return 2;
     }
@@ -122,39 +140,65 @@ class SideNav extends Component<IProps> {
         return currentDepartmentId === id;
     }
 
-    departmentClickHandler = (name: string) => () => this.props.setCurrentDepartment(name);
+    departmentClickHandler = ({ id, ffm }: IDepartment) => () => {
+        const { history, isAdmin, setCurrentDepartment, renewHistory } = this.props;
+        history.push(SALES_ROUTE);
+        setCurrentDepartment(id);
+        if (isAdmin) renewHistory(ffm);
+    }
+
+    homeClickHandler = () => {
+        const { history, clearHistory, setCurrentDepartment } = this.props;
+        setCurrentDepartment(null);
+        clearHistory();
+        history.push(ADMIN_ROUTE);
+    }
 
     render() {
-        const { classes, logout } = this.props;
+        const { classes, logout, isAdmin } = this.props;
 
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
-                    {
-                        this.userDepartments.map(({ id, name, image }) => (
-                            <Tooltip key={id} placement='right' title={name}>
-                                <Button
-                                    onClick={this.departmentClickHandler(name)}
-                                    className={cx(
-                                        classes.iconWrapper,
-                                        { active: this.isActive(id) }
-                                    )}>
-                                    <img src={`${Config.ASSETS_URL}/${image}`} className={classes.iconSm} />
-                                </Button>
-                            </Tooltip>
-                        ))
-                    }
+                {
+                    isAdmin &&
+                    <SideNavButton
+                        className={cx(
+                            classes.iconWrapper,
+                            { active: this.isHomeRouteActive }
+                        )}
+                        clickHandler={this.homeClickHandler}
+                        disabled={false}
+                        tooltip='home'>
+                            <HomeOutlined className={classes.iconSm} strokeWidth={2} fontSize='small' />
+                    </SideNavButton>
+                }
+                {
+                    this.userDepartments.map(department => (
+                        <SideNavButton
+                            key={department.id}
+                            clickHandler={this.departmentClickHandler(department)}
+                            disabled={isAdmin && !department.ffm}
+                            tooltip={department.name}
+                            className={cx(
+                                classes.iconWrapper,
+                                { active: this.isActive(department.id) }
+                            )}>
+                            <img src={`${Config.ASSETS_URL}/${department.image}`} className={classes.iconSm} />
+                        </SideNavButton>
+                    ))
+                }
 
-                    <Button className={cx(classes.action, { marginTopAuto: true })}>
-                        <Badge badgeContent={this.notificationsCount} color='error'>
-                            <NotificationsNoneOutlined />
-                        </Badge>
-                    </Button>
-                    <Button className={classes.action}>
-                        <Avatar className={classes.avatar}>L</Avatar>
-                    </Button>
-                    <Button onClick={logout} className={classes.action}>
-                        Out
-                    </Button>
+                <Button className={cx(classes.action, { marginTopAuto: true })}>
+                    <Badge badgeContent={this.notificationsCount} color='error'>
+                        <NotificationsNoneOutlined />
+                    </Badge>
+                </Button>
+                <Button className={classes.action}>
+                    <Avatar className={classes.avatar}>L</Avatar>
+                </Button>
+                <Button onClick={logout} className={classes.action}>
+                    Out
+                </Button>
             </Drawer>
         );
     }

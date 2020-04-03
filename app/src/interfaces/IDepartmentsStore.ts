@@ -18,4 +18,5 @@ export interface IDepartmentsStore {
     loadDepartments: () => void;
     loadPositions: () => void;
     setCurrentDepartment?: (value: number | string | IDepartment) => void;
+    loadFFMs: () => void;
 }
