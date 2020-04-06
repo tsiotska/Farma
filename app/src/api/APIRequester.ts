@@ -163,6 +163,7 @@ export class APIRequester {
         let url: string;
         if (position === USER_ROLE.FIELD_FORCE_MANAGER) url = `/api/branch/${departmentId}/ffm/hcf${urlParam}`;
         else if (position === USER_ROLE.REGIONAL_MANAGER) url = `/api/branch/${departmentId}/rm/${id}/hcf${urlParam}`;
+        else if (position === USER_ROLE.MEDICAL_AGENT) url = `/api/branch/${departmentId}/mp/${id}/hcf${urlParam}`;
 
         if (!url) return;
 
