@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Typography, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
@@ -8,6 +8,7 @@ import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
 import { observable } from 'mobx';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
+import { GetApp } from '@material-ui/icons';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -20,7 +21,7 @@ const styles = (theme: any) => createStyles({
             // marginRight: ({ fired }: any) => fired
             //     ? 0
             //     : 88
-            marginRight: 88
+            // marginRight: 88
         },
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
@@ -28,6 +29,9 @@ const styles = (theme: any) => createStyles({
             textOverflow: 'ellipsis',
             overflow: 'hidden'
         }
+    },
+    actionContainer: {
+        width: 88
     }
 });
 
@@ -36,6 +40,7 @@ interface IProps extends WithStyles<typeof styles> {
     fired: boolean;
     positions: Map<number, IPosition>;
     expandable: boolean;
+    headerAppend?: any;
 
     expandedWorker?: IExpandedWorker;
     setExpandedWorker?: (workerId: number | null) => void;
@@ -71,7 +76,8 @@ class List extends Component<IProps> {
             positions,
             fired,
             expandable,
-            expandedWorker
+            expandedWorker,
+            headerAppend
         } = this.props;
 
         return (
@@ -122,6 +128,9 @@ class List extends Component<IProps> {
                             № карти
                         </Typography>
                     </Grid>
+                    <div className={classes.actionContainer}>
+                        { headerAppend }
+                    </div>
                 </Grid>
 
                 {

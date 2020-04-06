@@ -13,6 +13,7 @@ import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
 import { DEPARTMENT_ROUTE } from '../constants/Router';
+import { stringify } from 'querystring';
 
 export interface IExpandedWorker {
     id: number;
@@ -196,6 +197,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (res) this.LPUs = res;
+    }
+
+    @action.bound
+    async loadWorkersExcel() {
+        const { api } = this.rootStore;
+        const url = this.getWorkersApiUrl(false, true);
+        api.getExcel(url);
     }
 
     @action.bound
@@ -387,18 +395,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }
     }
 
-    private getWorkersApiUrl(fired?: boolean): string {
+    private getWorkersApiUrl(fired: boolean = false, excel: boolean = false): string {
         const { userStore: { previewUser, role } } = this.rootStore;
 
         const userId = previewUser
             ? previewUser.id
             : null;
 
-        const queryParam = fired
-            ? '?fired=1'
-            : '';
-
         if (userId === null || this.currentDepartmentId === null) return null;
+
+        const urlParams: string[] = [];
+        if (fired) urlParams.push('fired=1');
+        if (excel) urlParams.push('excel=1');
+
+        const queryParam = urlParams.length
+            ? `?${urlParams.join('&')}`
+            : '';
 
         switch (role) {
             case USER_ROLE.ADMIN: return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;

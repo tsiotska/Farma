@@ -220,4 +220,14 @@ export class APIRequester {
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
     }
+
+    getExcel(url: string): Promise<any> {
+        return this.instance.get(url)
+        .then(x => {
+            console.log('load excel success: ', x);
+        })
+        .catch(() => {
+            console.log('load excel error');
+        });
+    }
 }

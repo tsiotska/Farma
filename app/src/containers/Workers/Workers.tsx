@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Tabs, Tab } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Tabs, Tab, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IDepartment } from '../../interfaces/IDepartment';
@@ -12,6 +12,7 @@ import { IWorker } from '../../interfaces/IWorker';
 import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
+import { GetApp } from '@material-ui/icons';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -31,6 +32,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     currentDepartment?: IDepartment;
     loadWorkers?: () => void;
+    loadWorkersExcel?: () => void;
     loadFiredWorkers?: () => void;
     history?: History;
     positions?: Map<number, IPosition>;
@@ -51,7 +53,8 @@ type TabValue = 'all' | 'fired';
             positions,
             workers,
             firedWorkers,
-            getAsyncStatus
+            getAsyncStatus,
+            loadWorkersExcel
         },
         userStore: {
             role
@@ -61,6 +64,7 @@ type TabValue = 'all' | 'fired';
     currentDepartment,
     loadWorkers,
     loadFiredWorkers,
+    loadWorkersExcel,
     positions,
     workers,
     firedWorkers,
@@ -75,6 +79,8 @@ class Workers extends Component<IProps> {
     get isFFM(): boolean {
         return this.props.role === USER_ROLE.FIELD_FORCE_MANAGER;
     }
+
+    loadExcel = () => this.props.loadWorkersExcel();
 
     loadData = () => {
         const { loadWorkers, loadFiredWorkers } = this.props;
@@ -160,6 +166,11 @@ class Workers extends Component<IProps> {
                     }
                     fired={this.isFFM && this.tab === 'fired'}
                     expandable={this.isFFM && this.tab === 'all'}
+                    headerAppend={
+                        <IconButton onClick={this.loadExcel}>
+                            <GetApp fontSize='small' />
+                        </IconButton>
+                    }
                 />
             </Grid>
         );
