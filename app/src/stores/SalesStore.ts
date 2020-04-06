@@ -11,7 +11,7 @@ import {
 } from 'date-fns';
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
-import { USER_ROLE } from '../constants/Roles';
+import { USER_ROLE, singleDepartmentRoles } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
 import { ILocation } from '../interfaces/ILocation';
@@ -256,7 +256,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const url = this.getMedsStatUrl(currentDepartmentId);
         const id = currentDepartmentId;
 
-        if (id === null || !url) return;
+        if (!url) return;
 
         this.setLoading(requestName);
         const { cache, promise } = api.getMedsSalesStat(url);
@@ -373,7 +373,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     private getMedsStatUrl(departmentId: number): string {
-        const { userStore: { role, previewUser } } = this.rootStore;
+        const { userStore: { user, previewUser } } = this.rootStore;
 
         const userId = previewUser
         ? previewUser.id
@@ -389,7 +389,12 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             group_by
         });
 
-        switch (role) {
+        const targetRole = previewUser
+        ? previewUser.position
+        : user.position;
+
+        switch (targetRole) {
+            case USER_ROLE.ADMIN: return `api/sales?${urlParams}`;
             case USER_ROLE.FIELD_FORCE_MANAGER:
                 return `api/branch/${departmentId}/ffm/sales?${urlParams}`;
             case USER_ROLE.REGIONAL_MANAGER:

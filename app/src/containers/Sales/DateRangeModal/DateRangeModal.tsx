@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Button, Grid } from '@material-ui/core';
-import { DatePicker } from '@material-ui/pickers';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Dialog from '../../../components/Dialog';
 import { DATA_RANGE_MODAL } from '../../../constants/Modals';
 import { observable } from 'mobx';
+import DateTimeUtils from '../DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     pickersContainer: {
@@ -112,35 +113,38 @@ class DateRangeModal extends Component<IProps> {
         } = this.props;
 
         return (
-            <Dialog
-                open={openedModal === DATA_RANGE_MODAL}
-                onClose={this.closeHandler}
-                maxWidth='md'
-                title='Дата'>
-                <Grid className={classes.pickersContainer} alignItems='center' justify='center' container>
-                    <DatePicker
-                        autoOk
-                        disableFuture
-                        disableToolbar
-                        variant='static'
-                        openTo='date'
-                        value={this.localDateFrom || dateFrom}
-                        onChange={this.setDateFrom}
-                    />
-                    <DatePicker
-                        autoOk
-                        disableFuture
-                        disableToolbar
-                        variant='static'
-                        openTo='date'
-                        value={this.localDateTo || dateTo}
-                        onChange={this.setDateTo}
-                    />
-                </Grid>
-                <Button onClick={this.submitHandler} className={classes.submitButton}>
-                    Застосувати
-                </Button>
-            </Dialog>
+            <MuiPickersUtilsProvider utils={DateTimeUtils}>
+                <Dialog
+                    open={openedModal === DATA_RANGE_MODAL}
+                    onClose={this.closeHandler}
+                    maxWidth='md'
+                    title='Дата'>
+                    <Grid className={classes.pickersContainer} alignItems='center' justify='center' container>
+                        <DatePicker
+                            autoOk
+                            disableFuture
+                            disableToolbar
+                            variant='static'
+                            openTo='date'
+                            value={this.localDateFrom || dateFrom}
+                            onChange={this.setDateFrom}
+                        />
+                        <DatePicker
+                            autoOk
+                            disableFuture
+                            disableToolbar
+                            variant='static'
+                            openTo='date'
+                            value={this.localDateTo || dateTo}
+                            onChange={this.setDateTo}
+                        />
+                    </Grid>
+                    <Button onClick={this.submitHandler} className={classes.submitButton}>
+                        Застосувати
+                    </Button>
+                </Dialog>
+            </MuiPickersUtilsProvider>
+
         );
     }
 }

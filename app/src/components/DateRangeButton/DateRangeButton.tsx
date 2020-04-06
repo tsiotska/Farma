@@ -3,8 +3,9 @@ import { createStyles, WithStyles, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { lightFormat } from 'date-fns';
-import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import DateTimeUtils, { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
 import { DATA_RANGE_MODAL } from '../../constants/Modals';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -34,7 +35,7 @@ interface IProps extends WithStyles<typeof styles> {
     openModal
 }))
 @observer
-class DataRangeButton extends Component<IProps> {
+class DateRangeButton extends Component<IProps> {
     readonly locale: string = 'ua';
     readonly dateOptions: any = { day: 'numeric', month: 'short' };
 
@@ -70,4 +71,4 @@ class DataRangeButton extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(DataRangeButton);
+export default withStyles(styles)(DateRangeButton);

@@ -52,7 +52,7 @@ class Statistic extends Component<IProps> {
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
-                <SalesModeSwitch />
+                <SalesModeSwitch title='Одиниці виміру: ' />
                 <ListHeader paddingRight={this.scrollBarWidth} />
                 <List
                     rootRef={this.ref}

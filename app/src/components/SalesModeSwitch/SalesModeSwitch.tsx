@@ -22,6 +22,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    title?: string;
     displayMode?: STAT_DISPLAY_MODE;
     setDisplayMode?: (newMode: STAT_DISPLAY_MODE) => void;
 }
@@ -43,13 +44,17 @@ class SalesModeSwitch extends Component<IProps> {
     checkboxChangeHandler = (mode: STAT_DISPLAY_MODE) => () => this.props.setDisplayMode(mode);
 
     render() {
-        const { classes, displayMode } = this.props;
+        const { classes, displayMode, title } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' container>
-                <Typography variant='body2' className={classes.text}>
-                    Одиниці виміру:
-                </Typography>
+                {
+                    title &&
+                    <Typography variant='body2' className={classes.text}>
+                        { title }
+                    </Typography>
+                }
+
                 <FormControlLabel
                     control={
                     <Checkbox

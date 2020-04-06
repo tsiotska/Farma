@@ -11,7 +11,7 @@ import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
 import { reaction, observable, action } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
-import DataRangeButton from '../../components/DataRangeButton';
+import DateRangeButton from '../../components/DateRangeButton';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -117,24 +117,21 @@ class Sales extends Component<IProps> {
         const { classes, chartSalesStat } = this.props;
 
         return (
-            <MuiPickersUtilsProvider utils={DateTimeUtils}>
-                <Grid className={classes.root} direction='column' container>
-                    <Grid className={classes.plotContainer} wrap='nowrap' container>
-                        <Plot
-                            chartSalesStat={chartSalesStat}
-                            header={
-                                <Typography className={classes.header} variant='h5'>
-                                    Реализація препаратів за
-                                    <DataRangeButton />
-                                </Typography>
-                            }
-                        />
-                        <Statistic chartSalesStat={chartSalesStat} />
-                    </Grid>
-                    <TableStat />
-                    <DateRangeModal />
+            <Grid className={classes.root} direction='column' container>
+                <Grid className={classes.plotContainer} wrap='nowrap' container>
+                    <Plot
+                        chartSalesStat={chartSalesStat}
+                        header={
+                            <Typography className={classes.header} variant='h5'>
+                                Реализація препаратів за
+                                <DateRangeButton />
+                            </Typography>
+                        }
+                    />
+                    <Statistic chartSalesStat={chartSalesStat} />
                 </Grid>
-            </MuiPickersUtilsProvider>
+                <TableStat />
+            </Grid>
         );
     }
 }

@@ -14,6 +14,7 @@ import { toJS } from 'mobx';
 import SideNavButton from '../SideNavButton';
 import { ADMIN_ROUTE, SALES_ROUTE } from '../../../constants/Router';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
+import DateRangeModal from '../../Sales/DateRangeModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -221,6 +222,7 @@ class SideNav extends Component<IProps> {
                 <Button onClick={logout} className={classes.action}>
                     Out
                 </Button>
+                <DateRangeModal />
             </Drawer>
         );
     }
