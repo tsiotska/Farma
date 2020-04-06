@@ -8,7 +8,8 @@ export interface IDepartmentsStore {
     departments: IDepartment[];
     currentDepartment: IDepartment;
     currentDepartmentId: number;
-    locations: Map<number, ILocation>;
+    regions: Map<number, ILocation>;
+    cities: Map<number, ILocation>;
     pharmacies: ILPU[];
     locationsAgents: Map<number, IUserCommonInfo>;
     meds: Map<number, IMedicine>;

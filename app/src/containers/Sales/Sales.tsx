@@ -38,7 +38,6 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId?: number;
     role?: USER_ROLE;
     loadLocationsAgents?: () => void;
-    loadLocations?: () => void;
     loadAllStat?: () => void;
     setPharmacyDemand?: (demand: boolean) => void;
 }
@@ -55,7 +54,6 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             currentDepartmentId,
             loadLocationsAgents,
-            loadLocations,
             setPharmacyDemand
         }
     }
@@ -64,7 +62,6 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     currentDepartmentId,
     loadLocationsAgents,
-    loadLocations,
     loadAllStat,
     setPharmacyDemand
 }))
@@ -85,7 +82,6 @@ class Sales extends Component<IProps> {
     @action.bound
     updateData = ([role, departmentId]: [USER_ROLE, number]) => {
         const {
-            loadLocations,
             loadLocationsAgents,
             loadAllStat,
             setPharmacyDemand
@@ -95,7 +91,6 @@ class Sales extends Component<IProps> {
         const departmentIdChanged = departmentId !== this.fetchedDepartmentId;
 
         if (roleChanged) {
-            loadLocations();
             setPharmacyDemand(role === USER_ROLE.MEDICAL_AGENT);
             loadLocationsAgents();
             loadAllStat();

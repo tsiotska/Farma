@@ -36,7 +36,7 @@ export enum GROUP_BY {
     appState: {
         userStore: {
             role,
-            previewUser
+            previewUser,
         },
         salesStore: {
             getAsyncStatus,
@@ -46,10 +46,10 @@ export enum GROUP_BY {
             ignoredAgents,
             loadLocaleSalesStat,
             loadAgentSalesStat,
-            pharmaciesMap
+            pharmaciesMap,
+            locations
         },
         departmentsStore: {
-            locations,
             locationsAgents
         }
     }

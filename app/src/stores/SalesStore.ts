@@ -14,6 +14,7 @@ import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
+import { ILocation } from '../interfaces/ILocation';
 
 export type DisplayMode = 'pack' | 'currency';
 type AgentTargetProperty = 'city' | 'region' | null;
@@ -85,6 +86,18 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             if (city !== null) return 'city';
         }
         return null;
+    }
+
+    @computed
+    get locations(): Map<number, ILocation> {
+        const {
+            userStore: { role },
+            departmentsStore: { cities, regions }
+        } = this.rootStore;
+
+        return role === USER_ROLE.FIELD_FORCE_MANAGER
+            ? regions
+            : cities;
     }
 
     @action.bound
@@ -167,26 +180,26 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleAllIgnoredLocations() {
-        const { departmentsStore: { locations, locationsAgents }} = this.rootStore;
+        const { departmentsStore: { locationsAgents }} = this.rootStore;
 
         if (this.ignoredLocations.size) {
             this.ignoredLocations.clear();
             this.ignoredAgents.clear();
         } else {
-            this.ignoredLocations = new Set([...locations.keys()]);
+            this.ignoredLocations = new Set([...this.locations.keys()]);
             this.ignoredAgents = new Set([...locationsAgents.keys()]);
         }
     }
 
     @action.bound
     toggleAllIgnoredAgents() {
-        const { departmentsStore: { locations, locationsAgents }} = this.rootStore;
+        const { departmentsStore: { locationsAgents }} = this.rootStore;
 
         if (this.ignoredAgents.size) {
             this.ignoredLocations.clear();
             this.ignoredAgents.clear();
         } else {
-            this.ignoredLocations = new Set([...locations.keys()]);
+            this.ignoredLocations = new Set([...this.locations.keys()]);
             this.ignoredAgents = new Set([...locationsAgents.keys()]);
         }
     }

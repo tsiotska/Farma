@@ -12,10 +12,11 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import cx from 'classnames';
 import { IUser } from '../../interfaces';
 import { IPosition } from '../../interfaces/IPosition';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -56,30 +57,12 @@ const styles = (theme: any) => createStyles({
     avatar: {
         height: 100,
         width: 100,
-        marginRight: 16
     },
     credentials: {
         fontFamily: 'Source Sans Pro SemiBold'
     },
     textContainer: {
-        padding: '8px 0'
-    },
-    fullWidth: {
-        width: '100%'
-    },
-    realizationContainer: {
-        width: 'auto'
-    },
-    colorGreen: {
-        color: theme.palette.primary.green.main
-    },
-    realizationProgress: {
-        width: '40%',
-        height: 4,
-        borderRadius: 2,
-        margin: '0 10px',
-        minWidth: 130,
-        maxWidth: 350
+        padding: '8px 0 8px 16px'
     },
     credsContainer: {
         minWidth: 280
@@ -87,9 +70,9 @@ const styles = (theme: any) => createStyles({
     dividerVertical: {
         minHeight: 100
     },
-    realizationTitle: {
-        paddingTop: theme.typography.pxToRem(15)
-    }
+    // realizationTitle: {
+    //     paddingTop: theme.typography.pxToRem(15)
+    // }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -190,6 +173,12 @@ class ProfilePreview extends Component<IProps> {
             : 0;
     }
 
+    @computed
+    get userRole(): USER_ROLE {
+        const { user: { position } } = this.props;
+        return position;
+    }
+
     clickHandler = () => {
         const { historyGoTo, scaleIndex, user: { id } } = this.props;
         if (scaleIndex === 0) return;
@@ -209,7 +198,7 @@ class ProfilePreview extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, user: { doctorsCount, pharmacyCount } } = this.props;
 
         return (
             <div
@@ -229,9 +218,9 @@ class ProfilePreview extends Component<IProps> {
                     container>
 
                     <Grid
-                        xs={12}
-                        sm={5}
-                        md={3}
+                        // xs={12}
+                        sm={4}
+                        // md={3}
                         className={cx(classes.gridContainer, classes.credsContainer)}
                         wrap='nowrap'
                         container
@@ -251,44 +240,50 @@ class ProfilePreview extends Component<IProps> {
                         </Grid>
                     </Grid>
 
+                    {
+                        this.userRole !== USER_ROLE.FIELD_FORCE_MANAGER &&
+                        <>
+                            <Hidden xsDown>
+                                <Divider className={classes.dividerVertical} orientation='vertical' />
+                            </Hidden>
+                            <Grid
+                                sm={2}
+                                className={cx(classes.gridContainer, classes.textContainer)}
+                                justify='space-around'
+                                direction='column'
+                                container
+                                zeroMinWidth
+                                item>
+                                <Typography>
+                                    region
+                                </Typography>
+                                <Typography>
+                                    value
+                                </Typography>
+                            </Grid>
+                        </>
+                    }
+
                     <Hidden xsDown>
                         <Divider className={classes.dividerVertical} orientation='vertical' />
                     </Hidden>
 
                     <Grid
-                        xs={12}
-                        sm={5}
-                        md
-                        className={classes.gridContainer}
+                        // xs={12}
+                        sm={2}
+                        // md
+                        className={cx(classes.gridContainer, classes.textContainer)}
+                        justify='space-around'
                         direction='column'
                         container
                         zeroMinWidth
                         item>
-                        <Typography className={classes.realizationTitle} variant='body2'>
-                            Реалізація препаратів
-                        </Typography>
-                        <Grid  wrap='nowrap' alignItems='center' container>
-                            <Typography className={classes.colorGreen} variant='body2'>
-                                { this.realizationPercent }%
+                            <Typography>
+                                Докторів
                             </Typography>
-                            <LinearProgress
-                                className={classes.realizationProgress}
-                                variant='determinate'
-                                value={this.realizationPercent} />
-                            <Grid
-                                className={classes.realizationContainer}
-                                alignItems='center'
-                                direction='column'
-                                container>
-                                <Typography className={classes.colorGreen} variant='body2'>
-                                    40
-                                </Typography>
-                                <Divider className={classes.fullWidth} />
-                                <Typography color='textSecondary' variant='body2'>
-                                    100
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                            <Typography>
+                                { doctorsCount === null ? '-' : doctorsCount }
+                            </Typography>
                     </Grid>
 
                     <Hidden smDown>
@@ -296,13 +291,20 @@ class ProfilePreview extends Component<IProps> {
                     </Hidden>
 
                     <Grid
-                        xs={12}
-                        sm={2}
-                        className={classes.gridContainer}
-                        justify='center'
+                        // xs={12}
+                        sm
+                        className={cx(classes.gridContainer, classes.textContainer)}
+                        justify='space-around'
+                        direction='column'
                         container
                         item>
-                        actions
+                            <Typography>
+                                ЛПУ/Aптеки
+                            </Typography>
+                            <Typography>
+                                { pharmacyCount === null ? '-' : pharmacyCount }
+                            </Typography>
+                        {/* actions */}
                     </Grid>
                 </Grid>
             </div>

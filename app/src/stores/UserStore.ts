@@ -99,7 +99,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 loadPositions,
                 loadDepartments,
                 setCurrentDepartment,
-                loadFFMs
+                loadFFMs,
+                loadLocations
         } } = this.rootStore;
 
         this.setLoading(requestName);
@@ -112,7 +113,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         await Promise.all([
             loadPositions(),
-            loadDepartments()
+            loadDepartments(),
+            loadLocations()
         ]);
 
         if (singleDepartmentRoles.includes(user.position)) {

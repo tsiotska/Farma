@@ -24,6 +24,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     // util data
     @observable meds: Map<number, IMedicine> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
+    @observable regions: Map<number, ILocation> = new Map();
+    @observable cities: Map<number, ILocation> = new Map();
 
     @observable LPUs: ILPU[] = null;
     @observable unconfirmedLPUs: ILPU[] = null;
@@ -33,7 +35,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable pharmacyDemand: boolean = false;
     @observable loadedPharmacyUrl: string = null;
 
-    @observable locations: Map<number, ILocation> = new Map();
     @observable locationsAgents: Map<number, IUser> = new Map();
 
     @observable departments: IDepartment[] = [];
@@ -70,6 +71,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.workers = [];
         this.firedWorkers = [];
         this.currentDepartment = null;
+        this.cities = new Map();
+        this.regions = new Map();
     }
 
     @action.bound
@@ -312,24 +315,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadLocations() {
-        const requestName = 'loadLocations';
-        const { api, userStore: { role } } = this.rootStore;
+        const { api } = this.rootStore;
 
-        let url: string;
-        if (role === USER_ROLE.FIELD_FORCE_MANAGER) url = 'api/region';
-        else if (role === USER_ROLE.REGIONAL_MANAGER) url = 'api/city';
-        if (!url) return;
+        const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
+            data ? data.map(x => ([ x.id, x ])) : [];
 
-        const res = await this.dispatchRequest(
-            api.getLocations(url),
-            requestName
-        );
-
-        if (res) {
-            const mapped: Array<[number, ILocation]> = res.map(x => ([ x.id, x ]));
-            this.locations = new Map(mapped);
-            return;
-        }
+        const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
+        const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
+        this.cities = new Map(await loadCitiesPromise);
+        this.regions = new Map(await loadRegionsPromise);
     }
 
     @action.bound
