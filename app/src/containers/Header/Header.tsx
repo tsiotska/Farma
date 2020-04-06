@@ -61,12 +61,12 @@ export class Header extends Component<IProps, {}> {
         : null;
     }
 
-    get title(): string {
-        const { isAdmin } = this.props;
+    get showSettingsBtn(): boolean {
+        return this.props.isAdmin;
+    }
 
-        return isAdmin
-        ? 'Адмін панель'
-        : this.departmentName;
+    get title(): string {
+        return this.departmentName || 'Адмін панель';
     }
 
     render() {
@@ -82,6 +82,9 @@ export class Header extends Component<IProps, {}> {
                     <Typography variant='h5'>
                         { this.title }
                     </Typography>
+                    {
+
+                    }
                 </AppBar>
                 {
                     navHistory.length !== 0 &&

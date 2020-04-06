@@ -43,7 +43,7 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <div className={classes.contentWrapper}>
                     <PrivateRoute
-                        path={NAVIGATION_ROUTES}
+                        path={ADMIN_ROUTES}
                         component={Header}
                         loadingPlaceholder={() => <p>Loading...</p>}
                     />
