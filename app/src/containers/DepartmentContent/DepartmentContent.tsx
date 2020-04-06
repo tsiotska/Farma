@@ -13,15 +13,17 @@ import {
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../constants/Roles';
 import { toJS, computed } from 'mobx';
 import { IUser } from '../../interfaces';
-import { ADMIN_ROUTE } from '../../constants/Router';
+import { ADMIN_ROUTE, LOGIN_ROUTE } from '../../constants/Router';
 import AdminPage from '../AdminPage';
+import Login from '../Login';
+import PrivateRoute from '../../components/PrivateRoute';
 
 interface IProps {
     user?: IUser;
     role?: USER_ROLE;
     isAdmin?: boolean;
     history?: History;
-    currentDepartmentId: number;
+    currentDepartmentId?: number;
 }
 
 @inject(({
@@ -78,21 +80,22 @@ class DepartmentContent extends Component<IProps> {
         if (this.isDepartmentRequired && currentDepartmentId === null) return null;
 
         return (
-            <>
+            <Switch>
+                <Route path={LOGIN_ROUTE} component={Login} />
                 {
                     this.userContent.map(({ path, component }) => (
-                        <Route key={path} path={path} component={component} />
+                        <PrivateRoute key={path} path={path} component={component} />
                     ))
                 }
                 {
                     isAdmin &&
-                    <Route path={ADMIN_ROUTE} component={AdminPage} />
+                    <PrivateRoute path={ADMIN_ROUTE} component={AdminPage} />
                 }
                 {
                     this.redirectPath &&
                     <Redirect to={this.redirectPath} />
                 }
-            </>
+            </Switch>
         );
     }
 }

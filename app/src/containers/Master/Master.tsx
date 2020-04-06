@@ -47,10 +47,7 @@ export class Master extends Component<IProps, null> {
                         component={Header}
                         loadingPlaceholder={() => <p>Loading...</p>}
                     />
-                    <Switch>
-                        <Route path={LOGIN_ROUTE} component={Login} />
-                        <PrivateRoute path={ROOT_ROUTE} component={DepartmentContent} />
-                    </Switch>
+                    <DepartmentContent />
                 </div>
                 <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
                 <AddDepartmentModal />
