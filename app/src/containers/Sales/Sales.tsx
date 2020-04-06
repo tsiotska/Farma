@@ -2,16 +2,14 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import Statistic from './Statistic';
 import Plot from '../Plot';
-import DateRangeModal from './DateRangeModal';
-import DateTimeUtils from './DateTimeUtils';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
-import { reaction, observable, action } from 'mobx';
+import { reaction, observable, action, computed } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
 import DateRangeButton from '../../components/DateRangeButton';
+import { IMedicine } from '../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -41,6 +39,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     chartSalesStat?: IMedsSalesStat[];
+    currentDepartmentMeds?: IMedicine[];
     currentDepartmentId?: number;
     role?: USER_ROLE;
     loadLocationsAgents?: () => void;
@@ -58,6 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
             role
         },
         departmentsStore: {
+            currentDepartmentMeds,
             currentDepartmentId,
             loadLocationsAgents,
             setPharmacyDemand
@@ -65,6 +65,7 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     chartSalesStat,
+    currentDepartmentMeds,
     role,
     currentDepartmentId,
     loadLocationsAgents,
@@ -76,6 +77,15 @@ class Sales extends Component<IProps> {
     @observable fetchedRole: USER_ROLE;
     @observable fetchedDepartmentId: number;
     reactionDisposer: any;
+
+    @computed
+    get medsMap(): Map<number, IMedicine> {
+        const { chartSalesStat, currentDepartmentMeds } = this.props;
+        const ids = chartSalesStat.map(({ medId }) => medId);
+        const meds = currentDepartmentMeds.filter(({ id }) => ids.includes(id));
+        const mapped: Array<[number, IMedicine]> = meds.map(medicine => ([ medicine.id, medicine]));
+        return new Map(mapped);
+    }
 
     componentDidMount() {
         this.reactionDisposer = reaction(
@@ -120,6 +130,7 @@ class Sales extends Component<IProps> {
             <Grid className={classes.root} direction='column' container>
                 <Grid className={classes.plotContainer} wrap='nowrap' container>
                     <Plot
+                        meds={this.medsMap}
                         chartSalesStat={chartSalesStat}
                         header={
                             <Typography className={classes.header} variant='h5'>
@@ -128,7 +139,7 @@ class Sales extends Component<IProps> {
                             </Typography>
                         }
                     />
-                    <Statistic chartSalesStat={chartSalesStat} />
+                    <Statistic meds={this.medsMap} chartSalesStat={chartSalesStat} />
                 </Grid>
                 <TableStat />
             </Grid>

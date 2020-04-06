@@ -22,7 +22,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
     // util data
-    @observable meds: Map<number, IMedicine> = new Map();
+    @observable meds: Map<number, IMedicine[]> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
     @observable regions: Map<number, ILocation> = new Map();
     @observable cities: Map<number, ILocation> = new Map();
@@ -63,6 +63,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return this.currentDepartment
         ? this.currentDepartment.id
         : null;
+    }
+
+    @computed
+    get currentDepartmentMeds(): IMedicine[] {
+        return this.meds.get(this.currentDepartmentId) || [];
     }
 
     @action.bound
@@ -268,31 +273,28 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async loadMeds() {
         const requestName = 'loadMeds';
         const { api } = this.rootStore;
+        const id = this.currentDepartmentId;
 
-        if (!this.currentDepartmentId) return;
+        if (id === null) return;
 
-        this.meds.clear();
-
+        this.meds.set(id, []);
         this.setLoading(requestName);
         const { cache, promise } = api.getMeds(this.currentDepartmentId);
-        if (cache) this.medsHandler(cache);
+        if (cache) this.medsHandler(id, cache);
 
         const requestResult = await promise;
 
         if (requestResult) {
-            this.medsHandler(requestResult);
+            this.medsHandler(id, requestResult);
             this.setSuccess(requestName);
         } else {
             this.setError(requestName);
         }
     }
 
-    private medsHandler = (meds: IMedicine[]) => {
+    private medsHandler = (id: number, meds: IMedicine[]) => {
         const { salesStore: { initMedsDisplayStatuses } } = this.rootStore;
-        const mapped: Array<[number, IMedicine]> = meds.map(x => (
-            [x.id, { ...x, color: getRandomColor() }]
-        ));
-        this.meds = new Map(mapped);
+        this.meds.set(id, meds);
         initMedsDisplayStatuses();
     }
 

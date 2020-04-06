@@ -11,7 +11,7 @@ import {
     differenceInCalendarMonths,
     getDate
 } from 'date-fns';
-import { observable, toJS } from 'mobx';
+import { observable, toJS, computed } from 'mobx';
 
 import { IMedsSalesStat, IPeriodSalesStat, IDaySalesStat, IMonthSalesStat, IYearSalesStat } from '../../interfaces/ISalesStat';
 import { IMedicine } from '../../interfaces/IMedicine';
@@ -32,11 +32,11 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     chartSalesStat: IMedsSalesStat[];
+    meds: Map<number, IMedicine>;
     header?: any;
 
     dateFrom?: Date;
     dateTo?: Date;
-    meds?: Map<number, IMedicine>;
     displayMode?: STAT_DISPLAY_MODE;
     medsDisplayStatus?: Map<number, boolean>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -53,14 +53,14 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
             medsDisplayStatus,
             getAsyncStatus
         },
-        departmentsStore: {
-            meds
-        }
+        // departmentsStore: {
+        //     meds
+        // }
     }
 }) => ({
     dateFrom,
     dateTo,
-    meds,
+    // meds,
     displayMode,
     medsDisplayStatus,
     getAsyncStatus
@@ -81,10 +81,12 @@ class Plot extends Component<IProps> {
         pointBorderColor: 'white',
     };
 
+    @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('loadMedsStat').loading;
     }
 
+    @computed
     get data(): any {
         return {
             labels: this.getLabels(),
@@ -92,6 +94,7 @@ class Plot extends Component<IProps> {
         };
     }
 
+    @computed
     get labelType(): LabelType {
         const { chartSalesStat } = this.props;
 
@@ -108,6 +111,7 @@ class Plot extends Component<IProps> {
         return 'unknown';
     }
 
+    @computed
     get eachIntervalDay(): Date[] {
         const { dateFrom: start, dateTo: end } = this.props;
         if (!start || !end) return [];

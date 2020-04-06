@@ -34,7 +34,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    meds?: Map<number, IMedicine>;
+    currentDepartmentMeds?: IMedicine[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
 }
@@ -42,7 +42,7 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         departmentsStore: {
-            meds,
+            currentDepartmentMeds,
             getAsyncStatus
         },
         uiStore: {
@@ -50,7 +50,7 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
-    meds,
+    currentDepartmentMeds,
     getAsyncStatus,
     openModal
 }))
@@ -63,7 +63,7 @@ class Medicines extends Component<IProps> {
     addMedsClickHandler = () => this.props.openModal(ADD_MEDICINE_MODAL);
 
     render() {
-        const { classes, meds } = this.props;
+        const { classes, currentDepartmentMeds } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -83,7 +83,7 @@ class Medicines extends Component<IProps> {
                 {
                     this.isMedsLoading
                     ? <LoadingMask color='primary' />
-                    : <List meds={[...meds.values()]} />
+                    : <List meds={currentDepartmentMeds} />
                 }
 
                 <AddMedsModal />

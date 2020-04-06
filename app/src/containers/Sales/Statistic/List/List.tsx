@@ -9,18 +9,16 @@ import { toJS } from 'mobx';
 
 interface IProps {
     chartSalesStat: IMedsSalesStat[];
-    meds?: Map<number, IMedicine>;
+    meds: Map<number, IMedicine>;
+    className: string;
+    rootRef: any;
+
     displayMode?: STAT_DISPLAY_MODE;
     medsDisplayStatus?: Map<number, boolean>;
-    className?: string;
-    rootRef: any;
 }
 
 @inject(({
     appState: {
-        departmentsStore: {
-            meds
-        },
         salesStore: {
             displayMode,
             medsDisplayStatus
@@ -28,7 +26,6 @@ interface IProps {
     }
 }) => ({
     displayMode,
-    meds,
     medsDisplayStatus
 }))
 @observer

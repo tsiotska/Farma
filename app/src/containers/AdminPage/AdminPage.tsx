@@ -35,7 +35,7 @@ class AdminPage extends Component<IProps> {
 
         return (
             <Grid direction='column' container>
-                <Plot chartSalesStat={chartSalesStat} header={<Header />} />
+                {/* <Plot chartSalesStat={chartSalesStat} header={<Header />} /> */}
             </Grid>
         );
     }

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import ListHeader from './ListHeader';
 import List from './List';
 import { observable } from 'mobx';
 import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
 import SalesModeSwitch from '../../../components/SalesModeSwitch';
+import { IMedicine } from '../../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -22,6 +23,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     chartSalesStat: IMedsSalesStat[];
+    meds: Map<number, IMedicine>;
 }
 
 @observer
@@ -48,7 +50,7 @@ class Statistic extends Component<IProps> {
     }
 
     render() {
-        const { classes, chartSalesStat } = this.props;
+        const { classes, chartSalesStat, meds } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
@@ -56,6 +58,7 @@ class Statistic extends Component<IProps> {
                 <ListHeader paddingRight={this.scrollBarWidth} />
                 <List
                     rootRef={this.ref}
+                    meds={meds}
                     className={classes.list}
                     chartSalesStat={chartSalesStat} />
             </Grid>

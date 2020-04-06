@@ -12,7 +12,8 @@ export interface IDepartmentsStore {
     cities: Map<number, ILocation>;
     pharmacies: ILPU[];
     locationsAgents: Map<number, IUserCommonInfo>;
-    meds: Map<number, IMedicine>;
+    meds: Map<number, IMedicine[]>;
+    currentDepartmentMeds: IMedicine[];
     resetStore: () => void;
     loadLocationsAgents: () => void;
     loadLocations: () => void;

@@ -230,8 +230,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     initMedsDisplayStatuses() {
-        const { departmentsStore: { meds }} = this.rootStore;
-        const values: Array<[number, boolean]> = [...meds.keys()].map(id => ([ id, true ]));
+        const { departmentsStore: { currentDepartmentMeds }} = this.rootStore;
+        const values: Array<[number, boolean]> = currentDepartmentMeds.map(({ id }) => ([ id, true ]));
         this.medsDisplayStatus = new Map(values);
     }
 

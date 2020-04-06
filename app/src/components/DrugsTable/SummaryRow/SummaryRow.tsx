@@ -11,14 +11,14 @@ interface IProps {
     stat: ISalesStat[];
     targetProp: 'money' | 'amount';
     mantisLength: number;
-    meds: Map<number, IMedicine>;
+    meds: IMedicine[];
     displayStatus: Map<number, boolean>;
 }
 
 @observer
 class SummaryRow extends Component<IProps> {
     get medsIds(): number[] {
-        return [...this.props.meds.keys()].filter(x => this.props.displayStatus.get(x));
+        return this.props.meds.map(({ id }) => id);
     }
 
     get data(): any {

@@ -7,7 +7,7 @@ import { IUserCommonInfo } from '../../../interfaces/IUser';
 import { ILocation } from '../../../interfaces/ILocation';
 
 interface IProps {
-    meds: Map<number, IMedicine>;
+    meds: IMedicine[];
     salesStat: ISalesStat[];
     displayStatuses: Map<number, boolean>;
     labelData: Map<number, ILocation | IUserCommonInfo>;
@@ -21,8 +21,7 @@ interface IProps {
 @observer
 class Body extends Component<IProps> {
     get medsIds(): number[] {
-        return [...this.props.meds.keys()]
-        .filter(x => this.props.displayStatuses.get(x) === true);
+        return this.props.meds.map(({ id }) => id);
     }
 
     getDataObject = (stat: IMedSalesInfo[]): any => stat.reduce(
@@ -45,23 +44,20 @@ class Body extends Component<IProps> {
         } = this.props;
 
         return salesStat.map(stat => (
-            // labelData.has(stat.id)
-            true
-            ? <TableRow
-                    key={stat.id}
-                    scrollBarWidth={scrollBarWidth}
-                    medsIds={this.medsIds}
-                    data={this.getDataObject(stat.stat)}
-                    mantisLength={this.props.mantisLength}
-                    rowEndAddornment={this.endAddornment}
-                    rowStartAddornment={
-                        <PrependComponent
-                            label={labelData.get(stat.id)}
-                            isIgnored={ignoredItems.has(stat.id)}
-                        />
-                    }
-                />
-            : null
+            <TableRow
+                key={stat.id}
+                scrollBarWidth={scrollBarWidth}
+                medsIds={this.medsIds}
+                data={this.getDataObject(stat.stat)}
+                mantisLength={this.props.mantisLength}
+                rowEndAddornment={this.endAddornment}
+                rowStartAddornment={
+                    <PrependComponent
+                        label={labelData.get(stat.id)}
+                        isIgnored={ignoredItems.has(stat.id)}
+                    />
+                }
+            />
         ));
     }
 }

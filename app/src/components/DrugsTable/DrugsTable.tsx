@@ -73,7 +73,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     displayMode?: STAT_DISPLAY_MODE;
-    meds?: Map<number, IMedicine>;
+    currentDepartmentMeds?: IMedicine[];
     medsDisplayStatus?: Map<number, boolean>;
 
     shouldCalculateOffset?: boolean;
@@ -93,18 +93,17 @@ interface ISettings {
 
 @inject(({
     appState: {
-
         salesStore: {
             displayMode,
             medsDisplayStatus
         },
         departmentsStore: {
-            meds
+            currentDepartmentMeds
         }
     }
 }) => ({
     displayMode,
-    meds,
+    currentDepartmentMeds,
     medsDisplayStatus
 }))
 @observer
@@ -118,8 +117,8 @@ class DrugsTable extends Component<IProps> {
 
     @computed
     get medsArray(): IMedicine[] {
-        return [...this.props.meds.values()]
-            .filter(({ id }) => this.props.medsDisplayStatus.get(id) === true);
+        const { currentDepartmentMeds, medsDisplayStatus } = this.props;
+        return currentDepartmentMeds.filter(({ id }) => medsDisplayStatus.get(id) === true);
     }
 
     @computed
@@ -148,7 +147,6 @@ class DrugsTable extends Component<IProps> {
     render() {
         const {
             classes,
-            meds,
             medsDisplayStatus,
             salesStat,
             headerPrepend,
@@ -180,7 +178,7 @@ class DrugsTable extends Component<IProps> {
                             Array.isArray(salesStat) && salesStat.length
                             ? <>
                                 <Body
-                                    meds={meds}
+                                    meds={this.medsArray}
                                     labelData={labelData}
                                     salesStat={salesStat || []}
                                     displayStatuses={medsDisplayStatus}
@@ -194,7 +192,7 @@ class DrugsTable extends Component<IProps> {
                                     stat={salesStat}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
-                                    meds={meds}
+                                    meds={this.medsArray}
                                     displayStatus={medsDisplayStatus}
                                 />
                               </>
