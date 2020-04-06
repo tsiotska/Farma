@@ -6,23 +6,12 @@ import { IWorker } from '../../../interfaces/IWorker';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
-import { observable } from 'mobx';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
-import { GetApp } from '@material-ui/icons';
 
 const styles = (theme: any) => createStyles({
     header: {
         color: theme.palette.primary.gray.light,
         margin: '24px 0 10px',
-        paddingLeft: ({ fired }: any) => fired
-            ? 0
-            : 34,
-        '& > *:last-of-type': {
-            // marginRight: ({ fired }: any) => fired
-            //     ? 0
-            //     : 88
-            // marginRight: 88
-        },
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
             paddingLeft: 5,
@@ -32,6 +21,9 @@ const styles = (theme: any) => createStyles({
     },
     actionContainer: {
         width: 88
+    },
+    withPadding: {
+        paddingLeft: 68
     }
 });
 
@@ -83,7 +75,7 @@ class List extends Component<IProps> {
         return (
             <Grid direction='column' container>
                 <Grid className={classes.header} alignItems='center' container>
-                    <Grid xs={3} item zeroMinWidth>
+                    <Grid xs={3} className={classes.withPadding} item zeroMinWidth>
                         {
                             fired !== true &&
                             <Typography variant='body2'>

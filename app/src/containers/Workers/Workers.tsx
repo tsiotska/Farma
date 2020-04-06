@@ -13,6 +13,7 @@ import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { GetApp } from '@material-ui/icons';
+import { isConstructorDeclaration } from 'typescript';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -31,6 +32,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     currentDepartment?: IDepartment;
+    resetWorkers?: () => void;
     loadWorkers?: () => void;
     loadWorkersExcel?: () => void;
     loadFiredWorkers?: () => void;
@@ -54,7 +56,8 @@ type TabValue = 'all' | 'fired';
             workers,
             firedWorkers,
             getAsyncStatus,
-            loadWorkersExcel
+            loadWorkersExcel,
+            resetWorkers
         },
         userStore: {
             role
@@ -69,6 +72,7 @@ type TabValue = 'all' | 'fired';
     workers,
     firedWorkers,
     getAsyncStatus,
+    resetWorkers,
     role
 }))
 @withRouter
@@ -103,34 +107,31 @@ class Workers extends Component<IProps> {
             pathname: history.location.pathname,
             search: stringify(searchParams)
         });
+
+        this.loadData();
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { role, currentDepartment: actualDep, getAsyncStatus } = this.props;
+        const { resetWorkers, role, currentDepartment: actualDep } = this.props;
         const { role: prevRole, currentDepartment: prevDep } = prevProps;
 
-        const requestName = this.tab === 'all'
-            ? 'loadWorkers'
-            : 'loadFiredWorkers';
+        const shouldLoadData = actualDep !== prevDep || role !== prevRole;
 
-        const { loading, success } = getAsyncStatus(requestName);
-
-        const shouldLoadData = loading === false
-            && success === false
-            || actualDep !== prevDep
-            || role !== prevRole;
-
-        if (shouldLoadData) this.loadData();
+        if (shouldLoadData) {
+            resetWorkers();
+            this.loadData();
+        }
     }
 
     componentDidMount() {
-        const { history: { location: { search } } } = this.props;
+        const { resetWorkers, history: { location: { search } } } = this.props;
         const queryParams = parse(search);
 
-        this.tab = ('fired' in queryParams && this.isFFM)
+        this.tab = 'fired' in queryParams
             ? 'fired'
             : 'all';
 
+        resetWorkers();
         this.loadData();
     }
 
@@ -144,27 +145,24 @@ class Workers extends Component<IProps> {
 
         return (
             <Grid direction='column' container>
-                {
-                    this.isFFM &&
-                    <Tabs
-                        classes={{
-                            root: classes.tabs,
-                            indicator: classes.indicator
-                        }}
-                        onChange={this.tabChangeHandler}
-                        value={this.tab}>
-                        <Tab className={classes.tab} value='all' label='Працівники' />
-                        <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
-                    </Tabs>
-                }
+                <Tabs
+                    classes={{
+                        root: classes.tabs,
+                        indicator: classes.indicator
+                    }}
+                    onChange={this.tabChangeHandler}
+                    value={this.tab}>
+                    <Tab className={classes.tab} value='all' label='Працівники' />
+                    <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
+                </Tabs>
                 <List
                     positions={positions}
                     workers={
-                        this.tab === (this.isFFM && 'fired')
+                        this.tab === 'fired'
                             ? firedWorkers
                             : workers
                     }
-                    fired={this.isFFM && this.tab === 'fired'}
+                    fired={this.tab === 'fired'}
                     expandable={this.isFFM && this.tab === 'all'}
                     headerAppend={
                         <IconButton onClick={this.loadExcel}>

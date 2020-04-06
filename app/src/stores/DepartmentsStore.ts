@@ -12,8 +12,6 @@ import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
-import { DEPARTMENT_ROUTE } from '../constants/Router';
-import { stringify } from 'querystring';
 
 export interface IExpandedWorker {
     id: number;
@@ -220,13 +218,18 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    resetWorkers() {
+        this.workers = [];
+        this.firedWorkers = [];
+    }
+
+    @action.bound
     async loadFiredWorkers() {
         const requestName = 'loadFiredWorkers';
         const { api } = this.rootStore;
 
         const url = this.getWorkersApiUrl(true);
         if (url === null) return;
-
         const res = await this.dispatchRequest(api.getWorkers(url), requestName);
 
         if (res) this.firedWorkers = res;
@@ -245,8 +248,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async addMedicine(data: any) {
         const requestName = 'addMedicine';
         const { api } = this.rootStore;
-        console.log('add med: ', data);
+
         if (!this.currentDepartmentId) return;
+
         const medicine = await this.dispatchRequest(
             api.addMedicine(this.currentDepartmentId, data),
             requestName
