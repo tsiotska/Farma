@@ -81,7 +81,7 @@ class Sales extends Component<IProps> {
     @computed
     get medsMap(): Map<number, IMedicine> {
         const { chartSalesStat, currentDepartmentMeds } = this.props;
-        const ids = chartSalesStat.map(({ medId }) => medId);
+        const ids = (chartSalesStat || []).map(({ medId }) => medId);
         const meds = currentDepartmentMeds.filter(({ id }) => ids.includes(id));
         const mapped: Array<[number, IMedicine]> = meds.map(medicine => ([ medicine.id, medicine]));
         return new Map(mapped);
