@@ -12,6 +12,7 @@ import SideNav from './SideNav';
 import PrivateRoute from '../../components/PrivateRoute';
 import DepartmentContent from '../DepartmentContent';
 import Login from '../Login';
+import AddDepartmentModal from './AddDepartmentModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -52,6 +53,7 @@ export class Master extends Component<IProps, null> {
                     </Switch>
                 </div>
                 <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
+                <AddDepartmentModal />
             </main>
         );
     }

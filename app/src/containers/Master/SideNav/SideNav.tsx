@@ -13,6 +13,7 @@ import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../..
 import { toJS } from 'mobx';
 import SideNavButton from '../SideNavButton';
 import { ADMIN_ROUTE, SALES_ROUTE } from '../../../constants/Router';
+import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -72,6 +73,7 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentDepartment?: (value: number | string | IDepartment) => void;
     renewHistory?: (ffm: IUser) => void;
     clearHistory?: () => void;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -87,6 +89,9 @@ interface IProps extends WithStyles<typeof styles> {
             departments,
             setCurrentDepartment,
             currentDepartmentId
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
@@ -97,7 +102,8 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentDepartment,
     currentDepartmentId,
     renewHistory,
-    clearHistory
+    clearHistory,
+    openModal
 }))
 @withRouter
 @observer
@@ -156,6 +162,8 @@ class SideNav extends Component<IProps> {
         if (isAdmin) renewHistory(ffm);
     }
 
+    addDepartmentClickHandler = () => this.props.openModal(ADD_DEPARTMENT_MODAL);
+
     homeClickHandler = () => {
         const { history, clearHistory, setCurrentDepartment } = this.props;
         setCurrentDepartment(null);
@@ -198,7 +206,7 @@ class SideNav extends Component<IProps> {
                 }
                 {
                     isAdmin &&
-                    <SideNavButton className={classes.iconWrapper}>
+                    <SideNavButton clickHandler={this.addDepartmentClickHandler} className={classes.iconWrapper}>
                         <Add className={classes.iconSm} fontSize='small' />
                     </SideNavButton>
                 }
