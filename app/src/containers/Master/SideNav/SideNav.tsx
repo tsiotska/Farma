@@ -4,8 +4,8 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { History, Location } from 'history';
-import { withRouter } from 'react-router-dom';
-import { NotificationsNoneOutlined, HomeOutlined } from '@material-ui/icons';
+import { withRouter, matchPath } from 'react-router-dom';
+import { NotificationsNoneOutlined, HomeOutlined, Add } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import Config from '../../../../Config';
 import { IUser } from '../../../interfaces';
@@ -127,7 +127,7 @@ class SideNav extends Component<IProps> {
 
     get isHomeRouteActive(): boolean {
         const { history: { location: { pathname }} } = this.props;
-        return false;
+        return !!matchPath(pathname, ADMIN_ROUTE);
     }
 
     get notificationsCount(): number {
@@ -178,7 +178,7 @@ class SideNav extends Component<IProps> {
                         clickHandler={this.homeClickHandler}
                         disabled={false}
                         tooltip='home'>
-                            <HomeOutlined className={classes.iconSm} strokeWidth={2} fontSize='small' />
+                            <HomeOutlined className={classes.iconSm} fontSize='small' />
                     </SideNavButton>
                 }
                 {
@@ -196,7 +196,12 @@ class SideNav extends Component<IProps> {
                         </SideNavButton>
                     ))
                 }
-
+                {
+                    isAdmin &&
+                    <SideNavButton className={classes.iconWrapper}>
+                        <Add className={classes.iconSm} fontSize='small' />
+                    </SideNavButton>
+                }
                 <Button className={cx(classes.action, { marginTopAuto: true })}>
                     <Badge badgeContent={this.notificationsCount} color='error'>
                         <NotificationsNoneOutlined />
