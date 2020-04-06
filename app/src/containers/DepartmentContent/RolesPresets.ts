@@ -50,7 +50,9 @@ export const FFMContent: IRoleContent[] = [
 export const RMContent: IRoleContent[] = [
     sales,
     marks,
-    workers
+    workers,
+    pharmacy,
+    lpu
 ];
 
 export const MAContent: IRoleContent[] = [

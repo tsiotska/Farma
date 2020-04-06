@@ -2,7 +2,7 @@ import React from 'react';
 import {inject, observer} from 'mobx-react';
 import {Redirect, Route, RouteProps} from 'react-router';
 import { IUser } from '../../interfaces';
-import { toJS } from 'mobx';
+import { computed } from 'mobx';
 import { LOGIN_ROUTE } from '../../constants/Router';
 
 interface IProps extends RouteProps {
@@ -24,6 +24,14 @@ interface IProps extends RouteProps {
 }))
 @observer
 class PrivateRoute extends Route<IProps & any> {
+    @computed
+    get loadingMask(): any {
+        const { loadingPlaceholder: LoadingPlaceholder } = this.props;
+        return LoadingPlaceholder
+        ? <LoadingPlaceholder />
+        : null;
+    }
+
     render() {
         const {
             user,
@@ -33,19 +41,11 @@ class PrivateRoute extends Route<IProps & any> {
             ...props
         } = this.props;
 
-        if (user) {
-            return <Route {...props} component={component} />;
-        }
-
-        const loadingMask = LoadingPlaceholder
-        ? <LoadingPlaceholder />
-        : null;
-
-        return <Route
-            {...props}
-            render={
+        return user
+        ? <Route {...props} component={component} />
+        : <Route {...props} render={
                 () => isUserLoading
-                ? loadingMask
+                ? this.loadingMask
                 : <Redirect to={LOGIN_ROUTE} />
             }
         />;

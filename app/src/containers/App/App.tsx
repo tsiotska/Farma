@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
 import { Provider } from 'mobx-react';
-import { SnackbarProvider } from 'notistack';
 import {createBrowserHistory} from 'history';
 
 import {
@@ -13,8 +12,7 @@ import Master from '../Master';
 import RootStore from '../../stores';
 
 import theme from '../../theme';
-
-const browserHistory = createBrowserHistory();
+import { Router } from 'react-router-dom';
 
 /**
  * Class representing application root component
@@ -26,9 +24,9 @@ export class App extends Component<{}, null> {
             <Provider appState={new RootStore()}>
                 <MuiThemeProvider theme={theme} >
                     <CssBaseline />
-                    <SnackbarProvider maxSnack={3}>
-                        <Master initialHistory={browserHistory}/>
-                    </SnackbarProvider>
+                    <Router history={createBrowserHistory()}>
+                        <Master />
+                    </Router>
                 </MuiThemeProvider>
             </Provider>
         );

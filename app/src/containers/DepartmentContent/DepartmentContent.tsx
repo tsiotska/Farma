@@ -78,7 +78,7 @@ class DepartmentContent extends Component<IProps> {
         if (this.isDepartmentRequired && currentDepartmentId === null) return null;
 
         return (
-            <Switch>
+            <>
                 {
                     this.userContent.map(({ path, component }) => (
                         <Route key={path} path={path} component={component} />
@@ -92,7 +92,7 @@ class DepartmentContent extends Component<IProps> {
                     this.redirectPath &&
                     <Redirect to={this.redirectPath} />
                 }
-            </Switch>
+            </>
         );
     }
 }

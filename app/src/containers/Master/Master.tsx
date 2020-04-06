@@ -1,7 +1,7 @@
 import React from 'react';
 import { Component } from 'react';
-import { observer } from 'mobx-react';
-import { Router, Route, Switch } from 'react-router-dom';
+import { observer, inject } from 'mobx-react';
+import { Router, Route, Switch, withRouter } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
@@ -31,30 +31,27 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    initialHistory: History;
 }
 
 @observer
 export class Master extends Component<IProps, null> {
     render() {
-        const { classes, initialHistory } = this.props;
+        const { classes } = this.props;
 
         return (
             <main className={classes.root}>
-                <Router history={initialHistory}>
-                    <div className={classes.contentWrapper}>
-                        <PrivateRoute
-                            path={NAVIGATION_ROUTES}
-                            component={Header}
-                            loadingPlaceholder={() => <p>Loading...</p>}
-                        />
-                        <Switch>
-                            <Route path={LOGIN_ROUTE} component={Login} />
-                            <PrivateRoute path={ROOT_ROUTE} component={DepartmentContent} />
-                        </Switch>
-                    </div>
-                    <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
-                </Router>
+                <div className={classes.contentWrapper}>
+                    <PrivateRoute
+                        path={NAVIGATION_ROUTES}
+                        component={Header}
+                        loadingPlaceholder={() => <p>Loading...</p>}
+                    />
+                    <Switch>
+                        <Route path={LOGIN_ROUTE} component={Login} />
+                        <PrivateRoute path={ROOT_ROUTE} component={DepartmentContent} />
+                    </Switch>
+                </div>
+                <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
             </main>
         );
     }
