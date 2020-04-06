@@ -1,15 +1,16 @@
-export const ROOT_ROUTE: string = '/';
+export const ROOT_ROUTE: string = `/`;
 
-export const LOGIN_ROUTE: string = '/login';
+export const LOGIN_ROUTE: string = `/login`;
 
-export const ADMIN_ROUTE: string = '/admin';
-export const SALES_ROUTE: string = '/sales';
-export const MARKS_ROUTE: string = '/marks';
-export const SALARY_ROUTE: string = '/salary';
-export const WORKERS_ROUTE: string = '/workers';
-export const MEDICINES_ROUTE: string = '/medicines';
-export const PHARMACY_ROUTE: string = '/pharmacy';
-export const LPU_ROUTE: string = '/lpu';
+export const ADMIN_ROUTE: string = `/admin`;
+export const DEPARTMENT_ROUTE: string = `/department/:departmentId`;
+export const SALES_ROUTE: string = `${DEPARTMENT_ROUTE}/sales`;
+export const MARKS_ROUTE: string = `${DEPARTMENT_ROUTE}/marks`;
+export const SALARY_ROUTE: string = `${DEPARTMENT_ROUTE}/salary`;
+export const WORKERS_ROUTE: string = `${DEPARTMENT_ROUTE}/workers`;
+export const MEDICINES_ROUTE: string = `${DEPARTMENT_ROUTE}/medicines`;
+export const PHARMACY_ROUTE: string = `${DEPARTMENT_ROUTE}/pharmacy`;
+export const LPU_ROUTE: string = `${DEPARTMENT_ROUTE}/lpu`;
 
 // routes, where navigation is resolved
 export const NAVIGATION_ROUTES: string[] = [

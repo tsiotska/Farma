@@ -8,6 +8,7 @@ import UserStore from './UserStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUIStore } from '../interfaces/IUIStore';
 import SalesStore from './SalesStore';
+import { History } from 'history';
 
 /**
  * Class representing Root Store container that collects

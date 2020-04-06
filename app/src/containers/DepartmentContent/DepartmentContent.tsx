@@ -64,9 +64,10 @@ class DepartmentContent extends Component<IProps> {
 
     @computed
     get redirectPath(): string {
+        const { isAdmin, currentDepartmentId } = this.props;
         return this.userContent.length
-        ? this.userContent[0].path
-        : this.props.isAdmin
+        ? this.userContent[0].path.replace(':departmentId', `${currentDepartmentId}`)
+        : isAdmin
             ? ADMIN_ROUTE
             : null;
     }

@@ -12,6 +12,7 @@ import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
+import { DEPARTMENT_ROUTE } from '../constants/Router';
 
 export interface IExpandedWorker {
     id: number;

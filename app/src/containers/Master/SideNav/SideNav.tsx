@@ -141,8 +141,17 @@ class SideNav extends Component<IProps> {
     }
 
     departmentClickHandler = ({ id, ffm }: IDepartment) => () => {
-        const { history, isAdmin, setCurrentDepartment, renewHistory } = this.props;
-        history.push(SALES_ROUTE);
+        const {
+            history,
+            isAdmin,
+            setCurrentDepartment,
+            renewHistory,
+            currentDepartmentId
+        } = this.props;
+
+        if (id === currentDepartmentId) return;
+
+        history.push(SALES_ROUTE.replace(':departmentId', `${id}`));
         setCurrentDepartment(id);
         if (isAdmin) renewHistory(ffm);
     }

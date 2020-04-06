@@ -43,18 +43,23 @@ interface ILink {
 interface IProps extends WithStyles<typeof styles> {
     match?: Match<any>;
     role?: USER_ROLE;
+    currentDepartmentId?: number;
 }
 
+@withRouter
 @inject(({
     appState: {
+        departmentsStore: {
+            currentDepartmentId
+        },
         userStore: {
-            role
+            role,
         }
     }
 }) => ({
-    role
+    role,
+    currentDepartmentId
 }))
-@withRouter
 @observer
 class DepartmentNav extends Component<IProps> {
     get userLinks(): IRoleContent[] {
@@ -68,7 +73,7 @@ class DepartmentNav extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, currentDepartmentId } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' container>
@@ -76,7 +81,7 @@ class DepartmentNav extends Component<IProps> {
                     this.userLinks.map(({ title, path }) => (
                         <NavLink
                             key={path}
-                            to={path}
+                            to={{ pathname: path.replace(':departmentId', `${currentDepartmentId}`) }}
                             className={classes.link}
                             activeClassName={classes.active}>
                             { title }
