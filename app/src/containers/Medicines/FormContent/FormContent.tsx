@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Button } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import FormRow from '../FormRow';
-import { Validator, stringValidator, moneyValidator, numberValidator } from '../../../helpers/validators';
+import { Validator, stringValidator, moneyValidator, numberValidator, lengthValidator } from '../../../helpers/validators';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -29,6 +30,7 @@ interface IProps extends WithStyles<typeof styles> {
     ref?: any;
     file: File;
     submitHandler: (data: any) => void;
+    isLoading: boolean;
 }
 
 type InputType = 'string' | 'number' | 'money';
@@ -39,11 +41,8 @@ interface IValidatorSettings {
 
 @observer
 class FormContent extends Component<IProps> {
-    readonly validatorSettings: Record<InputType, IValidatorSettings> = {
-        string: { validator: stringValidator, text: 'Пусті значення недопустимі' },
-        money: { validator: moneyValidator, text: 'Неправильне числове значення' },
-        number: { validator: numberValidator, text: 'Неправильне числове значення'},
-    };
+    lengthValidator: Validator;
+    readonly validatorSettings: Record<InputType, IValidatorSettings[]>;
     readonly values: any = {
         name: 'name',
         releaseForm: 'releaseForm',
@@ -52,6 +51,19 @@ class FormContent extends Component<IProps> {
         bonus: 'bonus',
         price: 'price'
     };
+
+    constructor(props: IProps) {
+        super(props);
+        this.lengthValidator = (value: string): boolean => {
+            return !!value && value.length >= 3;
+        };
+
+        this.validatorSettings = {
+            string: [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }],
+            money: [{ validator: stringValidator, text: 'Пусті значення недопустимі' }, { validator: moneyValidator, text: 'Неправильне числове значення' }],
+            number: [{ validator: numberValidator, text: 'Неправильне числове значення' }, { validator: stringValidator, text: 'Пусті значення недопустимі' }],
+        };
+    }
 
     @observable formValues: any = {};
     @observable fieldsErrorStatuses: any = {
@@ -63,6 +75,7 @@ class FormContent extends Component<IProps> {
         price: false,
     };
 
+    @computed
     get isSubmitAllowed(): boolean {
         const allValuesExist = Object.keys(this.fieldsErrorStatuses).length === Object.keys(this.formValues).length;
         const allValuesValid = Object.values(this.fieldsErrorStatuses).every(x => x === false);
@@ -74,15 +87,24 @@ class FormContent extends Component<IProps> {
         ({ target: { value }}: any) => {
             this.formValues[propName] = value;
             const validatorSetting = this.validatorSettings[type];
-            const isValid = value.length && validatorSetting.validator(value);
 
-            if (isValid) {
-                this.fieldsErrorStatuses[propName] = false;
-            } else {
-                this.fieldsErrorStatuses[propName] = value.length
-                ? validatorSetting.text
-                : 'Пусті значення недопустимі';
-            }
+            const { isValid, errorMessage } = validatorSetting.reduce(
+                (total, { validator, text }) => {
+                    const valid = validator(value);
+                    const newErrorMessage = valid
+                        ? null
+                        : text;
+                    return {
+                        isValid: total.isValid && valid,
+                        errorMessage: total.errorMessage || newErrorMessage
+                    };
+                },
+                { isValid: true, errorMessage: null }
+            );
+
+            this.fieldsErrorStatuses[propName] = isValid
+            ? false
+            : errorMessage;
         }
 
     enterPressHandler = (ev: KeyboardEvent) => {
@@ -110,7 +132,7 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, isLoading } = this.props;
 
         return (
             <>
@@ -157,12 +179,16 @@ class FormContent extends Component<IProps> {
                     </Grid>
                 </Grid>
                 <Button
-                    disabled={!this.isSubmitAllowed}
+                    disabled={!this.isSubmitAllowed || isLoading}
                     className={classes.submitButton}
                     variant='contained'
                     color='primary'
                     onClick={this.submitHandler}>
-                    Додати
+                        {
+                            isLoading
+                            ? <LoadingMask size={20} />
+                            : 'Додати'
+                        }
                 </Button>
             </>
         );

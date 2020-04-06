@@ -131,6 +131,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    addMedicine(departmentId: number, formData: any): Promise<any> {
+        return this.instance.post(`/api/branch/${departmentId}/drug`, formData)
+        .then(({ data }) => medsNormalizer({ data: [data]}))
+        .catch(this.defaultErrorHandler());
+    }
+
     getMeds(departmentId: number): ICachedPromise<IMedicine[]> {
         const url = `api/branch/${departmentId}/drug`;
         const cache = this.cacheStore.getCachedData(url, medsNormalizer);

@@ -242,6 +242,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async addMedicine(data: any) {
+        const requestName = 'addMedicine';
+        const { api } = this.rootStore;
+        console.log('add med: ', data);
+        if (!this.currentDepartmentId) return;
+        const medicine = await this.dispatchRequest(
+            api.addMedicine(this.currentDepartmentId, data),
+            requestName
+        );
+
+        if (medicine) this.meds.set(medicine.id, medicine);
+
+        return !!medicine;
+    }
+
+    @action.bound
     async loadMeds() {
         const requestName = 'loadMeds';
         const { api } = this.rootStore;
