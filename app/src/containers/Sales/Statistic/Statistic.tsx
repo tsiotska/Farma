@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import Header from './Header';
 import ListHeader from './ListHeader';
 import List from './List';
 import { observable } from 'mobx';
 import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
+import SalesModeSwitch from '../../../components/SalesModeSwitch';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -52,7 +52,7 @@ class Statistic extends Component<IProps> {
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
-                <Header />
+                <SalesModeSwitch />
                 <ListHeader paddingRight={this.scrollBarWidth} />
                 <List
                     rootRef={this.ref}

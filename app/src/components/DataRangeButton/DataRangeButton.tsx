@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { DATA_RANGE_MODAL } from '../../../constants/Modals';
 import { lightFormat } from 'date-fns';
-import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import { DATA_RANGE_MODAL } from '../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -47,9 +47,6 @@ class DataRangeButton extends Component<IProps> {
 
         const d1 = lightFormat(dateFrom, `dd '${m1}'`);
         const d2 = lightFormat(dateTo, `dd '${m2}'`);
-
-        // const d1 = dateFrom.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
-        // const d2 = dateTo.toLocaleDateString(this.locale, this.dateOptions).replace(/\./g, '');
 
         const year1 = dateFrom.getFullYear() === dateTo.getFullYear()
         ? ''

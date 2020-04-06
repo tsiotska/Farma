@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography, FormControlLabel, Checkbox } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { DisplayMode } from '../../../../stores/SalesStore';
+import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -22,8 +22,8 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    displayMode?: DisplayMode;
-    setDisplayMode?: (newMode: DisplayMode) => void;
+    displayMode?: STAT_DISPLAY_MODE;
+    setDisplayMode?: (newMode: STAT_DISPLAY_MODE) => void;
 }
 
 @inject(({
@@ -39,8 +39,8 @@ interface IProps extends WithStyles<typeof styles> {
     setDisplayMode
 }))
 @observer
-class Header extends Component<IProps> {
-    checkboxChangeHandler = (mode: DisplayMode) => () => this.props.setDisplayMode(mode);
+class SalesModeSwitch extends Component<IProps> {
+    checkboxChangeHandler = (mode: STAT_DISPLAY_MODE) => () => this.props.setDisplayMode(mode);
 
     render() {
         const { classes, displayMode } = this.props;
@@ -48,7 +48,7 @@ class Header extends Component<IProps> {
         return (
             <Grid className={classes.root} alignItems='center' container>
                 <Typography variant='body2' className={classes.text}>
-                    Зміни:
+                    Одиниці виміру:
                 </Typography>
                 <FormControlLabel
                     control={
@@ -56,8 +56,8 @@ class Header extends Component<IProps> {
                         className={classes.checkbox}
                         color='default'
                         size='small'
-                        checked={displayMode === 'pack'}
-                        onChange={this.checkboxChangeHandler('pack')}
+                        checked={displayMode === STAT_DISPLAY_MODE.PACK}
+                        onChange={this.checkboxChangeHandler(STAT_DISPLAY_MODE.PACK)}
                     />}
                     label='Упаковки'
                     classes={{ label:  classes.label }}
@@ -67,8 +67,8 @@ class Header extends Component<IProps> {
                         className={classes.checkbox}
                         color='default'
                         size='small'
-                        checked={displayMode === 'currency'}
-                        onChange={this.checkboxChangeHandler('currency')}
+                        checked={displayMode === STAT_DISPLAY_MODE.CURRENCY}
+                        onChange={this.checkboxChangeHandler(STAT_DISPLAY_MODE.CURRENCY)}
                     />}
                     label='Гривні'
                     classes={{ label:  classes.label }}
@@ -78,4 +78,4 @@ class Header extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(Header);
+export default withStyles(styles)(SalesModeSwitch);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
+import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Line } from 'react-chartjs-2';
@@ -12,26 +12,15 @@ import {
     getDate
 } from 'date-fns';
 import { observable, toJS } from 'mobx';
-import DataRangeButton from '../DataRangeButton';
-import {
-    IPeriodSalesStat,
-    IDaySalesStat,
-    IMonthSalesStat,
-    IYearSalesStat,
-    IMedsSalesStat
-} from '../../../interfaces/ISalesStat';
-import { IMedicine } from '../../../interfaces/IMedicine';
-import { DisplayMode } from '../../../stores/SalesStore';
-import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
-import { IAsyncStatus } from '../../../stores/AsyncStore';
-import LoadingMask from '../../../components/LoadingMask';
+
+import { IMedsSalesStat, IPeriodSalesStat, IDaySalesStat, IMonthSalesStat, IYearSalesStat } from '../../interfaces/ISalesStat';
+import { IMedicine } from '../../interfaces/IMedicine';
+import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
+import { IAsyncStatus } from '../../stores/AsyncStore';
+import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
+import LoadingMask from '../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
-    header: {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: theme.spacing(2)
-    },
     root: {
         overflow: 'hidden',
         paddingBottom: 50,
@@ -43,10 +32,12 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     chartSalesStat: IMedsSalesStat[];
+    header?: any;
+
     dateFrom?: Date;
     dateTo?: Date;
     meds?: Map<number, IMedicine>;
-    displayMode?: DisplayMode;
+    displayMode?: STAT_DISPLAY_MODE;
     medsDisplayStatus?: Map<number, boolean>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
 }
@@ -140,7 +131,7 @@ class Plot extends Component<IProps> {
         if (!chartSalesStat || !meds || this.labelType === 'unknown') return [];
 
         const comparer = this.getDateComparer();
-        const propName = displayMode === 'currency'
+        const propName = displayMode === STAT_DISPLAY_MODE.CURRENCY
         ? 'money'
         : 'amount';
 
@@ -232,14 +223,11 @@ class Plot extends Component<IProps> {
     }
 
     render() {
-        const { classes, chartSalesStat, meds } = this.props;
+        const { classes, header } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
-                <Typography className={classes.header} variant='h5'>
-                    Реализація препаратів за
-                    <DataRangeButton />
-                </Typography>
+                { header }
                 {
                     this.isLoading
                     ? <LoadingMask />

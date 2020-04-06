@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import Statistic from './Statistic';
-import Plot from './Plot';
+import Plot from '../Plot';
 import DateRangeModal from './DateRangeModal';
 import DateTimeUtils from './DateTimeUtils';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
 import { reaction, observable, action } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
+import DataRangeButton from '../../components/DataRangeButton';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -30,7 +31,12 @@ const styles = (theme: any) => createStyles({
                 marginLeft: 0
             },
         }
-    }
+    },
+    header: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: theme.spacing(2)
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -114,7 +120,15 @@ class Sales extends Component<IProps> {
             <MuiPickersUtilsProvider utils={DateTimeUtils}>
                 <Grid className={classes.root} direction='column' container>
                     <Grid className={classes.plotContainer} wrap='nowrap' container>
-                        <Plot chartSalesStat={chartSalesStat} />
+                        <Plot
+                            chartSalesStat={chartSalesStat}
+                            header={
+                                <Typography className={classes.header} variant='h5'>
+                                    Реализація препаратів за
+                                    <DataRangeButton />
+                                </Typography>
+                            }
+                        />
                         <Statistic chartSalesStat={chartSalesStat} />
                     </Grid>
                     <TableStat />

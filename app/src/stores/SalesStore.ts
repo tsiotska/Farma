@@ -16,7 +16,10 @@ import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
 import { ILocation } from '../interfaces/ILocation';
 
-export type DisplayMode = 'pack' | 'currency';
+export enum STAT_DISPLAY_MODE {
+    PACK,
+    CURRENCY
+}
 type AgentTargetProperty = 'city' | 'region' | null;
 
 export default class SalesStore extends AsyncStore implements ISalesStore {
@@ -25,7 +28,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @observable dateFrom: Date;
     @observable dateTo: Date;
-    @observable displayMode: DisplayMode = 'pack';
+    @observable displayMode: STAT_DISPLAY_MODE = STAT_DISPLAY_MODE.PACK;
 
     // @observable currentDepartmentId: number;
     @observable medsDisplayStatus: Map<number, boolean> = new Map();
@@ -130,7 +133,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.dateFrom = new Date(fromYear, 0);
 
-        this.displayMode = 'pack';
+        this.displayMode = STAT_DISPLAY_MODE.PACK;
         this.chartSalesStat = null;
         this.locationSalesStat = null;
         this.agentSalesStat = null;
@@ -215,7 +218,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
-    setDisplayMode(newMode: DisplayMode) {
+    setDisplayMode(newMode: STAT_DISPLAY_MODE) {
         this.displayMode = newMode;
     }
 

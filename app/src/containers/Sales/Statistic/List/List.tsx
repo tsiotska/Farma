@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IMedicine } from '../../../../interfaces/IMedicine';
-import { DisplayMode } from '../../../../stores/SalesStore';
+import { STAT_DISPLAY_MODE } from '../../../../stores/SalesStore';
 import ListItem from '../ListItem';
 import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
 import { toJS } from 'mobx';
@@ -10,7 +10,7 @@ import { toJS } from 'mobx';
 interface IProps {
     chartSalesStat: IMedsSalesStat[];
     meds?: Map<number, IMedicine>;
-    displayMode?: DisplayMode;
+    displayMode?: STAT_DISPLAY_MODE;
     medsDisplayStatus?: Map<number, boolean>;
     className?: string;
     rootRef: any;

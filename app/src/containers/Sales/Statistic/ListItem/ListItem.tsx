@@ -10,7 +10,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 
 import { IMedicine } from '../../../../interfaces/IMedicine';
-import { DisplayMode } from '../../../../stores/SalesStore';
+import { STAT_DISPLAY_MODE } from '../../../../stores/SalesStore';
 import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
 
 const styles = (theme: any) => createStyles({
@@ -46,7 +46,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     stat: IMedsSalesStat;
     medicament: IMedicine;
-    displayMode: DisplayMode;
+    displayMode: STAT_DISPLAY_MODE;
     displayed: boolean;
     toggleMedsDisplayStatus?: (id: number) => void;
 }
@@ -72,11 +72,11 @@ class ListItem extends Component<IProps> {
     get total(): string {
         const { stat, displayMode } = this.props;
 
-        const propName = displayMode === 'currency'
+        const propName = displayMode === STAT_DISPLAY_MODE.CURRENCY
         ? 'money'
         : 'amount';
 
-        const mantisLength = displayMode === 'currency'
+        const mantisLength = displayMode === STAT_DISPLAY_MODE.CURRENCY
         ? 2
         : 0;
 

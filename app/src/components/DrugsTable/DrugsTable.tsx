@@ -14,7 +14,7 @@ import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../interfaces/IMedicine';
 import HeaderItem from './HeaderItem';
 import Body from './Body';
-import { DisplayMode } from '../../stores/SalesStore';
+import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
 import cx from 'classnames';
 import { ISalesStat } from '../../interfaces/ISalesStat';
 
@@ -72,7 +72,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    displayMode?: DisplayMode;
+    displayMode?: STAT_DISPLAY_MODE;
     meds?: Map<number, IMedicine>;
     medsDisplayStatus?: Map<number, boolean>;
 
@@ -109,9 +109,9 @@ interface ISettings {
 }))
 @observer
 class DrugsTable extends Component<IProps> {
-    readonly modePressets: Record<DisplayMode, ISettings> = {
-        currency: { mantisLength: 2, propName: 'money' },
-        pack: { mantisLength: 0, propName: 'amount' }
+    readonly modePressets: Record<STAT_DISPLAY_MODE, ISettings> = {
+        [STAT_DISPLAY_MODE.CURRENCY]: { mantisLength: 2, propName: 'money' },
+        [STAT_DISPLAY_MODE.PACK]: { mantisLength: 0, propName: 'amount' }
     };
     ref: any = React.createRef();
     @observable scrollBarWidth: number = 0;
