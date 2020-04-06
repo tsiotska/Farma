@@ -119,7 +119,7 @@ class TableStat extends Component<IProps> {
 
     getTitle(): string {
         const { role, locations, previewUser } = this.props;
-
+        console.log(toJS(previewUser));
         if (role === USER_ROLE.REGIONAL_MANAGER) {
             const region = previewUser
             ? previewUser.region

@@ -17,6 +17,7 @@ import cx from 'classnames';
 import { IUser } from '../../interfaces';
 import { IPosition } from '../../interfaces/IPosition';
 import { USER_ROLE } from '../../constants/Roles';
+import { ILocation } from '../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -80,13 +81,17 @@ interface IProps extends WithStyles<typeof styles> {
     index: number;
     scaleIndex: number;
     positions?: Map<number, IPosition>;
+    cities?: Map<number, ILocation>;
+    regions?: Map<number, ILocation>;
     historyGoTo?: (userId: number) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
-            positions
+            positions,
+            cities,
+            regions
         },
         userStore: {
             historyGoTo
@@ -94,7 +99,9 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     positions,
-    historyGoTo
+    historyGoTo,
+    cities,
+    regions
 }))
 @observer
 class ProfilePreview extends Component<IProps> {
@@ -126,6 +133,24 @@ class ProfilePreview extends Component<IProps> {
         return pos
             ? pos.name
             : '';
+    }
+
+    @computed
+    get region(): string {
+        const { regions, user: { region } } = this.props;
+        const userRegion = regions.get(region);
+        return userRegion
+            ? userRegion.name
+            : '-';
+    }
+
+    @computed
+    get city(): string {
+        const { cities, user: { city } } = this.props;
+        const userCity = cities.get(city);
+        return userCity
+            ? userCity.name
+            : '-';
     }
 
     @computed
@@ -254,12 +279,29 @@ class ProfilePreview extends Component<IProps> {
                                 container
                                 zeroMinWidth
                                 item>
-                                <Typography>
-                                    region
-                                </Typography>
-                                <Typography>
-                                    value
-                                </Typography>
+                                    {
+                                        this.userRole === USER_ROLE.REGIONAL_MANAGER &&
+                                        <>
+                                            <Typography>
+                                                Регіон
+                                            </Typography>
+                                            <Typography>
+                                                { this.region }
+                                            </Typography>
+                                        </>
+                                    }
+                                    {
+                                        this.userRole === USER_ROLE.MEDICAL_AGENT &&
+                                        <>
+                                            <Typography>
+                                                { this.region }
+                                            </Typography>
+                                            <Typography>
+                                                { this.city }
+                                            </Typography>
+                                        </>
+                                    }
+
                             </Grid>
                         </>
                     }
