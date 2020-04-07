@@ -8,10 +8,10 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-
-import { IMedicine } from '../../../../interfaces/IMedicine';
-import { STAT_DISPLAY_MODE } from '../../../../stores/SalesStore';
-import { IMedsSalesStat } from '../../../../interfaces/ISalesStat';
+import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
+import { IMedicine } from '../../../interfaces/IMedicine';
+import { STAT_DISPLAY_MODE } from '../../../stores/SalesStore';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -62,6 +62,7 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class ListItem extends Component<IProps> {
+    @computed
     get kpd(): string {
         const { stat } = this.props;
         return stat
@@ -69,6 +70,7 @@ class ListItem extends Component<IProps> {
         : '-';
     }
 
+    @computed
     get total(): string {
         const { stat, displayMode } = this.props;
 
@@ -85,6 +87,7 @@ class ListItem extends Component<IProps> {
         : '-';
     }
 
+    @computed
     get medId(): number {
         const { stat, medicament } = this.props;
         if (stat) return stat.medId;

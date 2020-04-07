@@ -230,23 +230,30 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     initMedsDisplayStatuses() {
-        const { departmentsStore: { currentDepartmentMeds }} = this.rootStore;
-        const values: Array<[number, boolean]> = currentDepartmentMeds.map(({ id }) => ([ id, true ]));
+        const { departmentsStore: { meds }} = this.rootStore;
+        const values: Array<[number, boolean]> = [];
+        meds.forEach(x => {
+            const newValues: Array<[number, boolean]> = x.map(({ id }) => ([ id, true ]));
+            values.push(...newValues);
+        });
         this.medsDisplayStatus = new Map(values);
     }
 
     @action.bound
-    toggleAllMedsDisplayStatus() {
-        const values = [...this.medsDisplayStatus.entries()];
-        const shouldDisplayAll = values.some(x => x[1] === false);
-
-        const newValue = shouldDisplayAll
-        ? true
-        : false;
-
-        const newValues: Array<[number, boolean]> = values.map(([ key ]) => ([ key, newValue ]));
-
-        this.medsDisplayStatus = new Map(newValues);
+    toggleAllMedsDisplayStatus(departmentId: number) {
+        const { departmentsStore: { meds }} = this.rootStore;
+        const departmentMeds = meds.get(departmentId) || [];
+        const ids = departmentMeds.map(({ id }) => id);
+        let shouldDisplayAll: boolean = false;
+        for (const [id, status] of this.medsDisplayStatus) {
+            if (ids.includes(id) && status === false) {
+                shouldDisplayAll = true;
+                break;
+            }
+        }
+        departmentMeds.forEach(({ id }) => {
+            this.medsDisplayStatus.set(id, shouldDisplayAll);
+        });
     }
 
     @action.bound

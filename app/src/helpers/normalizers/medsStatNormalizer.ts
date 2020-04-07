@@ -46,5 +46,5 @@ export const medsStatNormalizer = ({ data }: any): IMedsSalesStat[] => {
         });
     }
 
-    return res;
+    return res.sort((a, b) => a.medId - b.medId);
 };

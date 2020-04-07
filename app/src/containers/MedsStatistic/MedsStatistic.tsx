@@ -5,9 +5,9 @@ import { withStyles } from '@material-ui/styles';
 import ListHeader from './ListHeader';
 import List from './List';
 import { observable } from 'mobx';
-import { IMedsSalesStat } from '../../../interfaces/ISalesStat';
-import SalesModeSwitch from '../../../components/SalesModeSwitch';
-import { IMedicine } from '../../../interfaces/IMedicine';
+import { IMedsSalesStat } from '../../interfaces/ISalesStat';
+import { IMedicine } from '../../interfaces/IMedicine';
+import SalesModeSwitch from '../../components/SalesModeSwitch';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -22,12 +22,13 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    departmentId: number;
     chartSalesStat: IMedsSalesStat[];
-    meds: Map<number, IMedicine>;
+    meds: IMedicine[];
 }
 
 @observer
-class Statistic extends Component<IProps> {
+class MedsStatistic extends Component<IProps> {
     @observable scrollBarWidth: number = 0;
     ref: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -50,12 +51,16 @@ class Statistic extends Component<IProps> {
     }
 
     render() {
-        const { classes, chartSalesStat, meds } = this.props;
+        const {
+            classes,
+            chartSalesStat,
+            meds,
+            departmentId
+        } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
-                <SalesModeSwitch title='Одиниці виміру: ' />
-                <ListHeader paddingRight={this.scrollBarWidth} />
+                <ListHeader meds={meds} departmentId={departmentId} paddingRight={this.scrollBarWidth} />
                 <List
                     rootRef={this.ref}
                     meds={meds}
@@ -66,4 +71,4 @@ class Statistic extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(Statistic);
+export default withStyles(styles)(MedsStatistic);

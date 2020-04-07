@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import { computed } from 'mobx';
+import { IMedicine } from '../../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -24,7 +26,9 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    toggleAllMedsDisplayStatus?: () => void;
+    departmentId: number;
+    meds: IMedicine[];
+    toggleAllMedsDisplayStatus?: (departmentId: number) => void;
     medsDisplayStatus?: Map<number, boolean>;
     paddingRight: number;
 }
@@ -42,20 +46,26 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class ListHeader extends Component<IProps> {
+    @computed
     get isAllMedsDisplayed(): boolean {
-        const { medsDisplayStatus } = this.props;
-        if (!medsDisplayStatus.size) return false;
-        return [...medsDisplayStatus.values()].every(x => !!x);
+        const { medsDisplayStatus, meds } = this.props;
+        if (!meds.length) return false;
+        return meds.every(({ id }) => medsDisplayStatus.get(id) === true);
+    }
+
+    toggleAllClickHandler = () => {
+        const { toggleAllMedsDisplayStatus, departmentId } = this.props;
+        toggleAllMedsDisplayStatus(departmentId);
     }
 
     render() {
-        const { classes, toggleAllMedsDisplayStatus } = this.props;
+        const { classes } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Checkbox
                     checked={this.isAllMedsDisplayed}
-                    onChange={toggleAllMedsDisplayStatus}
+                    onChange={this.toggleAllClickHandler}
                     className={classes.checkbox}
                     size='small'
                     color='default' />

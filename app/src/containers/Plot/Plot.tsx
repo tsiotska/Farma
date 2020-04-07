@@ -133,7 +133,6 @@ class Plot extends Component<IProps> {
         } = this.props;
 
         if (!chartSalesStat || !meds || this.labelType === 'unknown') return [];
-
         const comparer = this.getDateComparer();
         const propName = displayMode === STAT_DISPLAY_MODE.CURRENCY
         ? 'money'
@@ -143,7 +142,6 @@ class Plot extends Component<IProps> {
             const medicine = meds.get(x.medId);
 
             if (!medicine || !medsDisplayStatus.get(x.medId)) return;
-
             let i: number = 0;
             const data = this.eachIntervalDay.map((day: Date) => {
                 const period = comparer(day, x.periods, i);

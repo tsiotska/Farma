@@ -1,4 +1,4 @@
-import { observable, action, reaction, toJS, computed, when } from 'mobx';
+import { observable, action, reaction, toJS, computed, when, flow } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -51,8 +51,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         reaction(() => this.pharmacyDemand, this.loadPharmacies);
     }
 
-    private departmentChangeHandler = () => {
-        this.loadMeds();
+    private departmentChangeHandler = (newDepartment: IDepartment) => {
+        const departmentId = newDepartment
+        ? newDepartment.id
+        : null;
+        const storedMeds = this.meds.get(departmentId) || [];
+        if (!storedMeds.length) this.loadMeds(departmentId);
         this.expandedWorker = null;
         this.workers = [];
         this.firedWorkers = [];
@@ -270,22 +274,32 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadMeds() {
+    async loadAllMeds() {
+        const requestName = 'loadAllMeds';
+
+        this.setLoading(requestName);
+        for (const department of this.departments) {
+            await this.loadMeds(department.id);
+        }
+        this.setSuccess(requestName);
+    }
+
+    @action.bound
+    async loadMeds(departmentId: number) {
         const requestName = 'loadMeds';
         const { api } = this.rootStore;
-        const id = this.currentDepartmentId;
 
-        if (id === null) return;
+        if (departmentId === null) return;
 
-        this.meds.set(id, []);
+        this.meds.set(departmentId, []);
         this.setLoading(requestName);
-        const { cache, promise } = api.getMeds(this.currentDepartmentId);
-        if (cache) this.medsHandler(id, cache);
+        const { cache, promise } = api.getMeds(departmentId);
+        if (cache) this.medsHandler(departmentId, cache);
 
         const requestResult = await promise;
 
         if (requestResult) {
-            this.medsHandler(id, requestResult);
+            this.medsHandler(departmentId, requestResult);
             this.setSuccess(requestName);
         } else {
             this.setError(requestName);

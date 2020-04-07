@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import Statistic from './Statistic';
 import Plot from '../Plot';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
@@ -10,6 +9,8 @@ import { reaction, observable, action, computed } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
 import DateRangeButton from '../../components/DateRangeButton';
 import { IMedicine } from '../../interfaces/IMedicine';
+import MedsStatistic from '../MedsStatistic';
+import SalesModeSwitch from '../../components/SalesModeSwitch';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -29,12 +30,7 @@ const styles = (theme: any) => createStyles({
                 marginLeft: 0
             },
         }
-    },
-    header: {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: theme.spacing(2)
-    },
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -124,22 +120,23 @@ class Sales extends Component<IProps> {
     }
 
     render() {
-        const { classes, chartSalesStat } = this.props;
+        const { classes, chartSalesStat, currentDepartmentMeds, currentDepartmentId } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
+                <Grid alignItems='center' container>
+                    <Typography  variant='h5'>
+                        Реализація препаратів за
+                    </Typography>
+                    <DateRangeButton />
+                    <SalesModeSwitch title='Одиниці виміру: ' />
+                </Grid>
                 <Grid className={classes.plotContainer} wrap='nowrap' container>
                     <Plot
                         meds={this.medsMap}
                         chartSalesStat={chartSalesStat}
-                        header={
-                            <Typography className={classes.header} variant='h5'>
-                                Реализація препаратів за
-                                <DateRangeButton />
-                            </Typography>
-                        }
                     />
-                    <Statistic meds={this.medsMap} chartSalesStat={chartSalesStat} />
+                    <MedsStatistic departmentId={currentDepartmentId} meds={currentDepartmentMeds} chartSalesStat={chartSalesStat} />
                 </Grid>
                 <TableStat />
             </Grid>
