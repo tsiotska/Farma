@@ -29,7 +29,7 @@ interface IProps extends WithStyles<typeof styles> {
     departmentId: number;
     meds: IMedicine[];
     toggleAllMedsDisplayStatus?: (departmentId: number) => void;
-    medsDisplayStatus?: Map<number, boolean>;
+    ignoredMeds?: Set<number>;
     paddingRight: number;
 }
 
@@ -37,20 +37,20 @@ interface IProps extends WithStyles<typeof styles> {
     appState: {
         salesStore: {
             toggleAllMedsDisplayStatus,
-            medsDisplayStatus
+            ignoredMeds
         }
     }
 }) => ({
     toggleAllMedsDisplayStatus,
-    medsDisplayStatus
+    ignoredMeds
 }))
 @observer
 class ListHeader extends Component<IProps> {
     @computed
     get isAllMedsDisplayed(): boolean {
-        const { medsDisplayStatus, meds } = this.props;
+        const { ignoredMeds, meds } = this.props;
         if (!meds.length) return false;
-        return meds.every(({ id }) => medsDisplayStatus.get(id) === true);
+        return meds.every(({ id }) => ignoredMeds.has(id) === false);
     }
 
     toggleAllClickHandler = () => {

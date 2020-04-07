@@ -13,19 +13,19 @@ interface IProps {
     rootRef: any;
 
     displayMode?: STAT_DISPLAY_MODE;
-    medsDisplayStatus?: Map<number, boolean>;
+    ignoredMeds?: Set<number>;
 }
 
 @inject(({
     appState: {
         salesStore: {
             displayMode,
-            medsDisplayStatus
+            ignoredMeds
         }
     }
 }) => ({
     displayMode,
-    medsDisplayStatus
+    ignoredMeds
 }))
 @observer
 class List extends Component<IProps> {
@@ -36,7 +36,7 @@ class List extends Component<IProps> {
             chartSalesStat,
             meds,
             displayMode,
-            medsDisplayStatus
+            ignoredMeds
         } = this.props;
 
         return (
@@ -54,7 +54,7 @@ class List extends Component<IProps> {
                             stat={(chartSalesStat || []).find(({ medId }) => medId === medicine.id)}
                             medicament={medicine}
                             displayMode={displayMode}
-                            displayed={medsDisplayStatus.get(medicine.id) || false}
+                            displayed={ignoredMeds.has(medicine.id) === false}
                         />
                     ))
                 }

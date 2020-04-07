@@ -30,8 +30,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable dateTo: Date;
     @observable displayMode: STAT_DISPLAY_MODE = STAT_DISPLAY_MODE.PACK;
 
-    // @observable currentDepartmentId: number;
-    @observable medsDisplayStatus: Map<number, boolean> = new Map();
+    @observable ignoredMeds: Set<number> = new Set();
 
     // data for chart
     @observable chartSalesStat: IMedsSalesStat[] = null;
@@ -137,7 +136,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.chartSalesStat = null;
         this.locationSalesStat = null;
         this.agentSalesStat = null;
-        this.medsDisplayStatus = new Map();
+        this.ignoredMeds = new Set();
     }
 
     @action.bound
@@ -224,19 +223,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleMedsDisplayStatus(id: number) {
-        const current = this.medsDisplayStatus.get(id);
-        this.medsDisplayStatus.set(id, !current);
-    }
-
-    @action.bound
-    initMedsDisplayStatuses() {
-        const { departmentsStore: { meds }} = this.rootStore;
-        const values: Array<[number, boolean]> = [];
-        meds.forEach(x => {
-            const newValues: Array<[number, boolean]> = x.map(({ id }) => ([ id, true ]));
-            values.push(...newValues);
-        });
-        this.medsDisplayStatus = new Map(values);
+        if (this.ignoredMeds.has(id)) {
+            this.ignoredMeds.delete(id);
+        } else {
+            this.ignoredMeds.add(id);
+        }
     }
 
     @action.bound
@@ -244,16 +235,16 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const { departmentsStore: { meds }} = this.rootStore;
         const departmentMeds = meds.get(departmentId) || [];
         const ids = departmentMeds.map(({ id }) => id);
-        let shouldDisplayAll: boolean = false;
-        for (const [id, status] of this.medsDisplayStatus) {
-            if (ids.includes(id) && status === false) {
-                shouldDisplayAll = true;
-                break;
-            }
+        const shouldDisplayAll = ids.some(x => this.ignoredMeds.has(x));
+
+        if (shouldDisplayAll) {
+            const ignoredItems = [...this.ignoredMeds.values()];
+            const filtered = ignoredItems.filter(x => ids.includes(x) === false);
+            this.ignoredMeds = new Set(filtered);
+        } else {
+            const ignoredItems = [...this.ignoredMeds.values(), ...ids];
+            this.ignoredMeds = new Set(ignoredItems);
         }
-        departmentMeds.forEach(({ id }) => {
-            this.medsDisplayStatus.set(id, shouldDisplayAll);
-        });
     }
 
     @action.bound

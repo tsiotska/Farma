@@ -294,22 +294,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.meds.set(departmentId, []);
         this.setLoading(requestName);
         const { cache, promise } = api.getMeds(departmentId);
-        if (cache) this.medsHandler(departmentId, cache);
+        if (cache) this.meds.set(departmentId, cache);
 
         const requestResult = await promise;
 
         if (requestResult) {
-            this.medsHandler(departmentId, requestResult);
+            this.meds.set(departmentId, requestResult);
             this.setSuccess(requestName);
         } else {
             this.setError(requestName);
         }
-    }
-
-    private medsHandler = (id: number, meds: IMedicine[]) => {
-        const { salesStore: { initMedsDisplayStatuses } } = this.rootStore;
-        this.meds.set(id, meds);
-        initMedsDisplayStatuses();
     }
 
     @action.bound

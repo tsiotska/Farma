@@ -29,13 +29,12 @@ export const salesStatNormalizer = ({ data }: any) => {
             defaultMedSalesStat,
             medsStatValuesMap,
             normalizerOptions
-        );
+        ).sort((a, b) => a.medId - b.medId);
 
         res.push({
             id,
             stat
         });
     }
-
     return res;
 };

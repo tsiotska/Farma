@@ -46,6 +46,9 @@ const styles = (theme: any) => createStyles({
         },
         '&.alignBottom': {
             verticalAlign: 'bottom'
+        },
+        '&.displayNone': {
+            display: 'none'
         }
     },
     table: {
@@ -74,7 +77,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     displayMode?: STAT_DISPLAY_MODE;
     currentDepartmentMeds?: IMedicine[];
-    medsDisplayStatus?: Map<number, boolean>;
+    ignoredMeds?: Set<number>;
 
     shouldCalculateOffset?: boolean;
     ignoredItems: Set<number>;
@@ -95,7 +98,7 @@ interface ISettings {
     appState: {
         salesStore: {
             displayMode,
-            medsDisplayStatus
+            ignoredMeds
         },
         departmentsStore: {
             currentDepartmentMeds
@@ -104,7 +107,7 @@ interface ISettings {
 }) => ({
     displayMode,
     currentDepartmentMeds,
-    medsDisplayStatus
+    ignoredMeds
 }))
 @observer
 class DrugsTable extends Component<IProps> {
@@ -116,9 +119,20 @@ class DrugsTable extends Component<IProps> {
     @observable scrollBarWidth: number = 0;
 
     @computed
+    get ignoredIds(): number[] {
+        const { currentDepartmentMeds, ignoredMeds } = this.props;
+        const res: number[] = [];
+        currentDepartmentMeds.forEach(({ id }, i) => {
+            if (ignoredMeds.has(id)) res.push(i);
+        });
+        return res;
+    }
+
+    @computed
     get medsArray(): IMedicine[] {
-        const { currentDepartmentMeds, medsDisplayStatus } = this.props;
-        return currentDepartmentMeds.filter(({ id }) => medsDisplayStatus.get(id) === true);
+        const { currentDepartmentMeds, ignoredMeds } = this.props;
+        return currentDepartmentMeds;
+        // return currentDepartmentMeds.filter(({ id }) => ignoredMeds.has(id) === false);
     }
 
     @computed
@@ -147,7 +161,6 @@ class DrugsTable extends Component<IProps> {
     render() {
         const {
             classes,
-            medsDisplayStatus,
             salesStat,
             headerPrepend,
             rowPrepend,
@@ -164,6 +177,7 @@ class DrugsTable extends Component<IProps> {
             <Header
                 headerPrepend={headerPrepend}
                 medsArray={this.medsArray}
+                ignoredMeds={this.ignoredIds}
                 shouldCalculateHeight={shouldCalculateOffset}
                 classes={{
                     container: classes.container,
@@ -179,9 +193,9 @@ class DrugsTable extends Component<IProps> {
                             ? <>
                                 <Body
                                     meds={this.medsArray}
+                                    ignoredMeds={this.ignoredIds}
                                     labelData={labelData}
                                     salesStat={salesStat || []}
-                                    displayStatuses={medsDisplayStatus}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
                                     scrollBarWidth={this.scrollBarWidth}
@@ -190,10 +204,11 @@ class DrugsTable extends Component<IProps> {
                                 />
                                 <SummaryRow
                                     stat={salesStat}
+                                    ignoredItems={ignoredItems}
+                                    ignoredMeds={this.ignoredIds}
                                     targetProp={this.modeSettings.propName}
                                     mantisLength={this.modeSettings.mantisLength}
                                     meds={this.medsArray}
-                                    displayStatus={medsDisplayStatus}
                                 />
                               </>
                             : <InfoTableRow colSpan={this.medsArray.length + 3}>

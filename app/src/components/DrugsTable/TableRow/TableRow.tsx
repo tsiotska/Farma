@@ -2,10 +2,16 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, TableRow as MuiTableRow, TableCell } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IMedSalesInfo } from '../../../interfaces/ISalesStat';
+import { computed } from 'mobx';
+import cx from 'classnames';
+import { IMedicine } from '../../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
-    row: {},
+    row: {
+        '&.ignored': {
+            opacity: 0.5
+        }
+    },
     cell: {
         paddingRight: 5,
         overflow: 'hidden',
@@ -25,27 +31,33 @@ const styles = (theme: any) => createStyles({
         },
         '&:last-of-type': {
             width: ({ scrollBarWidth = 0}: any) => 100 - scrollBarWidth
+        },
+        '&.displayNone': {
+            display: 'none'
         }
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    medsIds: number[];
+    meds: IMedicine[];
     mantisLength: number;
     rowEndAddornment?: (data: number[]) => number | string;
     rowStartAddornment?: JSX.Element;
-    data: any;
+    data: { [key: number]: number };
     scrollBarWidth?: number;
+    ignoredMeds: number[];
+    isIgnored?: boolean;
 }
 
 @observer
 class TableRow extends Component<IProps> {
+    @computed
     get data(): number[] {
-        const { medsIds, data } = this.props;
+        const { meds, data } = this.props;
 
-        return medsIds.map(x => (
-            x in data
-            ? data[x]
+        return meds.map(({ id }) => (
+            id in data
+            ? data[id]
             : null
         ));
     }
@@ -55,18 +67,19 @@ class TableRow extends Component<IProps> {
             classes,
             rowEndAddornment,
             rowStartAddornment,
-            mantisLength
+            mantisLength,
+            ignoredMeds,
+            isIgnored
         } = this.props;
 
         return (
-            <MuiTableRow className={classes.row}>
+            <MuiTableRow className={cx(classes.row, { ignored: isIgnored })}>
                 <TableCell colSpan={2} className={classes.cell}>
                     { rowStartAddornment }
                 </TableCell>
-
                 {
                     this.data.map((x, i) => (
-                        <TableCell key={i} className={classes.cell}>
+                        <TableCell key={i} className={cx(classes.cell, { displayNone: ignoredMeds.includes(i) })}>
                             {
                                 x
                                 ? x.toFixed(mantisLength)

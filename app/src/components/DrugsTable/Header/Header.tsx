@@ -17,6 +17,9 @@ import ommitBy from 'lodash/omitBy';
 import cx from 'classnames';
 
 const styles = createStyles({
+    // displayNone: {
+    //     display: 'none'
+    // },
     container: {},
     table: {},
     thCell: {},
@@ -26,6 +29,7 @@ interface IProps extends WithStyles<typeof styles> {
     headerPrepend: any;
     medsArray: IMedicine[];
     shouldCalculateHeight?: boolean;
+    ignoredMeds: number[];
 
     salesHeaderHeight?: number;
     setSalesHeaderHeight?: (value: number) => void;
@@ -91,9 +95,14 @@ class Header extends Component<IProps> {
     }
 
     getContent = () => {
-        const { classes, medsArray, shouldCalculateHeight } = this.props;
-        return medsArray.map(medicine => (
-            <TableCell key={medicine.id} className={cx(classes.thCell, { alignBottom: true })}>
+        const { classes, medsArray, shouldCalculateHeight, ignoredMeds } = this.props;
+        return medsArray.map((medicine, i) => (
+            <TableCell
+                key={medicine.id}
+                className={cx(classes.thCell, {
+                    displayNone: ignoredMeds.includes(i),
+                    alignBottom: true,
+                })}>
                 <Grid container>
                     <HeaderItem
                         medicine={medicine}

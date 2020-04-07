@@ -38,7 +38,7 @@ interface IProps extends WithStyles<typeof styles> {
     dateFrom?: Date;
     dateTo?: Date;
     displayMode?: STAT_DISPLAY_MODE;
-    medsDisplayStatus?: Map<number, boolean>;
+    ignoredMeds?: Set<number>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
@@ -50,7 +50,7 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
             dateFrom,
             dateTo,
             displayMode,
-            medsDisplayStatus,
+            ignoredMeds,
             getAsyncStatus
         },
         // departmentsStore: {
@@ -62,7 +62,7 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
     dateTo,
     // meds,
     displayMode,
-    medsDisplayStatus,
+    ignoredMeds,
     getAsyncStatus
 }))
 @observer
@@ -129,7 +129,7 @@ class Plot extends Component<IProps> {
             chartSalesStat,
             meds,
             displayMode,
-            medsDisplayStatus
+            ignoredMeds
         } = this.props;
 
         if (!chartSalesStat || !meds || this.labelType === 'unknown') return [];
@@ -141,7 +141,7 @@ class Plot extends Component<IProps> {
         return chartSalesStat.map(x => {
             const medicine = meds.get(x.medId);
 
-            if (!medicine || !medsDisplayStatus.get(x.medId)) return;
+            if (!medicine || ignoredMeds.has(x.medId)) return;
             let i: number = 0;
             const data = this.eachIntervalDay.map((day: Date) => {
                 const period = comparer(day, x.periods, i);

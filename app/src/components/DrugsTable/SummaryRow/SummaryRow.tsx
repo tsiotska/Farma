@@ -6,53 +6,48 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import TableRow from '../TableRow';
 import { Typography } from '@material-ui/core';
+import { computed, toJS } from 'mobx';
 
 interface IProps {
     stat: ISalesStat[];
     targetProp: 'money' | 'amount';
     mantisLength: number;
     meds: IMedicine[];
-    displayStatus: Map<number, boolean>;
+    ignoredMeds: number[];
+    ignoredItems: Set<number>;
 }
 
 @observer
 class SummaryRow extends Component<IProps> {
-    get medsIds(): number[] {
-        return this.props.meds.map(({ id }) => id);
-    }
-
-    get data(): any {
-        const { stat, targetProp } = this.props;
+    @computed
+    get data(): { [key: number]: number } {
+        const { stat, ignoredItems, targetProp } = this.props;
 
         if (stat === null) return {};
 
-        const objects = stat.map(x => keyBy(x.stat, 'medId'));
-        const values = objects.map(x => mapValues(x, targetProp));
-
-        const total = this.medsIds.reduce((res, medId) => ({ ...res, [medId]: 0 }), {});
-
-        return values.reduce(
-            (res, x) => {
-                for (const q in res) {
-                    res[q] += q in x
-                    ? x[q]
-                    : 0;
+        return stat.reduce(
+            (total, statItem) => {
+                if (ignoredItems.has(statItem.id) === false) {
+                    statItem.stat.forEach(({ medId, [targetProp]: value}) => {
+                        const prevValue = total[medId] || 0;
+                        total[medId] = prevValue + value;
+                    });
                 }
-
-                return res;
+                return total;
             },
-            total
+            {}
         );
     }
 
     calculateTotal = (data: number[]) => data.reduce((a, b) => a + b, 0);
 
     render() {
-        const { mantisLength } = this.props;
+        const { mantisLength, ignoredMeds, meds } = this.props;
 
         return (
             <TableRow
-                medsIds={this.medsIds}
+                meds={meds}
+                ignoredMeds={ignoredMeds}
                 data={this.data}
                 mantisLength={mantisLength}
                 rowEndAddornment={this.calculateTotal}
