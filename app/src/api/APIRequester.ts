@@ -23,6 +23,8 @@ import { CacheStore } from '../stores/CacheStore';
 import Config from '../../Config';
 import delay from 'lodash/delay';
 import { USER_ROLE } from '../constants/Roles';
+import { ISalaryInfo } from '../interfaces/ISalaryInfo';
+import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -236,5 +238,11 @@ export class APIRequester {
         .catch(() => {
             console.log('load excel error');
         });
+    }
+
+    getUserSalary(departmentId: number, userId: number): Promise<any> {
+        return this.instance.get(`/api/branch/${departmentId}/salary/${userId}`)
+            .then(salaryNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 }

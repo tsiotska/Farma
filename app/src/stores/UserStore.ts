@@ -7,11 +7,14 @@ import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
+import { ISalaryInfo, IUserSales } from '../interfaces/ISalaryInfo';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
     @observable navHistory: IUser[] = [];
+    @observable userSalary: Map<number, ISalaryInfo> = new Map();
+    @observable userSales: IUserSales = null;
 
     constructor(rootStore: IRootStore) {
         super();
@@ -58,6 +61,25 @@ export default class UserStore extends AsyncStore implements IUserStore {
     historyGoTo(userId: number) {
         const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
         this.navHistory = this.navHistory.filter((_, i) => i <= userIndex);
+    }
+
+    @action.bound
+    async loadUserSalaryInfo({ id }: IUser) {
+        const requestName = 'loadUserSalaryInfo';
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        if (!currentDepartmentId || !id) return;
+
+        const res = await this.dispatchRequest(
+            api.getUserSalary(currentDepartmentId, id),
+            requestName
+        );
+
+        if (res) {
+            const { levels, sales } = res;
+            this.userSalary = new Map(levels);
+            this.userSales = sales;
+        }
     }
 
     @action.bound

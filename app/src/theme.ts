@@ -31,7 +31,19 @@ const palette = {
     },
     lightBlue: '#2196F3',
     blue: '#647CFE',
-    error: 'red'
+    error: 'red',
+level: {
+        redFaded: 'rgba(226, 83, 83, 0.2)',
+        red: '#e25353',
+        orangeredFaded: 'rgba(225, 155, 58, 0.2)',
+        orangered: '#ff9b3a',
+        yellowFaded: 'rgba(251, 203, 31, 0.2)',
+        yellow: '#f3ca47',
+        limeGreenFaded: 'rgba(165, 205, 88, 0.2)',
+        limeGreen: '#a5cd58',
+        greenFaded: 'rgba(37, 209, 116, 0.2)',
+        green: '#25d174',
+    }
 };
 
 const typographyOverrides: any = {

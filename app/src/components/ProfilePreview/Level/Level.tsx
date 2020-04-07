@@ -6,7 +6,7 @@ import { USER_ROLE } from '../../../constants/Roles';
 import cx from 'classnames';
 import { SALARY_PREVIEW_MODAL } from '../../../constants/Modals';
 
-const styles = createStyles({
+const styles = (theme: any) => createStyles({
     root: {
         transition: '0.3s',
         padding: '10px 0',
@@ -16,7 +16,7 @@ const styles = createStyles({
         paddingLeft: 5,
         borderRadius: 2,
         '&:hover': {
-            backgroundColor: '#f1f1f1'
+            backgroundColor: ({ disableClick }: any) => disableClick ? 'transparent' : '#f1f1f1'
         }
     },
     item: {
@@ -27,25 +27,26 @@ const styles = createStyles({
         backgroundColor: '#d2d2d9'
     },
     red: {
-        backgroundColor: '#e25353'
+        backgroundColor: theme.palette.primary.level.red
     },
     orangered: {
-        backgroundColor: '#ff9b3a'
+        backgroundColor: theme.palette.primary.level.orangered
     },
     yellow: {
-        backgroundColor: '#f3ca47'
+        backgroundColor: theme.palette.primary.level.yellow
     },
     limeGreen: {
-        backgroundColor: '#a5cd58'
+        backgroundColor: theme.palette.primary.level.limeGreen
     },
     green: {
-        backgroundColor: '#25d174'
+        backgroundColor: theme.palette.primary.level.green
     },
 });
 
 interface IProps extends WithStyles<typeof styles> {
     user: IUser;
     openModal?: (modalName: string, payload: any) => void;
+    disableClick?: boolean;
 }
 
 @inject(({
@@ -65,36 +66,39 @@ class Level extends Component<IProps> {
         super(props);
         const { classes: { red, orangered, yellow, limeGreen, green } } = this.props;
         this.colors = {
-            [USER_ROLE.REGIONAL_MANAGER]: [ red, yellow, green ],
-            [USER_ROLE.MEDICAL_AGENT]: [ red, orangered, yellow, limeGreen, green ],
+            [USER_ROLE.REGIONAL_MANAGER]: [red, yellow, green],
+            [USER_ROLE.MEDICAL_AGENT]: [red, orangered, yellow, limeGreen, green],
         };
     }
 
     get userColors() {
-        const { user: { position }} = this.props;
+        const { user: { position } } = this.props;
         return this.colors[position];
     }
 
-    clickHandler = () => this.props.openModal(SALARY_PREVIEW_MODAL, this.props.user);
+    clickHandler = () => {
+        const { disableClick, openModal, user } = this.props;
+        if (!disableClick) openModal(SALARY_PREVIEW_MODAL, user);
+    }
 
     render() {
-        const { classes, user: { level }} = this.props;
+        const { classes, user: { level } } = this.props;
 
         if (!this.userColors) return null;
 
         const content: any[] = [];
-        for (let i = 0; i < this.userColors.length; ++i) {
+        for (let i = 1; i <= this.userColors.length; ++i) {
             content.push(
                 <div
                     key={i}
-                    className={cx(classes.item, { [this.userColors[i]]: i <= level })}
+                    className={cx(classes.item, { [this.userColors[i - 1]]: i <= level })}
                 />
             );
         }
 
         return (
             <Grid onClick={this.clickHandler} className={classes.root} wrap='nowrap' alignItems='center' container>
-                { content }
+                {content}
             </Grid>
         );
     }

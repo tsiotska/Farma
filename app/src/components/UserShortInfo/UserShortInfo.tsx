@@ -23,6 +23,7 @@ const styles = createStyles({
 interface IProps extends WithStyles<typeof styles> {
     user: IUser;
     positions?: Map<number, IPosition>;
+    disableClick?: boolean;
 }
 
 @inject(({
@@ -48,6 +49,14 @@ class UserShortInfo extends Component<IProps> {
     }
 
     @computed
+    get userPosition(): USER_ROLE {
+        const { user } = this.props;
+        return user
+        ? user.position
+        : USER_ROLE.UNKNOWN;
+    }
+
+    @computed
     get userName(): string {
         return this.props.user
             ? this.props.user.name
@@ -55,14 +64,10 @@ class UserShortInfo extends Component<IProps> {
     }
 
     @computed
-    get userPosition(): string {
-        const { positions, user } = this.props;
+    get positionName(): string {
+        const { positions } = this.props;
 
-        const userPosition = user
-            ? user.position
-            : -1;
-
-        const pos = positions.get(userPosition);
+        const pos = positions.get(this.userPosition);
 
         return pos
             ? pos.name
@@ -70,7 +75,7 @@ class UserShortInfo extends Component<IProps> {
     }
 
     render() {
-        const { classes, user } = this.props;
+        const { classes, user, disableClick } = this.props;
 
         return (
             <>
@@ -84,11 +89,11 @@ class UserShortInfo extends Component<IProps> {
                         {this.userName}
                     </Typography>
                     <Typography color='textSecondary' variant='body2'>
-                        {this.userPosition}
+                        {this.positionName}
                     </Typography>
                     {
-                        (user.position === USER_ROLE.MEDICAL_AGENT || user.position === USER_ROLE.REGIONAL_MANAGER) &&
-                        <Level user={user} />
+                        (this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER) &&
+                        <Level user={user} disableClick={disableClick} />
                     }
                 </Grid>
             </>
