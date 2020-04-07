@@ -19,6 +19,7 @@ import { IPosition } from '../../interfaces/IPosition';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
 import Level from './Level';
+import UserShortInfo from '../UserShortInfo';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -56,13 +57,6 @@ const styles = (theme: any) => createStyles({
             justifyContent: 'center'
         }
     },
-    avatar: {
-        height: 100,
-        width: 100,
-    },
-    credentials: {
-        fontFamily: 'Source Sans Pro SemiBold'
-    },
     textContainer: {
         padding: '8px 0 8px 16px'
     },
@@ -78,7 +72,6 @@ interface IProps extends WithStyles<typeof styles> {
     user: IUser;
     index: number;
     scaleIndex: number;
-    positions?: Map<number, IPosition>;
     cities?: Map<number, ILocation>;
     regions?: Map<number, ILocation>;
     historyGoTo?: (userId: number) => void;
@@ -87,7 +80,6 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         departmentsStore: {
-            positions,
             cities,
             regions
         },
@@ -96,7 +88,6 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
-    positions,
     historyGoTo,
     cities,
     regions
@@ -109,28 +100,6 @@ class ProfilePreview extends Component<IProps> {
     @computed
     get realizationPercent(): number {
         return 65;
-    }
-
-    @computed
-    get userName(): string {
-        return this.props.user
-            ? this.props.user.name
-            : '';
-    }
-
-    @computed
-    get userPosition(): string {
-        const { positions, user } = this.props;
-
-        const userPosition = user
-            ? user.position
-            : -1;
-
-        const pos = positions.get(userPosition);
-
-        return pos
-            ? pos.name
-            : '';
     }
 
     @computed
@@ -149,17 +118,6 @@ class ProfilePreview extends Component<IProps> {
         return userCity
             ? userCity.name
             : '-';
-    }
-
-    @computed
-    get avatarProps(): any {
-        const { user } = this.props;
-
-        if (!user) return {};
-
-        return user.avatar
-        ? { src: user.avatar }
-        : { children: this.userName[0] };
     }
 
     @computed
@@ -222,7 +180,7 @@ class ProfilePreview extends Component<IProps> {
 
     render() {
         const { classes, user } = this.props;
-        const { doctorsCount, pharmacyCount, level, position } = user;
+        const { doctorsCount, pharmacyCount } = user;
 
         return (
             <div
@@ -247,23 +205,7 @@ class ProfilePreview extends Component<IProps> {
                         wrap='nowrap'
                         container
                         item>
-                        <Avatar className={classes.avatar} {...this.avatarProps} />
-                        <Grid
-                            className={classes.textContainer}
-                            justify='space-around'
-                            direction='column'
-                            container>
-                            <Typography className={classes.credentials} color='textPrimary'>
-                                { this.userName }
-                            </Typography>
-                            <Typography color='textSecondary' variant='body2'>
-                                { this.userPosition }
-                            </Typography>
-                            {
-                                (position === USER_ROLE.MEDICAL_AGENT || position === USER_ROLE.REGIONAL_MANAGER) &&
-                                <Level user={user} />
-                            }
-                        </Grid>
+                            <UserShortInfo user={user} />
                     </Grid>
 
                     {

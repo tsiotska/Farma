@@ -27,7 +27,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles>, Omit<DialogProps, 'classes' | 'title'> {
-    title: string | JSX.Element;
+    title?: string | JSX.Element;
     closeIcon?: boolean | JSX.Element;
     children: any;
 }

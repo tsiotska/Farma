@@ -11,6 +11,7 @@ import ProfilePreview from '../../components/ProfilePreview';
 import DepartmentNav from '../../components/DepartmentNav';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { IUser } from '../../interfaces';
+import SalaryReviewModal from './SalaryReviewModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -102,6 +103,7 @@ export class Header extends Component<IProps, {}> {
                     </div>
                 }
                 <DepartmentNav />
+                <SalaryReviewModal />
             </>
         );
     }
