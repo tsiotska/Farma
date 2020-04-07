@@ -1,73 +1,124 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, withStyles, Grid, Typography } from '@material-ui/core';
 import { IMedicine } from '../../../../interfaces/IMedicine';
-import { ISalaryInfo } from '../../../../interfaces/ISalaryInfo';
-import { observer } from 'mobx-react';
+import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
+import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     wideColumn: {
         width: 200
     },
+    cell: {
+        border: '1px solid transparent'
+    },
     red: {
-        backgroundColor: theme.palette.primary.level.redFaded
+        borderColor: theme.palette.primary.level.redFaded
     },
     orangered: {
-        backgroundColor: theme.palette.primary.level.orangeredFaded
+        borderColor: theme.palette.primary.level.orangeredFaded
     },
     yellow: {
-        backgroundColor: theme.palette.primary.level.yellowFaded
+        borderColor: theme.palette.primary.level.yellowFaded
     },
     limeGreen: {
-        backgroundColor: theme.palette.primary.level.limeGreenFaded
+        borderColor: theme.palette.primary.level.limeGreenFaded
     },
     green: {
-        backgroundColor: theme.palette.primary.level.greenFaded
+        borderColor: theme.palette.primary.level.greenFaded
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    levelsCount: number;
+    userColors: string[];
+    levels: number[];
     userLevel: number;
     medicine: IMedicine;
     salary: Map<number, ISalaryInfo>;
+    userSales?: IUserSales;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            userSales
+        }
+    }
+}) => ({
+    userSales
+}))
 @observer
 class SalaryRow extends Component<IProps> {
-    readonly colors: any;
-
+    readonly borderColors: any;
     constructor(props: IProps) {
         super(props);
-        const { classes: { red, orangered, yellow, limeGreen, green } } = props;
-        this.colors = {
-            3: [red, yellow, green],
-            5: [red, orangered, yellow, limeGreen, green]
-        };
+        const { levels, classes: { red, orangered, yellow, limeGreen, green } } = props;
+        this.borderColors = levels.length === 5
+        ? [ red, orangered, yellow, limeGreen, green ]
+        : [ red, yellow, green ];
     }
 
-    get userColors(): string[] {
-        const { levelsCount } = this.props;
-        return this.colors[levelsCount] || [];
+    get userValue(): number {
+        const { userSales, medicine: { id } } = this.props;
+        const item = userSales
+        ? userSales[id]
+        : null;
+        return item
+            ? item.amount
+            : null;
     }
 
-    get levels(): number[] {
-        const { levelsCount } = this.props;
-        return [...new Array(levelsCount)].map((x, i) => i + 1);
+    get valueLevel(): number {
+        const {
+            salary,
+            levels,
+            medicine: { id },
+        } = this.props;
+
+        let currentLevel = 0;
+        for (const i of levels) {
+            const infoItem = salary.get(i);
+            const medInfo = infoItem
+                ? infoItem.meds[id]
+                : null;
+            const amount = medInfo
+                ? medInfo.amount || Number.MAX_SAFE_INTEGER
+                : Number.MAX_SAFE_INTEGER;
+            if (amount <= this.userValue) currentLevel = i;
+        }
+        return currentLevel;
+    }
+
+    get deficit(): number | string {
+        const { salary, medicine: { id } } = this.props;
+
+        const soldAmount = this.userValue || 0;
+
+        const infoItem = salary.get(this.valueLevel + 1);
+        const medInfo = infoItem
+            ? infoItem.meds[id]
+            : null;
+        const amount = medInfo
+            ? medInfo.amount
+            : 0;
+
+        return soldAmount < amount
+            ? amount - soldAmount
+            : '-';
     }
 
     getLevelValue = (i: number) => {
         const { salary, medicine: { id } } = this.props;
         const salaryInfo = salary.get(i);
-        if (!salaryInfo) return '-';
+        if (!salaryInfo) return null;
         const medInfo = salaryInfo.meds[id];
         return medInfo
             ? medInfo.amount
-            : '-';
+            : null;
     }
 
     render() {
-        const { classes, medicine, userLevel } = this.props;
+        const { classes, medicine, userLevel, levels, userColors } = this.props;
 
         return (
             <Grid alignItems='center' wrap='nowrap' container>
@@ -78,23 +129,34 @@ class SalaryRow extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.wideColumn}>
                     <Typography align='center'>
-                        -
+                        { this.deficit }
                     </Typography>
                 </Grid>
                 {
-                    this.levels.map(i => (
-                        <Grid
-                            key={i}
-                            className={cx({[this.userColors[i - 1]]: i === userLevel })}
-                            justify='center'
-                            container
-                            item
-                            xs>
-                            <Typography align='center'>
-                                { this.getLevelValue(i) }
-                            </Typography>
-                        </Grid>
-                    ))
+                    levels.map(i => {
+                        const value = this.getLevelValue(i);
+                        return (
+                            <Grid
+                                key={i}
+                                className={
+                                    cx(
+                                        classes.cell,
+                                        {
+                                            [userColors[i - 1]]: i === userLevel,
+                                            [this.borderColors[i - 1]]: i === this.valueLevel
+                                        }
+                                    )
+                                }
+                                justify='center'
+                                container
+                                item
+                                xs>
+                                <Typography align='center'>
+                                    { value || '-' }
+                                </Typography>
+                            </Grid>
+                        );
+                    })
                 }
             </Grid>
         );
