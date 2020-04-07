@@ -18,6 +18,7 @@ import { IUser } from '../../interfaces';
 import { IPosition } from '../../interfaces/IPosition';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
+import Level from './Level';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -70,10 +71,7 @@ const styles = (theme: any) => createStyles({
     },
     dividerVertical: {
         minHeight: 100
-    },
-    // realizationTitle: {
-    //     paddingTop: theme.typography.pxToRem(15)
-    // }
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -223,7 +221,8 @@ class ProfilePreview extends Component<IProps> {
     }
 
     render() {
-        const { classes, user: { doctorsCount, pharmacyCount } } = this.props;
+        const { classes, user } = this.props;
+        const { doctorsCount, pharmacyCount, level, position } = user;
 
         return (
             <div
@@ -243,9 +242,7 @@ class ProfilePreview extends Component<IProps> {
                     container>
 
                     <Grid
-                        // xs={12}
-                        sm={4}
-                        // md={3}
+                        xs={4}
                         className={cx(classes.gridContainer, classes.credsContainer)}
                         wrap='nowrap'
                         container
@@ -262,6 +259,10 @@ class ProfilePreview extends Component<IProps> {
                             <Typography color='textSecondary' variant='body2'>
                                 { this.userPosition }
                             </Typography>
+                            {
+                                (position === USER_ROLE.MEDICAL_AGENT || position === USER_ROLE.REGIONAL_MANAGER) &&
+                                <Level user={user} />
+                            }
                         </Grid>
                     </Grid>
 
@@ -272,7 +273,7 @@ class ProfilePreview extends Component<IProps> {
                                 <Divider className={classes.dividerVertical} orientation='vertical' />
                             </Hidden>
                             <Grid
-                                sm={2}
+                                xs={2}
                                 className={cx(classes.gridContainer, classes.textContainer)}
                                 justify='space-around'
                                 direction='column'
@@ -311,9 +312,7 @@ class ProfilePreview extends Component<IProps> {
                     </Hidden>
 
                     <Grid
-                        // xs={12}
-                        sm={2}
-                        // md
+                        xs={2}
                         className={cx(classes.gridContainer, classes.textContainer)}
                         justify='space-around'
                         direction='column'
@@ -333,8 +332,7 @@ class ProfilePreview extends Component<IProps> {
                     </Hidden>
 
                     <Grid
-                        // xs={12}
-                        sm
+                        xs
                         className={cx(classes.gridContainer, classes.textContainer)}
                         justify='space-around'
                         direction='column'
@@ -346,7 +344,6 @@ class ProfilePreview extends Component<IProps> {
                             <Typography>
                                 { pharmacyCount === null ? '-' : pharmacyCount }
                             </Typography>
-                        {/* actions */}
                     </Grid>
                 </Grid>
             </div>

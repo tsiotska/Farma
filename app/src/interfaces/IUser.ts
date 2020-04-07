@@ -18,7 +18,7 @@ export interface IUser extends IUserCommonInfo {
     doctorsCount?: number;
     pharmacyCount?: number;
 
-    level?: string;
+    level?: number;
 
     department?: number;
 }
