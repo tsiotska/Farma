@@ -34,6 +34,7 @@ interface IProps extends WithStyles<typeof styles> {
     levelsCount: number;
     userSales?: IUserSales;
     isAdmin?: boolean;
+    changeUserSalary?: (level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) => void;
 }
 
 @inject(({
@@ -42,11 +43,13 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds
         },
         userStore: {
+            changeUserSalary,
             userSales,
             isAdmin
         }
     }
 }) => ({
+    changeUserSalary,
     currentDepartmentMeds,
     userSales,
     isAdmin
@@ -158,6 +161,15 @@ class UserContent extends Component<IProps> {
         });
     }
 
+    changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value }}: any) => {
+        const { changeUserSalary } = this.props;
+        const casted = +value;
+        const isValid = value.length
+            ? !Number.isNaN(casted)
+            : true;
+        if (isValid) changeUserSalary(level, propName, casted);
+    }
+
     render() {
         const { currentDepartmentMeds, salary, levelsCount, userSales, isAdmin } = this.props;
 
@@ -187,6 +199,8 @@ class UserContent extends Component<IProps> {
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={value}
+                    // changeHandler={isAdmin ? this.changeHandler('plannedCosts') : null}
+                    changeHandler={this.changeHandler('plannedCosts')}
                 />
                 <SumRow
                     title='Зарплата по рейтингу'
@@ -194,6 +208,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.ratingSalary}
                     userColors={this.userColors}
+                    changeHandler={this.changeHandler('salary')}
                 />
                 <SumRow
                     title='Додаткові витрати'
@@ -201,6 +216,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.extraCosts}
                     userColors={this.userColors}
+                    changeHandler={this.changeHandler('extraCosts')}
                 />
                 <SumRow
                     title='KPI звіти'
@@ -208,6 +224,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.KPIs}
                     userColors={this.userColors}
+                    changeHandler={this.changeHandler('kpi')}
                 />
                 <SumRow
                     title='Бонус за виконання більше 5 продуктів'

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { WithStyles, createStyles, Grid, withStyles, Typography } from '@material-ui/core';
+import { WithStyles, createStyles, Grid, withStyles, Typography, Input } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import cx from 'classnames';
 
@@ -18,6 +18,15 @@ const styles = createStyles({
     },
     text: {
         fontFamily: 'Source Sans Pro SemiBold'
+    },
+    inputRoot: {
+        maxWidth: 50,
+        border: '1px solid #a7a7a7',
+        margin: '0 2px',
+        borderRadius: 2
+    },
+    input: {
+        textAlign: 'center'
     }
 });
 
@@ -28,10 +37,13 @@ interface IProps extends WithStyles<typeof styles> {
     values: any[];
     userColors?: string[];
     secondColumnValue?: any;
+    changeHandler?: (level: number, e: any) => void;
 }
 
 @observer
 class SumRow extends Component<IProps> {
+    changeHandler = (level: number) => (e: any) => this.props.changeHandler(level, e);
+
     render() {
         const {
             classes,
@@ -40,7 +52,8 @@ class SumRow extends Component<IProps> {
             levels,
             values,
             userColors = {},
-            userLevel
+            userLevel,
+            changeHandler
         } = this.props;
 
         return (
@@ -76,7 +89,19 @@ class SumRow extends Component<IProps> {
                         container
                         item
                         xs>
-                            { values[i] || '' }
+                            {
+                                changeHandler
+                                ? <Input
+                                    classes={{
+                                        input: classes.input,
+                                        root: classes.inputRoot,
+                                    }}
+                                    value={values[i] || 0}
+                                    onChange={this.changeHandler(x)}
+                                    disableUnderline
+                                  />
+                                : (values[i] || '')
+                            }
                         </Grid>
                     ))
                 }
