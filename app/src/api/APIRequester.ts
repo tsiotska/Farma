@@ -25,6 +25,7 @@ import delay from 'lodash/delay';
 import { USER_ROLE } from '../constants/Roles';
 import { ISalaryInfo } from '../interfaces/ISalaryInfo';
 import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
+import { ISalarySettings } from '../interfaces/ISalarySettings';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -244,5 +245,14 @@ export class APIRequester {
         return this.instance.get(`/api/branch/${departmentId}/salary/${userId}`)
             .then(salaryNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    getSalarySettings(): Promise<ISalarySettings> {
+        return this.instance.get('/api/settings')
+        .then(({ data: { data: { default_amount_kpi, payments }} }) => ({
+            kpi: default_amount_kpi || null,
+            paymements: payments || null
+        }))
+        .catch(this.defaultErrorHandler());
     }
 }

@@ -8,6 +8,7 @@ import { IUser } from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
 import { computed } from 'mobx';
+import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -35,6 +36,7 @@ interface IProps extends WithStyles<typeof styles> {
     userSales?: IUserSales;
     isAdmin?: boolean;
     changeUserSalary?: (level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) => void;
+    salarySettings?: ISalarySettings;
 }
 
 @inject(({
@@ -45,14 +47,16 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             changeUserSalary,
             userSales,
-            isAdmin
+            isAdmin,
+            salarySettings
         }
     }
 }) => ({
     changeUserSalary,
     currentDepartmentMeds,
     userSales,
-    isAdmin
+    isAdmin,
+    salarySettings
 }))
 @observer
 class UserContent extends Component<IProps> {

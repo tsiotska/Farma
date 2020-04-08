@@ -8,11 +8,13 @@ import { IUser } from '../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
 import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
+import { ISalarySettings } from '../interfaces/ISalarySettings';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
     @observable navHistory: IUser[] = [];
+    @observable salarySettings: ISalarySettings = null;
     @observable userSalary: Map<number, ISalaryInfo> = new Map();
     @observable userSales: IUserSales = null;
 
@@ -50,6 +52,15 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    async loadUserSalarySettings() {
+        const { api } = this.rootStore;
+        this.salarySettings = await this.dispatchRequest(
+            api.getSalarySettings(),
+            null
+        );
     }
 
     @action.bound
@@ -146,7 +157,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         await Promise.all([
             loadPositions(),
             loadDepartments(),
-            loadLocations()
+            loadLocations(),
+            this.loadUserSalarySettings()
         ]);
 
         if (singleDepartmentRoles.includes(user.position)) {
