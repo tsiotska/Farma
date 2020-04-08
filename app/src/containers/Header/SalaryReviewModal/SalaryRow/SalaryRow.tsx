@@ -8,7 +8,7 @@ import cx from 'classnames';
 const styles = (theme: any) => createStyles({
     root: {
         minHeight: 48,
-        position: 'relative',
+        paddingLeft: 12,
         borderBottom: '1px solid #e5e7e8'
     },
     wideColumn: {

@@ -4,8 +4,15 @@ import { createStyles, WithStyles, withStyles, Grid, Typography } from '@materia
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
+    root: {
+        borderBottom: '1px solid #e5e7e8',
+        paddingLeft: 12
+    },
     wideColumn: {
         width: 200
+    },
+    text: {
+        fontFamily: 'Source Sans Pro SemiBold'
     },
     red: {
         color: theme.palette.primary.level.red
@@ -59,21 +66,21 @@ class SalaryHeader extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <Grid alignItems='center' wrap='nowrap' container>
+            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid className={classes.wideColumn}>
-                    <Typography>
+                    <Typography className={classes.text}>
                         Препарати
                     </Typography>
                 </Grid>
                 <Grid className={classes.wideColumn}>
-                    <Typography align='center'>
+                    <Typography className={classes.text} align='center'>
                         Кількість до наступного рівня
                     </Typography>
                 </Grid>
                 {
                     this.MPHeaders.map((header, i) => (
                         <Grid key={header} justify='center' xs container item>
-                            <Typography className={this.userColor[i]} align='center'>
+                            <Typography className={cx(classes.text, this.userColor[i])} align='center'>
                                 {header}
                             </Typography>
                         </Grid>

@@ -14,6 +14,9 @@ import { USER_ROLE } from '../../../constants/Roles';
 const styles = createStyles({
     header: {
         minWidth: 800
+    },
+    headerText: {
+        margin: '20px 0'
     }
 });
 
@@ -88,7 +91,7 @@ class SalaryReviewModal extends Component<IProps> {
                             <UserShortInfo user={user} disableClick />
                         </Grid>
                     </Grid>
-                    <Typography variant='h5'>
+                    <Typography className={classes.headerText} variant='h5'>
                         Заробітня плата
                     </Typography>
                     <UserContent levelsCount={this.levelsCount} user={user} salary={userSalary} />

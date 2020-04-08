@@ -148,6 +148,38 @@ class UserContent extends Component<IProps> {
                     userColors={this.userColors}
                     secondColumnValue={value}
                 />
+                <SumRow
+                    title='Зарплата по рейтингу'
+                    levels={this.levels}
+                    userLevel={level}
+                    values={this.plannedCosts}
+                    userColors={this.userColors}
+                    secondColumnValue={value}
+                />
+                <SumRow
+                    title='Додаткові витрати'
+                    levels={this.levels}
+                    userLevel={level}
+                    values={this.plannedCosts}
+                    userColors={this.userColors}
+                    secondColumnValue={value}
+                />
+                <SumRow
+                    title='KPI звіти'
+                    levels={this.levels}
+                    userLevel={level}
+                    values={this.plannedCosts}
+                    userColors={this.userColors}
+                    secondColumnValue={value}
+                />
+                <SumRow
+                    title='Бонус за виконання більше 5 продуктів'
+                    levels={this.levels}
+                    userLevel={level}
+                    values={this.plannedCosts}
+                    userColors={this.userColors}
+                    secondColumnValue={value}
+                />
             </>
         );
     }

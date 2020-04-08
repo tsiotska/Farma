@@ -5,13 +5,19 @@ import cx from 'classnames';
 
 const styles = createStyles({
     root: {
-        minHeight: 48
+        minHeight: 48,
+        borderBottom: '1px solid #e5e7e8',
+        backgroundColor: '#f5f7f7',
+        paddingLeft: 12
     },
     wideColumn: {
         width: 200
     },
     doubleWidth: {
         width: 400
+    },
+    text: {
+        fontFamily: 'Source Sans Pro SemiBold'
     }
 });
 
@@ -42,11 +48,12 @@ class SumRow extends Component<IProps> {
                 <Grid
                     container
                     alignItems='center'
-                    className={
+                    className={cx(
+                        classes.text,
                         secondColumnValue === undefined
                         ? classes.doubleWidth
                         : classes.wideColumn
-                    }>
+                    )}>
                     <Typography>
                         { title }
                     </Typography>
