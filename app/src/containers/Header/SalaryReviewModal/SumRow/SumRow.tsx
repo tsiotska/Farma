@@ -4,6 +4,9 @@ import { observer } from 'mobx-react';
 import cx from 'classnames';
 
 const styles = createStyles({
+    root: {
+        minHeight: 48
+    },
     wideColumn: {
         width: 200
     },
@@ -35,22 +38,24 @@ class SumRow extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid alignItems='center' container>
+            <Grid className={classes.root} container>
                 <Grid
+                    container
+                    alignItems='center'
                     className={
-                        secondColumnValue
-                        ? classes.wideColumn
-                        : classes.doubleWidth
+                        secondColumnValue === undefined
+                        ? classes.doubleWidth
+                        : classes.wideColumn
                     }>
                     <Typography>
                         { title }
                     </Typography>
                 </Grid>
                 {
-                    secondColumnValue &&
-                    <Grid className={classes.wideColumn}>
+                    secondColumnValue !== undefined &&
+                    <Grid className={classes.wideColumn} container alignItems='center' justify='center'>
                         <Typography>
-                            { title }
+                            { secondColumnValue || '-' }
                         </Typography>
                     </Grid>
                 }
@@ -60,6 +65,7 @@ class SumRow extends Component<IProps> {
                         key={i}
                         className={cx({[userColors[i]]: x === userLevel })}
                         justify='center'
+                        alignItems='center'
                         container
                         item
                         xs>

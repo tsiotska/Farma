@@ -77,7 +77,6 @@ class SalaryReviewModal extends Component<IProps> {
 
     render() {
         const { user, classes, userSalary } = this.props;
-        console.log(toJS(userSalary));
 
         return (
             <Dialog

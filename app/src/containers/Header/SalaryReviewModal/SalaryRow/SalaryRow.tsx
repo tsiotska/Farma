@@ -6,6 +6,11 @@ import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
+    root: {
+        minHeight: 48,
+        position: 'relative',
+        borderBottom: '1px solid #e5e7e8'
+    },
     wideColumn: {
         width: 200
     },
@@ -13,19 +18,19 @@ const styles = (theme: any) => createStyles({
         border: '1px solid transparent'
     },
     red: {
-        borderColor: theme.palette.primary.level.redFaded
+        borderColor: theme.palette.primary.level.red
     },
     orangered: {
-        borderColor: theme.palette.primary.level.orangeredFaded
+        borderColor: theme.palette.primary.level.orangered
     },
     yellow: {
-        borderColor: theme.palette.primary.level.yellowFaded
+        borderColor: theme.palette.primary.level.yellow
     },
     limeGreen: {
-        borderColor: theme.palette.primary.level.limeGreenFaded
+        borderColor: theme.palette.primary.level.limeGreen
     },
     green: {
-        borderColor: theme.palette.primary.level.greenFaded
+        borderColor: theme.palette.primary.level.green
     }
 });
 
@@ -35,18 +40,9 @@ interface IProps extends WithStyles<typeof styles> {
     userLevel: number;
     medicine: IMedicine;
     salary: Map<number, ISalaryInfo>;
-    userSales?: IUserSales;
+    userSales: IUserSales;
 }
 
-@inject(({
-    appState: {
-        userStore: {
-            userSales
-        }
-    }
-}) => ({
-    userSales
-}))
 @observer
 class SalaryRow extends Component<IProps> {
     readonly borderColors: any;
@@ -121,13 +117,13 @@ class SalaryRow extends Component<IProps> {
         const { classes, medicine, userLevel, levels, userColors } = this.props;
 
         return (
-            <Grid alignItems='center' wrap='nowrap' container>
-                <Grid className={classes.wideColumn}>
+            <Grid className={classes.root} wrap='nowrap' container>
+                <Grid className={classes.wideColumn} alignItems='center' container>
                     <Typography>
                         { medicine.name }
                     </Typography>
                 </Grid>
-                <Grid className={classes.wideColumn}>
+                <Grid className={classes.wideColumn} justify='center' alignItems='center' container>
                     <Typography align='center'>
                         { this.deficit }
                     </Typography>
@@ -147,6 +143,7 @@ class SalaryRow extends Component<IProps> {
                                         }
                                     )
                                 }
+                                alignItems='center'
                                 justify='center'
                                 container
                                 item

@@ -3,10 +3,11 @@ import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import SalaryHeader from '../SalaryHeader';
-import { ISalaryInfo } from '../../../../interfaces/ISalaryInfo';
+import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
 import { IUser } from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -31,16 +32,21 @@ interface IProps extends WithStyles<typeof styles> {
     user: IUser;
     salary: Map<number, ISalaryInfo>;
     levelsCount: number;
+    userSales?: IUserSales;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             currentDepartmentMeds
+        },
+        userStore: {
+            userSales
         }
     }
 }) => ({
-    currentDepartmentMeds
+    currentDepartmentMeds,
+    userSales
 }))
 @observer
 class UserContent extends Component<IProps> {
@@ -55,21 +61,25 @@ class UserContent extends Component<IProps> {
         };
     }
 
+    @computed
     get userLevel(): number {
         const { user } = this.props;
         return user ? user.level : 0;
     }
 
+    @computed
     get userColors(): string[] {
         const { levelsCount } = this.props;
         return this.colors[levelsCount] || [];
     }
 
+    @computed
     get levels(): number[] {
         const { levelsCount } = this.props;
         return [...new Array(levelsCount)].map((x, i) => i + 1);
     }
 
+    @computed
     get plannedCosts(): number[] {
         const { salary } = this.props;
         return this.levels.map(level => {
@@ -81,8 +91,38 @@ class UserContent extends Component<IProps> {
         });
     }
 
+    @computed
+    get totalUserSoldAmount(): number {
+        const { userSales, currentDepartmentMeds } = this.props;
+        if (!userSales) return 0;
+        return currentDepartmentMeds.reduce(
+            (total, { id }) => total + (id in userSales ? (userSales[id].money || 0) : 0),
+            0
+        );
+    }
+
+    @computed
+    get userMoneyDeficit(): {level: number, value: number} {
+        const { salary } = this.props;
+        let level = 0;
+        if (!salary) return { level, value: 0 };
+        for (const [i, { plannedCosts }] of salary) {
+            if (this.totalUserSoldAmount >= plannedCosts) {
+                level = i;
+            } else {
+                return {
+                    level,
+                    value: plannedCosts - this.totalUserSoldAmount
+                };
+            }
+        }
+        return { level, value: 0 };
+    }
+
     render() {
-        const { currentDepartmentMeds, salary, levelsCount, user } = this.props;
+        const { currentDepartmentMeds, salary, levelsCount, userSales } = this.props;
+
+        const { level, value } = this.userMoneyDeficit;
 
         return (
             <>
@@ -91,6 +131,7 @@ class UserContent extends Component<IProps> {
                     currentDepartmentMeds.map(medicine => (
                         <SalaryRow
                             key={medicine.id}
+                            userSales={userSales}
                             userColors={this.userColors}
                             levels={this.levels}
                             userLevel={this.userLevel}
@@ -102,10 +143,10 @@ class UserContent extends Component<IProps> {
                 <SumRow
                     title='План в грошах'
                     levels={this.levels}
-                    userLevel={this.userLevel}
+                    userLevel={level}
                     values={this.plannedCosts}
                     userColors={this.userColors}
-                    // secondColumnValue={}
+                    secondColumnValue={value}
                 />
             </>
         );
