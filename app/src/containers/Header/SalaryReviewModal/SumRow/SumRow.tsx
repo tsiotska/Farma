@@ -100,7 +100,9 @@ class SumRow extends Component<IProps> {
                                     onChange={this.changeHandler(x)}
                                     disableUnderline
                                   />
-                                : (values[i] || '')
+                                : <Typography align='center'>
+                                    { values[i] || '' }
+                                  </Typography>
                             }
                         </Grid>
                     ))

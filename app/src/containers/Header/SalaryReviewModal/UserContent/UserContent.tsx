@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, withStyles } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import SalaryHeader from '../SalaryHeader';
@@ -9,6 +9,7 @@ import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
 import { computed, toJS } from 'mobx';
 import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
+import TotalRow from '../TotalRow';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -25,6 +26,12 @@ const styles = (theme: any) => createStyles({
     },
     green: {
         backgroundColor: theme.palette.primary.level.greenFaded
+    },
+    submitButton: {
+        marginLeft: 'auto',
+        marginTop: 16,
+        backgroundColor: '#3796f6',
+        color: 'white'
     }
 });
 
@@ -37,6 +44,7 @@ interface IProps extends WithStyles<typeof styles> {
     isAdmin?: boolean;
     changeUserSalary?: (level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) => void;
     salarySettings?: ISalarySettings;
+    submitSalaryChanges?: () => void;
 }
 
 @inject(({
@@ -48,7 +56,8 @@ interface IProps extends WithStyles<typeof styles> {
             changeUserSalary,
             userSales,
             isAdmin,
-            salarySettings
+            salarySettings,
+            submitSalaryChanges
         }
     }
 }) => ({
@@ -56,7 +65,8 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentMeds,
     userSales,
     isAdmin,
-    salarySettings
+    salarySettings,
+    submitSalaryChanges
 }))
 @observer
 class UserContent extends Component<IProps> {
@@ -183,11 +193,6 @@ class UserContent extends Component<IProps> {
                 const soldAmount = userSales[medId]
                     ? (userSales[medId].amount || 0)
                     : 0;
-                // console.log(
-                //     'soldAmount: ', soldAmount,
-                //     'amount: ', amount,
-                //     'bonus: ', bonus
-                // );
                 return (!!soldAmount && !!bonus && soldAmount >= amount)
                     ? soldAmount * bonus
                     : 0;
@@ -211,7 +216,15 @@ class UserContent extends Component<IProps> {
     }
 
     render() {
-        const { currentDepartmentMeds, salary, levelsCount, userSales, isAdmin } = this.props;
+        const {
+            classes,
+            currentDepartmentMeds,
+            salary,
+            levelsCount,
+            userSales,
+            isAdmin,
+            submitSalaryChanges
+        } = this.props;
 
         const { level, value } = this.userMoneyDeficit;
         console.log('this.bonuses: ', toJS(this.bonuses));
@@ -273,6 +286,18 @@ class UserContent extends Component<IProps> {
                     values={this.bonuses}
                     userColors={this.userColors}
                 />
+                <TotalRow
+                    levels={this.levels}
+                    salaries={this.ratingSalary}
+                    extraCosts={this.extraCosts}
+                    KPIs={this.KPIs}
+                    bonuses={this.bonuses}
+                    userLevel={this.userLevel}
+                    colors={this.userColors}
+                />
+                <Button className={classes.submitButton} variant='contained' onClick={submitSalaryChanges}>
+                    Зберегти
+                </Button>
             </>
         );
     }

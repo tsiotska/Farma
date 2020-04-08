@@ -64,6 +64,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    async submitSalaryChanges() {
+        const { api } = this.rootStore;
+        const json = this.getJsonifiedSalarySettings();
+        const success = await api.updateSalarySettings(json);
+        return success;
+    }
+
+    @action.bound
     changeMedSalary(level: number, medId: number, propName: keyof IMedSalary, value: number) {
         try { this.userSalary.get(level).meds[medId][propName] = value; } catch { return; }
     }
@@ -217,5 +225,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
             case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
             default: return USER_ROLE.UNKNOWN;
         }
+    }
+
+    private getJsonifiedSalarySettings(): any {
+        // let propName: string;
+        // if (this.role === USER_ROLE.REGIONAL_MANAGER) propName = 'РМ';
+        // if (this.role === USER_ROLE.MEDICAL_AGENT) propName = 'МП';
+
+        // let res: any = {};
+
+        // this.userSalary.forEach((salaryInfo, number) => {
+
+        // });
+        return null;
     }
 }

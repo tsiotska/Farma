@@ -81,7 +81,6 @@ class DepartmentContent extends Component<IProps> {
 
         return (
             <Switch>
-                <Route path={LOGIN_ROUTE} component={Login} />
                 {
                     this.userContent.map(({ path, component }) => (
                         <PrivateRoute key={path} path={path} component={component} />

@@ -14,6 +14,8 @@ import RootStore from '../../stores';
 import theme from '../../theme';
 import { Router } from 'react-router-dom';
 
+const history = createBrowserHistory();
+
 /**
  * Class representing application root component
  * @class
@@ -24,7 +26,7 @@ export class App extends Component<{}, null> {
             <Provider appState={new RootStore()}>
                 <MuiThemeProvider theme={theme} >
                     <CssBaseline />
-                    <Router history={createBrowserHistory()}>
+                    <Router history={history}>
                         <Master />
                     </Router>
                 </MuiThemeProvider>

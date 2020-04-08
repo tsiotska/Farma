@@ -188,11 +188,9 @@ class SalaryRow extends Component<IProps> {
                                             medId={id}
                                             values={this.editableLevelValues[i - 1]}
                                             />
-                                        : (
-                                            <Typography align='center'>
+                                        : <Typography align='center'>
                                                 { this.levelValues[i - 1] }
-                                            </Typography>
-                                          )
+                                          </Typography>
                                     }
                             </Grid>
                         )

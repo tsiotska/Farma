@@ -38,16 +38,18 @@ interface IProps extends WithStyles<typeof styles> {
 export class Master extends Component<IProps, null> {
     render() {
         const { classes } = this.props;
-
         return (
             <main className={classes.root}>
                 <div className={classes.contentWrapper}>
-                    <PrivateRoute
-                        path={ADMIN_ROUTES}
-                        component={Header}
-                        loadingPlaceholder={() => <p>Loading...</p>}
-                    />
-                    <DepartmentContent />
+                    <Switch>
+                        <PrivateRoute
+                            path={ADMIN_ROUTES}
+                            component={Header}
+                            loadingPlaceholder={() => <p>Loading...</p>}
+                        />
+                        <Route path={LOGIN_ROUTE} component={Login} />
+                        <PrivateRoute path={ROOT_ROUTE} component={<DepartmentContent />} />
+                    </Switch>
                 </div>
                 <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
                 <AddDepartmentModal />

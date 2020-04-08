@@ -44,9 +44,9 @@ class PrivateRoute extends Route<IProps & any> {
         return user
         ? <Route {...props} component={component} />
         : <Route {...props} render={
-                () => isUserLoading
-                ? this.loadingMask
-                : <Redirect to={LOGIN_ROUTE} />
+            () => isUserLoading
+                    ? this.loadingMask
+                    : <Redirect to={LOGIN_ROUTE} />
             }
         />;
     }
