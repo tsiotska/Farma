@@ -65,10 +65,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     async submitSalaryChanges() {
-        const { api } = this.rootStore;
-        const json = this.getJsonifiedSalarySettings();
-        const success = await api.updateSalarySettings(json);
-        return success;
+        console.log('should submit');
+        // const { api } = this.rootStore;
+        // const json = this.getJsonifiedSalarySettings();
+        // const success = await api.updateSalarySettings(json);
+        // return success;
     }
 
     @action.bound
@@ -227,16 +228,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
         }
     }
 
-    private getJsonifiedSalarySettings(): any {
-        // let propName: string;
-        // if (this.role === USER_ROLE.REGIONAL_MANAGER) propName = 'РМ';
-        // if (this.role === USER_ROLE.MEDICAL_AGENT) propName = 'МП';
+    // private getJsonifiedSalarySettings(): any {
+    //     // let propName: string;
+    //     // if (this.role === USER_ROLE.REGIONAL_MANAGER) propName = 'РМ';
+    //     // if (this.role === USER_ROLE.MEDICAL_AGENT) propName = 'МП';
 
-        // let res: any = {};
+    //     // let res: any = {};
 
-        // this.userSalary.forEach((salaryInfo, number) => {
+    //     // this.userSalary.forEach((salaryInfo, number) => {
 
-        // });
-        return null;
-    }
+    //     // });
+    //     return null;
+    // }
 }
