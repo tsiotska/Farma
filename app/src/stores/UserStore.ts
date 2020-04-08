@@ -7,7 +7,7 @@ import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
-import { ISalaryInfo, IUserSales } from '../interfaces/ISalaryInfo';
+import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
@@ -50,6 +50,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    changeMedSalary(level: number, medId: number, propName: keyof IMedSalary, value: number) {
+        try { this.userSalary.get(level).meds[medId][propName] = value; } catch { return; }
+    }
+
+    @action.bound
+    changeUserSalary(level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) {
+        try { this.userSalary.get(level)[propName] = value; } catch { return; }
     }
 
     @action.bound

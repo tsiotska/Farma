@@ -33,6 +33,7 @@ interface IProps extends WithStyles<typeof styles> {
     salary: Map<number, ISalaryInfo>;
     levelsCount: number;
     userSales?: IUserSales;
+    isAdmin?: boolean;
 }
 
 @inject(({
@@ -41,12 +42,14 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds
         },
         userStore: {
-            userSales
+            userSales,
+            isAdmin
         }
     }
 }) => ({
     currentDepartmentMeds,
-    userSales
+    userSales,
+    isAdmin
 }))
 @observer
 class UserContent extends Component<IProps> {
@@ -156,13 +159,12 @@ class UserContent extends Component<IProps> {
     }
 
     render() {
-        const { currentDepartmentMeds, salary, levelsCount, userSales } = this.props;
+        const { currentDepartmentMeds, salary, levelsCount, userSales, isAdmin } = this.props;
 
         const { level, value } = this.userMoneyDeficit;
 
         return (
             <>
-                <SalaryHeader levelsCount={levelsCount} />
                 {
                     currentDepartmentMeds.map(medicine => (
                         <SalaryRow
@@ -173,6 +175,8 @@ class UserContent extends Component<IProps> {
                             userLevel={this.userLevel}
                             medicine={medicine}
                             salary={salary}
+                            editable={true}
+                            // editable={isAdmin}
                         />
                     ))
                 }

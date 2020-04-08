@@ -10,6 +10,7 @@ import { toJS, observable } from 'mobx';
 import UserContent from './UserContent';
 import { ISalaryInfo } from '../../../interfaces/ISalaryInfo';
 import { USER_ROLE } from '../../../constants/Roles';
+import SalaryHeader from './SalaryHeader';
 
 const styles = createStyles({
     header: {
@@ -94,7 +95,12 @@ class SalaryReviewModal extends Component<IProps> {
                     <Typography className={classes.headerText} variant='h5'>
                         Заробітня плата
                     </Typography>
-                    <UserContent levelsCount={this.levelsCount} user={user} salary={userSalary} />
+                    <SalaryHeader levelsCount={this.levelsCount} />
+                    <UserContent
+                        levelsCount={this.levelsCount}
+                        user={user}
+                        salary={userSalary}
+                    />
             </Dialog>
         );
     }

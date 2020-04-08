@@ -4,6 +4,8 @@ import { IMedicine } from '../../../../interfaces/IMedicine';
 import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
 import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
+import { computed } from 'mobx';
+import EditableCell from '../EditableCell';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -31,7 +33,8 @@ const styles = (theme: any) => createStyles({
     },
     green: {
         borderColor: theme.palette.primary.level.green
-    }
+    },
+
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -41,6 +44,7 @@ interface IProps extends WithStyles<typeof styles> {
     medicine: IMedicine;
     salary: Map<number, ISalaryInfo>;
     userSales: IUserSales;
+    editable?: boolean;
 }
 
 @observer
@@ -54,6 +58,38 @@ class SalaryRow extends Component<IProps> {
         : [ red, yellow, green ];
     }
 
+    @computed
+    get editableLevelValues(): Array<[number, number]> {
+        const { levels, salary, medicine: { id } } = this.props;
+        return levels.map(x => {
+            const salaryInfo = salary.get(x);
+            if (!salaryInfo) return null;
+            const medInfo = salaryInfo.meds[id];
+            const amount = medInfo
+                ? medInfo.amount
+                : null;
+            const bonus = medInfo
+                ? medInfo.bonus
+                : null;
+
+            return ([ amount, bonus ] as [number, number]);
+        });
+    }
+
+    @computed
+    get levelValues(): number[] | Array<[number, number]> {
+        const { levels, salary, medicine: { id } } = this.props;
+        return levels.map(x => {
+            const salaryInfo = salary.get(x);
+            if (!salaryInfo) return null;
+            const medInfo = salaryInfo.meds[id];
+            return medInfo
+                ? medInfo.amount
+                : null;
+        });
+    }
+
+    @computed
     get userValue(): number {
         const { userSales, medicine: { id } } = this.props;
         const item = userSales
@@ -64,6 +100,7 @@ class SalaryRow extends Component<IProps> {
             : null;
     }
 
+    @computed
     get valueLevel(): number {
         const {
             salary,
@@ -85,6 +122,7 @@ class SalaryRow extends Component<IProps> {
         return currentLevel;
     }
 
+    @computed
     get deficit(): number | string {
         const { salary, medicine: { id } } = this.props;
 
@@ -103,24 +141,21 @@ class SalaryRow extends Component<IProps> {
             : '-';
     }
 
-    getLevelValue = (i: number) => {
-        const { salary, medicine: { id } } = this.props;
-        const salaryInfo = salary.get(i);
-        if (!salaryInfo) return null;
-        const medInfo = salaryInfo.meds[id];
-        return medInfo
-            ? medInfo.amount
-            : null;
-    }
-
     render() {
-        const { classes, medicine, userLevel, levels, userColors } = this.props;
+        const {
+            classes,
+            medicine: { id, name },
+            userLevel,
+            levels,
+            userColors,
+            editable
+        } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' container>
                 <Grid className={classes.wideColumn} alignItems='center' container>
                     <Typography>
-                        { medicine.name }
+                        { name }
                     </Typography>
                 </Grid>
                 <Grid className={classes.wideColumn} justify='center' alignItems='center' container>
@@ -129,9 +164,7 @@ class SalaryRow extends Component<IProps> {
                     </Typography>
                 </Grid>
                 {
-                    levels.map(i => {
-                        const value = this.getLevelValue(i);
-                        return (
+                    levels.map(i => (
                             <Grid
                                 key={i}
                                 className={
@@ -148,12 +181,22 @@ class SalaryRow extends Component<IProps> {
                                 container
                                 item
                                 xs>
-                                <Typography align='center'>
-                                    { value || '-' }
-                                </Typography>
+                                    {
+                                        editable
+                                        ? <EditableCell
+                                            level={i}
+                                            medId={id}
+                                            values={this.editableLevelValues[i - 1]}
+                                            />
+                                        : (
+                                            <Typography align='center'>
+                                                { this.levelValues[i - 1] }
+                                            </Typography>
+                                          )
+                                    }
                             </Grid>
-                        );
-                    })
+                        )
+                    )
                 }
             </Grid>
         );
