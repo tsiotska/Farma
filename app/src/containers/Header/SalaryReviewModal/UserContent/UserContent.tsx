@@ -119,6 +119,42 @@ class UserContent extends Component<IProps> {
         return { level, value: 0 };
     }
 
+    @computed
+    get extraCosts(): number[] {
+        const { salary } = this.props;
+        return this.levels.map(level => {
+            const infoItem = salary.get(level);
+            const extraCosts = infoItem
+                ? infoItem.extraCosts
+                : 0;
+            return extraCosts;
+        });
+    }
+
+    @computed
+    get KPIs(): number[] {
+        const { salary } = this.props;
+        return this.levels.map(level => {
+            const infoItem = salary.get(level);
+            const res = infoItem
+                ? infoItem.kpi
+                : 0;
+            return res;
+        });
+    }
+
+    @computed
+    get ratingSalary(): number[] {
+        const { salary } = this.props;
+        return this.levels.map(level => {
+            const infoItem = salary.get(level);
+            const res = infoItem
+                ? infoItem.salary
+                : 0;
+            return res;
+        });
+    }
+
     render() {
         const { currentDepartmentMeds, salary, levelsCount, userSales } = this.props;
 
@@ -143,7 +179,7 @@ class UserContent extends Component<IProps> {
                 <SumRow
                     title='План в грошах'
                     levels={this.levels}
-                    userLevel={level}
+                    userLevel={this.userLevel}
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={value}
@@ -151,34 +187,30 @@ class UserContent extends Component<IProps> {
                 <SumRow
                     title='Зарплата по рейтингу'
                     levels={this.levels}
-                    userLevel={level}
-                    values={this.plannedCosts}
+                    userLevel={this.userLevel}
+                    values={this.ratingSalary}
                     userColors={this.userColors}
-                    secondColumnValue={value}
                 />
                 <SumRow
                     title='Додаткові витрати'
                     levels={this.levels}
-                    userLevel={level}
-                    values={this.plannedCosts}
+                    userLevel={this.userLevel}
+                    values={this.extraCosts}
                     userColors={this.userColors}
-                    secondColumnValue={value}
                 />
                 <SumRow
                     title='KPI звіти'
                     levels={this.levels}
-                    userLevel={level}
-                    values={this.plannedCosts}
+                    userLevel={this.userLevel}
+                    values={this.KPIs}
                     userColors={this.userColors}
-                    secondColumnValue={value}
                 />
                 <SumRow
                     title='Бонус за виконання більше 5 продуктів'
                     levels={this.levels}
-                    userLevel={level}
+                    userLevel={this.userLevel}
                     values={this.plannedCosts}
                     userColors={this.userColors}
-                    secondColumnValue={value}
                 />
             </>
         );

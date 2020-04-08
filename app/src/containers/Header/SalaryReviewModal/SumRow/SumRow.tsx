@@ -26,7 +26,7 @@ interface IProps extends WithStyles<typeof styles> {
     levels: number[];
     userLevel: number;
     values: any[];
-    userColors: string[];
+    userColors?: string[];
     secondColumnValue?: any;
 }
 
@@ -39,7 +39,7 @@ class SumRow extends Component<IProps> {
             secondColumnValue,
             levels,
             values,
-            userColors,
+            userColors = {},
             userLevel
         } = this.props;
 
@@ -76,7 +76,7 @@ class SumRow extends Component<IProps> {
                         container
                         item
                         xs>
-                            { values[i] || '-' }
+                            { values[i] || '' }
                         </Grid>
                     ))
                 }
