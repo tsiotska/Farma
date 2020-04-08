@@ -2,16 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { NavLink, withRouter } from 'react-router-dom';
-import { match as Match } from 'react-router';
-import {
-    IRoleContent,
-    adminContent,
-    FFMContent,
-    RMContent,
-    MAContent
-} from '../../containers/DepartmentContent/RolesPresets';
-import { USER_ROLE } from '../../constants/Roles';
+import { NavLink } from 'react-router-dom';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,48 +28,32 @@ const styles = (theme: any) => createStyles({
 
 interface ILink {
     title: string;
-    pathname: string;
+    path: string;
 }
 
 interface IProps extends WithStyles<typeof styles> {
-    match?: Match<any>;
-    role?: USER_ROLE;
     currentDepartmentId?: number;
+    userLinks: ILink[];
 }
 
-@withRouter
 @inject(({
     appState: {
         departmentsStore: {
             currentDepartmentId
-        },
-        userStore: {
-            role,
         }
     }
 }) => ({
-    role,
     currentDepartmentId
 }))
 @observer
 class DepartmentNav extends Component<IProps> {
-    get userLinks(): IRoleContent[] {
-        switch (this.props.role) {
-            case USER_ROLE.ADMIN: return adminContent;
-            case USER_ROLE.FIELD_FORCE_MANAGER: return FFMContent;
-            case USER_ROLE.REGIONAL_MANAGER: return RMContent;
-            case USER_ROLE.MEDICAL_AGENT: return MAContent;
-            default: return [];
-        }
-    }
-
     render() {
-        const { classes, currentDepartmentId } = this.props;
+        const { classes, currentDepartmentId, userLinks } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' container>
                 {
-                    this.userLinks.map(({ title, path }) => (
+                    userLinks.map(({ title, path }) => (
                         <NavLink
                             key={path}
                             to={{ pathname: path.replace(':departmentId', `${currentDepartmentId}`) }}

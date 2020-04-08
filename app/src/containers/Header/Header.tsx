@@ -12,6 +12,9 @@ import DepartmentNav from '../../components/DepartmentNav';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { IUser } from '../../interfaces';
 import SalaryReviewModal from './SalaryReviewModal';
+import { IRoleContent } from '../Master/Master';
+import { NAVIGATION_ROUTES, SALES_ROUTE } from '../../constants/Router';
+import { Route } from 'react-router-dom';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -71,7 +74,7 @@ export class Header extends Component<IProps, {}> {
     }
 
     render() {
-        const { classes, navHistory } = this.props;
+        const { classes, navHistory,  } = this.props;
 
         return (
             <>
@@ -83,9 +86,6 @@ export class Header extends Component<IProps, {}> {
                     <Typography variant='h5'>
                         { this.title }
                     </Typography>
-                    {
-
-                    }
                 </AppBar>
                 {
                     navHistory.length !== 0 &&
@@ -102,7 +102,6 @@ export class Header extends Component<IProps, {}> {
                     }
                     </div>
                 }
-                <DepartmentNav />
                 <SalaryReviewModal />
             </>
         );
