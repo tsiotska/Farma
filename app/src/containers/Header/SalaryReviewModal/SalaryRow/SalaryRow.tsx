@@ -138,7 +138,7 @@ class SalaryRow extends Component<IProps> {
 
         return soldAmount < amount
             ? amount - soldAmount
-            : '-';
+            : 0;
     }
 
     render() {

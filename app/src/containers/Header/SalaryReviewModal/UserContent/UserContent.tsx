@@ -7,7 +7,7 @@ import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
 import { IUser } from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
 
 const styles = (theme: any) => createStyles({
@@ -165,6 +165,42 @@ class UserContent extends Component<IProps> {
         });
     }
 
+    @computed
+    get bonuses(): number[] {
+        const { salarySettings, salary, userSales } = this.props;
+        const treshold = salarySettings
+            ? salarySettings.kpi
+            : null;
+        if (treshold === null) return [];
+        return this.levels.map(x => {
+            if (x !== this.userLevel || !userSales) return 0;
+            const salaryInfo = salary.get(x);
+            const meds = salaryInfo
+                ? salaryInfo.meds
+                : {};
+
+            const bonusValues = Object.entries(meds).map(([ medId, { amount, bonus }]) => {
+                const soldAmount = userSales[medId]
+                    ? (userSales[medId].amount || 0)
+                    : 0;
+                // console.log(
+                //     'soldAmount: ', soldAmount,
+                //     'amount: ', amount,
+                //     'bonus: ', bonus
+                // );
+                return (!!soldAmount && !!bonus && soldAmount >= amount)
+                    ? soldAmount * bonus
+                    : 0;
+            });
+
+            const filtered = bonusValues.filter(value => !!value);
+
+            return filtered.length >= treshold
+                ? bonusValues.reduce((total, current) => total + current, 0)
+                : 0;
+        });
+    }
+
     changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value }}: any) => {
         const { changeUserSalary } = this.props;
         const casted = +value;
@@ -178,7 +214,7 @@ class UserContent extends Component<IProps> {
         const { currentDepartmentMeds, salary, levelsCount, userSales, isAdmin } = this.props;
 
         const { level, value } = this.userMoneyDeficit;
-
+        console.log('this.bonuses: ', toJS(this.bonuses));
         return (
             <>
                 {
@@ -234,7 +270,7 @@ class UserContent extends Component<IProps> {
                     title='Бонус за виконання більше 5 продуктів'
                     levels={this.levels}
                     userLevel={this.userLevel}
-                    values={this.plannedCosts}
+                    values={this.bonuses}
                     userColors={this.userColors}
                 />
             </>
