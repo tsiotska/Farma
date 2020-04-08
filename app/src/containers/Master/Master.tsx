@@ -41,15 +41,13 @@ export class Master extends Component<IProps, null> {
         return (
             <main className={classes.root}>
                 <div className={classes.contentWrapper}>
-                    <Switch>
-                        <PrivateRoute
-                            path={ADMIN_ROUTES}
-                            component={Header}
-                            loadingPlaceholder={() => <p>Loading...</p>}
-                        />
-                        <Route path={LOGIN_ROUTE} component={Login} />
-                        <PrivateRoute path={ROOT_ROUTE} component={<DepartmentContent />} />
-                    </Switch>
+                    <PrivateRoute
+                        path={ADMIN_ROUTES}
+                        component={Header}
+                        loadingPlaceholder={() => <p>Loading...</p>}
+                    />
+                    <Route path={LOGIN_ROUTE} component={Login} />
+                    <DepartmentContent />
                 </div>
                 <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
                 <AddDepartmentModal />

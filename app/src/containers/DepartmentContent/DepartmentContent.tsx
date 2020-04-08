@@ -71,7 +71,7 @@ class DepartmentContent extends Component<IProps> {
         ? this.userContent[0].path.replace(':departmentId', `${currentDepartmentId}`)
         : isAdmin
             ? ADMIN_ROUTE
-            : null;
+            : LOGIN_ROUTE;
     }
 
     render() {
