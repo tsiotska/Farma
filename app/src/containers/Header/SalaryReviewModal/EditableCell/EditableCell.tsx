@@ -34,6 +34,9 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class EditableCell extends Component<IProps> {
+    readonly invalidNumberRegex = new RegExp(/^(0[1-9]+$)/); // match strings like 01234
+    @observable bonusStringValue: string;
+
     amountChangeHandler = ({ target: { value }}: any) => {
         const {
             level,
@@ -53,16 +56,23 @@ class EditableCell extends Component<IProps> {
             medId,
             changeMedSalary
         } = this.props;
-        const casted = +value;
+        const casted = value.length
+        ? +value
+        : null;
+
         const isValid = value.length
-            ? !Number.isNaN(casted)
+            ? Number.isNaN(casted) === false
             : true;
-        if (isValid) changeMedSalary(level, medId, 'price', casted);
+
+        if (isValid) {
+            this.bonusStringValue = this.invalidNumberRegex.test(value) ? value[1] : value;
+            changeMedSalary(level, medId, 'bonus', casted);
+        }
     }
 
     render() {
         const { classes, values } = this.props;
-
+        console.log(this.bonusStringValue, values, values ? values[1] : null);
         return (
             <>
                 <Input
@@ -79,7 +89,7 @@ class EditableCell extends Component<IProps> {
                         input: classes.input,
                         root: classes.inputRoot,
                     }}
-                    value={values ? (values[1] || 0) : 0}
+                    value={this.bonusStringValue || (values ? (values[1] || 0) : 0)}
                     onChange={this.bonusChangeHandler}
                     disableUnderline
                 />

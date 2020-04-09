@@ -118,7 +118,7 @@ class UserContent extends Component<IProps> {
             const plannedCost = infoItem
                 ? [...Object.values(infoItem.meds)].reduce((total, { amount, price }) => (total + (amount || 0) * (price || 0)), 0)
                 : 0;
-            return Math.floor(plannedCost * 100) / 100;
+            return Math.floor(plannedCost);
         });
     }
 
@@ -138,7 +138,7 @@ class UserContent extends Component<IProps> {
 
         if (!userSales) return 0;
         const value = Object.values(userSales).reduce((total, { money }) => total + (money || 0), 0);
-        return Math.floor(value * 100) / 100;
+        return Math.floor(value);
     }
 
     @computed
@@ -197,7 +197,7 @@ class UserContent extends Component<IProps> {
                     ? (userSales[medId].amount || 0)
                     : 0;
                 return (!!soldAmount && !!bonus && soldAmount >= amount)
-                    ? soldAmount * bonus
+                    ? Math.floor(soldAmount * bonus)
                     : 0;
             });
 

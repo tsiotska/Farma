@@ -17,7 +17,7 @@ const styles = (theme: any) => createStyles({
         width: 200
     },
     cell: {
-        border: '1px solid transparent'
+        border: '2px solid transparent'
     },
     red: {
         borderColor: theme.palette.primary.level.red
@@ -68,11 +68,11 @@ class SalaryRow extends Component<IProps> {
             const amount = medInfo
                 ? medInfo.amount
                 : null;
-            const price = medInfo
-                ? medInfo.price
+            const bonus = medInfo
+                ? medInfo.bonus
                 : null;
 
-            return ([ amount, price ] as [number, number]);
+            return ([ amount, bonus ] as [number, number]);
         });
     }
 
