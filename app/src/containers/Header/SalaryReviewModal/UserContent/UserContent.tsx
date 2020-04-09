@@ -10,6 +10,8 @@ import SumRow from '../SumRow';
 import { computed, toJS } from 'mobx';
 import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
 import TotalRow from '../TotalRow';
+import { IAsyncStatus } from '../../../../stores/AsyncStore';
+import LoadingMask from '../../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -44,7 +46,9 @@ interface IProps extends WithStyles<typeof styles> {
     isAdmin?: boolean;
     changeUserSalary?: (level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) => void;
     salarySettings?: ISalarySettings;
-    submitSalaryChanges?: () => void;
+    onSubmit?: () => void;
+    clearUserSalaryInfo?: () => void;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
 @inject(({
@@ -57,7 +61,8 @@ interface IProps extends WithStyles<typeof styles> {
             userSales,
             isAdmin,
             salarySettings,
-            submitSalaryChanges
+            clearUserSalaryInfo,
+            getAsyncStatus
         }
     }
 }) => ({
@@ -66,7 +71,8 @@ interface IProps extends WithStyles<typeof styles> {
     userSales,
     isAdmin,
     salarySettings,
-    submitSalaryChanges
+    clearUserSalaryInfo,
+    getAsyncStatus
 }))
 @observer
 class UserContent extends Component<IProps> {
@@ -79,6 +85,11 @@ class UserContent extends Component<IProps> {
             3: [red, yellow, green],
             5: [red, orangered, yellow, limeGreen, green]
         };
+    }
+
+    @computed
+    get isLoadingSubmit(): boolean {
+        return this.props.getAsyncStatus('updateSalary').loading;
     }
 
     @computed
@@ -172,7 +183,7 @@ class UserContent extends Component<IProps> {
         const treshold = salarySettings
             ? salarySettings.kpi
             : null;
-            // return [];
+
         if (treshold === null) return [];
         return this.levels.map(x => {
             if (x !== this.userLevel || !userSales) return 0;
@@ -196,7 +207,6 @@ class UserContent extends Component<IProps> {
                 ? filtered.reduce((total, current) => total + current, 0)
                 : 0;
         });
-        return [];
     }
 
     changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value }}: any) => {
@@ -208,13 +218,17 @@ class UserContent extends Component<IProps> {
         if (isValid) changeUserSalary(level, propName, casted);
     }
 
+    componentWillUnmount() {
+        this.props.clearUserSalaryInfo();
+    }
+
     render() {
         const {
             classes,
             currentDepartmentMeds,
             salary,
             userSales,
-            submitSalaryChanges
+            onSubmit
         } = this.props;
 
         return (
@@ -241,8 +255,6 @@ class UserContent extends Component<IProps> {
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={this.userMoneyDeficit}
-                    // changeHandler={isAdmin ? this.changeHandler('plannedCosts') : null}
-                    // changeHandler={this.changeHandler('plannedCosts')}
                 />
                 <SumRow
                     title='Зарплата по рейтингу'
@@ -284,8 +296,16 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     colors={this.userColors}
                 />
-                <Button className={classes.submitButton} variant='contained' onClick={submitSalaryChanges}>
-                    Зберегти
+                <Button
+                    className={classes.submitButton}
+                    variant='contained'
+                    onClick={onSubmit}
+                    disabled={this.isLoadingSubmit}>
+                    {
+                        this.isLoadingSubmit
+                        ? <LoadingMask size={20} />
+                        : 'Зберегти'
+                    }
                 </Button>
             </>
         );

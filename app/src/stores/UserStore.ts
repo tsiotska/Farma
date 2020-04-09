@@ -64,12 +64,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async submitSalaryChanges() {
-        console.log('should submit');
-        // const { api } = this.rootStore;
-        // const json = this.getJsonifiedSalarySettings();
-        // const success = await api.updateSalarySettings(json);
-        // return success;
+    async submitSalaryChanges(): Promise<boolean | null> {
+        const requestName = 'updateSalary';
+        const { api } = this.rootStore;
+        const preparedObject = this.getPreparedSalarySettings();
+
+        console.log('json: ', preparedObject);
+        if (preparedObject === null) return null;
+
+        return await this.dispatchRequest(
+            api.updateSalarySettings(preparedObject),
+            requestName
+        );
     }
 
     @action.bound
@@ -91,6 +97,12 @@ export default class UserStore extends AsyncStore implements IUserStore {
     historyGoTo(userId: number) {
         const userIndex = this.navHistory.findIndex(({ id }) => id === userId);
         this.navHistory = this.navHistory.filter((_, i) => i <= userIndex);
+    }
+
+    @action.bound
+    clearUserSalaryInfo() {
+        this.userSalary = new Map();
+        this.userSales = null;
     }
 
     @action.bound
@@ -228,16 +240,43 @@ export default class UserStore extends AsyncStore implements IUserStore {
         }
     }
 
-    // private getJsonifiedSalarySettings(): any {
-    //     // let propName: string;
-    //     // if (this.role === USER_ROLE.REGIONAL_MANAGER) propName = 'РМ';
-    //     // if (this.role === USER_ROLE.MEDICAL_AGENT) propName = 'МП';
+    private getPreparedSalarySettings(): any {
+        console.log(toJS(this.userSalary));
+        let levelName: string;
+        if (this.role === USER_ROLE.REGIONAL_MANAGER) levelName = 'РМ';
+        if (this.role === USER_ROLE.MEDICAL_AGENT) levelName = 'МП';
 
-    //     // let res: any = {};
+        if (!levelName) return null;
 
-    //     // this.userSalary.forEach((salaryInfo, number) => {
+        const res: any = {};
+        this.userSalary.forEach((salaryInfo, num) => {
+            const {
+                extraCosts,
+                kpi,
+                meds,
+                salary
+            } = salaryInfo;
 
-    //     // });
-    //     return null;
-    // }
+            const drugs = Object.entries(meds || {}).map(([drug, drugData]) => {
+                const { amount, bonus, price } = drugData;
+                return {
+                    drug,
+                    amount,
+                    bonus,
+                    price
+                };
+            });
+
+            const dataObject: any = {
+                drugs,
+                salary,
+                kpi,
+                add_costs: extraCosts,
+            };
+
+            res[`${levelName}${num}`] = dataObject;
+        });
+
+        return res;
+    }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withStyles, createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
+import { withStyles, createStyles, WithStyles, Grid, Typography, SnackbarOrigin } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import Dialog from '../../../components/Dialog';
 import { SALARY_PREVIEW_MODAL } from '../../../constants/Modals';
@@ -11,6 +11,8 @@ import UserContent from './UserContent';
 import { ISalaryInfo } from '../../../interfaces/ISalaryInfo';
 import { USER_ROLE } from '../../../constants/Roles';
 import SalaryHeader from './SalaryHeader';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
 
 const styles = createStyles({
     header: {
@@ -18,22 +20,27 @@ const styles = createStyles({
     },
     headerText: {
         margin: '20px 0'
+    },
+    snackbar: {
+        position: 'fixed'
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     user?: IUser;
     openedModal?: string;
+    userSalary?: Map<number, ISalaryInfo>;
     openModal?: (modalName: string) => void;
     loadUserSalaryInfo?: (user: IUser) => void;
-    userSalary?: Map<number, ISalaryInfo>;
+    submitSalaryChanges?: () => boolean;
 }
 
 @inject(({
     appState: {
         userStore: {
             loadUserSalaryInfo,
-            userSalary
+            userSalary,
+            submitSalaryChanges
         },
         uiStore: {
             modalPayload: user,
@@ -46,11 +53,14 @@ interface IProps extends WithStyles<typeof styles> {
     userSalary,
     openedModal,
     openModal,
-    user
+    user,
+    submitSalaryChanges
 }))
 @observer
 class SalaryReviewModal extends Component<IProps> {
     @observable isOpen: boolean = false;
+    @observable snackbar: SNACKBAR_TYPE = null;
+    @observable showSnackbar: boolean = false;
 
     get levelsCount() {
         const { user } = this.props;
@@ -66,6 +76,19 @@ class SalaryReviewModal extends Component<IProps> {
             () => this.props.openModal(null),
             300
         );
+    }
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
+    }
+
+    submitHandler = async () => {
+        const { submitSalaryChanges } = this.props;
+        const updatedSuccessfully = await submitSalaryChanges();
+        this.snackbar = await updatedSuccessfully
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -100,6 +123,20 @@ class SalaryReviewModal extends Component<IProps> {
                         levelsCount={this.levelsCount}
                         user={user}
                         salary={userSalary}
+                        onSubmit={this.submitHandler}
+                    />
+                    <Snackbar
+                        open={this.showSnackbar}
+                        onClose={this.snackbarCloseHandler}
+                        type={this.snackbar || SNACKBAR_TYPE.SUCCESS}
+                        classes={{ root: classes.snackbar }}
+                        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                        // autoHideDuration={6000}
+                        message={
+                            this.snackbar === SNACKBAR_TYPE.SUCCESS
+                            ? 'Дані успішно оновленно'
+                            : 'Оновити дані не вдалося'
+                        }
                     />
             </Dialog>
         );

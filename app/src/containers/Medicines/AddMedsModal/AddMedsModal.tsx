@@ -6,7 +6,8 @@ import Dialog from '../../../components/Dialog';
 import PhotoDropzone from '../PhotoDropzone';
 import FormContent from '../FormContent';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import Snackbar, { SNACKBAR_TYPE } from '../Snackbar/Snackbar';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
 
 interface IProps {
     openedModal?: string;
@@ -147,6 +148,13 @@ class AddMedsModal extends Component<IProps> {
                     open={!!this.openSnackbar}
                     onClose={this.snackbarCloseHandler}
                     type={this.snackbarType}
+                    autoHideDuration={6000}
+                    anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Медикамент успішно додано'
+                        : 'Неможливо додати медикамент'
+                    }
                 />
             </>
         );
