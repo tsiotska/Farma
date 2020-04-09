@@ -1,10 +1,11 @@
 export interface IMedSalary {
     amount: number;
     bonus: number;
+    price: number;
 }
 
 export interface ISalaryInfo {
-    plannedCosts: number;
+    // plannedCosts: number;
     salary: number;
     extraCosts: number;
     kpi: number; // Key Performance Indicators, KPI

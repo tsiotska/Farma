@@ -119,7 +119,7 @@ class SalaryHeader extends Component<IProps> {
                                         к-сть
                                     </Typography>
                                     <Typography className={cx(classes.text, classes.secondaryText)} align='left' variant='body2' color='textSecondary'>
-                                        бонус
+                                        ціна
                                     </Typography>
                                 </Grid>
                             }

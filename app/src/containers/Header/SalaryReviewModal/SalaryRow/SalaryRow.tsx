@@ -68,11 +68,14 @@ class SalaryRow extends Component<IProps> {
             const amount = medInfo
                 ? medInfo.amount
                 : null;
-            const bonus = medInfo
-                ? medInfo.bonus
+            const price = medInfo
+                ? medInfo.price
                 : null;
+            // const bonus = medInfo
+            //     ? medInfo.bonus
+            //     : null;
 
-            return ([ amount, bonus ] as [number, number]);
+            return ([ amount, price ] as [number, number]);
         });
     }
 

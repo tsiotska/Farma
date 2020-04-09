@@ -104,10 +104,10 @@ class UserContent extends Component<IProps> {
         const { salary } = this.props;
         return this.levels.map(level => {
             const infoItem = salary.get(level);
-            const plannedCosts = infoItem
-                ? infoItem.plannedCosts
+            const plannedCost = infoItem
+                ? [...Object.values(infoItem.meds)].reduce((total, { amount, price }) => (total + (amount || 0) * (price || 0)), 0)
                 : 0;
-            return plannedCosts;
+            return Math.floor(plannedCost * 100) / 100;
         });
     }
 
@@ -122,21 +122,12 @@ class UserContent extends Component<IProps> {
     }
 
     @computed
-    get userMoneyDeficit(): {level: number, value: number} {
-        const { salary } = this.props;
-        let level = 0;
-        if (!salary) return { level, value: 0 };
-        for (const [i, { plannedCosts }] of salary) {
-            if (this.totalUserSoldAmount >= plannedCosts) {
-                level = i;
-            } else {
-                return {
-                    level,
-                    value: plannedCosts - this.totalUserSoldAmount
-                };
-            }
-        }
-        return { level, value: 0 };
+    get userMoneyDeficit(): number {
+        const { userSales } = this.props;
+
+        if (!userSales) return 0;
+        const value = Object.values(userSales).reduce((total, { money }) => total + (money || 0), 0);
+        return Math.floor(value * 100) / 100;
     }
 
     @computed
@@ -181,6 +172,7 @@ class UserContent extends Component<IProps> {
         const treshold = salarySettings
             ? salarySettings.kpi
             : null;
+            // return [];
         if (treshold === null) return [];
         return this.levels.map(x => {
             if (x !== this.userLevel || !userSales) return 0;
@@ -201,9 +193,10 @@ class UserContent extends Component<IProps> {
             const filtered = bonusValues.filter(value => !!value);
 
             return filtered.length >= treshold
-                ? bonusValues.reduce((total, current) => total + current, 0)
+                ? filtered.reduce((total, current) => total + current, 0)
                 : 0;
         });
+        return [];
     }
 
     changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value }}: any) => {
@@ -220,14 +213,10 @@ class UserContent extends Component<IProps> {
             classes,
             currentDepartmentMeds,
             salary,
-            levelsCount,
             userSales,
-            isAdmin,
             submitSalaryChanges
         } = this.props;
 
-        const { level, value } = this.userMoneyDeficit;
-        console.log('this.bonuses: ', toJS(this.bonuses));
         return (
             <>
                 {
@@ -251,9 +240,9 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.plannedCosts}
                     userColors={this.userColors}
-                    secondColumnValue={value}
+                    secondColumnValue={this.userMoneyDeficit}
                     // changeHandler={isAdmin ? this.changeHandler('plannedCosts') : null}
-                    changeHandler={this.changeHandler('plannedCosts')}
+                    // changeHandler={this.changeHandler('plannedCosts')}
                 />
                 <SumRow
                     title='Зарплата по рейтингу'

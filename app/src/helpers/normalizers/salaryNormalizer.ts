@@ -15,7 +15,6 @@ export const salaryNormalizer = ({ data: { data: { levels, sales } }}: any): INo
         if (keyPattern.test(key) === false) continue;
 
         const {
-            plan_money,
             salary,
             add_costs,
             kpi,
@@ -23,14 +22,13 @@ export const salaryNormalizer = ({ data: { data: { levels, sales } }}: any): INo
         } = levels[key];
 
         const meds: { [key: number]: IMedSalary } = drugs.reduce(
-            (total: any, { drug, ...rest }: any) => ({ ...total, [drug]: rest }),
+            (total: any, { drug, amount, price }: any) => ({ ...total, [drug]: { amount: amount || null, price: price || null} }),
             {}
         );
 
         const newObject: ISalaryInfo = {
             extraCosts: add_costs || null,
             kpi: kpi || null,
-            plannedCosts: plan_money || null,
             salary: salary || null,
             meds
         };

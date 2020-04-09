@@ -57,7 +57,7 @@ class EditableCell extends Component<IProps> {
         const isValid = value.length
             ? !Number.isNaN(casted)
             : true;
-        if (isValid) changeMedSalary(level, medId, 'bonus', casted);
+        if (isValid) changeMedSalary(level, medId, 'price', casted);
     }
 
     render() {
@@ -70,7 +70,7 @@ class EditableCell extends Component<IProps> {
                         input: classes.input,
                         root: classes.inputRoot,
                     }}
-                    value={values ? values[0] : 0}
+                    value={values ? (values[0] || 0) : 0}
                     onChange={this.amountChangeHandler}
                     disableUnderline
                 />
@@ -79,7 +79,7 @@ class EditableCell extends Component<IProps> {
                         input: classes.input,
                         root: classes.inputRoot,
                     }}
-                    value={values ? values[1] : 0}
+                    value={values ? (values[1] || 0) : 0}
                     onChange={this.bonusChangeHandler}
                     disableUnderline
                 />
