@@ -15,6 +15,7 @@ import { IAsyncStatus } from '../../../stores/AsyncStore';
 import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
+import { ILocation } from '../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     title: {
@@ -37,6 +38,7 @@ interface IProps extends WithStyles<typeof styles> {
     rmId: number;
     positions: Map<number, IPosition>;
 
+    cities?: Map<number, ILocation>;
     expandedWorker?: IExpandedWorker;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     retryLoadSubworkers?: () => void;
@@ -47,13 +49,15 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             expandedWorker,
             getAsyncStatus,
+            cities,
             loadSubworkers: retryLoadSubworkers
         }
     }
 }) => ({
     retryLoadSubworkers,
     getAsyncStatus,
-    expandedWorker
+    expandedWorker,
+    cities,
 }))
 @observer
 class Sublist extends Component<IProps> {
@@ -62,7 +66,7 @@ class Sublist extends Component<IProps> {
     }
 
     getList = () => {
-        const { expandedWorker, positions, classes } = this.props;
+        const { expandedWorker, positions, classes, cities } = this.props;
 
         if (expandedWorker === null || expandedWorker.subworkers === null) return;
 
@@ -74,6 +78,7 @@ class Sublist extends Component<IProps> {
                 worker={x}
                 fired={false}
                 isExpanded={false}
+                location={cities.get(x.city)}
                 classes={{
                     avatar: classes.avatar
                 }}

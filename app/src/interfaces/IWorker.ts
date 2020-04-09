@@ -8,6 +8,8 @@ export interface IWorker {
     fired?: Date;
     hired?: Date;
     created?: Date;
+    region?: number;
+    city: number;
 
     email: string;
     mobilePhone: string;

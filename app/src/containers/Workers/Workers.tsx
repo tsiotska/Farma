@@ -14,6 +14,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { GetApp } from '@material-ui/icons';
 import { isConstructorDeclaration } from 'typescript';
+import { LOCATION_TITLE } from './List/List';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -140,7 +141,8 @@ class Workers extends Component<IProps> {
             classes,
             workers,
             firedWorkers,
-            positions
+            positions,
+            role
         } = this.props;
 
         return (
@@ -156,6 +158,11 @@ class Workers extends Component<IProps> {
                     <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
                 </Tabs>
                 <List
+                    locationTitle={
+                        role === USER_ROLE.FIELD_FORCE_MANAGER
+                        ? LOCATION_TITLE.REGION
+                        : LOCATION_TITLE.CITY
+                    }
                     positions={positions}
                     workers={
                         this.tab === 'fired'

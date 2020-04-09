@@ -8,13 +8,14 @@ import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
-import { toJS } from 'mobx';
+import { toJS, computed } from 'mobx';
+import { ILocation } from '../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     header: {
         color: theme.palette.primary.gray.light,
         margin: '24px 0 10px',
-        paddingLeft: ({ fired }: any) => fired ? 0 : 32,
+        paddingLeft: ({ fired, expandable }: any) => (expandable && !fired) ? 32 : 0,
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
             paddingLeft: 5,
@@ -30,44 +31,56 @@ const styles = (theme: any) => createStyles({
     }
 });
 
+export enum LOCATION_TITLE {
+    CITY= 'місто',
+    REGION= 'регіон',
+}
+
 interface IProps extends WithStyles<typeof styles> {
     workers: IWorker[];
     fired: boolean;
     positions: Map<number, IPosition>;
     expandable: boolean;
     headerAppend?: any;
+    locationTitle?: LOCATION_TITLE;
 
+    cities?: Map<number, ILocation>;
+    regions?: Map<number, ILocation>;
     expandedWorker?: IExpandedWorker;
     setExpandedWorker?: (workerId: number | null) => void;
-    role?: USER_ROLE;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             expandedWorker,
-            setExpandedWorker
+            setExpandedWorker,
+            cities,
+            regions
         },
-        userStore: {
-            role
-        }
     }
 }) => ({
     expandedWorker,
     setExpandedWorker,
-    role
+    cities,
+    regions
 }))
 @observer
 class List extends Component<IProps> {
-    get locationHeader(): string {
-        const { fired, role } = this.props;
+    @computed
+    get targetLocations(): Map<number, ILocation> {
+        const { cities, regions, locationTitle} = this.props;
+        if (locationTitle === LOCATION_TITLE.CITY) return cities;
+        if (locationTitle === LOCATION_TITLE.REGION) return regions;
+        return new Map();
+    }
 
-        if (fired) {
-            return role === USER_ROLE.REGIONAL_MANAGER
-                ? 'Місто'
-                : 'Регіон';
-        }
-        return 'Посада';
+    @computed
+    get targetPropName(): 'city' | 'region' {
+        const { locationTitle } = this.props;
+        return locationTitle === LOCATION_TITLE.REGION
+            ? 'region'
+            : 'city';
     }
 
     expandChangeHandler = (workerId: number) => (event: any, expanded: boolean) => {
@@ -88,7 +101,8 @@ class List extends Component<IProps> {
             fired,
             expandable,
             expandedWorker,
-            headerAppend
+            headerAppend,
+            locationTitle
         } = this.props;
 
         return (
@@ -104,7 +118,11 @@ class List extends Component<IProps> {
                     </Grid>
                     <Grid xs item zeroMinWidth>
                         <Typography variant='body2'>
-                            { this.locationHeader }
+                            {
+                                expandable
+                                ? 'Регіон/Місто'
+                                : locationTitle
+                            }
                         </Typography>
                     </Grid>
                     <Grid
@@ -156,6 +174,7 @@ class List extends Component<IProps> {
                                 ? expandedWorker.id === x.id
                                 : false
                             }
+                            location={this.targetLocations.get(x[this.targetPropName])}
                             expandChangeHandler={this.expandChangeHandler(x.id)}
                             position={positions.get(x.position)}
                             children={expandable && <Sublist rmId={x.id} positions={positions} />}

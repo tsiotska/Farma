@@ -22,6 +22,7 @@ import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
 import vacancyIcon from '../../../../assets/icons/vacancyIcon.png';
 import { IUserCommonInfo } from '../../../interfaces/IUser';
 import { USER_ROLE } from '../../../constants/Roles';
+import { ILocation } from '../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -103,6 +104,7 @@ interface IProps extends WithStyles<typeof styles> {
     isExpanded?: boolean;
     expandChangeHandler?: (e: any, expanded: boolean) => void;
     loadUserInfo?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
+    location: ILocation;
 }
 
 @inject(({
@@ -118,17 +120,11 @@ interface IProps extends WithStyles<typeof styles> {
 class ListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
 
-    get position(): string {
-        const { position } = this.props;
-        return position
-            ? position.alias
+    get location(): string {
+        const { location } = this.props;
+        return location
+            ? location.name
             : '-';
-    }
-
-    get region(): string {
-        // const { region } = this.props;
-        // return region ? region.name : '-';
-        return '-';
     }
 
     get date(): string {
@@ -249,14 +245,9 @@ class ListItem extends Component<IProps> {
                             {name}
                         </Typography>
                     </Grid>
-                    {/* ={fired ? 2 : true} */}
                     <Grid xs className={classes.gridItem} alignItems='center' container zeroMinWidth item>
                         <Typography variant='body2'>
-                            {
-                                fired
-                                    ? this.region
-                                    : this.position
-                            }
+                            { this.location }
                         </Typography>
                     </Grid>
                     <Grid xs={fired ? 2 : true} className={classes.gridItem} alignItems='center' zeroMinWidth container item>

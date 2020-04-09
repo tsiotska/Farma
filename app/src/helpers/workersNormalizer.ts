@@ -13,7 +13,9 @@ const defaultWorker: IWorker = {
     workPhone: null,
     mobilePhone: null,
     card: null,
-    isVacancy: false
+    isVacancy: false,
+    region: null,
+    city: null
 };
 
 const valuesMap: IValuesMap = {
@@ -28,7 +30,9 @@ const valuesMap: IValuesMap = {
     mobile_phone: 'mobilePhone',
     work_phone: 'workPhone',
     bank_card: 'card',
-    vacancy: 'isVacancy'
+    vacancy: 'isVacancy',
+    region: 'region',
+    city: 'city'
 };
 
 export const workersNormalizer = ({ data: { data }}: any): IWorker[] => objectArrayNormalizer(
