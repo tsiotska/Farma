@@ -4,7 +4,7 @@ import { IMedicine } from '../../../../interfaces/IMedicine';
 import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
 import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import EditableCell from '../EditableCell';
 
 const styles = (theme: any) => createStyles({
@@ -71,16 +71,13 @@ class SalaryRow extends Component<IProps> {
             const price = medInfo
                 ? medInfo.price
                 : null;
-            // const bonus = medInfo
-            //     ? medInfo.bonus
-            //     : null;
 
             return ([ amount, price ] as [number, number]);
         });
     }
 
     @computed
-    get levelValues(): number[] | Array<[number, number]> {
+    get levelValues(): number[] {
         const { levels, salary, medicine: { id } } = this.props;
         return levels.map(x => {
             const salaryInfo = salary.get(x);
@@ -88,7 +85,7 @@ class SalaryRow extends Component<IProps> {
             const medInfo = salaryInfo.meds[id];
             return medInfo
                 ? medInfo.amount
-                : null;
+                : 0;
         });
     }
 

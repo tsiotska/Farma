@@ -127,8 +127,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadUserInfo(agentInfo: IUserCommonInfo, role?: USER_ROLE) {
         const position = role || this.getNextRole();
+        console.log('pos: ', position);
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
+        console.log('role: ', this.role);
         if (!res) return;
 
         const agent = this.navHistory.find(({ id }) => id === res.id);
@@ -234,8 +236,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     private getNextRole(): USER_ROLE {
         switch (this.role) {
-            case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.FIELD_FORCE_MANAGER;
-            case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
+            case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
+            case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.MEDICAL_AGENT;
             default: return USER_ROLE.UNKNOWN;
         }
     }

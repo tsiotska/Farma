@@ -22,13 +22,9 @@ export const salaryNormalizer = ({ data: { data: { levels, sales } }}: any): INo
         } = levels[key];
 
         const meds: { [key: number]: IMedSalary } = drugs.reduce(
-            (total: any, { drug, amount, price, bonus }: any) => ({
+            (total: any, { drug, amount = 0, price = 0, bonus = 0 }: any) => ({
                 ...total,
-                [drug]: {
-                    amount: amount || null,
-                    price: price || null,
-                    bonus: bonus || null,
-                }
+                [drug]: { amount, price, bonus }
             }),
             {}
         );

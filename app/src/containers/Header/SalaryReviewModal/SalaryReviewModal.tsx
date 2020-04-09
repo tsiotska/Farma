@@ -131,7 +131,7 @@ class SalaryReviewModal extends Component<IProps> {
                         type={this.snackbar || SNACKBAR_TYPE.SUCCESS}
                         classes={{ root: classes.snackbar }}
                         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                        // autoHideDuration={6000}
+                        autoHideDuration={6000}
                         message={
                             this.snackbar === SNACKBAR_TYPE.SUCCESS
                             ? 'Дані успішно оновленно'

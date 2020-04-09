@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { createStyles, WithStyles, withStyles, Grid, Typography } from '@material-ui/core';
 import cx from 'classnames';
+import { USER_ROLE } from '../../../../constants/Roles';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -53,16 +55,19 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     levelsCount: number;
     isAdmin?: boolean;
+    role?: USER_ROLE;
 }
 
 @inject(({
     appState: {
         userStore: {
-            isAdmin
+            isAdmin,
+            role
         }
     }
 }) => ({
-    isAdmin
+    isAdmin,
+    role
 }))
 @observer
 class SalaryHeader extends Component<IProps> {
@@ -77,16 +82,22 @@ class SalaryHeader extends Component<IProps> {
         };
     }
 
+    @computed
     get userColor(): string[] {
         const { levelsCount } = this.props;
         return this.colors[levelsCount] || [];
     }
 
+    @computed
     get MPHeaders(): string[] {
-        const { levelsCount } = this.props;
+        const { levelsCount, role } = this.props;
+        const keyName = role === USER_ROLE.REGIONAL_MANAGER
+            ? 'РМ'
+            : 'МП';
         const res: string[] = [];
         for (let i = 0; i < levelsCount; ++i) {
-            res.push(`МП${i + 1}`);
+
+            res.push(`${keyName}${i + 1}`);
         }
         return res;
     }
@@ -113,7 +124,7 @@ class SalaryHeader extends Component<IProps> {
                                 {header}
                             </Typography>
                             {
-                                true &&
+                                isAdmin &&
                                 <Grid className={classes.adminTextBlock} alignItems='center' wrap='nowrap' container>
                                     <Typography className={cx(classes.text, classes.secondaryText)} align='right' variant='body2' color='textSecondary'>
                                         к-сть

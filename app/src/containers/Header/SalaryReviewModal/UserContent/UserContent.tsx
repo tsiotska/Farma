@@ -228,7 +228,8 @@ class UserContent extends Component<IProps> {
             currentDepartmentMeds,
             salary,
             userSales,
-            onSubmit
+            onSubmit,
+            isAdmin
         } = this.props;
 
         return (
@@ -243,8 +244,7 @@ class UserContent extends Component<IProps> {
                             userLevel={this.userLevel}
                             medicine={medicine}
                             salary={salary}
-                            editable={true}
-                            // editable={isAdmin}
+                            editable={isAdmin}
                         />
                     ))
                 }
@@ -262,7 +262,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.ratingSalary}
                     userColors={this.userColors}
-                    changeHandler={this.changeHandler('salary')}
+                    changeHandler={isAdmin && this.changeHandler('salary')}
                 />
                 <SumRow
                     title='Додаткові витрати'
@@ -270,7 +270,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.extraCosts}
                     userColors={this.userColors}
-                    changeHandler={this.changeHandler('extraCosts')}
+                    changeHandler={isAdmin && this.changeHandler('extraCosts')}
                 />
                 <SumRow
                     title='KPI звіти'
@@ -278,7 +278,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.KPIs}
                     userColors={this.userColors}
-                    changeHandler={this.changeHandler('kpi')}
+                    changeHandler={isAdmin && this.changeHandler('kpi')}
                 />
                 <SumRow
                     title='Бонус за виконання більше 5 продуктів'
@@ -296,17 +296,20 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     colors={this.userColors}
                 />
-                <Button
-                    className={classes.submitButton}
-                    variant='contained'
-                    onClick={onSubmit}
-                    disabled={this.isLoadingSubmit}>
-                    {
-                        this.isLoadingSubmit
-                        ? <LoadingMask size={20} />
-                        : 'Зберегти'
-                    }
-                </Button>
+                {
+                    isAdmin &&
+                    <Button
+                        className={classes.submitButton}
+                        variant='contained'
+                        onClick={onSubmit}
+                        disabled={this.isLoadingSubmit}>
+                        {
+                            this.isLoadingSubmit
+                            ? <LoadingMask size={20} />
+                            : 'Зберегти'
+                        }
+                    </Button>
+                }
             </>
         );
     }
