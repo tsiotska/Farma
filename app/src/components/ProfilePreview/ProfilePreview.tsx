@@ -262,7 +262,7 @@ class ProfilePreview extends Component<IProps> {
                         zeroMinWidth
                         item>
                             <Typography>
-                                Докторів
+                                Лікарів
                             </Typography>
                             <Typography>
                                 { doctorsCount === null ? '-' : doctorsCount }

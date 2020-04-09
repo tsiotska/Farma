@@ -14,6 +14,7 @@ import cx from 'classnames';
 import { Edit, Delete } from '@material-ui/icons';
 import { gridStyles } from '../gridStyles';
 import CommitBadge from '../CommtiBadge';
+import { ILocation } from '../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -78,10 +79,26 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     pharmacy: ILPU;
     unconfirmed: boolean;
+    region: ILocation;
+    city: ILocation;
 }
 
 @observer
 class ListItem extends Component<IProps> {
+    get cityName(): string {
+        const { city, } = this.props;
+        return city
+            ? city.name
+            : '-';
+    }
+
+    get regionName(): string {
+        const { region } = this.props;
+        return region
+            ? region.name
+            : '-';
+    }
+
     render() {
         const {
             classes,
@@ -116,7 +133,7 @@ class ListItem extends Component<IProps> {
                 </Grid>
                 <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { region }
+                        { this.regionName }
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.oblast)} xs={1} alignItems='center' container item>
@@ -126,7 +143,7 @@ class ListItem extends Component<IProps> {
                 </Grid>
                 <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { city }
+                        { this.cityName }
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>

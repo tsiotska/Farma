@@ -7,11 +7,14 @@ import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
+import { USER_ROLE } from '../../../constants/Roles';
+import { toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     header: {
         color: theme.palette.primary.gray.light,
         margin: '24px 0 10px',
+        paddingLeft: ({ fired }: any) => fired ? 0 : 32,
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',
             paddingLeft: 5,
@@ -23,7 +26,7 @@ const styles = (theme: any) => createStyles({
         width: 88
     },
     withPadding: {
-        paddingLeft: 68
+        paddingLeft: 41
     }
 });
 
@@ -36,6 +39,7 @@ interface IProps extends WithStyles<typeof styles> {
 
     expandedWorker?: IExpandedWorker;
     setExpandedWorker?: (workerId: number | null) => void;
+    role?: USER_ROLE;
 }
 
 @inject(({
@@ -43,14 +47,29 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             expandedWorker,
             setExpandedWorker
+        },
+        userStore: {
+            role
         }
     }
 }) => ({
     expandedWorker,
-    setExpandedWorker
+    setExpandedWorker,
+    role
 }))
 @observer
 class List extends Component<IProps> {
+    get locationHeader(): string {
+        const { fired, role } = this.props;
+
+        if (fired) {
+            return role === USER_ROLE.REGIONAL_MANAGER
+                ? 'Місто'
+                : 'Регіон';
+        }
+        return 'Посада';
+    }
+
     expandChangeHandler = (workerId: number) => (event: any, expanded: boolean) => {
         const { setExpandedWorker, expandable } = this.props;
         if (expandable === false) return;
@@ -85,15 +104,15 @@ class List extends Component<IProps> {
                     </Grid>
                     <Grid xs item zeroMinWidth>
                         <Typography variant='body2'>
-                            {
-                                fired
-                                    ? 'Регіон'
-                                    : 'Посада'
-                            }
+                            { this.locationHeader }
                         </Typography>
                     </Grid>
                     <Grid
-                        xs={fired ? 2 : true}
+                        xs={
+                            fired
+                                ? 2
+                                : true
+                            }
                         zeroMinWidth
                         item>
                         <Typography variant='body2'>

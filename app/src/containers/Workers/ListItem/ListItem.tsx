@@ -65,9 +65,6 @@ const styles = (theme: any) => createStyles({
     summaryRoot: {
         padding: 0,
         minHeight: '48px !important',
-        // cursor: ({ children }: any) => children
-        //     ? 'initial'
-        //     : 'default !important',
         border: ({ worker: { isVacancy }}: any) => isVacancy
             ? '1px solid #f3ca47'
             : '1px solid transparent',
@@ -83,7 +80,6 @@ const styles = (theme: any) => createStyles({
             backgroundColor: ( {worker: { isVacancy }}: any) => isVacancy
                 ? 'transparent'
                 : '#f1f1f1'
-            // pointer: 'cursor !important'
         }
     },
     details: {
@@ -253,9 +249,14 @@ class ListItem extends Component<IProps> {
                             {name}
                         </Typography>
                     </Grid>
+                    {/* ={fired ? 2 : true} */}
                     <Grid xs className={classes.gridItem} alignItems='center' container zeroMinWidth item>
                         <Typography variant='body2'>
-                            {fired ? this.region : this.position}
+                            {
+                                fired
+                                    ? this.region
+                                    : this.position
+                            }
                         </Typography>
                     </Grid>
                     <Grid xs={fired ? 2 : true} className={classes.gridItem} alignItems='center' zeroMinWidth container item>
