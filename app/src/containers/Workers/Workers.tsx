@@ -12,9 +12,8 @@ import { IWorker } from '../../interfaces/IWorker';
 import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
-import { GetApp } from '@material-ui/icons';
-import { isConstructorDeclaration } from 'typescript';
 import { LOCATION_TITLE } from './List/List';
+import ExcelIcon from '-!react-svg-loader!../../../assets/icons/excel.svg';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -28,6 +27,12 @@ const styles = (theme: any) => createStyles({
         textTransform: 'capitalize',
         minHeight: 0,
         padding: '0 10px'
+    },
+    excelButton: {
+        padding: 4,
+        borderRadius: 2,
+        marginLeft: 'auto',
+        marginRight: 6
     }
 });
 
@@ -172,8 +177,8 @@ class Workers extends Component<IProps> {
                     fired={this.tab === 'fired'}
                     expandable={this.isFFM && this.tab === 'all'}
                     headerAppend={
-                        <IconButton onClick={this.loadExcel}>
-                            <GetApp fontSize='small' />
+                        <IconButton className={classes.excelButton} onClick={this.loadExcel}>
+                            <ExcelIcon width={24} height={24} />
                         </IconButton>
                     }
                 />

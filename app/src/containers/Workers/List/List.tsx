@@ -24,7 +24,8 @@ const styles = (theme: any) => createStyles({
         }
     },
     actionContainer: {
-        width: 88
+        width: 88,
+        display: 'flex'
     },
     withPadding: {
         paddingLeft: 41

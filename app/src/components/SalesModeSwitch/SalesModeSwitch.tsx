@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography, FormControlLabel, Checkbox } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Typography, FormControlLabel, Checkbox, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
+import ExcelIcon from '-!react-svg-loader!../../../assets/icons/excel.svg';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -18,13 +19,19 @@ const styles = (theme: any) => createStyles({
     },
     checkbox: {
         padding: 8
-    }
+    },
+    loadButton: {
+        padding: 4,
+        borderRadius: 2
+    },
+    loadIcon: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {
     title?: string;
     displayMode?: STAT_DISPLAY_MODE;
     setDisplayMode?: (newMode: STAT_DISPLAY_MODE) => void;
+    loadExcelHandler?: () => void;
 }
 
 @inject(({
@@ -44,7 +51,7 @@ class SalesModeSwitch extends Component<IProps> {
     checkboxChangeHandler = (mode: STAT_DISPLAY_MODE) => () => this.props.setDisplayMode(mode);
 
     render() {
-        const { classes, displayMode, title } = this.props;
+        const { classes, displayMode, title, loadExcelHandler } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' container>
@@ -78,6 +85,12 @@ class SalesModeSwitch extends Component<IProps> {
                     label='Гривні'
                     classes={{ label:  classes.label }}
                 />
+                {
+                    loadExcelHandler &&
+                    <IconButton onClick={loadExcelHandler} className={classes.loadButton}>
+                        <ExcelIcon width={24} height={24} className={classes.loadIcon} />
+                    </IconButton>
+                }
             </Grid>
         );
     }

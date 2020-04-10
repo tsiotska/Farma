@@ -41,13 +41,15 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents?: () => void;
     loadAllStat?: () => void;
     setPharmacyDemand?: (demand: boolean) => void;
+    loadSalesExcel?: () => void;
 }
 
 @inject(({
     appState: {
         salesStore: {
             chartSalesStat,
-            loadAllStat
+            loadAllStat,
+            loadSalesExcel
         },
         userStore: {
             role
@@ -66,7 +68,8 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadLocationsAgents,
     loadAllStat,
-    setPharmacyDemand
+    setPharmacyDemand,
+    loadSalesExcel
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -120,7 +123,13 @@ class Sales extends Component<IProps> {
     }
 
     render() {
-        const { classes, chartSalesStat, currentDepartmentMeds, currentDepartmentId } = this.props;
+        const {
+            classes,
+            chartSalesStat,
+            currentDepartmentMeds,
+            currentDepartmentId,
+            loadSalesExcel
+        } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -129,14 +138,18 @@ class Sales extends Component<IProps> {
                         Реализація препаратів за
                     </Typography>
                     <DateRangeButton />
-                    <SalesModeSwitch title='Одиниці виміру: ' />
                 </Grid>
                 <Grid className={classes.plotContainer} wrap='nowrap' container>
                     <Plot
                         meds={this.medsMap}
                         chartSalesStat={chartSalesStat}
                     />
-                    <MedsStatistic departmentId={currentDepartmentId} meds={currentDepartmentMeds} chartSalesStat={chartSalesStat} />
+                    <MedsStatistic
+                        prepend={<SalesModeSwitch title='Одиниці виміру: ' loadExcelHandler={loadSalesExcel} />}
+                        departmentId={currentDepartmentId}
+                        meds={currentDepartmentMeds}
+                        chartSalesStat={chartSalesStat}
+                    />
                 </Grid>
                 <TableStat />
             </Grid>

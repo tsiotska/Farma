@@ -25,6 +25,7 @@ interface IProps extends WithStyles<typeof styles> {
     departmentId: number;
     chartSalesStat: IMedsSalesStat[];
     meds: IMedicine[];
+    prepend?: any;
 }
 
 @observer
@@ -55,11 +56,13 @@ class MedsStatistic extends Component<IProps> {
             classes,
             chartSalesStat,
             meds,
-            departmentId
+            departmentId,
+            prepend
         } = this.props;
 
         return (
             <Grid className={classes.root} wrap='nowrap' direction='column' container>
+                { prepend }
                 <ListHeader meds={meds} departmentId={departmentId} paddingRight={this.scrollBarWidth} />
                 <List
                     rootRef={this.ref}

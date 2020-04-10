@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, computed, toJS } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import {
     endOfMonth,
     format,
@@ -11,7 +11,7 @@ import {
 } from 'date-fns';
 import { stringify } from 'query-string';
 import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
-import { USER_ROLE, singleDepartmentRoles } from '../constants/Roles';
+import { USER_ROLE } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
 import { ILocation } from '../interfaces/ILocation';
@@ -326,6 +326,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.clearParams(requestName);
     }
 
+    @action.bound
+    async loadSalesExcel() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        if (!currentDepartmentId) return;
+        const url = this.getMedsStatUrl(currentDepartmentId, true);
+        if (url) api.getExcel(url);
+    }
+
     private getAgentStatUrl(departmentId: number) {
         const { userStore: { role, previewUser }} = this.rootStore;
 
@@ -370,7 +378,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         }
     }
 
-    private getMedsStatUrl(departmentId: number): string {
+    private getMedsStatUrl(departmentId: number, excel?: boolean): string {
         const { userStore: { user, previewUser } } = this.rootStore;
 
         const userId = previewUser
@@ -381,24 +389,29 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
         else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
 
-        const urlParams = stringify({
+        const params: any = {
             from: format(this.dateFrom, this.apiDateMask),
             to: format(this.dateTo, this.apiDateMask),
-            group_by
-        });
+            group_by,
+        };
+
+        if (excel) params.excel = 1;
+
+        const paramsStringified = stringify(params);
 
         const targetRole = previewUser
         ? previewUser.position
         : user.position;
 
         switch (targetRole) {
-            case USER_ROLE.ADMIN: return `api/sales?${urlParams}`;
+            case USER_ROLE.ADMIN:
+                return `api/sales?${paramsStringified}`;
             case USER_ROLE.FIELD_FORCE_MANAGER:
-                return `api/branch/${departmentId}/ffm/sales?${urlParams}`;
+                return `api/branch/${departmentId}/ffm/sales?${paramsStringified}`;
             case USER_ROLE.REGIONAL_MANAGER:
-                return `/api/branch/${departmentId}/rm/${userId}/sales?${urlParams}`;
+                return `/api/branch/${departmentId}/rm/${userId}/sales?${paramsStringified}`;
             case USER_ROLE.MEDICAL_AGENT:
-                return `/api/branch/${departmentId}/mp/${userId}/sales?${urlParams}`;
+                return `/api/branch/${departmentId}/mp/${userId}/sales?${paramsStringified}`;
             default: return null;
         }
     }

@@ -213,6 +213,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async loadWorkersExcel() {
         const { api } = this.rootStore;
         const url = this.getWorkersApiUrl(false, true);
+        if (!url) return;
         api.getExcel(url);
     }
 
