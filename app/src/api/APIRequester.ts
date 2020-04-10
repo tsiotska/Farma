@@ -278,4 +278,10 @@ export class APIRequester {
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
+
+    updatePermissions(data: any): Promise<boolean> {
+        return this.instance.put('/api/position', data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

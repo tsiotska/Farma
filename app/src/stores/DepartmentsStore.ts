@@ -12,6 +12,7 @@ import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
+import { PERMISSIONS } from '../constants/Permissions';
 
 export interface IExpandedWorker {
     id: number;
@@ -397,6 +398,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : this.setError;
 
         callback(requestName);
+    }
+
+    @action.bound
+    async updatePermissions(permissionsMap: Map<USER_ROLE, PERMISSIONS[]>) {
+        const requestName = 'updatePermissions';
+        const { api } = this.rootStore;
+
+        if (!permissionsMap.size) return;
+
+        const data = [...permissionsMap.entries()]
+            .map(([ permissions, id ]) => ({ permissions, id }));
+
+        return await this.dispatchRequest(
+            api.updatePermissions(data),
+            requestName
+        );
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {

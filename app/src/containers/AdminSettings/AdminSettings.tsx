@@ -80,8 +80,8 @@ class AdminSettings extends Component<IProps> {
                         <Tab component={Link} to={USERS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
                     </Tabs>
                     <Switch>
-                        <Route path={ACCESS_SETTINGS_ROUTE} component={UserSettings} />
-                        <Route path={USERS_SETTINGS_ROUTE} component={AccessSettings} />
+                        <Route path={USERS_SETTINGS_ROUTE} component={UserSettings} />
+                        <Route path={ACCESS_SETTINGS_ROUTE} component={AccessSettings} />
                         <Route path={SETTINGS_ROUTE} component={CommonSettings} />
                     </Switch>
                 </Grid>
