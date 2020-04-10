@@ -14,29 +14,9 @@ const styles = (theme: any) => createStyles({
     root: {
         margin: '10px 0 6px',
     },
-    input: {
-        // border: `1px solid ${theme.palette.primary.gray.light}`,
-        // marginBottom: 20,
-        // borderRadius: 1,
-        // '&.Mui-error': {
-        //     borderColor: 'red'
-        // }
-    },
-    labelRoot: {
-        // transform: 'translateY(-5px)',
-        // fontSize: theme.typography.pxToRem(13),
-        // color: theme.palette.primary.gray.mainLight,
-        // '&.Mui-focused': {
-        //     color: theme.palette.primary.gray.mainLight
-        // },
-        // '&.Mui-error': {
-        //     color: theme.palette.primary.error
-        // }
-    },
-    helperText: {
-        // position: 'absolute',
-        // bottom: 0
-    }
+    input: {},
+    labelRoot: {},
+    helperText: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {

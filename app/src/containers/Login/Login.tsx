@@ -164,7 +164,7 @@ class Login extends Component<IProps> {
                     Вхід
                 </Typography>
 
-                <FormControl className={classes.formControl}  error={this.showErrors.email && !this.validityStatuses.email}>
+                <FormControl className={classes.formControl} error={this.showErrors.email && !this.validityStatuses.email}>
                     <InputLabel disableAnimation shrink>
                         Email
                     </InputLabel>

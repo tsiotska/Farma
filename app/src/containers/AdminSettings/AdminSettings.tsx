@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, Tabs, Tab } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Grid, Tabs, Tab, Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { ACCESS_SETTINGS_ROUTE, SETTINGS_ROUTE, USERS_SETTINGS_ROUTE, SETTINGS_ROUTES } from '../../constants/Router';
@@ -10,11 +10,15 @@ import CommonSettings from './CommonSettings';
 import UserSettings from './UserSettings';
 
 const styles = (theme: any) => createStyles({
+    paper: {
+        padding: '30px 20px'
+    },
     indicator: {
         backgroundColor: theme.palette.primary.blue
     },
     tabs: {
-        minHeight: 0
+        minHeight: 0,
+        marginBottom: '3vh'
     },
     tab: {
         fontSize: theme.typography.pxToRem(20),
@@ -62,24 +66,26 @@ class AdminSettings extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <Grid>
-                <Tabs
-                    value={this.tab}
-                    onChange={this.tabChangeHandler}
-                    classes={{
-                        root: classes.tabs,
-                        indicator: classes.indicator
-                    }}>
-                    <Tab component={Link} to={SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування' />
-                    <Tab component={Link} to={ACCESS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу' />
-                    <Tab component={Link} to={USERS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
-                </Tabs>
-                <Switch>
-                    <Route path={ACCESS_SETTINGS_ROUTE} component={UserSettings} />
-                    <Route path={USERS_SETTINGS_ROUTE} component={AccessSettings} />
-                    <Route path={SETTINGS_ROUTE} component={CommonSettings} />
-                </Switch>
-            </Grid>
+            <Paper className={classes.paper}>
+                <Grid>
+                    <Tabs
+                        value={this.tab}
+                        onChange={this.tabChangeHandler}
+                        classes={{
+                            root: classes.tabs,
+                            indicator: classes.indicator
+                        }}>
+                        <Tab component={Link} to={SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування' />
+                        <Tab component={Link} to={ACCESS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу' />
+                        <Tab component={Link} to={USERS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
+                    </Tabs>
+                    <Switch>
+                        <Route path={ACCESS_SETTINGS_ROUTE} component={UserSettings} />
+                        <Route path={USERS_SETTINGS_ROUTE} component={AccessSettings} />
+                        <Route path={SETTINGS_ROUTE} component={CommonSettings} />
+                    </Switch>
+                </Grid>
+            </Paper>
         );
     }
 }
