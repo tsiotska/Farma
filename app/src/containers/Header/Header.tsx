@@ -5,7 +5,7 @@ import withTranslation from '../../components/hoc/withTranslations';
 
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
-import { AppBar, Typography, Paper } from '@material-ui/core';
+import { AppBar, Typography, Paper, IconButton } from '@material-ui/core';
 import { History } from 'history';
 import ProfilePreview from '../../components/ProfilePreview';
 import DepartmentNav from '../../components/DepartmentNav';
@@ -13,8 +13,9 @@ import { IDepartment } from '../../interfaces/IDepartment';
 import { IUser } from '../../interfaces';
 import SalaryReviewModal from './SalaryReviewModal';
 import { IRoleContent } from '../Master/Master';
-import { NAVIGATION_ROUTES, SALES_ROUTE } from '../../constants/Router';
-import { Route } from 'react-router-dom';
+import { NAVIGATION_ROUTES, SALES_ROUTE, ADMIN_ROUTE } from '../../constants/Router';
+import { Route, matchPath } from 'react-router-dom';
+import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -29,18 +30,20 @@ const styles = (theme: any) => createStyles({
         height: 128,
         position: 'relative',
         overflow: 'hidden'
+    },
+    settingsButton: {
+        marginLeft: 'auto',
+        padding: 6
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    t?: (key: string) => string;
     history?: History;
     currentDepartment?: IDepartment;
     navHistory?: IUser[];
     isAdmin?: boolean;
 }
 
-@withTranslation
 @inject(({
     appState: {
         departmentsStore: {
@@ -66,7 +69,8 @@ export class Header extends Component<IProps, {}> {
     }
 
     get showSettingsBtn(): boolean {
-        return this.props.isAdmin;
+        const { history: { location: {pathname}} } = this.props;
+        return !!matchPath(pathname, ADMIN_ROUTE);
     }
 
     get title(): string {
@@ -86,6 +90,12 @@ export class Header extends Component<IProps, {}> {
                     <Typography variant='h5'>
                         { this.title }
                     </Typography>
+                    {
+                        this.showSettingsBtn &&
+                        <IconButton className={classes.settingsButton}>
+                            <Settings width={22} height={22} />
+                        </IconButton>
+                    }
                 </AppBar>
                 {
                     navHistory.length !== 0 &&
