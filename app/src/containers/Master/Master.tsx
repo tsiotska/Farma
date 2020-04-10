@@ -1,11 +1,25 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Router, Route, Switch, withRouter, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import { LOGIN_ROUTE, ROOT_ROUTE, ADMIN_ROUTE, ADMIN_ROUTES, SALES_ROUTE, MARKS_ROUTE, SALARY_ROUTE, WORKERS_ROUTE, MEDICINES_ROUTE, PHARMACY_ROUTE, LPU_ROUTE, NAVIGATION_ROUTES } from '../../constants/Router';
+import {
+    LOGIN_ROUTE,
+    ROOT_ROUTE,
+    ADMIN_ROUTE,
+    ADMIN_ROUTES,
+    SALES_ROUTE,
+    MARKS_ROUTE,
+    SALARY_ROUTE,
+    WORKERS_ROUTE,
+    MEDICINES_ROUTE,
+    PHARMACY_ROUTE,
+    LPU_ROUTE,
+    NAVIGATION_ROUTES,
+    SETTINGS_ROUTES
+} from '../../constants/Router';
 
 import Header from '../Header';
 import SideNav from './SideNav';
@@ -24,6 +38,7 @@ import Medicines from '../Medicines';
 import Pharmacy from '../Pharmacy';
 import Lpu from '../Lpu';
 import DepartmentNav from '../../components/DepartmentNav';
+import AdminSettings from '../AdminSettings';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -147,6 +162,7 @@ export class Master extends Component<IProps, null> {
                     <PrivateRoute path={ADMIN_ROUTES} component={Header} />
                     <PrivateRoute path={NAVIGATION_ROUTES} render={() => <DepartmentNav userLinks={this.userContent} />} />
                     <Switch>
+                        <Route path={SETTINGS_ROUTES} component={AdminSettings} />
                         <Route path={LOGIN_ROUTE} component={Login} />
                         {
                             isUserFetched === false &&

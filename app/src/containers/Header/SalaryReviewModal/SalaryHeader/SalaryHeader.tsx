@@ -50,6 +50,9 @@ const styles = (theme: any) => createStyles({
     green: {
         color: theme.palette.primary.level.green
     },
+    withOffset: {
+        margin: '0 4px'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -107,7 +110,7 @@ class SalaryHeader extends Component<IProps> {
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                <Grid className={classes.wideColumn}>
+                <Grid className={cx(classes.withOffset, classes.wideColumn)}>
                     <Typography className={classes.text} color='textSecondary'>
                         Препарати
                     </Typography>
@@ -119,7 +122,7 @@ class SalaryHeader extends Component<IProps> {
                 </Grid>
                 {
                     this.MPHeaders.map((header, i) => (
-                        <Grid key={header} alignItems='center' direction='column' xs container item>
+                        <Grid key={header} className={classes.withOffset} alignItems='center' direction='column' xs container item>
                             <Typography className={cx(classes.text, this.userColor[i])} align='center'>
                                 {header}
                             </Typography>

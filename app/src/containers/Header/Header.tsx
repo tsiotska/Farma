@@ -13,7 +13,7 @@ import { IDepartment } from '../../interfaces/IDepartment';
 import { IUser } from '../../interfaces';
 import SalaryReviewModal from './SalaryReviewModal';
 import { IRoleContent } from '../Master/Master';
-import { NAVIGATION_ROUTES, SALES_ROUTE, ADMIN_ROUTE } from '../../constants/Router';
+import { NAVIGATION_ROUTES, SALES_ROUTE, ADMIN_ROUTE, SETTINGS_ROUTE } from '../../constants/Router';
 import { Route, matchPath } from 'react-router-dom';
 import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
 
@@ -77,6 +77,8 @@ export class Header extends Component<IProps, {}> {
         return this.departmentName || 'Адмін панель';
     }
 
+    settingsClickHandler = () => this.props.history.push(SETTINGS_ROUTE);
+
     render() {
         const { classes, navHistory,  } = this.props;
 
@@ -92,7 +94,7 @@ export class Header extends Component<IProps, {}> {
                     </Typography>
                     {
                         this.showSettingsBtn &&
-                        <IconButton className={classes.settingsButton}>
+                        <IconButton onClick={this.settingsClickHandler} className={classes.settingsButton}>
                             <Settings width={22} height={22} />
                         </IconButton>
                     }

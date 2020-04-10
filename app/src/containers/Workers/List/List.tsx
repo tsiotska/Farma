@@ -20,7 +20,8 @@ const styles = (theme: any) => createStyles({
             fontFamily: 'Source Sans Pro SemiBold',
             paddingLeft: 5,
             textOverflow: 'ellipsis',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            textTransform: 'capitalize'
         }
     },
     actionContainer: {

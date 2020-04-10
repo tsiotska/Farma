@@ -255,6 +255,7 @@ class UserContent extends Component<IProps> {
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={this.userMoneyDeficit}
+                    emptyPlaceholder=''
                 />
                 <SumRow
                     title='Зарплата по рейтингу'
@@ -263,6 +264,7 @@ class UserContent extends Component<IProps> {
                     values={this.ratingSalary}
                     userColors={this.userColors}
                     changeHandler={isAdmin && this.changeHandler('salary')}
+                    emptyPlaceholder=''
                 />
                 <SumRow
                     title='Додаткові витрати'
@@ -271,6 +273,7 @@ class UserContent extends Component<IProps> {
                     values={this.extraCosts}
                     userColors={this.userColors}
                     changeHandler={isAdmin && this.changeHandler('extraCosts')}
+                    emptyPlaceholder=''
                 />
                 <SumRow
                     title='KPI звіти'
@@ -279,6 +282,7 @@ class UserContent extends Component<IProps> {
                     values={this.KPIs}
                     userColors={this.userColors}
                     changeHandler={isAdmin && this.changeHandler('kpi')}
+                    emptyPlaceholder=''
                 />
                 <SumRow
                     title='Бонус за виконання більше 5 продуктів'

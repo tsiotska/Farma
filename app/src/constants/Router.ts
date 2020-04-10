@@ -3,6 +3,11 @@ export const ROOT_ROUTE: string = `/`;
 export const LOGIN_ROUTE: string = `/login`;
 
 export const ADMIN_ROUTE: string = `/admin`;
+
+export const SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings`;
+export const ACCESS_SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings/access`;
+export const USERS_SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings/users`;
+
 export const DEPARTMENT_ROUTE: string = `/department/:departmentId`;
 export const SALES_ROUTE: string = `${DEPARTMENT_ROUTE}/sales`;
 export const MARKS_ROUTE: string = `${DEPARTMENT_ROUTE}/marks`;
@@ -25,7 +30,16 @@ export const NAVIGATION_ROUTES: string[] = [
 
 export const ADMIN_ROUTES: string[] = [
     ...NAVIGATION_ROUTES,
-    ADMIN_ROUTE
+    ADMIN_ROUTE,
+    SETTINGS_ROUTE,
+    ACCESS_SETTINGS_ROUTE,
+    USERS_SETTINGS_ROUTE,
+];
+
+export const SETTINGS_ROUTES: string[] = [
+    SETTINGS_ROUTE,
+    ACCESS_SETTINGS_ROUTE,
+    USERS_SETTINGS_ROUTE
 ];
 
 export const AUTH_ROUTES: string[] = [

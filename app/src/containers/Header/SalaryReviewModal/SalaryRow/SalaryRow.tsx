@@ -34,7 +34,9 @@ const styles = (theme: any) => createStyles({
     green: {
         borderColor: theme.palette.primary.level.green
     },
-
+    withOffset: {
+        margin: '0 4px'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -153,7 +155,7 @@ class SalaryRow extends Component<IProps> {
 
         return (
             <Grid className={classes.root} wrap='nowrap' container>
-                <Grid className={classes.wideColumn} alignItems='center' container>
+                <Grid className={cx(classes.wideColumn, classes.withOffset)} alignItems='center' container>
                     <Typography>
                         { name }
                     </Typography>
@@ -169,6 +171,7 @@ class SalaryRow extends Component<IProps> {
                                 key={i}
                                 className={
                                     cx(
+                                        classes.withOffset,
                                         classes.cell,
                                         {
                                             [userColors[i - 1]]: i === userLevel,

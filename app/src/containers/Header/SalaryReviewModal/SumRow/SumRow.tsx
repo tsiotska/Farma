@@ -27,6 +27,9 @@ const styles = createStyles({
     },
     input: {
         textAlign: 'center'
+    },
+    withOffset: {
+        margin: '0 4px'
     }
 });
 
@@ -38,6 +41,7 @@ interface IProps extends WithStyles<typeof styles> {
     userColors?: string[];
     secondColumnValue?: any;
     changeHandler?: (level: number, e: any) => void;
+    emptyPlaceholder?: string;
 }
 
 @observer
@@ -53,7 +57,8 @@ class SumRow extends Component<IProps> {
             values,
             userColors = {},
             userLevel,
-            changeHandler
+            changeHandler,
+            emptyPlaceholder
         } = this.props;
 
         return (
@@ -63,6 +68,7 @@ class SumRow extends Component<IProps> {
                     alignItems='center'
                     className={cx(
                         classes.text,
+                        classes.withOffset,
                         secondColumnValue === undefined
                         ? classes.doubleWidth
                         : classes.wideColumn
@@ -73,7 +79,7 @@ class SumRow extends Component<IProps> {
                 </Grid>
                 {
                     secondColumnValue !== undefined &&
-                    <Grid className={classes.wideColumn} container alignItems='center' justify='center'>
+                    <Grid className={cx(classes.wideColumn)} container alignItems='center' justify='center'>
                         <Typography>
                             { secondColumnValue || '-' }
                         </Typography>
@@ -83,7 +89,7 @@ class SumRow extends Component<IProps> {
                     levels.map((x, i) => (
                         <Grid
                         key={i}
-                        className={cx({[userColors[i]]: x === userLevel })}
+                        className={cx(classes.withOffset, {[userColors[i]]: x === userLevel })}
                         justify='center'
                         alignItems='center'
                         container
@@ -101,7 +107,11 @@ class SumRow extends Component<IProps> {
                                     disableUnderline
                                   />
                                 : <Typography align='center'>
-                                    { values[i] || '' }
+                                    {
+                                        emptyPlaceholder !== undefined
+                                        ? values[i] || emptyPlaceholder
+                                        : values[i]
+                                    }
                                   </Typography>
                             }
                         </Grid>

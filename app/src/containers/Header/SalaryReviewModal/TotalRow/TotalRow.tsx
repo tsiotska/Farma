@@ -5,12 +5,15 @@ import { computed } from 'mobx';
 import zip from 'lodash/zip';
 import cx from 'classnames';
 
-const styles = createStyles({
+const styles = (theme: any) => createStyles({
     root: {
         minHeight: 48,
-        borderBottom: '1px solid #e5e7e8',
-        backgroundColor: '#f5f7f7',
-        paddingLeft: 12
+        // borderBottom: '1px solid #e5e7e8',
+        // backgroundColor: '#f5f7f7',
+        paddingLeft: 12,
+        '& > *': {
+            paddingTop: 16
+        }
     },
     doubleWidth: {
         width: 400
@@ -18,6 +21,24 @@ const styles = createStyles({
     text: {
         fontFamily: 'Source Sans Pro SemiBold'
     },
+    red: {
+        backgroundColor: '#f97575'
+    },
+    orangered: {
+        backgroundColor: '#ff9b3a'
+    },
+    yellow: {
+        backgroundColor: '#f3ca47'
+    },
+    limeGreen: {
+        backgroundColor: '#a5cd58'
+    },
+    green: {
+        backgroundColor: '#25d174'
+    },
+    withOffset: {
+        margin: '0 4px'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -32,6 +53,23 @@ interface IProps extends WithStyles<typeof styles> {
 
 @observer
 class TotalRow extends Component<IProps> {
+    readonly blockColors: { [key: number]: string[]};
+
+    constructor(props: IProps) {
+        super(props);
+        const { classes: { red, orangered, yellow, limeGreen, green }} = props;
+        this.blockColors = {
+            3: [ red, yellow, green ],
+            5: [ red, orangered, yellow, limeGreen, green ]
+        };
+    }
+
+    @computed
+    get actualBlockColors(): string[] {
+        const { levels } = this.props;
+        return this.blockColors[levels.length] || [];
+    }
+
     @computed
     get data(): number[] {
         const {
@@ -62,7 +100,7 @@ class TotalRow extends Component<IProps> {
                 <Grid
                     container
                     alignItems='center'
-                    className={cx(classes.text, classes.doubleWidth)}>
+                    className={cx(classes.withOffset, classes.text, classes.doubleWidth)}>
                     <Typography>
                         Всього за місяць
                     </Typography>
@@ -71,15 +109,19 @@ class TotalRow extends Component<IProps> {
                     this.data.map((x, i) => (
                         <Grid
                             key={i}
-                            className={cx({[colors[i]]: i + 1 === userLevel })}
-                            justify='center'
-                            alignItems='center'
+                            className={cx(classes.withOffset, {[colors[i]]: i + 1 === userLevel })}
                             container
                             item
                             xs>
-                                <Typography align='center'>
-                                    { x || '' }
-                                </Typography>
+                                <Grid
+                                    justify='center'
+                                    alignItems='center'
+                                    className={cx({ [this.actualBlockColors[i] ]: true })}
+                                    container>
+                                    <Typography align='center'>
+                                        { x || '' }
+                                    </Typography>
+                                </Grid>
                         </Grid>
                     ))
                 }
