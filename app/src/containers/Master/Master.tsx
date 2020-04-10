@@ -162,12 +162,12 @@ export class Master extends Component<IProps, null> {
                     <PrivateRoute path={ADMIN_ROUTES} component={Header} />
                     <PrivateRoute path={NAVIGATION_ROUTES} render={() => <DepartmentNav userLinks={this.userContent} />} />
                     <Switch>
-                        <Route path={SETTINGS_ROUTES} component={AdminSettings} />
                         <Route path={LOGIN_ROUTE} component={Login} />
                         {
                             isUserFetched === false &&
                             <Route>loading...</Route>
                         }
+                        <Route path={SETTINGS_ROUTES} component={AdminSettings} />
                         {
                             this.userContent.map(({ path, component }) => (
                                 <PrivateRoute key={path} path={path} component={component} />

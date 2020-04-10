@@ -242,9 +242,10 @@ export class APIRequester {
             const fileUrl = window.URL.createObjectURL(new Blob([data]));
             const link = document.createElement('a');
             link.href = fileUrl;
+            console.log('filename: ', fileName);
             link.setAttribute(
                 'download',
-                fileName && fileName.match(/\*.xlsx/)
+                (fileName && fileName.match(/.xlsx$/))
                     ? fileName
                     : 'file.xlsx'
             );
