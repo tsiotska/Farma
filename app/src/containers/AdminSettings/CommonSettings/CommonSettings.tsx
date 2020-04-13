@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, withStyles, WithStyles, Grid, Typography, Input, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
+import { toJS, computed, observable } from 'mobx';
 
 const styles = createStyles({
     row: {
@@ -17,12 +18,14 @@ const styles = createStyles({
     },
     text: {},
     input: {
+        textAlign: 'center',
         width: 45,
         border: '1px solid #aaa',
         borderRadius: 2,
         margin: '0 10px'
     },
-    inputRoot: {},
+    inputRoot: {
+    },
     inputError: {},
     submitButton: {
         margin: '20px auto 20px 0 '
@@ -44,8 +47,62 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class CommonSettings extends Component<IProps> {
+    @observable changedValues: ISalarySettings = {
+        kpi: null,
+        payments: null
+    };
+
+    @computed
+    get initialKpi(): number {
+        const { salarySettings } = this.props;
+        return salarySettings
+            ? salarySettings.kpi
+            : 0;
+    }
+
+    @computed
+    get bonuses(): [number, number] {
+        const { salarySettings } = this.props;
+        if (!salarySettings) return null;
+        const initialBonus = this.changedValues.payments === null
+        ? salarySettings.payments
+        : this.changedValues.payments;
+        const bonus = initialBonus * 100;
+        const res = 100 - bonus;
+        const isValid = bonus >= 0
+            && bonus <= 100
+            && res >= 0
+            && res <= 100;
+        return isValid
+            ? [bonus, res]
+            : [100, 0];
+    }
+
+    inputFocusHandler = ({ target }: any) => target.select();
+
+    kpiChangeHandler = ({ target: { value }}: any) => {
+        const newValue = +value;
+        const isInvalid = Number.isNaN(newValue) || newValue < 0;
+        if (isInvalid) return;
+        this.changedValues.kpi = newValue;
+    }
+
+    bonusChangeHandler = ({ target: { value }}: any) => {
+        const newValue = +value / 100;
+        const isInvalid = Number.isNaN(newValue) || newValue > 1;
+        if (isInvalid) return;
+        this.changedValues.payments = newValue;
+    }
+
+    bonusRestChangeHandler = ({ target: { value }}: any) => {
+        const newValue = +value / 100;
+        const isInvalid = Number.isNaN(newValue) || newValue > 1;
+        if (isInvalid) return;
+        this.changedValues.payments = 1 - newValue;
+    }
+
     render() {
-        const { classes } = this.props;
+        const { classes, salarySettings } = this.props;
 
         return (
             <Grid direction='column' container>
@@ -57,32 +114,54 @@ class CommonSettings extends Component<IProps> {
                         Розподіл бонусів, %
                     </Typography>
                     <Input
+                        value={
+                            this.bonuses
+                            ? this.bonuses[0].toFixed(0)
+                            : ''
+                        }
                         classes={{
                             input: classes.input,
                             root: classes.inputRoot,
                             error: classes.inputError
                         }}
+                        onFocus={this.inputFocusHandler}
+                        disabled={this.bonuses === null}
+                        onChange={this.bonusChangeHandler}
                         disableUnderline />
                     <Typography className={classes.text}>на</Typography>
                     <Input
+                        value={
+                            this.bonuses
+                            ? this.bonuses[1].toFixed(0)
+                            : ''
+                        }
                         classes={{
                             input: classes.input,
                             root: classes.inputRoot,
                             error: classes.inputError
                         }}
+                        onFocus={this.inputFocusHandler}
+                        disabled={this.bonuses === null}
+                        onChange={this.bonusRestChangeHandler}
                         disableUnderline />
                 </Grid>
                 <Grid className={classes.row} alignItems='center' container>
                     <Typography className={classes.text}>
                         Ліміт товарів для нарахування бонусів
-                        <Input
-                            classes={{
-                                input: classes.input,
-                                root: classes.inputRoot,
-                                error: classes.inputError
-                            }}
-                            disableUnderline />
                     </Typography>
+                    <Input
+                        value={
+                            this.changedValues.kpi === null
+                            ? this.initialKpi
+                            : this.changedValues.kpi
+                        }
+                        classes={{
+                            input: classes.input,
+                            root: classes.inputRoot,
+                            error: classes.inputError
+                        }}
+                        onChange={this.kpiChangeHandler}
+                        disableUnderline />
                 </Grid>
                 <Button className={classes.submitButton} variant='contained' color='primary'>
                     Зберегти

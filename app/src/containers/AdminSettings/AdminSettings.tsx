@@ -75,9 +75,9 @@ class AdminSettings extends Component<IProps> {
                             root: classes.tabs,
                             indicator: classes.indicator
                         }}>
-                        <Tab component={Link} to={SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування' />
-                        <Tab component={Link} to={ACCESS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу' />
-                        <Tab component={Link} to={USERS_SETTINGS_ROUTE} className={classes.tab} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
+                        <Tab component={Link} className={classes.tab} to={SETTINGS_ROUTE} value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування' />
+                        <Tab component={Link} className={classes.tab} to={ACCESS_SETTINGS_ROUTE} value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу' />
+                        <Tab component={Link} className={classes.tab} to={USERS_SETTINGS_ROUTE} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
                     </Tabs>
                     <Switch>
                         <Route path={USERS_SETTINGS_ROUTE} component={UserSettings} />
