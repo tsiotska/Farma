@@ -7,6 +7,9 @@ import { IPosition } from '../../../../interfaces/IPosition';
 import { toJS } from 'mobx';
 
 const styles = createStyles({
+    root: {
+        borderBottom: '1px solid #e4e8f6'
+    },
     dateCell: {
         display: 'none'
     }
@@ -30,6 +33,7 @@ class ListItem extends Component<IProps> {
                 isExpanded={false}
                 disableClick
                 classes={{
+                    root: classes.root,
                     dateCell: classes.dateCell
                 }}
             />
