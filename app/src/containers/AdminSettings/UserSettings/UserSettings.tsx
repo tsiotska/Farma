@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Grid, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IWorker } from '../../../interfaces/IWorker';
 import ListHeader from './ListHeader';
 import ListItem from './ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
-import { toJS } from 'mobx';
 
-const styles = createStyles({});
+const styles = (theme: any) => createStyles({
+    submitButton: {
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'transparent',
+        marginRight: 'auto',
+        marginTop: 20
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     workers?: IWorker[];
@@ -49,6 +56,9 @@ class UserSettings extends Component<IProps> {
                         />
                     ))
                 }
+                <Button variant='outlined' className={classes.submitButton}>
+                    Додати користувача
+                </Button>
             </Grid>
         );
     }
