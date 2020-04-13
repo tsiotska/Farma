@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
 import { Provider } from 'mobx-react';
-import {createBrowserHistory} from 'history';
 
 import {
     CssBaseline,
@@ -12,9 +11,7 @@ import Master from '../Master';
 import RootStore from '../../stores';
 
 import theme from '../../theme';
-import { Router } from 'react-router-dom';
-
-const history = createBrowserHistory();
+import { HashRouter } from 'react-router-dom';
 
 /**
  * Class representing application root component
@@ -26,9 +23,9 @@ export class App extends Component<{}, null> {
             <Provider appState={new RootStore()}>
                 <MuiThemeProvider theme={theme} >
                     <CssBaseline />
-                    <Router history={history}>
+                    <HashRouter >
                         <Master />
-                    </Router>
+                    </HashRouter>
                 </MuiThemeProvider>
             </Provider>
         );
