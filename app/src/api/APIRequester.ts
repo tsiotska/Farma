@@ -273,8 +273,8 @@ export class APIRequester {
         .catch(this.defaultErrorHandler());
     }
 
-    updateSalarySettings(data: any): Promise<boolean> {
-        return this.instance.put('/api/branch/{branch_id}/salary', data)
+    updateSalarySettings(departmentId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/branch/${departmentId}/salary`, data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

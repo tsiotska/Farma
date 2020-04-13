@@ -66,14 +66,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async submitSalaryChanges(): Promise<boolean | null> {
         const requestName = 'updateSalary';
-        const { api } = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
         const preparedObject = this.getPreparedSalarySettings();
 
         console.log('json: ', preparedObject);
         if (preparedObject === null) return null;
 
         return await this.dispatchRequest(
-            api.updateSalarySettings(preparedObject),
+            api.updateSalarySettings(currentDepartmentId, preparedObject),
             requestName
         );
     }
