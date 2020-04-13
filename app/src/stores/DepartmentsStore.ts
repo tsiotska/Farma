@@ -401,11 +401,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async updatePermissions(permissionsMap: Map<USER_ROLE, PERMISSIONS[]>) {
+    async updatePermissions(permissionsMap: Map<USER_ROLE, PERMISSIONS[]>): Promise<boolean> {
         const requestName = 'updatePermissions';
         const { api } = this.rootStore;
 
-        if (!permissionsMap.size) return;
+        if (!permissionsMap.size) return false;
 
         const data = [...permissionsMap.entries()]
             .map(([ permissions, id ]) => ({ permissions, id }));
