@@ -3,6 +3,10 @@ import { createStyles, withStyles, WithStyles, Grid, Typography, Input, Button }
 import { observer, inject } from 'mobx-react';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 import { toJS, computed, observable } from 'mobx';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = createStyles({
     row: {
@@ -34,23 +38,36 @@ const styles = createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     salarySettings?: ISalarySettings;
+    submitCommonSettingsChanges?: (settings: ISalarySettings) => Promise<boolean>;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
 @inject(({
     appState: {
         userStore: {
-            salarySettings
+            salarySettings,
+            submitCommonSettingsChanges,
+            getAsyncStatus
         }
     }
 }) => ({
-    salarySettings
+    salarySettings,
+    submitCommonSettingsChanges,
+    getAsyncStatus
 }))
 @observer
 class CommonSettings extends Component<IProps> {
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable changedValues: ISalarySettings = {
         kpi: null,
         payments: null
     };
+
+    @computed
+    get isRequestProccessing(): boolean {
+        return this.props.getAsyncStatus('submitCommonSettingsChanges').loading;
+    }
 
     @computed
     get initialKpi(): number {
@@ -99,6 +116,20 @@ class CommonSettings extends Component<IProps> {
         const isInvalid = Number.isNaN(newValue) || newValue > 1;
         if (isInvalid) return;
         this.changedValues.payments = 1 - newValue;
+    }
+
+    submitHandler = async () => {
+        if (this.isRequestProccessing) return;
+        const { submitCommonSettingsChanges } = this.props;
+        const res = await submitCommonSettingsChanges(this.changedValues);
+        this.showSnackbar = true;
+        this.snackbarType = res
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+    }
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
     }
 
     render() {
@@ -163,9 +194,29 @@ class CommonSettings extends Component<IProps> {
                         onChange={this.kpiChangeHandler}
                         disableUnderline />
                 </Grid>
-                <Button className={classes.submitButton} variant='contained' color='primary'>
-                    Зберегти
+                <Button
+                    onClick={this.submitHandler}
+                    className={classes.submitButton}
+                    variant='contained'
+                    color='primary'>
+                        {
+                            this.isRequestProccessing
+                                ? <LoadingMask size={20} />
+                                : 'Зберегти'
+                        }
                 </Button>
+                <Snackbar
+                    open={this.showSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    autoHideDuration={6000}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Налаштування змінено'
+                            : 'Неможливо змінити налаштування'
+                    }
+                />
             </Grid>
         );
     }

@@ -79,6 +79,17 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    async submitCommonSettingsChanges(settings: ISalarySettings): Promise<boolean> {
+        const requestName = 'submitCommonSettingsChanges';
+        const { api } = this.rootStore;
+
+        return await this.dispatchRequest(
+            api.updateCommonSettings(settings),
+            requestName
+        );
+    }
+
+    @action.bound
     changeMedSalary(level: number, medId: number, propName: keyof IMedSalary, value: number) {
         try { this.userSalary.get(level).meds[medId][propName] = value; } catch { return; }
     }

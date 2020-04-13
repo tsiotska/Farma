@@ -284,4 +284,10 @@ export class APIRequester {
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
+
+    updateCommonSettings(settings: ISalarySettings) {
+        return this.instance.put('/api/settings', settings)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }
