@@ -72,7 +72,7 @@ class EditableCell extends Component<IProps> {
 
     render() {
         const { classes, values } = this.props;
-        console.log(this.bonusStringValue, values, values ? values[1] : null);
+
         return (
             <>
                 <Input

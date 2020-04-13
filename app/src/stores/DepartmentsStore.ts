@@ -219,6 +219,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadAdminWorkers() {
+        const requestName = 'loadAdminWorkers';
+        const { api } = this.rootStore;
+
+        const res = await this.dispatchRequest(
+            api.getWorkers('/api/user'),
+            requestName
+        );
+
+        if (res) this.workers = res;
+    }
+
+    @action.bound
     async loadWorkers() {
         const requestName = 'loadWorkers';
         const { api } = this.rootStore;

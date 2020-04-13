@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography, IconButton } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IWorker } from '../../../interfaces/IWorker';
-import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import Sublist from '../Sublist';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
-import { USER_ROLE } from '../../../constants/Roles';
-import { toJS, computed } from 'mobx';
+import { computed } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
+import WorkerListItem from '../../../components/WorkerListItem';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -166,7 +165,7 @@ class List extends Component<IProps> {
 
                 {
                     workers.map(x => (
-                        <ListItem
+                        <WorkerListItem
                             key={x.id}
                             worker={x}
                             fired={fired}

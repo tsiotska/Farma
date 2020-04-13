@@ -69,7 +69,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
         const preparedObject = this.getPreparedSalarySettings();
 
-        console.log('json: ', preparedObject);
         if (preparedObject === null) return null;
 
         return await this.dispatchRequest(
@@ -138,10 +137,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadUserInfo(agentInfo: IUserCommonInfo, role?: USER_ROLE) {
         const position = role || this.getNextRole();
-        console.log('pos: ', position);
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
-        console.log('role: ', this.role);
         if (!res) return;
 
         const agent = this.navHistory.find(({ id }) => id === res.id);
@@ -254,7 +251,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     private getPreparedSalarySettings(): any {
-        console.log(toJS(this.userSalary));
         let levelName: string;
         if (this.role === USER_ROLE.REGIONAL_MANAGER) levelName = 'РМ';
         if (this.role === USER_ROLE.MEDICAL_AGENT) levelName = 'МП';

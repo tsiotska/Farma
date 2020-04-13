@@ -8,21 +8,24 @@ import {
     ExpansionPanelDetails,
     IconButton,
     Avatar,
-    Typography
+    Typography,
+    ListItem
 } from '@material-ui/core';
 import { KeyboardArrowDown, PermIdentity } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IWorker } from '../../../interfaces/IWorker';
 import { NotInterested, Edit } from '@material-ui/icons';
 import { isValid, lightFormat } from 'date-fns';
-import ImageLoader from '../../../components/ImageLoader';
-import { IPosition } from '../../../interfaces/IPosition';
-import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
-import vacancyIcon from '../../../../assets/icons/vacancyIcon.png';
-import { IUserCommonInfo } from '../../../interfaces/IUser';
-import { USER_ROLE } from '../../../constants/Roles';
-import { ILocation } from '../../../interfaces/ILocation';
+import vacancyIcon from '../../../assets/icons/vacancyIcon.png';
+import { computed } from 'mobx';
+import { IPosition } from '../../interfaces/IPosition';
+import { IWorker } from '../../interfaces/IWorker';
+import { IUserCommonInfo } from '../../interfaces/IUser';
+import { USER_ROLE } from '../../constants/Roles';
+import { ILocation } from '../../interfaces/ILocation';
+import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import cx from 'classnames';
+import ImageLoader from '../ImageLoader';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -78,7 +81,7 @@ const styles = (theme: any) => createStyles({
         borderRadius: 2,
         transition: '0.3s',
         '&:first-of-type:hover': {
-            backgroundColor: ( {worker: { isVacancy }}: any) => isVacancy
+            backgroundColor: ({ disableClick }: any) => disableClick
                 ? 'transparent'
                 : '#f1f1f1'
         }
@@ -92,11 +95,16 @@ const styles = (theme: any) => createStyles({
     },
     placeholderImage: {
         margin: '8px 6px 8px 10px'
-    }
+    },
+    nameCell: {},
+    locationCell: {},
+    dateCell: {},
+    emailCell: {},
+    phoneCell: {},
+    cardCell: {},
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    position: IPosition;
     worker: IWorker;
     fired: boolean;
     expandable?: boolean;
@@ -104,7 +112,9 @@ interface IProps extends WithStyles<typeof styles> {
     isExpanded?: boolean;
     expandChangeHandler?: (e: any, expanded: boolean) => void;
     loadUserInfo?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
-    location: ILocation;
+    location?: ILocation;
+    position?: IPosition;
+    disableClick?: boolean;
 }
 
 @inject(({
@@ -117,16 +127,26 @@ interface IProps extends WithStyles<typeof styles> {
     loadUserInfo
 }))
 @observer
-class ListItem extends Component<IProps> {
+class WorkerListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
 
+    @computed
     get location(): string {
         const { location } = this.props;
         return location
             ? location.name
-            : '-';
+            : null;
     }
 
+    @computed
+    get position(): string {
+        const { position } = this.props;
+        return position
+            ? position.alias
+            : null;
+    }
+
+    @computed
     get date(): string {
         const {
             worker: { hired, fired },
@@ -161,8 +181,12 @@ class ListItem extends Component<IProps> {
     }
 
     workerClickHandler = (e: any) => {
-        const { loadUserInfo, worker : { id, name, avatar, position, isVacancy }} = this.props;
-        if (isVacancy) return;
+        const {
+            loadUserInfo,
+            disableClick,
+            worker : { id, name, avatar, position, isVacancy }
+        } = this.props;
+        if (disableClick) return;
         e.stopPropagation();
         loadUserInfo({
             id,
@@ -217,7 +241,7 @@ class ListItem extends Component<IProps> {
                     <Grid
                         xs={3}
                         onClick={this.workerClickHandler}
-                        className={classes.gridItem}
+                        className={cx(classes.gridItem, classes.nameCell)}
                         wrap='nowrap'
                         alignItems='center'
                         zeroMinWidth
@@ -245,22 +269,22 @@ class ListItem extends Component<IProps> {
                             {name}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} alignItems='center' container zeroMinWidth item>
+                    <Grid xs className={cx(classes.gridItem, classes.locationCell)} alignItems='center' container zeroMinWidth item>
                         <Typography variant='body2'>
-                            { this.location }
+                            { this.location || this.position || '-' }
                         </Typography>
                     </Grid>
-                    <Grid xs={fired ? 2 : true} className={classes.gridItem} alignItems='center' zeroMinWidth container item>
+                    <Grid xs={fired ? 2 : true} className={cx(classes.gridItem, classes.dateCell)} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {this.date}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.emailCell)} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {email}
                         </Typography>
                     </Grid>
-                    <Grid xs className={classes.gridItem} direction='column' justify='center' alignItems='flex-start' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.phoneCell)} direction='column' justify='center' alignItems='flex-start' zeroMinWidth container item>
                         {
                             workPhone &&
                             <Typography variant='body2'>
@@ -274,7 +298,7 @@ class ListItem extends Component<IProps> {
                             </Typography>
                         }
                     </Grid>
-                    <Grid xs className={classes.gridItem} alignItems='center' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.cardCell)} alignItems='center' zeroMinWidth container item>
                         <Typography variant='body2'>
                             {card}
                         </Typography>
@@ -308,4 +332,4 @@ class ListItem extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(ListItem);
+export default withStyles(styles)(WorkerListItem);

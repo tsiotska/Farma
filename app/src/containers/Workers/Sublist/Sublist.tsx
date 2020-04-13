@@ -12,10 +12,10 @@ import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx';
 import { IWorker } from '../../../interfaces/IWorker';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import ListItem from '../ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 import { ILocation } from '../../../interfaces/ILocation';
+import WorkerListItem from '../../../components/WorkerListItem';
 
 const styles = (theme: any) => createStyles({
     title: {
@@ -72,7 +72,7 @@ class Sublist extends Component<IProps> {
 
         return expandedWorker.subworkers.length
         ? expandedWorker.subworkers.map(x => (
-            <ListItem
+            <WorkerListItem
                 key={x.id}
                 position={positions.get(x.position)}
                 worker={x}

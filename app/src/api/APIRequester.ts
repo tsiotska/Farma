@@ -234,7 +234,6 @@ export class APIRequester {
     getExcel(url: string): Promise<any> {
         return this.instance.get(url, { responseType: 'blob' })
         .then(({ headers, data }) => {
-            console.log('load excel success: ', headers['content-disposition']);
             const headerValue = headers['content-disposition'];
             const fileName = headerValue
                 ? headerValue.split('=')[1]
@@ -242,7 +241,6 @@ export class APIRequester {
             const fileUrl = window.URL.createObjectURL(new Blob([data]));
             const link = document.createElement('a');
             link.href = fileUrl;
-            console.log('filename: ', fileName);
             link.setAttribute(
                 'download',
                 (fileName && fileName.match(/.xlsx$/))
