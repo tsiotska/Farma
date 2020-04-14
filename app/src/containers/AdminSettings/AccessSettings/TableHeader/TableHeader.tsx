@@ -9,7 +9,7 @@ const styles = createStyles({
     },
     complexHeader: {
         marginLeft: 5,
-        backgroundColor: '#fafcfe',
+        backgroundColor: '#E4EDF7',
         width: 270,
         '&.wider': {
             width: 350

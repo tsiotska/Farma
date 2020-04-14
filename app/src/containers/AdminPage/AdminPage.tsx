@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withStyles, createStyles, WithStyles, Grid } from '@material-ui/core';
+import { withStyles, createStyles, WithStyles, Grid, Paper } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import Plot from '../Plot';
 import Header from './Header';
@@ -9,7 +9,11 @@ import { computed, toJS } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import MedsStatistic from '../MedsStatistic';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    root: {
+        padding: '30px 20px'
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine[]>;
@@ -77,19 +81,21 @@ class AdminPage extends Component<IProps> {
     }
 
     render() {
-        const { chartSalesStat } = this.props;
+        const { chartSalesStat, classes } = this.props;
 
         return (
-            <Grid direction='column' container>
-                <Plot
-                    chartSalesStat={chartSalesStat}
-                    meds={this.meds}
-                    header={<Header />}
-                />
-                <Grid container>
-                    { this.medsList }
+            <Paper className={classes.root}>
+                <Grid direction='column' container>
+                    <Plot
+                        chartSalesStat={chartSalesStat}
+                        meds={this.meds}
+                        header={<Header />}
+                    />
+                    <Grid container>
+                        { this.medsList }
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Paper>
         );
     }
 }

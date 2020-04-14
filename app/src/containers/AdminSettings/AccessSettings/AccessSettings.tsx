@@ -15,7 +15,7 @@ import Snackbar from '../../../components/Snackbar';
 
 const styles = createStyles({
     submitButton: {
-        marginLeft: 'auto',
+        marginRight: 'auto',
         marginTop: 30
     }
 });

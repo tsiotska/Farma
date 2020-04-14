@@ -5,6 +5,9 @@ import SalesModeSwitch from '../../../components/SalesModeSwitch';
 import DateRangeButton from '../../../components/DateRangeButton';
 
 const styles = (theme: any) => createStyles({
+    root: {
+        marginBottom: 12
+    },
     salesModeSwitch: {
         width: 'auto',
         marginBottom: 0
@@ -19,7 +22,7 @@ class Header extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <Grid alignItems='center' container>
+            <Grid className={classes.root} alignItems='center' container>
                 <Typography>
                     Реалізація препартів
                 </Typography>
