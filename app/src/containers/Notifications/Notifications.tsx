@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { withStyles, createStyles, WithStyles } from '@material-ui/core';
+import { withStyles, createStyles, WithStyles, Grid } from '@material-ui/core';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { INotification } from '../../interfaces/iNotification';
 import { toJS, computed } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
+import Notification from './Notification';
 
 const styles = createStyles({});
 
@@ -51,10 +52,29 @@ class Notifications extends Component<IProps> {
     render() {
         const { notifications, classes } = this.props;
         console.log('notifications: ', toJS(notifications));
+
+        let showSubheader: boolean = true;
         return (
-            <div>
-                notificatiosn
-            </div>
+            <Grid direction='column' container>
+                {
+                    notifications.map(notification => {
+                        const { isNew, id } = notification;
+
+                        let before: any = null;
+                        if (showSubheader && isNew === false) {
+                            showSubheader = false;
+                            before = <p>Попередні сповіщення</p>;
+                        }
+
+                        return (
+                            <React.Fragment key={id}>
+                                { before }
+                                <Notification notification={notification} />
+                            </React.Fragment>
+                        );
+                    })
+                }
+            </Grid>
         );
     }
 }

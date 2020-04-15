@@ -299,7 +299,7 @@ export class APIRequester {
 
     getNotificationsCount(): Promise<number> {
         return this.instance.get('/api/notify?new=1')
-            .then(({ data: { notify_new }}: any) => (+notify_new || 0))
+            .then(({ data: { data: { notify_new }}}: any) => (+notify_new || 0))
             .catch(this.defaultErrorHandler(0));
     }
 }

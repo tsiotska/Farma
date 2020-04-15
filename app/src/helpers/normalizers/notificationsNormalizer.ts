@@ -2,8 +2,10 @@ import { INotification } from '../../interfaces/iNotification';
 import { objectArrayNormalizer, IValuesMap } from './normalizer';
 import { NOTIFICATIONS_TYPE } from '../../constants/NotificationsType';
 import isValid from 'date-fns/isValid';
+import shortid from 'shortid';
 
 const defaultNotification: INotification = {
+    id: null,
     user: null,
     department: null,
     message: null,
@@ -61,4 +63,10 @@ export const notificationsNormalizer = ({ data: { data }}: any) => objectArrayNo
             },
         }
     }
-);
+).sort((a, b) => (
+    (a.isNew === b.isNew)
+        ? 0
+        : a.isNew
+            ? -1
+            :  1
+)).map(x => ({ ...x, id: shortid.generate() }));

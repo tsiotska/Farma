@@ -164,11 +164,17 @@ export class Master extends Component<IProps, null> {
 
     componentDidUpdate() {
         const { location: { pathname }, setCurrentDepartment, currentDepartmentId } = this.props;
+
         const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
-        if (!matchDepartmentPath) return;
+        if (!matchDepartmentPath) {
+            setCurrentDepartment(null);
+            return;
+        }
+
         const departmentId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
             ? +(matchDepartmentPath.params as any).departmentId
             : null;
+
         if (departmentId !== currentDepartmentId) setCurrentDepartment(departmentId);
     }
 

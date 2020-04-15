@@ -1,7 +1,9 @@
 import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
+import { IUser } from './IUser';
 
 export interface INotification {
-    user: number;
+    id: string | number;
+    user: number | IUser;
     department: number;
     message: string;
     date: Date;
