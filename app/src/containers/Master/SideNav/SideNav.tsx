@@ -75,6 +75,7 @@ interface IProps extends WithStyles<typeof styles> {
     renewHistory?: (ffm: IUser) => void;
     clearHistory?: () => void;
     openModal?: (modalName: string) => void;
+    notificationsCount?: number;
 }
 
 @inject(({
@@ -84,7 +85,8 @@ interface IProps extends WithStyles<typeof styles> {
             logout,
             isAdmin,
             renewHistory,
-            clearHistory
+            clearHistory,
+            notificationsCount
         },
         departmentsStore: {
             departments,
@@ -104,7 +106,8 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     renewHistory,
     clearHistory,
-    openModal
+    openModal,
+    notificationsCount
 }))
 @withRouter
 @observer
@@ -135,10 +138,6 @@ class SideNav extends Component<IProps> {
     get isHomeRouteActive(): boolean {
         const { history: { location: { pathname }} } = this.props;
         return !!matchPath(pathname, ADMIN_ROUTE);
-    }
-
-    get notificationsCount(): number {
-        return 2;
     }
 
     isActive = (id: number): boolean => {
@@ -173,7 +172,7 @@ class SideNav extends Component<IProps> {
     }
 
     render() {
-        const { classes, logout, isAdmin } = this.props;
+        const { classes, logout, isAdmin, notificationsCount } = this.props;
 
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
@@ -212,12 +211,9 @@ class SideNav extends Component<IProps> {
                     </SideNavButton>
                 }
                 <Button className={cx(classes.action, { marginTopAuto: true })}>
-                    <Badge badgeContent={this.notificationsCount} color='error'>
+                    <Badge badgeContent={notificationsCount} color='error'>
                         <NotificationsNoneOutlined />
                     </Badge>
-                </Button>
-                <Button className={classes.action}>
-                    <Avatar className={classes.avatar}>L</Avatar>
                 </Button>
                 <Button onClick={logout} className={classes.action}>
                     Out

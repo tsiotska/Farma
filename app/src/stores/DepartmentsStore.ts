@@ -83,6 +83,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.currentDepartment = null;
         this.cities = new Map();
         this.regions = new Map();
+        this.asyncStatusMap = new Map();
+        this.requestParams = new Map();
     }
 
     @action.bound

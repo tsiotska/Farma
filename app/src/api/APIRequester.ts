@@ -26,6 +26,8 @@ import { USER_ROLE } from '../constants/Roles';
 import { ISalaryInfo } from '../interfaces/ISalaryInfo';
 import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
+import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
+import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -287,5 +289,17 @@ export class APIRequester {
         return this.instance.put('/api/settings', settings)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
+    }
+
+    getNotifications() {
+        return this.instance.get('/api/notify')
+            .then(notificationsNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getNotificationsCount(): Promise<number> {
+        return this.instance.get('/api/notify?new=1')
+            .then(({ data: { notify_new }}: any) => (+notify_new || 0))
+            .catch(this.defaultErrorHandler(0));
     }
 }

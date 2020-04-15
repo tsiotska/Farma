@@ -23,7 +23,6 @@ export interface IAsyncStatus {
  */
 export default class AsyncStore implements IAsyncStore {
     @observable asyncStatusMap: Map<string, IAsyncStatus> = new Map();
-    // @observable retryCounts: Map<string, number> = new Map();
     @observable requestParams: Map<string, any> = new Map();
 
     readonly defaultStatus: IAsyncStatus = {
@@ -39,16 +38,6 @@ export default class AsyncStore implements IAsyncStore {
     getRequestParams = (key: string): any => {
         return this.requestParams.get(key) || null;
     }
-
-    // @action.bound
-    // setRetryCount(requestName: string, value: number) {
-    //     this.retryCounts.set(requestName, value);
-    // }
-
-    // @action.bound
-    // getRetryCount(requestName: string) {
-    //     return this.retryCounts.get(requestName) || -1;
-    // }
 
     @action.bound
     setLoading(key: string, params?: any): void {

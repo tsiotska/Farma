@@ -4,7 +4,7 @@ export interface IValuesMap {
 
 export interface IOptions <T> {
     requiredProps?: string[];
-    valueNormalizers?: Partial<Record<keyof T, (data: any) => any>>;
+    valueNormalizers?: Partial<Record<keyof T, (value: any, dataObject?: any) => any>>;
     objectNormalizer?: (dataObject: T, defaultValue: T, namesMap: IValuesMap, valueNormalizers?: Partial<Record<keyof T, (data: any) => any>>) => T;
 }
 
@@ -56,7 +56,7 @@ export const defaultObjectNormalizer = <T>(
         const unnormalizedValue = dataObject[prop];
 
         const value = propName in valueNormalizers
-        ? valueNormalizers[propName](unnormalizedValue)
+        ? valueNormalizers[propName](unnormalizedValue, dataObject)
         : unnormalizedValue;
 
         normalizedObject[propName] = value;

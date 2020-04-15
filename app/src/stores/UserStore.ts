@@ -17,6 +17,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable salarySettings: ISalarySettings = null;
     @observable userSalary: Map<number, ISalaryInfo> = new Map();
     @observable userSales: IUserSales = null;
+    @observable notificationsCount: number = 0;
 
     constructor(rootStore: IRootStore) {
         super();
@@ -116,6 +117,15 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    async loadNotificationsCount() {
+        const { api } = this.rootStore;
+        this.notificationsCount = await this.dispatchRequest(
+            api.getNotificationsCount(),
+            'loadNotificationsCount'
+        );
+    }
+
+    @action.bound
     async loadUserSalaryInfo({ id }: IUser) {
         const requestName = 'loadUserSalaryInfo';
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
@@ -189,6 +199,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             loadPositions(),
             loadDepartments(),
             loadLocations(),
+            this.loadNotificationsCount(),
             this.loadUserSalarySettings()
         ]);
 
@@ -198,6 +209,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         } else if (multiDepartmentRoles.includes(user.position)) {
             loadFFMs();
         }
+
         this.user = user;
         this.setSuccess(requestName);
         return true;
@@ -215,6 +227,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.dispatchRequest(api.logout(), requestName);
         this.user = null;
         this.navHistory = [];
+        this.notificationsCount = 0;
+        this.asyncStatusMap = new Map();
+        this.requestParams = new Map();
         resetDepartmentsStore();
         resetSalesStore();
     }
