@@ -3,10 +3,9 @@ import { observer, inject } from 'mobx-react';
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { AppBar, Typography, IconButton } from '@material-ui/core';
-import { History } from 'history';
 import { IDepartment } from '../../interfaces/IDepartment';
 import SalaryReviewModal from './SalaryReviewModal';
-import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES } from '../../constants/Router';
+import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES, DEPARTMENT_ROUTE, NOTIFICATIONS_ROUTE } from '../../constants/Router';
 import { matchPath, RouteComponentProps } from 'react-router-dom';
 import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
 import { computed } from 'mobx';
@@ -81,7 +80,11 @@ export class Header extends Component<IProps, {}> {
 
     @computed
     get title(): string {
-        return this.departmentName || 'Адмін панель';
+        const { history: { location: { pathname }}} = this.props;
+        if (!!matchPath(pathname, DEPARTMENT_ROUTE)) return this.departmentName;
+        if (!!matchPath(pathname, ADMIN_ROUTE)) return 'Адмін панель';
+        if (!!matchPath(pathname, NOTIFICATIONS_ROUTE)) return 'Сповіщення';
+        return null;
     }
 
     settingsClickHandler = () => this.props.history.push(SETTINGS_ROUTE);

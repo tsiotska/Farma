@@ -243,6 +243,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.user = null;
         this.navHistory = [];
         this.notificationsCount = 0;
+        this.notifications = [];
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
         resetDepartmentsStore();
