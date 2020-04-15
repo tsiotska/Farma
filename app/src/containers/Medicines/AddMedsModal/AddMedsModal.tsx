@@ -21,10 +21,10 @@ interface IProps {
         uiStore: {
             openedModal,
             openModal,
-            getAsyncStatus
         },
         departmentsStore: {
-            addMedicine
+            addMedicine,
+            getAsyncStatus
         }
     }
 }) => ({

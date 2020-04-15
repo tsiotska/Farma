@@ -7,7 +7,7 @@ import { History } from 'history';
 import { IDepartment } from '../../interfaces/IDepartment';
 import SalaryReviewModal from './SalaryReviewModal';
 import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES } from '../../constants/Router';
-import { matchPath } from 'react-router-dom';
+import { matchPath, RouteComponentProps } from 'react-router-dom';
 import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
 import { computed } from 'mobx';
 import { ArrowBack } from '@material-ui/icons';
@@ -36,8 +36,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
-    history?: History;
+interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     currentDepartment?: IDepartment;
     isAdmin?: boolean;
 }

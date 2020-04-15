@@ -1,7 +1,7 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, withRouter, RouteComponentProps, matchPath } from 'react-router-dom';
 import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
@@ -20,7 +20,8 @@ import {
     NAVIGATION_ROUTES,
     SETTINGS_ROUTES,
     NOTIFICATIONS_ROUTE,
-    PROFILE_PREVIEW_ROUTES
+    PROFILE_PREVIEW_ROUTES,
+    DEPARTMENT_ROUTE
 } from '../../constants/Router';
 
 import Header from '../Header';
@@ -61,13 +62,14 @@ const styles = (theme: any) => createStyles({
     },
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<any>> {
     user?: IUser;
     role?: USER_ROLE;
     isAdmin?: boolean;
-    history?: History;
+    // history?: History;
     currentDepartmentId?: number;
     isUserFetched?: boolean;
+    setCurrentDepartment?: (departmentId: number) => void;
 }
 
 export interface IRoleContent {
@@ -94,7 +96,8 @@ const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
             isUserFetched
         },
         departmentsStore: {
-            currentDepartmentId
+            currentDepartmentId,
+            setCurrentDepartment
         }
     }
 }) => ({
@@ -102,8 +105,10 @@ const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
     role,
     isAdmin,
     currentDepartmentId,
-    isUserFetched
+    isUserFetched,
+    setCurrentDepartment
 }))
+@withRouter
 @observer
 export class Master extends Component<IProps, null> {
     readonly rolesPresets: Record<USER_ROLE, IRoleContent[]> = {
@@ -155,6 +160,16 @@ export class Master extends Component<IProps, null> {
         return this.userContent.length
             ? this.userContent[0].path.replace(':departmentId', `${currentDepartmentId}`)
             : null;
+    }
+
+    componentDidUpdate() {
+        const { location: { pathname }, setCurrentDepartment, currentDepartmentId } = this.props;
+        const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
+        if (!matchDepartmentPath) return;
+        const departmentId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
+            ? +(matchDepartmentPath.params as any).departmentId
+            : null;
+        if (departmentId !== currentDepartmentId) setCurrentDepartment(departmentId);
     }
 
     render() {
