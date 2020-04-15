@@ -10,9 +10,9 @@ import { IDepartment } from '../../../interfaces/IDepartment';
 import Config from '../../../../Config';
 import { IUser } from '../../../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../../constants/Roles';
-import { toJS } from 'mobx';
+import { toJS, computed } from 'mobx';
 import SideNavButton from '../SideNavButton';
-import { ADMIN_ROUTE, SALES_ROUTE } from '../../../constants/Router';
+import { ADMIN_ROUTE, SALES_ROUTE, NOTIFICATIONS_ROUTE } from '../../../constants/Router';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import DateRangeModal from '../../Sales/DateRangeModal';
 
@@ -34,9 +34,12 @@ const styles = (theme: any) => createStyles({
         minWidth: 0,
         minHeight: 0,
         borderRadius: 0,
-        '&.active': {
-            backgroundColor: theme.palette.primary.green.main
-        },
+    },
+    active: {
+        backgroundColor: theme.palette.primary.green.main,
+        '&:hover': {
+            backgroundColor: theme.palette.primary.green.main,
+        }
     },
     iconSm: {
         width: 36,
@@ -50,8 +53,9 @@ const styles = (theme: any) => createStyles({
         boxSizing: 'content-box',
         minWidth: 0,
         padding: 0,
-        width: 50,
-        height: 50,
+        width: 70,
+        height: 70,
+        borderRadius: 0,
         margin: '8px auto',
         '&.marginTopAuto': {
             marginTop: 'auto'
@@ -112,6 +116,7 @@ interface IProps extends WithStyles<typeof styles> {
 @withRouter
 @observer
 class SideNav extends Component<IProps> {
+    @computed
     get userRole(): USER_ROLE {
         const { user } = this.props;
         return user
@@ -119,6 +124,7 @@ class SideNav extends Component<IProps> {
         : USER_ROLE.UNKNOWN;
     }
 
+    @computed
     get userDepartments(): IDepartment[] {
         const { departments, user } = this.props;
 
@@ -135,14 +141,20 @@ class SideNav extends Component<IProps> {
         return [];
     }
 
+    @computed
     get isHomeRouteActive(): boolean {
         const { history: { location: { pathname }} } = this.props;
         return !!matchPath(pathname, ADMIN_ROUTE);
     }
 
+    @computed
+    get isNotificationsRouteActive(): boolean {
+        const { history: { location: { pathname }} } = this.props;
+        return !!matchPath(pathname, NOTIFICATIONS_ROUTE);
+    }
+
     isActive = (id: number): boolean => {
         const { currentDepartmentId } = this.props;
-
         return currentDepartmentId === id;
     }
 
@@ -171,6 +183,12 @@ class SideNav extends Component<IProps> {
         history.push(ADMIN_ROUTE);
     }
 
+    notificationsClickHandler = () => {
+        const { history, setCurrentDepartment } = this.props;
+        history.push(NOTIFICATIONS_ROUTE);
+        setCurrentDepartment(null);
+    }
+
     render() {
         const { classes, logout, isAdmin, notificationsCount } = this.props;
 
@@ -181,7 +199,7 @@ class SideNav extends Component<IProps> {
                     <SideNavButton
                         className={cx(
                             classes.iconWrapper,
-                            { active: this.isHomeRouteActive }
+                            { [classes.active]: this.isHomeRouteActive }
                         )}
                         clickHandler={this.homeClickHandler}
                         disabled={false}
@@ -198,7 +216,7 @@ class SideNav extends Component<IProps> {
                             tooltip={department.name}
                             className={cx(
                                 classes.iconWrapper,
-                                { active: this.isActive(department.id) }
+                                { [classes.active]: this.isActive(department.id) }
                             )}>
                             <img src={`${Config.ASSETS_URL}/${department.image}`} className={classes.iconSm} />
                         </SideNavButton>
@@ -210,7 +228,7 @@ class SideNav extends Component<IProps> {
                         <Add className={classes.iconSm} fontSize='small' />
                     </SideNavButton>
                 }
-                <Button className={cx(classes.action, { marginTopAuto: true })}>
+                <Button onClick={this.notificationsClickHandler} className={cx(classes.action, { marginTopAuto: true, [classes.active]: this.isNotificationsRouteActive })}>
                     <Badge badgeContent={notificationsCount} color='error'>
                         <NotificationsNoneOutlined />
                     </Badge>

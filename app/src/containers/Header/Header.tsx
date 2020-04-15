@@ -4,9 +4,7 @@ import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { AppBar, Typography, IconButton } from '@material-ui/core';
 import { History } from 'history';
-import ProfilePreview from '../../components/ProfilePreview';
 import { IDepartment } from '../../interfaces/IDepartment';
-import { IUser } from '../../interfaces';
 import SalaryReviewModal from './SalaryReviewModal';
 import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES } from '../../constants/Router';
 import { matchPath } from 'react-router-dom';
@@ -23,11 +21,6 @@ const styles = (theme: any) => createStyles({
         alignItems: 'center',
         padding: 20,
         textTransform: 'capitalize'
-    },
-    navContainer: {
-        height: 128,
-        position: 'relative',
-        overflow: 'hidden'
     },
     settingsButton: {
         marginLeft: 'auto',
@@ -46,7 +39,6 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     history?: History;
     currentDepartment?: IDepartment;
-    navHistory?: IUser[];
     isAdmin?: boolean;
 }
 
@@ -56,13 +48,11 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartment
         },
         userStore: {
-            navHistory,
             isAdmin
         }
     }
 }) => ({
     currentDepartment,
-    navHistory,
     isAdmin
 }))
 @observer
@@ -100,7 +90,7 @@ export class Header extends Component<IProps, {}> {
     backClickHandler = () => this.props.history.push(ADMIN_ROUTE);
 
     render() {
-        const { classes, navHistory,  } = this.props;
+        const { classes } = this.props;
 
         return (
             <>
@@ -125,21 +115,6 @@ export class Header extends Component<IProps, {}> {
                         </IconButton>
                     }
                 </AppBar>
-                {
-                    navHistory.length !== 0 &&
-                    <div className={classes.navContainer}>
-                    {
-                        navHistory.map((user, i, arr) => (
-                            <ProfilePreview
-                                key={user.id}
-                                user={user}
-                                index={i}
-                                scaleIndex={arr.length - i - 1}
-                            />
-                        ))
-                    }
-                    </div>
-                }
                 <SalaryReviewModal />
             </>
         );

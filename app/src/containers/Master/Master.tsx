@@ -18,7 +18,9 @@ import {
     PHARMACY_ROUTE,
     LPU_ROUTE,
     NAVIGATION_ROUTES,
-    SETTINGS_ROUTES
+    SETTINGS_ROUTES,
+    NOTIFICATIONS_ROUTE,
+    PROFILE_PREVIEW_ROUTES
 } from '../../constants/Router';
 
 import Header from '../Header';
@@ -39,6 +41,8 @@ import Pharmacy from '../Pharmacy';
 import Lpu from '../Lpu';
 import DepartmentNav from '../../components/DepartmentNav';
 import AdminSettings from '../AdminSettings';
+import Notifications from '../Notifications';
+import ProfilePreviewContainer from '../ProfilePreviewContainer';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -160,6 +164,7 @@ export class Master extends Component<IProps, null> {
             <main className={classes.root}>
                 <div className={classes.contentWrapper}>
                     <PrivateRoute path={ADMIN_ROUTES} component={Header} />
+                    <PrivateRoute path={PROFILE_PREVIEW_ROUTES} component={ProfilePreviewContainer} />
                     <PrivateRoute path={NAVIGATION_ROUTES} render={() => <DepartmentNav userLinks={this.userContent} />} />
                     <Switch>
                         <Route path={LOGIN_ROUTE} component={Login} />
@@ -168,6 +173,7 @@ export class Master extends Component<IProps, null> {
                             <Route>loading...</Route>
                         }
                         <Route path={SETTINGS_ROUTES} component={AdminSettings} />
+                        <PrivateRoute path={NOTIFICATIONS_ROUTE} component={Notifications} />
                         {
                             this.userContent.map(({ path, component }) => (
                                 <PrivateRoute key={path} path={path} component={component} />

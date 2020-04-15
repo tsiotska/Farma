@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, withStyles, WithStyles, Grid, Tabs, Tab, Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { ACCESS_SETTINGS_ROUTE, SETTINGS_ROUTE, USERS_SETTINGS_ROUTE, SETTINGS_ROUTES } from '../../constants/Router';
+import { ACCESS_SETTINGS_ROUTE, SETTINGS_ROUTE, USERS_SETTINGS_ROUTE } from '../../constants/Router';
 import { NavLink, Link, matchPath, Route, Switch } from 'react-router-dom';
 import { History } from 'history';
 import AccessSettings from './AccessSettings';

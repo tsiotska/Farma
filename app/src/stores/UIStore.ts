@@ -3,7 +3,7 @@ import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action } from 'mobx';
 import { SALARY_PREVIEW_MODAL } from '../constants/Modals';
 
-export class UIStore extends AsyncStore implements IUIStore {
+export class UIStore implements IUIStore {
     @observable salesHeaderHeight: number;
     @observable openedModal: string;
     @observable modalPayload: any;

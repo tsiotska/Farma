@@ -9,6 +9,7 @@ import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../const
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
 import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
+import { INotification } from '../interfaces/iNotification';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
@@ -18,6 +19,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable userSalary: Map<number, ISalaryInfo> = new Map();
     @observable userSales: IUserSales = null;
     @observable notificationsCount: number = 0;
+    @observable notifications: INotification[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
@@ -53,6 +55,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    async loadNotifications() {
+        const requestName = 'loadNotifications';
+        const { api } = this.rootStore;
+        const res = await this.dispatchRequest(
+            api.getNotifications(),
+            requestName
+        );
+        if (res && Array.isArray(res)) {
+            this.notifications = res;
+        }
     }
 
     @action.bound

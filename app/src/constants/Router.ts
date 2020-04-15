@@ -1,9 +1,9 @@
 export const ROOT_ROUTE: string = `/`;
 
 export const LOGIN_ROUTE: string = `/login`;
+export const NOTIFICATIONS_ROUTE: string = '/notifications';
 
 export const ADMIN_ROUTE: string = `/admin`;
-
 export const SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings`;
 export const ACCESS_SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings/access`;
 export const USERS_SETTINGS_ROUTE: string = `${ADMIN_ROUTE}/settings/users`;
@@ -28,12 +28,17 @@ export const NAVIGATION_ROUTES: string[] = [
     LPU_ROUTE
 ];
 
-export const ADMIN_ROUTES: string[] = [
+export const PROFILE_PREVIEW_ROUTES: string[] = [
     ...NAVIGATION_ROUTES,
     ADMIN_ROUTE,
     SETTINGS_ROUTE,
     ACCESS_SETTINGS_ROUTE,
     USERS_SETTINGS_ROUTE,
+];
+
+export const ADMIN_ROUTES: string[] = [
+    ...PROFILE_PREVIEW_ROUTES,
+    NOTIFICATIONS_ROUTE
 ];
 
 export const SETTINGS_ROUTES: string[] = [
