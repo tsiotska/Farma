@@ -10,6 +10,7 @@ import { defaultUser } from '../helpers/normalizers/userNormalizer';
 import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { INotification } from '../interfaces/iNotification';
+import uniq from 'lodash/uniq';
 
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
@@ -65,9 +66,47 @@ export default class UserStore extends AsyncStore implements IUserStore {
             api.getNotifications(),
             requestName
         );
-        if (res && Array.isArray(res)) {
-            this.notifications = res;
-        }
+
+        const responesExist = res && Array.isArray(res);
+        if (!responesExist) return;
+
+        const prevUsers: IUser[] = this.notifications
+            .map(({ user }) => typeof user === 'object' ? user : null)
+            .filter(user => !!user);
+
+        this.notifications = res.map(notification => {
+            const user = prevUsers.find(({ id }) => id === notification.user);
+
+            return user
+                ? { ...notification, user }
+                : notification;
+        });
+    }
+
+    @action.bound
+    async loadNotificationsUsers() {
+        const { api } = this.rootStore;
+        const usersToFetch = this.notifications
+            .map(({ user }) => (typeof user === 'number' ? user : 0))
+            .filter(x => !!x);
+
+        const uniqUsers = uniq(usersToFetch);
+
+        if (!uniqUsers.length) return;
+
+        const promises = uniqUsers.map(id => api.getUser(id));
+        const users = await Promise.all(promises);
+
+        users.forEach(fetchedUser => {
+            if (!fetchedUser) return;
+
+            // for (let i = 0; i < this.notifications.length; ++i) {
+            for (const notification of this.notifications) {
+                if (notification.user === fetchedUser.id) {
+                    notification.user = fetchedUser;
+                }
+            }
+        });
     }
 
     @action.bound
@@ -160,7 +199,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async loadUserInfo(agentInfo: IUserCommonInfo, role?: USER_ROLE) {
+    async historyPushUser(agentInfo: IUserCommonInfo, role?: USER_ROLE) {
         const position = role || this.getNextRole();
         this.navHistory.push({ ...defaultUser, ...agentInfo, position });
         const res = await this.rootStore.api.getUser(agentInfo.id);
@@ -181,7 +220,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async renewHistory(ffm?: IUser) {
         this.clearHistory();
-        this.loadUserInfo(ffm, USER_ROLE.FIELD_FORCE_MANAGER);
+        this.historyPushUser(ffm, USER_ROLE.FIELD_FORCE_MANAGER);
     }
 
     @action.bound

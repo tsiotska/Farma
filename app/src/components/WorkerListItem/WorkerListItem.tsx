@@ -111,7 +111,7 @@ interface IProps extends WithStyles<typeof styles> {
     children?: any;
     isExpanded?: boolean;
     expandChangeHandler?: (e: any, expanded: boolean) => void;
-    loadUserInfo?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
+    historyPushUser?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
     location?: ILocation;
     position?: IPosition;
     disableClick?: boolean;
@@ -120,11 +120,11 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         userStore: {
-            loadUserInfo
+            historyPushUser
         }
     }
 }) => ({
-    loadUserInfo
+    historyPushUser
 }))
 @observer
 class WorkerListItem extends Component<IProps> {
@@ -182,13 +182,13 @@ class WorkerListItem extends Component<IProps> {
 
     workerClickHandler = (e: any) => {
         const {
-            loadUserInfo,
+            historyPushUser,
             disableClick,
             worker : { id, name, avatar, position, isVacancy }
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
-        loadUserInfo({
+        historyPushUser({
             id,
             name,
             avatar,

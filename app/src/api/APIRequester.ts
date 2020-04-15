@@ -28,6 +28,7 @@ import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
+import { INotification } from '../interfaces/iNotification';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -291,7 +292,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    getNotifications() {
+    getNotifications(): Promise<INotification[]> {
         return this.instance.get('/api/notify')
             .then(notificationsNormalizer)
             .catch(this.defaultErrorHandler());

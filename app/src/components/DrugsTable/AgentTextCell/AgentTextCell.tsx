@@ -27,7 +27,7 @@ interface IProps extends WithStyles<typeof styles> {
     label: IUserCommonInfo;
     isIgnored: boolean;
     toggleIgnoredAgents?: (agent: IUserCommonInfo) => void;
-    loadUserInfo?: (agent: IUserCommonInfo) => void;
+    historyPushUser?: (agent: IUserCommonInfo) => void;
 }
 
 @inject(({
@@ -36,12 +36,12 @@ interface IProps extends WithStyles<typeof styles> {
             toggleIgnoredAgents
         },
         userStore: {
-            loadUserInfo
+            historyPushUser
         }
     }
 }) => ({
     toggleIgnoredAgents,
-    loadUserInfo
+    historyPushUser
 }))
 @observer
 class AgentTextCell extends Component<IProps> {
@@ -67,8 +67,8 @@ class AgentTextCell extends Component<IProps> {
 
     onClick = (e: any) => {
         e.preventDefault();
-        const { label, loadUserInfo } = this.props;
-        loadUserInfo(label);
+        const { label, historyPushUser } = this.props;
+        historyPushUser(label);
     }
 
     render() {

@@ -14,6 +14,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadNotifications?: () => void;
     notifications?: INotification[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    loadNotificationsUsers?: () => void;
 }
 
 @inject(({
@@ -24,14 +25,16 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             loadNotifications,
             notifications,
-            getAsyncStatus
+            getAsyncStatus,
+            loadNotificationsUsers
         }
     }
 }) => ({
     setCurrentDepartment,
     loadNotifications,
     notifications,
-    getAsyncStatus
+    getAsyncStatus,
+    loadNotificationsUsers
 }))
 @observer
 class Notifications extends Component<IProps> {
@@ -45,8 +48,10 @@ class Notifications extends Component<IProps> {
         return this.props.getAsyncStatus('loadNotifications').loading;
     }
 
-    componentDidMount() {
-        this.props.loadNotifications();
+    async componentDidMount() {
+        const { loadNotifications, loadNotificationsUsers } = this.props;
+        await loadNotifications();
+        loadNotificationsUsers();
     }
 
     render() {
@@ -69,7 +74,9 @@ class Notifications extends Component<IProps> {
                         return (
                             <React.Fragment key={id}>
                                 { before }
-                                <Notification notification={notification} />
+                                <Notification
+                                    notification={notification}
+                                />
                             </React.Fragment>
                         );
                     })

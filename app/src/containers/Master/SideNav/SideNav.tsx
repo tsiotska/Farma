@@ -229,7 +229,7 @@ class SideNav extends Component<IProps> {
                     </SideNavButton>
                 }
                 <Button onClick={this.notificationsClickHandler} className={cx(classes.action, { marginTopAuto: true, [classes.active]: this.isNotificationsRouteActive })}>
-                    <Badge badgeContent={notificationsCount} color='error'>
+                    <Badge badgeContent={this.isNotificationsRouteActive ? 0 : notificationsCount} color='error'>
                         <NotificationsNoneOutlined />
                     </Badge>
                 </Button>
