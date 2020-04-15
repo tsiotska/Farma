@@ -1,29 +1,48 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, withStyles, Grid, Divider, Paper } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles, Grid, Divider, Paper, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { INotification } from '../../../interfaces/iNotification';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import { computed } from 'mobx';
 import Config from '../../../../Config';
+import UserShortInfo from '../../../components/UserShortInfo';
 
-const styles = createStyles({
+const styles = (theme: any) => createStyles({
     root: {
         margin: '8px 0',
         display: 'flex',
         flexDirection: 'column'
     },
     row: {
+        padding: '0 8px',
         '&:first-of-type': {
-            height: 48
+            height: 60,
+            borderBottom: '1px solid #e2e2e2'
         },
         '&:last-of-type': {
-            height: 58
+            height: 48
         }
     },
     icon: {
         width: 40,
         height: 40,
-        margin: 10
+    },
+    divider: {
+        backgroundColor: '#e2e2e2',
+        margin: '0 16px'
+    },
+    userTextContainer: {
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        padding: '8px 0 8px 8px'
+    },
+    textSemiBold: {
+        fontFamily: 'Source Sans Pro SemiBold'
+    },
+    text: {
+        fontSize: '14px',
+        fontFamily: 'Source Sans Pro',
+        color: theme.palette.primary.gray.mainLight
     }
 });
 
@@ -53,7 +72,7 @@ class Notification extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, notification: { user, message } } = this.props;
 
         return (
             <Paper className={classes.root}>
@@ -62,12 +81,28 @@ class Notification extends Component<IProps> {
                         this.iconSrc &&
                         <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon} />
                     }
-                    <Divider orientation='vertical' />
-                    <Grid xs={5} container item>
-                        user info
+                    <Divider className={classes.divider} orientation='vertical' />
+                    <Grid xs={4} wrap='nowrap' alignItems='center' zeroMinWidth container item>
+                        {
+                            typeof user === 'object' &&
+                            <UserShortInfo
+                                classes={{
+                                    avatar: classes.icon,
+                                    textContainer: classes.userTextContainer,
+                                    credentials: classes.text,
+                                    position: classes.text,
+                                }}
+                                user={user}
+                                disableClick
+                                hideLevel
+                            />
+                        }
                     </Grid>
+                    <Divider className={classes.divider} orientation='vertical' />
                     <Grid xs container item>
-                        message
+                        <Typography variant='body2' className={classes.textSemiBold}>
+                            { message }
+                        </Typography>
                     </Grid>
                 </Grid>
                 <Grid className={classes.row} alignItems='center' container>

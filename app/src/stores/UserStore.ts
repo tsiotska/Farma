@@ -100,7 +100,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         users.forEach(fetchedUser => {
             if (!fetchedUser) return;
 
-            // for (let i = 0; i < this.notifications.length; ++i) {
             for (const notification of this.notifications) {
                 if (notification.user === fetchedUser.id) {
                     notification.user = fetchedUser;

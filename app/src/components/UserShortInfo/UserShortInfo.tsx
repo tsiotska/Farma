@@ -18,12 +18,14 @@ const styles = createStyles({
     credentials: {
         fontFamily: 'Source Sans Pro SemiBold'
     },
+    position: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {
     user: IUser;
     positions?: Map<number, IPosition>;
     disableClick?: boolean;
+    hideLevel?: boolean;
 }
 
 @inject(({
@@ -75,7 +77,7 @@ class UserShortInfo extends Component<IProps> {
     }
 
     render() {
-        const { classes, user, disableClick } = this.props;
+        const { classes, user, disableClick, hideLevel } = this.props;
 
         return (
             <>
@@ -88,11 +90,11 @@ class UserShortInfo extends Component<IProps> {
                     <Typography className={classes.credentials} color='textPrimary'>
                         {this.userName}
                     </Typography>
-                    <Typography color='textSecondary' variant='body2'>
+                    <Typography className={classes.position} color='textSecondary' variant='body2'>
                         {this.positionName}
                     </Typography>
                     {
-                        (this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER) &&
+                        (hideLevel === false && this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER) &&
                         <Level user={user} disableClick={disableClick} />
                     }
                 </Grid>
