@@ -9,8 +9,7 @@ import cx from 'classnames';
 import { ILocation } from '../../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
-    root: {
-    },
+    root: {},
     cell: {},
     name: {},
     badge: {
@@ -34,7 +33,9 @@ const styles = (theme: any) => createStyles({
     confirmButton: {
         padding: '2px 0',
         margin: '0 4px',
-        minWidth: 95
+        minWidth: 95,
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main
     },
     iconButton: {},
     icon: {},
@@ -92,7 +93,7 @@ class HCFPanel extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' container>
+            <>
                 <Grid className={cx(classes.cell, classes.name)} xs={3} alignItems='center' container item>
                     <>
                         <CommitBadge className={classes.badge} title='ФФМ' committed={true} />
@@ -140,7 +141,7 @@ class HCFPanel extends Component<IProps> {
                 <IconButton className={classes.iconButton}>
                     <Delete className={classes.icon} />
                 </IconButton>
-            </Grid>
+            </>
         );
     }
 }

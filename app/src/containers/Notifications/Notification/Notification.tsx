@@ -10,7 +10,7 @@ import cx from 'classnames';
 import { NOTIFICATIONS_TYPE } from '../../../constants/NotificationsType';
 import DoctorPanel from './DoctorPanel';
 import HCFPanel from './HCFPanel';
-import WorkerPanel from './WorkerPanel';
+import AgentPanel from './AgentPanel';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -117,7 +117,7 @@ class Notification extends Component<IProps> {
                         { type === NOTIFICATIONS_TYPE.AGENT && <DoctorPanel doctor={payload} /> }
                         { type === NOTIFICATIONS_TYPE.HCF && <HCFPanel hcf={payload} /> }
                         { type === NOTIFICATIONS_TYPE.PHARMACY && <HCFPanel hcf={payload} /> }
-                        { type === NOTIFICATIONS_TYPE.USER && <WorkerPanel worker={payload} /> }
+                        { type === NOTIFICATIONS_TYPE.USER && <AgentPanel agent={payload} /> }
                     </Grid>
                 }
             </Paper>
