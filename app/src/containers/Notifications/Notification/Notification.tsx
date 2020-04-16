@@ -3,10 +3,14 @@ import { createStyles, WithStyles, withStyles, Grid, Divider, Paper, Typography 
 import { observer, inject } from 'mobx-react';
 import { INotification } from '../../../interfaces/iNotification';
 import { IDepartment } from '../../../interfaces/IDepartment';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import Config from '../../../../Config';
 import UserShortInfo from '../../../components/UserShortInfo';
 import cx from 'classnames';
+import { NOTIFICATIONS_TYPE } from '../../../constants/NotificationsType';
+import DoctorPanel from './DoctorPanel';
+import HCFPanel from './HCFPanel';
+import WorkerPanel from './WorkerPanel';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -22,7 +26,8 @@ const styles = (theme: any) => createStyles({
         borderBottom: '1px solid #e2e2e2'
     },
     subjectRow: {
-        height: 48
+        height: 48,
+        backgroundColor: '#fafbfc'
     },
     icon: {
         width: 40,
@@ -73,7 +78,7 @@ class Notification extends Component<IProps> {
     }
 
     render() {
-        const { classes, notification: { user, message, payload } } = this.props;
+        const { classes, notification: { type, user, message, payload } } = this.props;
 
         return (
             <Paper className={classes.root}>
@@ -109,7 +114,10 @@ class Notification extends Component<IProps> {
                 {
                     payload &&
                     <Grid className={cx(classes.row, classes.subjectRow)} alignItems='center' container>
-                        ROWS
+                        { type === NOTIFICATIONS_TYPE.AGENT && <DoctorPanel doctor={payload} /> }
+                        { type === NOTIFICATIONS_TYPE.HCF && <HCFPanel hcf={payload} /> }
+                        { type === NOTIFICATIONS_TYPE.PHARMACY && <HCFPanel hcf={payload} /> }
+                        { type === NOTIFICATIONS_TYPE.USER && <WorkerPanel worker={payload} /> }
                     </Grid>
                 }
             </Paper>

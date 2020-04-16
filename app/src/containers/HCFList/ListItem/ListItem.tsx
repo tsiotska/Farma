@@ -13,8 +13,8 @@ import { ILPU } from '../../../interfaces/ILPU';
 import cx from 'classnames';
 import { Edit, Delete } from '@material-ui/icons';
 import { gridStyles } from '../gridStyles';
-import CommitBadge from '../CommtiBadge';
 import { ILocation } from '../../../interfaces/ILocation';
+import CommitBadge from '../../../components/CommitBadge';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
