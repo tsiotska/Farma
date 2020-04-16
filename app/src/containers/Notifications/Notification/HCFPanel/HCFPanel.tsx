@@ -9,9 +9,6 @@ import cx from 'classnames';
 import { ILocation } from '../../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
-    root: {},
-    cell: {},
-    name: {},
     badge: {
         marginRight: 5,
         backgroundColor: '#f2f2f2',
@@ -25,11 +22,6 @@ const styles = (theme: any) => createStyles({
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
-    region: {},
-    oblast: {},
-    city: {},
-    address: {},
-    phoneText: {},
     confirmButton: {
         padding: '2px 0',
         margin: '0 4px',
@@ -37,8 +29,6 @@ const styles = (theme: any) => createStyles({
         color: theme.palette.primary.green.main,
         borderColor: theme.palette.primary.green.main
     },
-    iconButton: {},
-    icon: {},
     phone: {
         minWidth: 220
     }
@@ -94,52 +84,52 @@ class HCFPanel extends Component<IProps> {
 
         return (
             <>
-                <Grid className={cx(classes.cell, classes.name)} xs={3} alignItems='center' container item>
+                <Grid xs={3} alignItems='center' container item>
                     <>
                         <CommitBadge className={classes.badge} title='ФФМ' committed={true} />
                         <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm} />
                     </>
                     <Typography className={classes.text} variant='body2'>
-                        { name }
+                        { name || '-' }
                     </Typography>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.region)} xs alignItems='center' container item>
+                <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
                         { this.regionName }
                     </Typography>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.oblast)} xs alignItems='center' container item>
+                <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { oblast }
+                        { oblast || '-' }
                     </Typography>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.city)} xs alignItems='center' container item>
+                <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
                         { this.cityName }
                     </Typography>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
+                <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { address }
+                        { address || '-' }
                     </Typography>
                 </Grid>
                 <Grid
-                    className={cx(classes.cell, classes.phone)}
+                    className={classes.phone}
                     xs={1}
                     wrap='nowrap'
                     alignItems='center'
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span className={classes.phoneText}>{ phone1 }</span>
-                        <span className={classes.phoneText}>{ phone2 }</span>
+                        <span>{ phone1 || '-' }</span>
+                        <span>{ phone2 || '-' }</span>
                     </Typography>
                 </Grid>
                 <Button variant='outlined' className={classes.confirmButton}>
                     Підтвердити
                 </Button>
-                <IconButton className={classes.iconButton}>
-                    <Delete className={classes.icon} />
+                <IconButton>
+                    <Delete />
                 </IconButton>
             </>
         );

@@ -25,6 +25,18 @@ const styles = (theme: any) => createStyles({
         minWidth: 95,
         color: theme.palette.primary.green.main,
         borderColor: theme.palette.primary.green.main
+    },
+    text: {
+        lineHeight: 1.5,
+        marginRight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+    },
+    phone: {
+        minWidth: 220
     }
 });
 
@@ -56,7 +68,6 @@ class AgentPanel extends Component<IProps> {
         const {
             name,
             email,
-            position,
             workPhone,
             mobilePhone,
             card,
@@ -81,14 +92,10 @@ class AgentPanel extends Component<IProps> {
                         {this.positionName}
                     </Typography>
                 </Grid>
-                <Grid xs container item>
-                    <Typography variant='body2'>
-                        {mobilePhone || '-'}
-                    </Typography>
-                </Grid>
-                <Grid xs container item>
-                    <Typography variant='body2'>
-                        {workPhone || '-'}
+                <Grid className={classes.phone} xs container item>
+                    <Typography className={classes.text} variant='body2'>
+                        <span>{ workPhone || '-' }</span>
+                        <span>{ mobilePhone || '-' }</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
