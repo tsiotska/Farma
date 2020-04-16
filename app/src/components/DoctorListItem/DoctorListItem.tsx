@@ -45,7 +45,6 @@ class DoctorListItem extends Component<IProps> {
             doctor: {
                 name,
                 specialty,
-                phone,
                 card
             }
         } = this.props;
@@ -69,7 +68,7 @@ class DoctorListItem extends Component<IProps> {
                     { specialty }
                 </Grid>
                 <Grid container item>
-                    { phone }
+                    {/* { phone } */}
                 </Grid>
                 <Grid container item>
                     { card }

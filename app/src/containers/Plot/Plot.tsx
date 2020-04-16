@@ -53,14 +53,10 @@ type LabelType = 'year' | 'month' | 'day' | 'unknown';
             ignoredMeds,
             getAsyncStatus
         },
-        // departmentsStore: {
-        //     meds
-        // }
     }
 }) => ({
     dateFrom,
     dateTo,
-    // meds,
     displayMode,
     ignoredMeds,
     getAsyncStatus

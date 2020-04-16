@@ -1,7 +1,7 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizers/normalizer';
 import { IWorker } from '../interfaces/IWorker';
 
-const defaultWorker: IWorker = {
+export const defaultWorker: IWorker = {
     id: null,
     name: null,
     avatar: null,
@@ -18,7 +18,7 @@ const defaultWorker: IWorker = {
     city: null
 };
 
-const valuesMap: IValuesMap = {
+export const workerValuesMap: IValuesMap = {
     id: 'id',
     full_name: 'name',
     avatar: 'avatar',
@@ -38,7 +38,7 @@ const valuesMap: IValuesMap = {
 export const workersNormalizer = ({ data: { data }}: any): IWorker[] => objectArrayNormalizer(
     data,
     defaultWorker,
-    valuesMap,
+    workerValuesMap,
     {
         requiredProps: [ 'id' ],
         valueNormalizers: {

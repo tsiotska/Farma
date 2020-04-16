@@ -5,6 +5,9 @@ export interface IDoctor {
     FFMCommit: boolean;
     RMCommit: boolean;
     specialty: string;
-    phone: string;
+    workPhone: string;
+    mobilePhone: string;
     card: string;
+    created: Date;
+    confirmed: boolean;
 }

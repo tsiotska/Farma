@@ -1,31 +1,37 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizer';
 import { IDoctor } from './../../interfaces/IDoctor';
 
-const defaultDoctor: IDoctor = {
+export const defaultDoctor: IDoctor = {
     id: null,
     name: null,
     LPUId: null,
     FFMCommit: null,
     RMCommit: null,
     specialty: null,
-    phone: null,
+    workPhone: null,
+    mobilePhone: null,
     card: null,
+    created: null,
+    confirmed: null,
 };
 
-const valuesMap: IValuesMap = {
+export const doctorValuesMap: IValuesMap = {
     id: 'id',
     name: 'name',
-    LPUId: 'LPUId',
-    FFMCommit: 'FFMCommit',
-    RMCommit: 'RMCommit',
-    specialty: 'specialty',
-    phone: 'phone',
-    card: 'card',
+    hcf: 'LPUId',
+    ffm_confirmed: 'FFMCommit',
+    rm_confirmed: 'RMCommit',
+    speciality: 'specialty',
+    work_phone: 'workPhone',
+    mobile_phone: 'mobilePhone',
+    bank_card: 'card',
+    created: 'created',
+    confirmed: 'confirmed',
 };
 
 export const docktorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(
     data,
     defaultDoctor,
-    valuesMap,
+    doctorValuesMap,
     { requiredProps: [ 'id' ] }
 );

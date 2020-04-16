@@ -1,8 +1,11 @@
 import { INotification } from '../../interfaces/iNotification';
-import { objectArrayNormalizer, IValuesMap } from './normalizer';
+import { objectArrayNormalizer, IValuesMap, defaultObjectNormalizer } from './normalizer';
 import { NOTIFICATIONS_TYPE } from '../../constants/NotificationsType';
 import isValid from 'date-fns/isValid';
 import shortid from 'shortid';
+import { doctorValuesMap, defaultDoctor } from './doctorsNormalizer';
+import { lpuValuesMap, defaultLPU } from './lpuNormalizer';
+import { workerValuesMap } from '../workersNormalizer';
 
 const defaultNotification: INotification = {
     id: null,
@@ -53,11 +56,10 @@ export const notificationsNormalizer = ({ data: { data }}: any) => objectArrayNo
                 const { notify_type } = dataObject;
                 const type = typeNormalizer(notify_type);
                 switch (type) {
-                    case NOTIFICATIONS_TYPE.MESSAGE: return null;
-                    case NOTIFICATIONS_TYPE.AGENT: return ;
-                    case NOTIFICATIONS_TYPE.HCF: return null;
-                    case NOTIFICATIONS_TYPE.PHARMACY: return null;
-                    case NOTIFICATIONS_TYPE.USER: return null;
+                    case NOTIFICATIONS_TYPE.AGENT: return defaultObjectNormalizer(value, defaultDoctor, doctorValuesMap);
+                    case NOTIFICATIONS_TYPE.HCF: return defaultObjectNormalizer(value, defaultLPU, lpuValuesMap);
+                    case NOTIFICATIONS_TYPE.PHARMACY: return defaultObjectNormalizer(value, defaultLPU, lpuValuesMap);
+                    case NOTIFICATIONS_TYPE.USER: return defaultObjectNormalizer(value, defaultDoctor, workerValuesMap);
                     default: return null;
                 }
             },

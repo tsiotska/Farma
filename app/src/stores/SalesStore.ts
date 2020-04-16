@@ -252,7 +252,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const requestName = 'loadMedsStat';
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
         const url = this.getMedsStatUrl(currentDepartmentId);
-        const id = currentDepartmentId;
 
         if (!url) return;
 
@@ -261,9 +260,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (cache) this.chartSalesStat = cache;
 
         const res = await promise;
-
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
-        if (id !== this.rootStore.departmentsStore.currentDepartmentId) return;
+        const testUrl = this.getMedsStatUrl(this.rootStore.departmentsStore.currentDepartmentId);
+        if (url !== testUrl) return;
+
         this.chartSalesStat = res;
 
         // if fetched data is relevant we process it

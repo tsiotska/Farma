@@ -6,6 +6,7 @@ import { IDepartment } from '../../../interfaces/IDepartment';
 import { computed } from 'mobx';
 import Config from '../../../../Config';
 import UserShortInfo from '../../../components/UserShortInfo';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -15,13 +16,13 @@ const styles = (theme: any) => createStyles({
     },
     row: {
         padding: '0 8px',
-        '&:first-of-type': {
-            height: 60,
-            borderBottom: '1px solid #e2e2e2'
-        },
-        '&:last-of-type': {
-            height: 48
-        }
+    },
+    titleRow: {
+        height: 60,
+        borderBottom: '1px solid #e2e2e2'
+    },
+    subjectRow: {
+        height: 48
     },
     icon: {
         width: 40,
@@ -72,11 +73,11 @@ class Notification extends Component<IProps> {
     }
 
     render() {
-        const { classes, notification: { user, message } } = this.props;
+        const { classes, notification: { user, message, payload } } = this.props;
 
         return (
             <Paper className={classes.root}>
-                <Grid className={classes.row} alignItems='center' container>
+                <Grid className={cx(classes.row, classes.titleRow)} alignItems='center' container>
                     {
                         this.iconSrc &&
                         <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon} />
@@ -105,9 +106,12 @@ class Notification extends Component<IProps> {
                         </Typography>
                     </Grid>
                 </Grid>
-                <Grid className={classes.row} alignItems='center' container>
-                    ROWS
-                </Grid>
+                {
+                    payload &&
+                    <Grid className={cx(classes.row, classes.subjectRow)} alignItems='center' container>
+                        ROWS
+                    </Grid>
+                }
             </Paper>
         );
     }

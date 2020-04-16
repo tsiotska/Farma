@@ -1,7 +1,7 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizer';
 import { ILPU } from './../../interfaces/ILPU';
 
-const defaultLPU: ILPU = {
+export const defaultLPU: ILPU = {
     id: null,
     name: null,
     type: null,
@@ -13,7 +13,7 @@ const defaultLPU: ILPU = {
     phone2: null,
 };
 
-const valuesMap: IValuesMap = {
+export const lpuValuesMap: IValuesMap = {
     id: 'id',
     name: 'name',
     hcf_type: 'type',
@@ -29,6 +29,6 @@ const valuesMap: IValuesMap = {
 export const lpuNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
     data,
     defaultLPU,
-    valuesMap,
+    lpuValuesMap,
     { requiredProps: [ 'id', 'name' ]}
 );
