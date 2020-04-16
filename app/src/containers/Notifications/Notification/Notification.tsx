@@ -60,11 +60,11 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         departmentsStore: {
-            departments
+            departments,
         }
     }
 }) => ({
-    departments
+    departments,
 }))
 @observer
 class Notification extends Component<IProps> {

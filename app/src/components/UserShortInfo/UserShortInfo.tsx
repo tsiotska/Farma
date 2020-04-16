@@ -94,7 +94,7 @@ class UserShortInfo extends Component<IProps> {
                         {this.positionName}
                     </Typography>
                     {
-                        (hideLevel === false && this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER) &&
+                        (hideLevel === false && (this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER)) &&
                         <Level user={user} disableClick={disableClick} />
                     }
                 </Grid>

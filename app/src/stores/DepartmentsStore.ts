@@ -6,7 +6,6 @@ import AsyncStore from './AsyncStore';
 import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IPosition } from '../interfaces/IPosition';
-import { getRandomColor } from '../helpers/getRandomColor';
 import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';

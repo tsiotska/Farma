@@ -71,7 +71,7 @@ class AgentPanel extends Component<IProps> {
             workPhone,
             mobilePhone,
             card,
-            confirmed
+            confirmed,
         } = agent;
 
         return (

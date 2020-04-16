@@ -6,6 +6,7 @@ import { INotification } from '../../interfaces/iNotification';
 import { toJS, computed } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import Notification from './Notification';
+import { ILPU } from '../../interfaces/ILPU';
 
 const styles = createStyles({});
 
@@ -20,7 +21,7 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         departmentsStore: {
-            setCurrentDepartment
+            setCurrentDepartment,
         },
         userStore: {
             loadNotifications,
@@ -56,7 +57,6 @@ class Notifications extends Component<IProps> {
 
     render() {
         const { notifications, classes } = this.props;
-        console.log('notifications: ', toJS(notifications));
 
         let showSubheader: boolean = true;
         return (

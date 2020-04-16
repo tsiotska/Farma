@@ -5,6 +5,7 @@ export const defaultDoctor: IDoctor = {
     id: null,
     name: null,
     LPUId: null,
+    LPUName: null,
     FFMCommit: null,
     RMCommit: null,
     specialty: null,
@@ -13,12 +14,14 @@ export const defaultDoctor: IDoctor = {
     card: null,
     created: null,
     confirmed: null,
+    position: null
 };
 
 export const doctorValuesMap: IValuesMap = {
     id: 'id',
-    name: 'name',
+    full_name: 'name',
     hcf: 'LPUId',
+    hcf_name: 'LPUName',
     ffm_confirmed: 'FFMCommit',
     rm_confirmed: 'RMCommit',
     speciality: 'specialty',
@@ -27,6 +30,7 @@ export const doctorValuesMap: IValuesMap = {
     bank_card: 'card',
     created: 'created',
     confirmed: 'confirmed',
+    position: 'position'
 };
 
 export const docktorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(

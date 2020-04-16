@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { WithStyles, withStyles, createStyles, Grid, Typography, Button, IconButton } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { IDoctor } from '../../../../interfaces/IDoctor';
 import { Delete } from '@material-ui/icons';
 import CommitBadge from '../../../../components/CommitBadge';
+import { IPosition } from '../../../../interfaces/IPosition';
 
 const styles = (theme: any) =>  createStyles({
     badge: {
@@ -33,18 +34,20 @@ const styles = (theme: any) =>  createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
+    positions?: Map<number, IPosition>;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            positions
+        }
+    }
+}) => ({
+    positions
+}))
 @observer
 class DoctorPanel extends Component<IProps> {
-    get positionName(): string {
-        return 'position';
-    }
-
-    get lpuName(): string {
-        return 'lpu';
-    }
-
     render() {
         const {
             classes,
@@ -54,7 +57,9 @@ class DoctorPanel extends Component<IProps> {
                 name,
                 mobilePhone,
                 workPhone,
-                card
+                card,
+                LPUName,
+                position
             }
         } = this.props;
 
@@ -69,12 +74,12 @@ class DoctorPanel extends Component<IProps> {
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        { this.lpuName }
+                        { LPUName }
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        { this.positionName }
+                        { position }
                     </Typography>
                 </Grid>
                 <Grid className={classes.phone} xs container item>

@@ -58,54 +58,7 @@ const userNotificationValuesMap: IValuesMap = {
 const typeNormalizer = (value: string) => NOTIFICATIONS_TYPE[value.toUpperCase()] || NOTIFICATIONS_TYPE.MESSAGE;
 
 export const notificationsNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
-    // [
-    //     {
-            // 'user': 2,
-            // 'branch': 1,
-            // 'message': 'Додавання нового користувача',
-            // 'datetime': '2020-04-14 12:57:26',
-            // 'notify_type': 'user',
-            // 'is_new': true,
-            // 'object': {
-            //     'id': 10,
-            //     'full_name': 'new user',
-            //     'employee_id': null,
-            //     'position': 4,
-            //     'email': 'user2@gmail.com',
-            //     'hash_password': '5f4dcc3b5aa765d61d8327deb882cf99',
-            //     'work_phone': null,
-            //     'mobile_phone': null,
-            //     'bank_card': '3425 8963 8768 3902',
-            //     'avatar': null,
-            //     'created': '2020-04-14 12:57:26',
-            //     'modified': null,
-            //     'confirmed': true
-            // }
-    //     }
-    // ],
-    [...data, {
-        'user': 2,
-        'branch': 1,
-        'message': 'Додавання нового користувача',
-        'datetime': '2020-04-14 12:57:26',
-        'notify_type': 'user',
-        'is_new': true,
-        'object': {
-            'id': 10,
-            'full_name': 'new user',
-            'employee_id': null,
-            'position': 4,
-            'email': 'user2@gmail.com',
-            'hash_password': '5f4dcc3b5aa765d61d8327deb882cf99',
-            'work_phone': '123412341324',
-            'mobile_phone': '4534645765',
-            'bank_card': '3425 8963 8768 3902',
-            'avatar': null,
-            'created': '2020-04-14 12:57:26',
-            'modified': null,
-            'confirmed': true
-        }
-    }],
+    data,
     defaultNotification,
     valuesMap,
     {
