@@ -22,6 +22,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable notificationsCount: number = 0;
     @observable notifications: INotification[] = [];
 
+    notificationsUpdateInterval: any = null;
+
     constructor(rootStore: IRootStore) {
         super();
         this.rootStore = rootStore;
@@ -56,6 +58,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    async reviewNotifications() {
+        const { api } = this.rootStore;
+        const reviewed = await api.reviewNotifications();
+
+        if (!reviewed) return;
+
+        this.notificationsCount = 0;
+        this.notifications.forEach(x => {
+            x.isNew = false;
+        });
     }
 
     @action.bound
@@ -176,6 +191,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
             api.getNotificationsCount(),
             'loadNotificationsCount'
         );
+
+        if (!this.notificationsUpdateInterval) {
+            this.notificationsUpdateInterval = setInterval(
+                this.loadNotificationsCount,
+                5000
+            );
+        }
     }
 
     @action.bound
@@ -284,6 +306,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.notifications = [];
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+        window.clearInterval(this.notificationsUpdateInterval);
+        this.notificationsUpdateInterval = null;
         resetDepartmentsStore();
         resetSalesStore();
     }

@@ -303,4 +303,10 @@ export class APIRequester {
             .then(({ data: { data: { notify_new }}}: any) => (+notify_new || 0))
             .catch(this.defaultErrorHandler(0));
     }
+
+    reviewNotifications(): Promise<boolean> {
+        return this.instance.put('/api/notify')
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

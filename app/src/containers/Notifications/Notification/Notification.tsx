@@ -68,6 +68,8 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Notification extends Component<IProps> {
+    timeout: any = null;
+
     @computed
     get iconSrc(): string {
         const { departments, notification: { department }} = this.props;

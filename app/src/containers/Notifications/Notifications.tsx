@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles, createStyles, WithStyles, Grid } from '@material-ui/core';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { INotification } from '../../interfaces/iNotification';
-import { toJS, computed } from 'mobx';
+import { toJS, computed, reaction } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import Notification from './Notification';
 import { ILPU } from '../../interfaces/ILPU';
@@ -16,6 +16,8 @@ interface IProps extends WithStyles<typeof styles> {
     notifications?: INotification[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadNotificationsUsers?: () => void;
+    reviewNotifications?: () => void;
+    notificationsCount?: number;
 }
 
 @inject(({
@@ -27,7 +29,9 @@ interface IProps extends WithStyles<typeof styles> {
             loadNotifications,
             notifications,
             getAsyncStatus,
-            loadNotificationsUsers
+            loadNotificationsUsers,
+            reviewNotifications,
+            notificationsCount,
         }
     }
 }) => ({
@@ -35,10 +39,15 @@ interface IProps extends WithStyles<typeof styles> {
     loadNotifications,
     notifications,
     getAsyncStatus,
-    loadNotificationsUsers
+    loadNotificationsUsers,
+    reviewNotifications,
+    notificationsCount,
 }))
 @observer
 class Notifications extends Component<IProps> {
+    timeout: any = null;
+    reactionDisposer: any = null;
+
     constructor(props: IProps) {
         super(props);
         this.props.setCurrentDepartment(null);
@@ -49,10 +58,30 @@ class Notifications extends Component<IProps> {
         return this.props.getAsyncStatus('loadNotifications').loading;
     }
 
+    updateNotifications = async () => {
+        await this.props.loadNotifications();
+        this.props.loadNotificationsUsers();
+    }
+
     async componentDidMount() {
-        const { loadNotifications, loadNotificationsUsers } = this.props;
-        await loadNotifications();
-        loadNotificationsUsers();
+        const { reviewNotifications } = this.props;
+        await this.updateNotifications();
+        this.timeout = setTimeout(
+            reviewNotifications,
+            3000
+        );
+        this.reactionDisposer = reaction(
+            () => this.props.notificationsCount,
+            (count: number) => {
+                if (!count) return;
+                this.updateNotifications();
+            }
+        );
+    }
+
+    componentWillUnmount() {
+        window.clearTimeout(this.timeout);
+        this.reactionDisposer();
     }
 
     render() {
