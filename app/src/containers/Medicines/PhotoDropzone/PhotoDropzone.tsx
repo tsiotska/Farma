@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { useState, useCallback } from 'react';
 import { createStyles, WithStyles, Backdrop } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import Dropzone from 'react-dropzone';
-import { observable } from 'mobx';
+import { useDropzone } from 'react-dropzone';
 import DropzoneContent from '../DropzoneContent';
 
 const styles = (theme: any) => createStyles({
@@ -34,78 +33,62 @@ interface IProps extends WithStyles<typeof styles> {
     removeFile: () => void;
 }
 
-@observer
-class PhotoDropzone extends Component<IProps> {
-    @observable hovered: boolean = false;
+export const PhotoDropzone: React.FC<IProps> = ({ file, appendFile, removeFile, classes }) => {
+    const onDrop = useCallback((files: File[]) => {
+        if (files.length) appendFile(files[0]);
+    }, []);
 
-    onMouseOver = () => {
-        this.hovered = true;
-    }
+    const {
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        open
+    } = useDropzone({
+        onDrop,
+        accept: 'image/*',
+        multiple: false,
+        noClick: true
+    });
 
-    onMouseOut = () => {
-        this.hovered = false;
-    }
+    const [isHovered, setHoverStatus] = useState(false);
 
-    removeFileClickHandler = () => {
-        const { file, removeFile } = this.props;
+    const onMouseEnter = () => setHoverStatus(true);
+
+    const onMouseLeave = () => setHoverStatus(false);
+
+    const removeFileClickHandler = () => {
         if (file) removeFile();
-    }
+    };
 
-    dropHandler = (droppedFiles: File[]) => {
-        if (!droppedFiles.length) return;
-        this.props.appendFile(droppedFiles[0]);
-    }
+    const colorTheme = file
+    ? 'white'
+    : 'black';
 
-    render() {
-        const { classes, file } = this.props;
+    return (
+        <div className={classes.section} {...getRootProps({
+            onMouseEnter,
+            onMouseLeave,
+        })}>
+            <input {...getInputProps()}/>
+            {
+                file
+                ? <Backdrop className={classes.backdrop} open={isHovered}>
+                    <DropzoneContent
+                        fileAppended
+                        removeFile={removeFileClickHandler}
+                        colorTheme={colorTheme}
+                        isDragActive={isDragActive}
+                        onButtonClick={open} />
+                    </Backdrop>
+                : <DropzoneContent
+                    fileAppended={false}
+                    removeFile={removeFileClickHandler}
+                    colorTheme={colorTheme}
+                    isDragActive={isDragActive}
+                    onButtonClick={open} />
+            }
+        </div>
+    );
+};
 
-        const isHovered = this.hovered;
-        const colorTheme = file
-        ? 'white'
-        : 'black';
-
-        return (
-            <Dropzone
-                accept='image/*'
-                onDrop={this.dropHandler}
-                multiple={false}
-                noClick>
-                {
-                    ({
-                        getRootProps,
-                        getInputProps,
-                        isDragActive,
-                        open,
-                    }) => (
-                        <section
-                            onMouseEnter={this.onMouseOver}
-                            onMouseLeave={this.onMouseOut}
-                            className={classes.section}
-                            {...getRootProps()}>
-                                <input {...getInputProps()} />
-                                {
-                                    file
-                                    ? <Backdrop className={classes.backdrop} open={isHovered}>
-                                        <DropzoneContent
-                                            fileAppended
-                                            removeFile={this.removeFileClickHandler}
-                                            colorTheme={colorTheme}
-                                            isDragActive={isDragActive}
-                                            onButtonClick={open} />
-                                        </Backdrop>
-                                    : <DropzoneContent
-                                        fileAppended={false}
-                                        removeFile={this.removeFileClickHandler}
-                                        colorTheme={colorTheme}
-                                        isDragActive={isDragActive}
-                                        onButtonClick={open} />
-                                }
-                        </section>
-                    )
-                }
-            </Dropzone>
-        );
-    }
-}
-
-export default withStyles(styles)(PhotoDropzone);
+export default withStyles(styles)(observer(PhotoDropzone));
