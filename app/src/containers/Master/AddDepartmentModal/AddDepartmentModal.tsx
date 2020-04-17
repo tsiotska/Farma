@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { withStyles, createStyles, WithStyles } from '@material-ui/core';
+import { withStyles, createStyles, WithStyles, Divider } from '@material-ui/core';
 import Dialog from '../../../components/Dialog';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import { observable } from 'mobx';
@@ -75,6 +75,10 @@ class AddDepartmentModal extends Component<IProps> {
         }
     }
 
+    deparmentNameChangeHandler = ({ target: { value }}: any) => {
+        this.departmentData.name = value;
+    }
+
     submitHandler = (data: any) => {
         console.log('submit');
     }
@@ -92,8 +96,11 @@ class AddDepartmentModal extends Component<IProps> {
                 title='Додати відділення'>
                     <DepartmentBlock
                         file={this.departmentData.image}
+                        departmentName={this.departmentData.name}
+                        onNameChange={this.deparmentNameChangeHandler}
                         removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
                         appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)} />
+                        <Divider />
                     <FFMBlock />
             </Dialog>
         );
