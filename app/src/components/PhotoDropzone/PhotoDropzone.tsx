@@ -10,7 +10,7 @@ const styles = (theme: any) => createStyles({
     input: {},
     background: {
         background: ({ file }: any) => file
-        ? `url(${URL.createObjectURL(file)}) center center/280px 280px no-repeat`
+        ? `url(${URL.createObjectURL(file)}) center / cover no-repeat`
         : 'transparent',
     }
 });
@@ -18,7 +18,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     file: File;
     appendFile: (file: File) => void;
-    children: (isHovered: boolean, isDragActive: boolean, openHandler: () => void) => any;
+    children?: (isHovered: boolean, isDragActive: boolean, openHandler: () => void) => any;
 }
 
 export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children }) => {
@@ -51,7 +51,11 @@ export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children 
             onMouseLeave,
         })}>
             <input {...getInputProps({ className: classes.input })}/>
-            { children(isHovered, isDragActive, open) }
+            {
+                children
+                ? children(isHovered, isDragActive, open)
+                : null
+            }
         </div>
     );
 };

@@ -4,6 +4,8 @@ import { withStyles, createStyles, WithStyles } from '@material-ui/core';
 import Dialog from '../../../components/Dialog';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import { observable } from 'mobx';
+import FFMBlock from '../FFMBlock';
+import DepartmentBlock from '../DepartmentBlock';
 
 const styles = (theme: any) => createStyles({
 });
@@ -57,7 +59,7 @@ class AddDepartmentModal extends Component<IProps> {
         email: '',
     };
 
-    appendImage = (targetProp: TARGET_IMAGE, image: File) => {
+    appendImage = (targetProp: TARGET_IMAGE) => (image: File) => {
         if (targetProp === TARGET_IMAGE.FFM) {
             this.ffmData.image = image;
         } else if (targetProp === TARGET_IMAGE.DEPARTMENT) {
@@ -65,7 +67,7 @@ class AddDepartmentModal extends Component<IProps> {
         }
     }
 
-    removeImage = (targetProp: TARGET_IMAGE) => {
+    removeImage = (targetProp: TARGET_IMAGE) => () => {
         if (targetProp === TARGET_IMAGE.DEPARTMENT) {
             this.departmentData.image = null;
         } else if (targetProp === TARGET_IMAGE.FFM) {
@@ -88,7 +90,11 @@ class AddDepartmentModal extends Component<IProps> {
                 open={openedModal === ADD_DEPARTMENT_MODAL}
                 onClose={this.closeHandler}
                 title='Додати відділення'>
-                    modal
+                    <DepartmentBlock
+                        file={this.departmentData.image}
+                        removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
+                        appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)} />
+                    <FFMBlock />
             </Dialog>
         );
     }
