@@ -5,7 +5,8 @@ import Dialog from '../../../components/Dialog';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import { observable } from 'mobx';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+});
 
 interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;

@@ -3,13 +3,34 @@ import { observer, inject } from 'mobx-react';
 import { observable, toJS, computed } from 'mobx';
 import { ADD_MEDICINE_MODAL } from '../../../constants/Modals';
 import Dialog from '../../../components/Dialog';
-import PhotoDropzone from '../PhotoDropzone';
+import PhotoDropzone from '../../../components/PhotoDropzone';
 import FormContent from '../FormContent';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
+import { createStyles, WithStyles, withStyles, Backdrop } from '@material-ui/core';
+import DropzoneContent from '../DropzoneContent';
 
-interface IProps {
+const styles = (theme: any) => createStyles({
+    dropzone: {
+        minHeight: 300,
+        border: `1px dashed ${theme.palette.primary.lightBlue}`,
+        margin: '26px 0',
+        display: 'flex',
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+    },
+    backdrop: {
+        position: 'absolute',
+        zIndex: 200,
+        display: 'flex',
+        flexDirection: 'column'
+    },
+});
+
+interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     openModal?: (modalName: string) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -123,7 +144,8 @@ class AddMedsModal extends Component<IProps> {
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { openedModal, classes } = this.props;
+
         return (
             <>
                 <Dialog
@@ -133,10 +155,35 @@ class AddMedsModal extends Component<IProps> {
                     maxWidth='md'
                     title='Додати препарат'>
                         <PhotoDropzone
-                            removeFile={this.removeImage}
+                            classes={{
+                                dropzone: classes.dropzone
+                            }}
                             file={this.image}
-                            appendFile={this.appendImage}
-                        />
+                            appendFile={this.appendImage}>
+                            {
+                                (isHovered: boolean, isDragActive: boolean, openHandler: () => void) => {
+                                    const colorTheme = this.image
+                                    ? 'white'
+                                    : 'black';
+
+                                    return this.image
+                                        ? <Backdrop className={classes.backdrop} open={isHovered}>
+                                            <DropzoneContent
+                                                fileAppended
+                                                removeFile={this.removeImage}
+                                                colorTheme={colorTheme}
+                                                isDragActive={isDragActive}
+                                                onButtonClick={openHandler} />
+                                            </Backdrop>
+                                        : <DropzoneContent
+                                            fileAppended={false}
+                                            removeFile={this.removeImage}
+                                            colorTheme={colorTheme}
+                                            isDragActive={isDragActive}
+                                            onButtonClick={openHandler} />;
+                                }
+                            }
+                        </PhotoDropzone>
                         <FormContent
                             ref={(component: any) => this.contentRef = component}
                             file={this.image}
@@ -161,4 +208,4 @@ class AddMedsModal extends Component<IProps> {
     }
 }
 
-export default AddMedsModal;
+export default withStyles(styles)(AddMedsModal);
