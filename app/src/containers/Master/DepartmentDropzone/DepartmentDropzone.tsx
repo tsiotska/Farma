@@ -76,9 +76,8 @@ class DepartmentDropzone extends Component<IProps> {
         return (
             <PhotoDropzone
                 classes={{ dropzone: cx(classes.dropzone, {[classes.hoverable]: !file}) }}
-                file={file}
                 appendFile={appendFile}
-            >
+                file={file}>
                 {
                     (isHovered: boolean, isDragActive: boolean, open: () => void) => (
                         file

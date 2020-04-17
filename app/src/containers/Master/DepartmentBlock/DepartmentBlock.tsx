@@ -4,12 +4,11 @@ import {
     withStyles,
     createStyles,
     Grid,
-    Input,
-    Button,
     TextField
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import DepartmentDropzone from '../DepartmentDropzone';
+import { IDepartmentData } from '../AddDepartmentModal/AddDepartmentModal';
 
 const styles = createStyles({
     input: {
@@ -24,30 +23,37 @@ const styles = createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    file: File;
     appendFile: (file: File) => void;
     removeIcon: () => void;
-    departmentName: string;
     onNameChange?: (e: any) => void;
+    values?: IDepartmentData;
 }
 
 @observer
 class DepartmentBlock extends Component<IProps> {
+    appendFileHandler = (file: File) => this.props.appendFile(file);
+
+    removeFileHandler = () => this.props.removeIcon();
+
     render() {
         const {
-            file,
-            appendFile,
             classes,
-            removeIcon,
-            departmentName,
-            onNameChange
+            onNameChange,
+            values: {
+                name,
+                image
+            }
          } = this.props;
 
         return (
             <Grid alignItems='center' wrap='nowrap'  container>
-                <DepartmentDropzone file={file} removeIcon={removeIcon} appendFile={appendFile} />
+                <DepartmentDropzone
+                    file={image}
+                    removeIcon={this.removeFileHandler}
+                    appendFile={this.appendFileHandler}
+                />
                 <TextField
-                    value={departmentName}
+                    value={name}
                     onChange={onNameChange}
                     label='Назва Відділення'
                     className={classes.textField}
