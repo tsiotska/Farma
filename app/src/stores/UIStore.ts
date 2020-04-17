@@ -1,11 +1,11 @@
 import AsyncStore from './AsyncStore';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action } from 'mobx';
-import { SALARY_PREVIEW_MODAL } from '../constants/Modals';
+import { SALARY_PREVIEW_MODAL, ADD_DEPARTMENT_MODAL } from '../constants/Modals';
 
 export class UIStore implements IUIStore {
     @observable salesHeaderHeight: number;
-    @observable openedModal: string;
+    @observable openedModal: string = ADD_DEPARTMENT_MODAL;
     @observable modalPayload: any;
     @observable itemsPerPage: Readonly<number> = 50;
     @observable currentPage: number = 0;
