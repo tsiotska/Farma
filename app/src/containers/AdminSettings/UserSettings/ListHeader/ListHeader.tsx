@@ -32,7 +32,7 @@ class ListHeader extends Component<IProps> {
 
         return (
             <Grid className={classes.header} alignItems='center' container>
-                <Grid xs={3} className={classes.withPadding}>
+                <Grid xs={3} className={classes.withPadding} item>
                     <Typography variant='body2' color='textSecondary'>
                         Ім'я
                     </Typography>

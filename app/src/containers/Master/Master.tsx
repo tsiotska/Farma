@@ -2,12 +2,10 @@ import React from 'react';
 import { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Route, Switch, Redirect, withRouter, RouteComponentProps, matchPath } from 'react-router-dom';
-import { History } from 'history';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
 import {
     LOGIN_ROUTE,
-    ROOT_ROUTE,
     ADMIN_ROUTE,
     ADMIN_ROUTES,
     SALES_ROUTE,
@@ -21,7 +19,8 @@ import {
     SETTINGS_ROUTES,
     NOTIFICATIONS_ROUTE,
     PROFILE_PREVIEW_ROUTES,
-    DEPARTMENT_ROUTE
+    DEPARTMENT_ROUTE,
+    DOCTORS_ROUTE
 } from '../../constants/Router';
 
 import Header from '../Header';
@@ -31,7 +30,7 @@ import Login from '../Login';
 import AddDepartmentModal from './AddDepartmentModal';
 import { IUser } from '../../interfaces';
 import { USER_ROLE } from '../../constants/Roles';
-import { computed, toJS } from 'mobx';
+import { computed } from 'mobx';
 import AdminPage from '../AdminPage';
 import Sales from '../Sales';
 import Marks from '../Marks';
@@ -44,6 +43,7 @@ import DepartmentNav from '../../components/DepartmentNav';
 import AdminSettings from '../AdminSettings';
 import Notifications from '../Notifications';
 import ProfilePreviewContainer from '../ProfilePreviewContainer';
+import Doctors from '../Doctors';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -66,7 +66,6 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     user?: IUser;
     role?: USER_ROLE;
     isAdmin?: boolean;
-    // history?: History;
     currentDepartmentId?: number;
     isUserFetched?: boolean;
     setCurrentDepartment?: (departmentId: number) => void;
@@ -86,6 +85,7 @@ const workers = { title: 'Працівники', path: WORKERS_ROUTE, component:
 const meds = { title: 'Препарати', path: MEDICINES_ROUTE, component: Medicines };
 const pharmacy = { title: 'Аптеки', path: PHARMACY_ROUTE, component: Pharmacy };
 const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
+const doctors = { title: 'Лікарі', path: DOCTORS_ROUTE, component: Doctors };
 
 @inject(({
     appState: {
@@ -133,6 +133,7 @@ export class Master extends Component<IProps, null> {
         [USER_ROLE.MEDICAL_AGENT]: [
             sales,
             marks,
+            doctors,
             pharmacy,
             lpu
         ],
@@ -163,19 +164,25 @@ export class Master extends Component<IProps, null> {
     }
 
     componentDidUpdate() {
-        const { location: { pathname }, setCurrentDepartment, currentDepartmentId } = this.props;
+        const {
+            setCurrentDepartment,
+            currentDepartmentId,
+            location: { pathname }
+        } = this.props;
 
         const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
-        if (!matchDepartmentPath) {
-            setCurrentDepartment(null);
-            return;
-        }
 
-        const departmentId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
-            ? +(matchDepartmentPath.params as any).departmentId
+        if (matchDepartmentPath) {
+            const departmentId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
+            ? +((matchDepartmentPath.params as any).departmentId)
             : null;
 
-        if (departmentId !== currentDepartmentId) setCurrentDepartment(departmentId);
+            if (departmentId && departmentId !== currentDepartmentId) {
+                setCurrentDepartment(departmentId);
+            }
+        } else if (!!matchPath(pathname, ADMIN_ROUTE)) {
+            setCurrentDepartment(null);
+        }
     }
 
     render() {

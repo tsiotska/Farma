@@ -53,7 +53,7 @@ class AdminSettings extends Component<IProps> {
     }
 
     componentDidMount() {
-        const { history: { location}} = this.props;
+        const { history: { location} } = this.props;
         for (const [tab, path] of Object.entries(this.tabURLs)) {
             if (!!matchPath(location.pathname, { path, exact: true })) {
                 this.tab = +tab;

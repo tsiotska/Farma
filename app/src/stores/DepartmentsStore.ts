@@ -12,6 +12,7 @@ import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
 import { PERMISSIONS } from '../constants/Permissions';
+import { IDoctor } from '../interfaces/IDoctor';
 
 export interface IExpandedWorker {
     id: number;
@@ -43,6 +44,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable workers: IWorker[] = [];
     @observable expandedWorker: IExpandedWorker = null;
     @observable firedWorkers: IWorker[] = [];
+    @observable doctors: IDoctor[] = [];
 
     constructor(rootStore: IRootStore) {
         super();
@@ -84,6 +86,40 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map();
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+    }
+
+    @action.bound
+    async loadDoctors() {
+        const { api, userStore: { previewUser } } = this.rootStore;
+
+        if (!this.currentDepartmentId || !previewUser) return;
+
+        const { position, id } = previewUser;
+
+        if (position !== USER_ROLE.MEDICAL_AGENT) return;
+
+        const unconfirmed = await this.dispatchRequest(
+            api.getDoctors(this.currentDepartmentId, id, true),
+            'loadUconfirmedDoctors'
+        );
+
+        if (unconfirmed) {
+            this.doctors.push(...unconfirmed);
+        }
+
+        const res = await this.dispatchRequest(
+            api.getDoctors(this.currentDepartmentId, id),
+            'loadDoctors'
+        );
+
+        if (res) {
+            this.doctors.push(...res);
+        }
+    }
+
+    @action.bound
+    clearDoctors() {
+        this.doctors = [];
     }
 
     @action.bound
@@ -381,11 +417,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         : this.setError;
 
         callback(requestName);
-    }
-
-    @action.bound
-    async loadDoctors() {
-        console.log('load doctors');
     }
 
     @action.bound

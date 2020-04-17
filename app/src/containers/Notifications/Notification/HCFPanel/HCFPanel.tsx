@@ -68,6 +68,7 @@ class HCFPanel extends Component<IProps> {
             ? targetRegion.name
             : '-';
     }
+
     render() {
         const {
             classes,
@@ -81,12 +82,12 @@ class HCFPanel extends Component<IProps> {
                 rmConfirm
             }
         } = this.props;
-
+        console.log('hcf: ', this.props.hcf);
         return (
             <>
                 <Grid xs={3} alignItems='center' container item>
                     <>
-                        <CommitBadge className={classes.badge} title='ФФМ' committed={true} />
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm} />
                         <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm} />
                     </>
                     <Typography className={classes.text} variant='body2'>

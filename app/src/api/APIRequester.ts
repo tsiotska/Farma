@@ -29,6 +29,8 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
+import { IDoctor } from '../interfaces/IDoctor';
+import { docktorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -308,5 +310,15 @@ export class APIRequester {
         return this.instance.put('/api/notify')
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
+    }
+
+    getDoctors(departmentId: number, mpId: number, unconfirmed?: boolean): Promise<IDoctor[]> {
+        const query = unconfirmed
+            ? '&unconfirmed=1'
+            : '';
+
+        return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
+            .then(docktorsNormalizer)
+            .catch(this.defaultErrorHandler(null));
     }
 }

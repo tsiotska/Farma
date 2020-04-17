@@ -16,6 +16,7 @@ export const WORKERS_ROUTE: string = `${DEPARTMENT_ROUTE}/workers`;
 export const MEDICINES_ROUTE: string = `${DEPARTMENT_ROUTE}/medicines`;
 export const PHARMACY_ROUTE: string = `${DEPARTMENT_ROUTE}/pharmacy`;
 export const LPU_ROUTE: string = `${DEPARTMENT_ROUTE}/lpu`;
+export const DOCTORS_ROUTE: string = `${DEPARTMENT_ROUTE}/doctors`;
 
 // routes, where navigation is resolved
 export const NAVIGATION_ROUTES: string[] = [
@@ -25,7 +26,8 @@ export const NAVIGATION_ROUTES: string[] = [
     WORKERS_ROUTE,
     MEDICINES_ROUTE,
     PHARMACY_ROUTE,
-    LPU_ROUTE
+    LPU_ROUTE,
+    DOCTORS_ROUTE
 ];
 
 export const PROFILE_PREVIEW_ROUTES: string[] = [
