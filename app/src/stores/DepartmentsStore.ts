@@ -19,6 +19,11 @@ export interface IExpandedWorker {
     subworkers: IWorker[];
 }
 
+export interface ICreateDepartmentReport {
+    isDepartmentCreated: boolean;
+    isFFMCreated: boolean;
+}
+
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
@@ -459,6 +464,25 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             api.updatePermissions(data),
             requestName
         );
+    }
+
+    @action.bound
+    async createDepartment(departmentData: FormData, FFMData: FormData): Promise<ICreateDepartmentReport> {
+        const { api } = this.rootStore;
+        const initialReport: ICreateDepartmentReport = {
+            isDepartmentCreated: false,
+            isFFMCreated: false,
+        };
+
+        const createdDepartment = await api.createDepartment(departmentData);
+
+        if (createdDepartment) initialReport.isDepartmentCreated = true;
+        else return initialReport;
+
+        const createdFFM = await api.createFFM(createdDepartment.id, FFMData);
+
+        if (createdFFM) initialReport.isFFMCreated = true;
+        return initialReport;
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {

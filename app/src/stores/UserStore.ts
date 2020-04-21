@@ -195,7 +195,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (!this.notificationsUpdateInterval) {
             this.notificationsUpdateInterval = setInterval(
                 this.loadNotificationsCount,
-                5000
+                30_000
             );
         }
     }

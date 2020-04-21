@@ -43,9 +43,11 @@ class FFMBlock extends Component<IProps> {
             values: {
                 image,
                 name,
-                phone,
+                workPhone,
+                mobilePhone,
                 card,
-                email
+                email,
+                password
             }
         } = this.props;
 
@@ -85,8 +87,8 @@ class FFMBlock extends Component<IProps> {
                         Авторизація
                     </Typography>
                     <TextField
-                        // value={email}
-                        // onChange={this.changeHandler('email')}
+                        value={email}
+                        onChange={this.changeHandler('email')}
                         label='Email'
                         InputProps={{
                             className: classes.input,
@@ -99,9 +101,9 @@ class FFMBlock extends Component<IProps> {
                 </Grid>
                 <Grid direction='column' xs container item>
                     <TextField
-                        value={phone}
-                        onChange={this.changeHandler('phone')}
-                        label='Телефон'
+                        value={workPhone}
+                        onChange={this.changeHandler('workPhone')}
+                        label='Робочий телефон'
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -111,9 +113,9 @@ class FFMBlock extends Component<IProps> {
                         }}
                     />
                     <TextField
-                        value={email}
-                        onChange={this.changeHandler('email')}
-                        label='Email'
+                        value={mobilePhone}
+                        onChange={this.changeHandler('mobilePhone')}
+                        label='Мобільний телефон'
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -123,8 +125,8 @@ class FFMBlock extends Component<IProps> {
                         }}
                     />
                     <TextField
-                        // value={name}
-                        // onChange={this.changeHandler('name')}
+                        value={password}
+                        onChange={this.changeHandler('password')}
                         label='Пароль'
                         className={classes.paddedInput}
                         InputProps={{

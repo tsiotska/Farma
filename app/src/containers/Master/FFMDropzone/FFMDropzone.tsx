@@ -21,10 +21,10 @@ const styles = (theme: any) => createStyles({
         width: 'auto'
     },
     removePhotoButton: {
-        marginTop: 12,
+        marginTop: 22,
     },
     addPhotoButton: {
-        marginTop: 12,
+        marginTop: 22,
         color: theme.palette.primary.lightBlue,
         borderColor: theme.palette.primary.lightBlue,
     },

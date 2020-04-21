@@ -7,7 +7,7 @@ import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
 import axios, { AxiosInstance } from 'axios';
 
 import { IDepartment } from '../interfaces/IDepartment';
-import { branchesNormalizer } from '../helpers/normalizers/branchesNormalizer';
+import { branchesNormalizer, branchNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
 import { userNormalizer, multipleUserNormalizer } from '../helpers/normalizers/userNormalizer';
 import { IMedicine } from '../interfaces/IMedicine';
@@ -320,5 +320,17 @@ export class APIRequester {
         return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
             .then(docktorsNormalizer)
             .catch(this.defaultErrorHandler(null));
+    }
+
+    createDepartment(departmentData: FormData): Promise<IDepartment> {
+        return this.instance.post('/api/branch', departmentData)
+            .then(branchNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    createFFM(departmentId: number, ffmData: FormData): Promise<IUser> {
+        return this.instance.post(`/api/branch/${departmentId}/worker`, ffmData)
+            .then(userNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 }
