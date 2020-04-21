@@ -82,7 +82,7 @@ class HCFPanel extends Component<IProps> {
                 rmConfirm
             }
         } = this.props;
-        console.log('hcf: ', this.props.hcf);
+
         return (
             <>
                 <Grid xs={3} alignItems='center' container item>

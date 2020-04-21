@@ -82,8 +82,8 @@ class CommonSettings extends Component<IProps> {
         const { salarySettings } = this.props;
         if (!salarySettings) return null;
         const initialBonus = this.changedValues.payments === null
-        ? salarySettings.payments
-        : this.changedValues.payments;
+            ? salarySettings.payments
+            : this.changedValues.payments;
         const bonus = initialBonus * 100;
         const res = 100 - bonus;
         const isValid = bonus >= 0

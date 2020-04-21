@@ -271,7 +271,7 @@ export class APIRequester {
         return this.instance.get('/api/settings')
         .then(({ data: { data: { default_amount_kpi, payments }} }) => ({
             kpi: default_amount_kpi || null,
-            paymements: payments || null
+            payments: payments || null
         }))
         .catch(this.defaultErrorHandler());
     }
