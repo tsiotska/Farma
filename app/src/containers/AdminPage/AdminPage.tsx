@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withStyles, createStyles, WithStyles, Grid, Paper } from '@material-ui/core';
+import { withStyles, createStyles, WithStyles, Grid, Paper, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import Plot from '../Plot';
 import Header from './Header';
@@ -8,16 +8,25 @@ import { IMedicine } from '../../interfaces/IMedicine';
 import { computed, toJS } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import MedsStatistic from '../MedsStatistic';
+import { IDepartment } from '../../interfaces/IDepartment';
 
 const styles = (theme: any) => createStyles({
     root: {
         padding: '30px 20px'
+    },
+    departmentName: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        color: theme.palette.primary.gray.secondary,
+        fontSize: theme.typography.pxToRem(16),
+        marginBottom: 12,
+        textTransform: 'capitalize'
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     meds?: Map<number, IMedicine[]>;
     chartSalesStat?: IMedsSalesStat[];
+    departments?: IDepartment[];
     loadAllMeds?: () => void;
     loadMedsStat?: () => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -32,7 +41,8 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             meds,
             loadAllMeds,
-            getAsyncStatus
+            getAsyncStatus,
+            departments
         }
     }
 }) => ({
@@ -40,7 +50,8 @@ interface IProps extends WithStyles<typeof styles> {
     loadAllMeds,
     chartSalesStat,
     loadMedsStat,
-    meds
+    meds,
+    departments
 }))
 @observer
 class AdminPage extends Component<IProps> {
@@ -48,22 +59,37 @@ class AdminPage extends Component<IProps> {
     get meds(): Map<number, IMedicine> {
         const { meds, chartSalesStat } = this.props;
         const ids = (chartSalesStat || []).map(({ medId }) => medId);
+
         const filteredMeds: IMedicine[] = [];
+
         meds.forEach(medsList => {
             const filtered = medsList.filter(({ id }) => ids.includes(id));
             filteredMeds.push(...filtered);
         });
+
         const mapped: Array<[number, IMedicine]> = filteredMeds.map(x => ([ x.id, x ]));
         return new Map(mapped);
     }
 
     @computed
     get medsList(): any {
-        const { meds, chartSalesStat } = this.props;
+        const { meds, chartSalesStat, departments, classes } = this.props;
         const res: any[] = [];
         meds.forEach((items, department) => {
+            const targetDepartment = departments.find(({ id }) => id === department);
+
+            const prepend = targetDepartment
+                ? <Typography className={classes.departmentName}>{targetDepartment.name}</Typography>
+                : null;
+
             res.push(
-                <MedsStatistic key={department} departmentId={department} meds={items} chartSalesStat={chartSalesStat} />
+                <MedsStatistic
+                    key={department}
+                    prepend={prepend}
+                    departmentId={department}
+                    meds={items}
+                    chartSalesStat={chartSalesStat}
+                />
             );
         });
         return res;
@@ -75,7 +101,9 @@ class AdminPage extends Component<IProps> {
             loadAllMeds,
             getAsyncStatus
         } = this.props;
+
         const { loading, success } = getAsyncStatus('loadAllMeds');
+
         if (!loading && !success) loadAllMeds();
         loadMedsStat();
     }
