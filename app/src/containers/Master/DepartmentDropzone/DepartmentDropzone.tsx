@@ -11,7 +11,7 @@ const styles = (theme: any) => createStyles({
         width: 70,
         height: 71,
         borderRadius: '50%',
-        border: `1px dashed ${theme.palette.primary.lightBlue}`,
+        border: ({ error }: any) => `1px dashed ${error ? theme.palette.primary.error : theme.palette.primary.lightBlue}`,
         margin: '16px 0',
         display: 'flex',
         position: 'relative',
@@ -64,6 +64,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     file: File;
+    error: boolean;
     appendFile: (file: File) => void;
     removeIcon: () => void;
 }

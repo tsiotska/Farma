@@ -23,7 +23,10 @@ interface IProps extends WithStyles<typeof styles> {
 
 export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children }) => {
     const onDrop = useCallback((files: File[]) => {
-        if (files.length) appendFile(files[0]);
+        if (files.length) {
+            appendFile(files[0]);
+            setHoverStatus(false);
+        }
     }, []);
 
     const {

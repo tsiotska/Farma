@@ -10,6 +10,7 @@ import { ICreateDepartmentReport } from '../../../stores/DepartmentsStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import LoadingMask from '../../../components/LoadingMask';
 import Snackbar from '../../../components/Snackbar';
+import { emailValidator } from '../../../helpers/validators';
 
 const styles = (theme: any) => createStyles({
     subtitle: {
@@ -94,14 +95,25 @@ class AddDepartmentModal extends Component<IProps> {
         password: ''
     };
 
+    readonly validators: Partial<Record<keyof IFFMData & IDepartmentData, any>> = {
+        email: emailValidator,
+        image: (value: File) => !!value,
+    };
+
     @observable departmentData: IDepartmentData = {...this.initialDepartmentData};
     @observable ffmData: IFFMData = {...this.initialFfmData};
+
+    @observable invalidDepartmentFields: Set<keyof IDepartmentData> = new Set();
+    @observable invalidFFMFields: Set<keyof IFFMData> = new Set();
+
     @observable isProccessing: boolean = false;
     @observable snackbarSettings: ISnackbarSettings = {
         isOpen: false,
         type: SNACKBAR_TYPE.SUCCESS,
         text: ''
     };
+
+    defaultValueValidator = (value: string): boolean => !!value && value.length >= 3;
 
     appendImage = (targetProp: TARGET_IMAGE) => (image: File) => {
         if (targetProp === TARGET_IMAGE.FFM) {
@@ -170,7 +182,7 @@ class AddDepartmentModal extends Component<IProps> {
         }
 
         const text: string = !isDepartmentCreated
-            ? 'Неможливо створити відділ'
+            ? 'Неможливо створити відділення'
             : 'неможливо стоврити ФФМ`а';
 
         this.snackbarSettings = {
@@ -180,10 +192,29 @@ class AddDepartmentModal extends Component<IProps> {
         };
     }
 
+    validate = (): boolean => {
+        this.invalidFFMFields.clear();
+        Object.entries(this.ffmData).forEach(([ prop, value ]: [keyof IFFMData, any]) => {
+            const validator = this.validators[prop] || this.defaultValueValidator;
+            const isValid = validator(value);
+            if (!isValid) this.invalidFFMFields.add(prop);
+        });
+
+        this.invalidDepartmentFields.clear();
+        Object.entries(this.departmentData).forEach(([ prop, value ]: [keyof IDepartmentData, any]) => {
+            const validator = this.validators[prop] || this.defaultValueValidator;
+            const isValid = validator(value);
+            if (!isValid) this.invalidDepartmentFields.add(prop);
+        });
+
+        return !this.invalidDepartmentFields.size && !this.invalidFFMFields.size;
+    }
+
     submitHandler = async () => {
         const { createDepartment } = this.props;
 
-        if (this.isProccessing) return;
+        const isValid = this.validate();
+        if (this.isProccessing || !isValid) return;
 
         const ffmData = this.getFFMFormData();
         const departmentData = this.getDepartmentFormData();
@@ -227,6 +258,7 @@ class AddDepartmentModal extends Component<IProps> {
                         onNameChange={this.deparmentNameChangeHandler}
                         removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
                         appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)}
+                        invalidFields={this.invalidDepartmentFields}
                     />
                     <Divider />
                     <Typography variant='h5' className={classes.subtitle}>
@@ -237,6 +269,7 @@ class AddDepartmentModal extends Component<IProps> {
                         changeHandler={this.fmmDataChangeHandler}
                         appendFile={this.appendImage(TARGET_IMAGE.FFM)}
                         removeIcon={this.removeImage(TARGET_IMAGE.FFM)}
+                        invalidFields={this.invalidFFMFields}
                     />
                     <Button
                         onClick={this.submitHandler}
@@ -253,6 +286,7 @@ class AddDepartmentModal extends Component<IProps> {
                         onClose={this.snackbarCloseHandler}
                         type={this.snackbarSettings.type}
                         message={this.snackbarSettings.text}
+                        autoHideDuration={6000}
                         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                         classes={{ root: classes.snackbar }}
                     />

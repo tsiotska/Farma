@@ -27,6 +27,7 @@ interface IProps extends WithStyles<typeof styles> {
     appendFile: (file: File) => void;
     removeIcon: () => void;
     values: IFFMData;
+    invalidFields?: Set<keyof IFFMData>;
 }
 
 @observer
@@ -40,6 +41,7 @@ class FFMBlock extends Component<IProps> {
     render() {
         const {
             classes,
+            invalidFields,
             values: {
                 image,
                 name,
@@ -57,12 +59,14 @@ class FFMBlock extends Component<IProps> {
                     file={image}
                     appendFile={this.imageAddHandler}
                     removeIcon={this.imageRemoveHandler}
+                    error={invalidFields.has('image')}
                 />
                 <Grid direction='column' xs container item>
                     <TextField
                         value={name}
                         onChange={this.changeHandler('name')}
                         label='ПІБ'
+                        error={invalidFields.has('name')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -75,6 +79,7 @@ class FFMBlock extends Component<IProps> {
                         value={card}
                         onChange={this.changeHandler('card')}
                         label='№ Карти'
+                        error={invalidFields.has('card')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -90,6 +95,7 @@ class FFMBlock extends Component<IProps> {
                         value={email}
                         onChange={this.changeHandler('email')}
                         label='Email'
+                        error={invalidFields.has('email')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -104,6 +110,7 @@ class FFMBlock extends Component<IProps> {
                         value={workPhone}
                         onChange={this.changeHandler('workPhone')}
                         label='Робочий телефон'
+                        error={invalidFields.has('workPhone')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -116,6 +123,7 @@ class FFMBlock extends Component<IProps> {
                         value={mobilePhone}
                         onChange={this.changeHandler('mobilePhone')}
                         label='Мобільний телефон'
+                        error={invalidFields.has('mobilePhone')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true
@@ -129,6 +137,7 @@ class FFMBlock extends Component<IProps> {
                         onChange={this.changeHandler('password')}
                         label='Пароль'
                         className={classes.paddedInput}
+                        error={invalidFields.has('password')}
                         InputProps={{
                             className: classes.input,
                             disableUnderline: true

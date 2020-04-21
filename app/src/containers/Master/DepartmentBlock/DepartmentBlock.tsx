@@ -27,6 +27,7 @@ interface IProps extends WithStyles<typeof styles> {
     removeIcon: () => void;
     onNameChange?: (e: any) => void;
     values?: IDepartmentData;
+    invalidFields?: Set<keyof IDepartmentData>;
 }
 
 @observer
@@ -39,6 +40,7 @@ class DepartmentBlock extends Component<IProps> {
         const {
             classes,
             onNameChange,
+            invalidFields,
             values: {
                 name,
                 image
@@ -49,6 +51,7 @@ class DepartmentBlock extends Component<IProps> {
             <Grid alignItems='center' wrap='nowrap'  container>
                 <DepartmentDropzone
                     file={image}
+                    error={invalidFields.has('image')}
                     removeIcon={this.removeFileHandler}
                     appendFile={this.appendFileHandler}
                 />
@@ -57,6 +60,7 @@ class DepartmentBlock extends Component<IProps> {
                     onChange={onNameChange}
                     label='Назва Відділення'
                     className={classes.textField}
+                    error={invalidFields.has('name')}
                     InputProps={{
                         className: classes.input,
                         disableUnderline: true
