@@ -72,6 +72,7 @@ class AddMedsModal extends Component<IProps> {
             releaseForm: 'release_form',
             manufacturer: 'manufacturer',
             price: 'price',
+            barcode: 'barcode'
         };
 
         const preparedData: any = Object.entries(data).reduce(

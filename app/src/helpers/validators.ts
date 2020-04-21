@@ -25,3 +25,5 @@ export const emailValidator: Validator = (value: string): boolean => {
 export const lengthValidator = (minLength: number, value: string): boolean => {
     return value.length >= minLength;
 };
+
+export const onlyNumbersValidator: Validator = (value: string): boolean => value.match(/^\d+$/) !== null;

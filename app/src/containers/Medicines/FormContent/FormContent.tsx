@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, computed } from 'mobx';
 import FormRow from '../FormRow';
-import { Validator, stringValidator, moneyValidator, numberValidator, lengthValidator } from '../../../helpers/validators';
+import { Validator, stringValidator, moneyValidator, numberValidator, lengthValidator, onlyNumbersValidator } from '../../../helpers/validators';
 import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
@@ -33,7 +33,7 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
 }
 
-type InputType = 'string' | 'number' | 'money';
+type InputType = 'string' | 'number' | 'money' | 'barcode';
 interface IValidatorSettings {
     validator: Validator;
     text: string;
@@ -49,7 +49,8 @@ class FormContent extends Component<IProps> {
         dosage: 'dosage',
         manufacturer: 'manufacturer',
         bonus: 'bonus',
-        price: 'price'
+        price: 'price',
+        barcode: 'barcode'
     };
 
     constructor(props: IProps) {
@@ -62,6 +63,7 @@ class FormContent extends Component<IProps> {
             string: [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }],
             money: [{ validator: stringValidator, text: 'Пусті значення недопустимі' }, { validator: moneyValidator, text: 'Неправильне числове значення' }],
             number: [{ validator: numberValidator, text: 'Неправильне числове значення' }, { validator: stringValidator, text: 'Пусті значення недопустимі' }],
+            barcode: [{ validator: onlyNumbersValidator, text: 'Допустимі лише цифри' }]
         };
     }
 
@@ -103,8 +105,8 @@ class FormContent extends Component<IProps> {
             );
 
             this.fieldsErrorStatuses[propName] = isValid
-            ? false
-            : errorMessage;
+                ? false
+                : errorMessage;
         }
 
     enterPressHandler = (ev: KeyboardEvent) => {
@@ -151,7 +153,13 @@ class FormContent extends Component<IProps> {
                             error={this.fieldsErrorStatuses[this.values.dosage]}
                         />
                         <FormRow
-                            label='Бонус, грн'
+                            label='Штрихкод'
+                            value={this.formValues[this.values.barcode] || ''}
+                            onChange={this.changeHandler(this.values.barcode, 'barcode')}
+                            error={this.fieldsErrorStatuses[this.values.barcode]}
+                        />
+                        <FormRow
+                            label='Балл'
                             value={this.formValues[this.values.bonus] || ''}
                             onChange={this.changeHandler(this.values.bonus, 'money')}
                             error={this.fieldsErrorStatuses[this.values.bonus]}
