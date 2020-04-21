@@ -16,6 +16,8 @@ const styles = (theme: any) => createStyles({
         margin: '12px 0'
     },
     submitButton: {
+        height: 36,
+        width: 90,
         color: 'white',
         backgroundColor: '#647cfe',
         marginLeft: 'auto',
@@ -242,7 +244,7 @@ class AddDepartmentModal extends Component<IProps> {
                         className={classes.submitButton}>
                         {
                             this.isProccessing
-                            ? <LoadingMask />
+                            ? <LoadingMask size={20} />
                             : 'Зберегти'
                         }
                     </Button>
