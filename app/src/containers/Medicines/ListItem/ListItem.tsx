@@ -56,11 +56,12 @@ class ListItem extends Component<IProps> {
             classes,
             medicine: {
                 name,
+                barcode,
                 image,
                 releaseForm,
                 dosage,
                 manufacturer,
-                bonus,
+                mark,
                 price,
         } } = this.props;
 
@@ -93,8 +94,13 @@ class ListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
                 <Grid xs container item zeroMinWidth>
+                    <Typography variant='body2'>
+                        { barcode }
+                    </Typography>
+                </Grid>
+                <Grid xs container item zeroMinWidth>
                     <Typography className={classes.bold} variant='body2'>
-                        { bonus }
+                        { mark }
                     </Typography>
                 </Grid>
                 <Grid xs container item zeroMinWidth>

@@ -58,7 +58,13 @@ class ListHeader extends Component<IProps> {
 
                 <Grid xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
-                        Бонус, грн
+                        Штрихкод
+                    </Typography>
+                </Grid>
+
+                <Grid xs item zeroMinWidth>
+                    <Typography variant='subtitle1' noWrap>
+                        Балл
                     </Typography>
                 </Grid>
 

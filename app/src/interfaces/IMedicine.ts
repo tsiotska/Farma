@@ -5,7 +5,8 @@ export interface IMedicine {
     releaseForm: string;
     dosage: number;
     manufacturer: string;
-    bonus: number;
+    barcode: string;
+    mark: number;
     price: number;
     color?: string;
 }

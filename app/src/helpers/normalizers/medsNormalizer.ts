@@ -9,7 +9,8 @@ const defaultMedicine: IMedicine = {
     releaseForm: null,
     dosage: null,
     manufacturer: null,
-    bonus: null,
+    mark: null,
+    barcode: null,
     price: null,
 };
 
@@ -20,7 +21,8 @@ const valuesMap: IValuesMap = {
     release_form: 'releaseForm',
     dosage: 'dosage',
     manufacturer: 'manufacturer',
-    bonus: 'bonus',
+    mark: 'mark',
+    barcode: 'barcode',
     price: 'price',
 };
 
