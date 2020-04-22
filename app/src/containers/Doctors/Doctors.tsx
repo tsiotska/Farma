@@ -7,11 +7,15 @@ import Header from './Header';
 import ListHeader from './ListHeader';
 import { IDoctor } from '../../interfaces/IDoctor';
 import DoctorListItem from './DoctorListItem';
+import Pagination from '../../components/Pagination';
 
 const styles = (theme: any) => createStyles({
     root: {
         padding: '0 20px'
-    }
+    },
+    pagination: {
+        margin: '16px 0 60px auto'
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -19,6 +23,9 @@ interface IProps extends WithStyles<typeof styles> {
     loadDoctors?: () => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     clearDoctors?: () => void;
+    setCurrentPage?: (page: number) => void;
+    currentPage?: number;
+    itemsPerPage?: number;
 }
 
 @inject(({
@@ -28,13 +35,21 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             clearDoctors,
             doctors
+        },
+        uiStore: {
+            setCurrentPage,
+            currentPage,
+            itemsPerPage
         }
     }
 }) => ({
     loadDoctors,
     getAsyncStatus,
     clearDoctors,
-    doctors
+    doctors,
+    setCurrentPage,
+    currentPage,
+    itemsPerPage
 
 }))
 @observer
@@ -52,16 +67,30 @@ class Doctors extends Component<IProps> {
         return isUnconfirmedDocsLoaded && isDocsLoaded;
     }
 
+    @computed
+    get preparedDoctors(): IDoctor[] {
+        const { doctors, currentPage, itemsPerPage } = this.props;
+        const begin = itemsPerPage * currentPage;
+        return doctors.filter((x, i) => (i >= begin && i < begin + itemsPerPage));
+    }
+
     componentDidMount() {
         this.props.loadDoctors();
     }
 
     componentWillUnmount() {
         this.props.clearDoctors();
+        this.props.setCurrentPage(0);
     }
 
     render() {
-        const { classes, doctors } = this.props;
+        const {
+            classes,
+            doctors,
+            currentPage,
+            setCurrentPage,
+            itemsPerPage
+        } = this.props;
 
         return (
             <Grid className={classes.root} container direction='column'>
@@ -75,7 +104,7 @@ class Doctors extends Component<IProps> {
                     </Typography>
                 }
                 {
-                    doctors.map((doc, i) => (
+                    this.preparedDoctors.map((doc, i) => (
                         <DoctorListItem
                             key={doc.id}
                             doctor={doc}
@@ -83,6 +112,13 @@ class Doctors extends Component<IProps> {
                         />
                     ))
                 }
+                <Pagination
+                    currentPage={currentPage}
+                    dataLength={doctors ? doctors.length : null}
+                    itemsPerPage={itemsPerPage}
+                    setCurrentPage={setCurrentPage}
+                    className={classes.pagination}
+                />
             </Grid>
         );
     }

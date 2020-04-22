@@ -107,7 +107,7 @@ class Lpu extends Component<IProps> {
         const { LPUs, itemsPerPage, currentPage } = this.props;
         const begin = itemsPerPage * currentPage;
         return Array.isArray(LPUs)
-        ? LPUs.filter((x, i) => (i > begin && i < begin + itemsPerPage))
+        ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
         : [];
     }
 

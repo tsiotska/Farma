@@ -108,7 +108,7 @@ class Pharmacy extends Component<IProps> {
         const { pharmacies, itemsPerPage, currentPage } = this.props;
         const begin = itemsPerPage * currentPage;
         return Array.isArray(pharmacies)
-        ? pharmacies.filter((x, i) => (i > begin && i < begin + itemsPerPage))
+        ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
         : [];
     }
 
