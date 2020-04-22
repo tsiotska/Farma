@@ -14,7 +14,8 @@ export const defaultDoctor: IDoctor = {
     card: null,
     created: null,
     confirmed: null,
-    position: null
+    position: null,
+    deposit: null,
 };
 
 export const doctorValuesMap: IValuesMap = {
@@ -30,7 +31,8 @@ export const doctorValuesMap: IValuesMap = {
     bank_card: 'card',
     created: 'created',
     confirmed: 'confirmed',
-    position: 'position'
+    position: 'position',
+    deposit: 'deposit'
 };
 
 export const docktorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(

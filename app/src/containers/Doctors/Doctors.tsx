@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Grid, LinearProgress } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { computed } from 'mobx';
+import Header from './Header';
+import ListHeader from './ListHeader';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    root: {
+        padding: '0 20px'
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     loadDoctors?: () => void;
@@ -41,11 +47,14 @@ class Doctors extends Component<IProps> {
     }
 
     render() {
+        const { classes } = this.props;
+
         return (
-            <div>
-                { this.isLoading && <p>loading</p> }
-                doctors
-            </div>
+            <Grid className={classes.root} container direction='column'>
+                <Header />
+                <ListHeader />
+                { this.isLoading && <LinearProgress /> }
+            </Grid>
         );
     }
 }

@@ -12,4 +12,5 @@ export interface IDoctor {
     card: string;
     created: Date;
     confirmed: boolean;
+    deposit: number;
 }
