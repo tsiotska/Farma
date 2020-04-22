@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, WithStyles, Grid, Typography, IconButton } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import ExcelIcon from '-!react-svg-loader!../../../../assets/icons/excel.svg';
 
 const styles = (theme: any) => createStyles({
     column: {
@@ -11,17 +12,29 @@ const styles = (theme: any) => createStyles({
         marginTop: 16,
         paddingLeft: 5,
         marginBottom: 12
+    },
+    excelButton: {
+        marginLeft: 'auto'
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-
+    loadDocsExcel?: () => void;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            loadDocsExcel
+        }
+    }
+}) => ({
+    loadDocsExcel
+}))
 @observer
 class ListHeader extends Component<IProps> {
     render() {
-        const { classes } = this.props;
+        const { classes, loadDocsExcel } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
@@ -50,10 +63,13 @@ class ListHeader extends Component<IProps> {
                         № карти
                     </Typography>
                 </Grid>
-                <Grid xs={3} container item>
+                <Grid xs={3} alignItems='center' container item>
                     <Typography variant='body2' color='textSecondary'>
                         Депозит
                     </Typography>
+                    <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
+                        <ExcelIcon width={24} height={24} />
+                    </IconButton>
                 </Grid>
             </Grid>
         );

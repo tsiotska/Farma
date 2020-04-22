@@ -114,7 +114,7 @@ class Doctors extends Component<IProps> {
                 }
                 <Pagination
                     currentPage={currentPage}
-                    dataLength={doctors ? doctors.length : null}
+                    dataLength={doctors.length || null}
                     itemsPerPage={itemsPerPage}
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}

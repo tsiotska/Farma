@@ -256,6 +256,18 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadDocsExcel() {
+        const { api, userStore: { previewUser } } = this.rootStore;
+        const userId = previewUser
+            ? previewUser.id
+            : null;
+
+        if (!this.currentDepartmentId || !userId) return;
+
+        api.getExcel(`/api/branch/${this.currentDepartmentId}/mp/${userId}/agent?excel=1`);
+    }
+
+    @action.bound
     async loadWorkersExcel() {
         const { api } = this.rootStore;
         const url = this.getWorkersApiUrl(false, true);

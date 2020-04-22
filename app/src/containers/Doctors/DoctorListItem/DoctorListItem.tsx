@@ -53,7 +53,8 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px'
     },
     deposit: {
-        width: '100%'
+        width: '100%',
+        color: '#7B8FFE'
     }
 });
 
