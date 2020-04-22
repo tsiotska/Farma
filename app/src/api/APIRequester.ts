@@ -21,16 +21,15 @@ import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { ICacheStore } from '../interfaces/ICacheStore';
 import { CacheStore } from '../stores/CacheStore';
 import Config from '../../Config';
-import delay from 'lodash/delay';
 import { USER_ROLE } from '../constants/Roles';
-import { ISalaryInfo } from '../interfaces/ISalaryInfo';
 import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
-import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
 import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
+import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
+import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -331,6 +330,22 @@ export class APIRequester {
     createFFM(departmentId: number, ffmData: FormData): Promise<IUser> {
         return this.instance.post(`/api/branch/${departmentId}/worker`, ffmData)
             .then(userNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getBonusInfo(depId: number, year: number) {
+        return this.instance.get(`/api/branch/${depId}/mark?year=${year}`)
+            .then(bonusInfoNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getBonusesData(depId: number, userId: number, year: number, month: number):
+    Promise<{
+        sales: Map<number, IDrugSale>,
+        agents: IAgentInfo[]
+    }> {
+        return this.instance.get(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}`)
+            .then(bonusesDataNormalizer)
             .catch(this.defaultErrorHandler());
     }
 }

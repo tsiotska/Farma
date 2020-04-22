@@ -1,3 +1,4 @@
+import { IBonusInfo } from './../interfaces/IBonusInfo';
 import { computed, action, observable, toJS } from 'mobx';
 
 import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
@@ -21,6 +22,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable userSales: IUserSales = null;
     @observable notificationsCount: number = 0;
     @observable notifications: INotification[] = [];
+
+    @observable bonuses: IBonusInfo[] = null;
+    @observable previewBonus: IBonusInfo = null;
 
     notificationsUpdateInterval: any = null;
 
@@ -58,6 +62,53 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    setPreviewBonus = (bonusInfo: IBonusInfo) => {
+        this.previewBonus = bonusInfo;
+    }
+
+    @action.bound
+    async loadBonuses() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const tmpDate = new Date();
+        this.bonuses = await this.dispatchRequest(
+            api.getBonusInfo(currentDepartmentId, tmpDate.getFullYear()),
+            'loadBonuses'
+        );
+    }
+
+    @action.bound
+    async loadBonusesData() {
+        const { api, departmentsStore: { currentDepartmentId }} = this.rootStore;
+        const tmpDate = new Date();
+
+        if (!currentDepartmentId || !this.previewUser) return;
+
+        const bonusId = this.previewBonus.id;
+
+        const request = api.getBonusesData(
+            currentDepartmentId,
+            this.previewUser.id,
+            tmpDate.getFullYear(),
+            this.previewBonus.month
+        );
+
+        const res = await this.dispatchRequest(
+            request,
+            'loadBonusesData'
+        );
+
+        const currentBonusId = this.previewUser
+            ? this.previewUser.id
+            : null;
+        const isDataRelevant = currentBonusId === bonusId;
+
+        if (!res || !isDataRelevant) return;
+
+        this.previewBonus.agents = res.agents;
+        this.previewBonus.sales = res.sales;
     }
 
     @action.bound
