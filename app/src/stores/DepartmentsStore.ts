@@ -105,10 +105,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const unconfirmed = await this.dispatchRequest(
             api.getDoctors(this.currentDepartmentId, id, true),
-            'loadUconfirmedDoctors'
+            'loadUn2confirmedDoctors'
         );
 
         if (unconfirmed) {
+            unconfirmed.forEach(x => {
+                x.confirmed = false;
+            });
             this.doctors.push(...unconfirmed);
         }
 

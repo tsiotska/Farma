@@ -30,7 +30,7 @@ import { NOTIFICATIONS_TYPE } from '../constants/NotificationsType';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
-import { docktorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
+import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -318,7 +318,7 @@ export class APIRequester {
             : '';
 
         return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
-            .then(docktorsNormalizer)
+            .then(doctorsNormalizer)
             .catch(this.defaultErrorHandler(null));
     }
 

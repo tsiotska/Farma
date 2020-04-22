@@ -35,7 +35,7 @@ export const doctorValuesMap: IValuesMap = {
     deposit: 'deposit'
 };
 
-export const docktorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(
+export const doctorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(
     data,
     defaultDoctor,
     doctorValuesMap,

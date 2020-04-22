@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, LinearProgress } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Grid, LinearProgress, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import Header from './Header';
 import ListHeader from './ListHeader';
+import { IDoctor } from '../../interfaces/IDoctor';
+import DoctorListItem from './DoctorListItem';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -13,6 +15,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    doctors?: IDoctor[];
     loadDoctors?: () => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     clearDoctors?: () => void;
@@ -23,19 +26,30 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             loadDoctors,
             getAsyncStatus,
-            clearDoctors
+            clearDoctors,
+            doctors
         }
     }
 }) => ({
     loadDoctors,
     getAsyncStatus,
-    clearDoctors
+    clearDoctors,
+    doctors
+
 }))
 @observer
 class Doctors extends Component<IProps> {
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('loadDoctors').loading;
+    }
+
+    @computed
+    get isLoaded(): boolean {
+        const { getAsyncStatus } = this.props;
+        const isUnconfirmedDocsLoaded = getAsyncStatus('loadUnconfirmedDoctors').success;
+        const isDocsLoaded = getAsyncStatus('loadDoctors').success;
+        return isUnconfirmedDocsLoaded && isDocsLoaded;
     }
 
     componentDidMount() {
@@ -47,13 +61,28 @@ class Doctors extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, doctors } = this.props;
 
         return (
             <Grid className={classes.root} container direction='column'>
                 <Header />
                 <ListHeader />
                 { this.isLoading && <LinearProgress /> }
+                {
+                    (this.isLoaded && !doctors.length) &&
+                    <Typography>
+                        Список лікарів пустий
+                    </Typography>
+                }
+                {
+                    doctors.map((doc, i) => (
+                        <DoctorListItem
+                            key={doc.id}
+                            doctor={doc}
+                            unconfirmed={doc.confirmed === false}
+                        />
+                    ))
+                }
             </Grid>
         );
     }
