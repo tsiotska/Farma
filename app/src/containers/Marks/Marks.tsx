@@ -9,6 +9,7 @@ import { computed } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
+import TableHeader from './TableHeader';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -109,6 +110,7 @@ class Marks extends Component<IProps> {
                             Додати лікаря
                         </Button>
                     </Grid>
+                    <TableHeader />
                 </Paper>
             </Grid>
         );
