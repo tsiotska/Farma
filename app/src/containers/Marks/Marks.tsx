@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography, LinearProgress, Paper, IconButton, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IBonusInfo } from '../../interfaces/IBonusInfo';
+import { IBonusInfo, IAgentInfo } from '../../interfaces/IBonusInfo';
 import TabItem from './TabItem';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { computed } from 'mobx';
@@ -10,6 +10,7 @@ import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
+import Table from './Table';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -74,6 +75,27 @@ class Marks extends Component<IProps> {
         return uaMonthsNames[month];
     }
 
+    @computed
+    get agents(): IAgentInfo[] {
+        const { previewBonus } = this.props;
+        return [
+            {
+                id: 1,
+                lastPayment: 3,
+                lastDeposit: 5,
+                marks: new Map(),
+            }
+        ];
+        return previewBonus
+            ? previewBonus.agents
+            : [];
+    }
+
+    @computed
+    get showLpuColumn(): boolean {
+        return true;
+    }
+
     async componentDidMount() {
         this.props.loadBonuses();
     }
@@ -110,7 +132,8 @@ class Marks extends Component<IProps> {
                             Додати лікаря
                         </Button>
                     </Grid>
-                    <TableHeader />
+                    <TableHeader showLpu={this.showLpuColumn} />
+                    <Table showLpu={this.showLpuColumn} agents={this.agents} />
                 </Paper>
             </Grid>
         );

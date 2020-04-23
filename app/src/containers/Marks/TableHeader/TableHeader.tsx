@@ -45,6 +45,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     meds?: IMedicine[];
+    showLpu: boolean;
 }
 
 @inject(({
@@ -58,13 +59,8 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class TableHeader extends Component<IProps> {
-    @computed
-    get showLPUColumn(): boolean {
-        return true;
-    }
-
     render() {
-        const { classes, meds } = this.props;
+        const { classes, meds, showLpu } = this.props;
 
         return (
             <TableContainer className={classes.container}>
@@ -72,7 +68,7 @@ class TableHeader extends Component<IProps> {
                     <TableHead>
                         <TableRow>
                             {
-                                this.showLPUColumn &&
+                                showLpu &&
                                 <TableCell
                                     padding='none'
                                     className={cx(classes.cell, classes.wideColumn)}>
@@ -82,8 +78,8 @@ class TableHeader extends Component<IProps> {
                             <TableCell
                                 padding='none'
                                 className={cx(classes.cell, {
-                                    [classes.doubleWidthColumn]: !this.showLPUColumn,
-                                    [classes.wideColumn]: this.showLPUColumn,
+                                    [classes.doubleWidthColumn]: !showLpu,
+                                    [classes.wideColumn]: showLpu,
                                 })}>
                                 ПІБ
                             </TableCell>
