@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import ExcelIcon from '-!react-svg-loader!../../../../assets/icons/excel.svg';
+import ExcelIcon from '../../../components/ExcelIcon';
 
 const styles = (theme: any) => createStyles({
     column: {
@@ -68,7 +68,7 @@ class ListHeader extends Component<IProps> {
                         Депозит
                     </Typography>
                     <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
-                        <ExcelIcon width={24} height={24} />
+                        <ExcelIcon />
                     </IconButton>
                 </Grid>
             </Grid>

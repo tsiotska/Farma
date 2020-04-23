@@ -13,7 +13,7 @@ import List from './List';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { LOCATION_TITLE } from './List/List';
-import ExcelIcon from '-!react-svg-loader!../../../assets/icons/excel.svg';
+import ExcelIcon from '../../components/ExcelIcon';
 
 const styles = (theme: any) => createStyles({
     indicator: {
@@ -178,7 +178,7 @@ class Workers extends Component<IProps> {
                     expandable={this.isFFM && this.tab === 'all'}
                     headerAppend={
                         <IconButton className={classes.excelButton} onClick={this.loadExcel}>
-                            <ExcelIcon width={24} height={24} />
+                            <ExcelIcon size={24} />
                         </IconButton>
                     }
                 />

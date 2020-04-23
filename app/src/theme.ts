@@ -32,7 +32,7 @@ const palette = {
     lightBlue: '#2196F3',
     blue: '#647CFE',
     error: 'red',
-level: {
+    level: {
         redFaded: 'rgba(226, 83, 83, 0.2)',
         red: '#e25353',
         orangeredFaded: 'rgba(225, 155, 58, 0.2)',

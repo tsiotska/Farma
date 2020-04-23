@@ -155,7 +155,7 @@ class Pharmacy extends Component<IProps> {
                     justify='space-between'
                     alignItems='center'
                     container>
-                    <Typography>
+                    <Typography variant='h5'>
                         Аптеки
                     </Typography>
                     <Button>

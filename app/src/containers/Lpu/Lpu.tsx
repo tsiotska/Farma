@@ -161,7 +161,7 @@ class Lpu extends Component<IProps> {
                     justify='space-between'
                     alignItems='center'
                     container>
-                    <Typography>
+                    <Typography variant='h5'>
                         ЛПУ
                     </Typography>
                     <Button>

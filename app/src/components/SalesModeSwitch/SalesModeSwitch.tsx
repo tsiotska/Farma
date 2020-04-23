@@ -3,7 +3,7 @@ import { createStyles, WithStyles, Grid, Typography, FormControlLabel, Checkbox,
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
-import ExcelIcon from '-!react-svg-loader!../../../assets/icons/excel.svg';
+import ExcelIcon from '../ExcelIcon';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -23,8 +23,7 @@ const styles = (theme: any) => createStyles({
     loadButton: {
         padding: 4,
         borderRadius: 2
-    },
-    loadIcon: {}
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -88,7 +87,7 @@ class SalesModeSwitch extends Component<IProps> {
                 {
                     loadExcelHandler &&
                     <IconButton onClick={loadExcelHandler} className={classes.loadButton}>
-                        <ExcelIcon width={24} height={24} className={classes.loadIcon} />
+                        <ExcelIcon />
                     </IconButton>
                 }
             </Grid>

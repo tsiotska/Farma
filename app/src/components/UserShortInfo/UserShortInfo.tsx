@@ -76,6 +76,12 @@ class UserShortInfo extends Component<IProps> {
             : '';
     }
 
+    @computed
+    get showLevel(): boolean {
+        const { hideLevel } = this.props;
+        return hideLevel !== true && (this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER);
+    }
+
     render() {
         const { classes, user, disableClick, hideLevel } = this.props;
 
@@ -94,7 +100,7 @@ class UserShortInfo extends Component<IProps> {
                         {this.positionName}
                     </Typography>
                     {
-                        (hideLevel === false && (this.userPosition === USER_ROLE.MEDICAL_AGENT || this.userPosition === USER_ROLE.REGIONAL_MANAGER)) &&
+                        this.showLevel &&
                         <Level user={user} disableClick={disableClick} />
                     }
                 </Grid>
