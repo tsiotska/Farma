@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, WithStyles, Grid, Typography, Button } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IBonusInfo } from '../../../interfaces/IBonusInfo';
 import ExcelIcon from '../../../components/ExcelIcon';
 import { Check, Close } from '@material-ui/icons';
+import cx from 'classnames';
+import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     root: {
+        display: 'flex',
+        alignItems: 'center',
+        flexWrap: 'nowrap',
         width: 192,
         height: 64,
-        padding: 16,
         backgroundColor: ({ selected }: any) => selected
             ? 'white'
             : 'transparent'
@@ -19,6 +23,10 @@ const styles = (theme: any) => createStyles({
         fill: ({ selected }: any) => selected
             ? theme.palette.primary.green.main
             : '#7F888C'
+    },
+    text: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
     leadText: {
         textTransform: 'capitalize',
@@ -29,13 +37,14 @@ const styles = (theme: any) => createStyles({
             : theme.palette.primary.gray.main
     },
     secondaryText: {
-        fontSize: theme.typography.pxToRem(15),
+        fontSize: theme.typography.pxToRem(14),
         color: ({ selected}: any) => selected
             ? theme.palette.primary.green.main
             : theme.palette.primary.gray.mainLight
     },
     textContainer: {
-        padding: '0 8px'
+        padding: '0 8px',
+        overflow: 'hidden'
     },
     checkIcon: {
         color: 'white',
@@ -59,22 +68,37 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     bonus: IBonusInfo;
     selected: boolean;
+    setPreviewBonus?: (bonus: IBonusInfo) => void;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            setPreviewBonus
+        }
+    }
+}) => ({
+    setPreviewBonus
+}))
 @observer
 class TabItem extends Component<IProps> {
+    clickHandler = () => {
+        const { setPreviewBonus, bonus } = this.props;
+        setPreviewBonus(bonus);
+    }
+
     render() {
-        const { classes } = this.props;
+        const { classes, bonus: { deposit, payments, month } } = this.props;
 
         return (
-            <Grid alignItems='center' wrap='nowrap' className={classes.root} container>
+            <Button onClick={this.clickHandler} className={classes.root}>
                 <ExcelIcon className={classes.icon} size={35} />
-                <Grid className={classes.textContainer} direction='column' container>
-                    <Typography className={classes.leadText}>
-                        month name
+                <Grid className={classes.textContainer} alignItems='flex-start' direction='column' container>
+                    <Typography className={cx(classes.text, classes.leadText)}>
+                        { uaMonthsNames[month - 1] }
                     </Typography>
-                    <Typography className={classes.secondaryText} variant='body2'>
-                        1234 / 1234
+                    <Typography className={cx(classes.text, classes.secondaryText)} variant='body2'>
+                        { payments } / { deposit }
                     </Typography>
                 </Grid>
 
@@ -82,7 +106,7 @@ class TabItem extends Component<IProps> {
                     <Close fontSize='small' className={classes.closeIcon}/>
                     <Check fontSize='small' className={classes.checkIcon}/>
                 </Grid>
-            </Grid>
+            </Button>
         );
     }
 }

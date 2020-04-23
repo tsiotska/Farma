@@ -66,7 +66,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     setPreviewBonus = (bonusInfo: IBonusInfo) => {
+        const shouldLoadData = bonusInfo !== this.previewBonus;
         this.previewBonus = bonusInfo;
+        if (shouldLoadData) {
+            console.log('should load adta');
+        }
     }
 
     @action.bound
@@ -77,6 +81,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
             api.getBonusInfo(currentDepartmentId, tmpDate.getFullYear()),
             'loadBonuses'
         );
+
+        if (this.bonuses && this.bonuses.length) {
+            const currentPreviewBonusId = this.previewBonus
+                ? this.previewBonus.id
+                : null;
+            const updatedBonus = currentPreviewBonusId
+                ? this.bonuses.find(({ id }) => id === currentPreviewBonusId)
+                : null;
+            const itemToSet = updatedBonus || this.bonuses[this.bonuses.length - 1];
+            this.setPreviewBonus(itemToSet);
+        } else {
+            this.setPreviewBonus(null);
+        }
     }
 
     @action.bound
@@ -357,6 +374,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.notifications = [];
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+        this.previewBonus = null;
+        this.bonuses = null;
         window.clearInterval(this.notificationsUpdateInterval);
         this.notificationsUpdateInterval = null;
         resetDepartmentsStore();
