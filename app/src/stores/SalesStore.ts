@@ -1,7 +1,7 @@
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, toJS } from 'mobx';
 import {
     endOfMonth,
     format,
@@ -143,15 +143,22 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     toggleIgnoredLocation = (locationId: number) => {
         const { departmentsStore: { locationsAgents }} = this.rootStore;
 
-        if (this.ignoredLocations.has(locationId)) this.ignoredLocations.delete(locationId);
-        else this.ignoredLocations.add(locationId);
+        if (this.ignoredLocations.has(locationId)) {
+            this.ignoredLocations.delete(locationId);
+        } else {
+            this.ignoredLocations.add(locationId);
+        }
 
-        if (this.agentsTargetProperty === null) return;
+        const callback = this.ignoredLocations.has(locationId)
+            ? this.ignoredAgents.add
+            : this.ignoredAgents.delete;
 
-        locationsAgents.forEach(agent => {
+        locationsAgents.forEach((agent) => {
             const { id, [this.agentsTargetProperty]: location} = agent;
-            if (location === locationId) this.ignoredAgents.add(id);
+            if (location === locationId) callback.call(this.ignoredAgents, id);
         });
+        this.sortAgentsSales();
+        this.sortLocationsSales();
     }
 
     @action.bound
@@ -178,6 +185,34 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 this.ignoredLocations.add(targetLocation);
             }
         }
+        this.sortAgentsSales();
+        this.sortLocationsSales();
+    }
+
+    @action.bound
+    sortAgentsSales() {
+        if (this.ignoredAgents.size === 0) return;
+        this.agentSalesStat = this.agentSalesStat.slice().sort((a, b) => {
+            const isLeftIgnored = this.ignoredAgents.has(a.id);
+            const isRightIgnored = this.ignoredAgents.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return 0;
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        });
+    }
+
+    @action.bound
+    sortLocationsSales() {
+        if (this.ignoredLocations.size === 0) return;
+        this.locationSalesStat = this.locationSalesStat.slice().sort((a, b) => {
+            const isLeftIgnored = this.ignoredLocations.has(a.id);
+            const isRightIgnored = this.ignoredLocations.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return 0;
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        });
     }
 
     @action.bound
