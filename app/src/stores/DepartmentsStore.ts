@@ -332,15 +332,21 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async addMedicine(data: any) {
         const requestName = 'addMedicine';
         const { api } = this.rootStore;
+        const depId = this.currentDepartmentId;
 
-        if (!this.currentDepartmentId) return;
+        if (!depId) return;
 
         const medicine = await this.dispatchRequest(
             api.addMedicine(this.currentDepartmentId, data),
             requestName
         );
 
-        if (medicine) this.meds.set(medicine.id, medicine);
+        if (medicine) {
+            const targetMeds = this.meds.get(depId);
+            if (targetMeds) targetMeds.push(medicine);
+        }
+
+        this.loadMeds(depId);
 
         return !!medicine;
     }
@@ -351,8 +357,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         this.setLoading(requestName);
         for (const department of this.departments) {
+            this.meds.set(department.id, []);
             await this.loadMeds(department.id);
         }
+
         this.setSuccess(requestName);
     }
 
@@ -363,12 +371,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (departmentId === null) return;
 
-        this.meds.set(departmentId, []);
         this.setLoading(requestName);
-        const { cache, promise } = api.getMeds(departmentId);
-        if (cache) this.meds.set(departmentId, cache);
-
-        const requestResult = await promise;
+        const requestResult = await api.getMeds(departmentId);
 
         if (requestResult) {
             this.meds.set(departmentId, requestResult);

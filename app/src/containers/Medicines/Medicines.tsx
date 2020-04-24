@@ -81,9 +81,11 @@ class Medicines extends Component<IProps> {
 
                 <ListHeader />
                 {
-                    this.isMedsLoading
-                    ? <LoadingMask color='primary' />
-                    : <List meds={currentDepartmentMeds} />
+                    currentDepartmentMeds.length
+                    ? <List meds={currentDepartmentMeds} />
+                    : this.isMedsLoading
+                        ? <LoadingMask color='primary' />
+                        : null
                 }
 
                 <AddMedsModal />

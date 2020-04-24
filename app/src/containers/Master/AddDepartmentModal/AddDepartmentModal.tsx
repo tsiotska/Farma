@@ -144,7 +144,7 @@ class AddDepartmentModal extends Component<IProps> {
         const departmentFormData = new FormData();
 
         departmentFormData.append('image', image);
-        departmentFormData.append('name', JSON.stringify({ name }));
+        departmentFormData.append('json', JSON.stringify({ name }));
 
         return departmentFormData;
     }
@@ -161,13 +161,26 @@ class AddDepartmentModal extends Component<IProps> {
         } = this.ffmData;
         const ffmFormData = new FormData();
 
-        ffmFormData.append('bank_card', card);
-        ffmFormData.append('email', email);
         ffmFormData.append('image', image);
-        ffmFormData.append('full_name', name);
-        ffmFormData.append('password', password);
-        ffmFormData.append('work_phone', workPhone);
-        ffmFormData.append('mobile_phone', mobilePhone);
+
+        // variant1
+        const json = JSON.stringify({
+            bank_card: card,
+            email: email,
+            full_name: name,
+            password: password,
+            work_phone: workPhone,
+            mobile_phone: mobilePhone,
+        });
+        ffmFormData.append('json', json);
+
+        // variant2
+        // ffmFormData.append('bank_card', card);
+        // ffmFormData.append('email', email);
+        // ffmFormData.append('full_name', name);
+        // ffmFormData.append('password', password);
+        // ffmFormData.append('work_phone', workPhone);
+        // ffmFormData.append('mobile_phone', mobilePhone);
 
         return ffmFormData;
     }

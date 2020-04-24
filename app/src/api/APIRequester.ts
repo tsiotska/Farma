@@ -140,20 +140,14 @@ export class APIRequester {
 
     addMedicine(departmentId: number, formData: any): Promise<any> {
         return this.instance.post(`/api/branch/${departmentId}/drug`, formData)
-        .then(({ data }) => medsNormalizer({ data: [data]}))
+        .then(({ data: { data } }) => medsNormalizer({ data: [data]}))
         .catch(this.defaultErrorHandler());
     }
 
-    getMeds(departmentId: number): ICachedPromise<IMedicine[]> {
-        const url = `api/branch/${departmentId}/drug`;
-        const cache = this.cacheStore.getCachedData(url, medsNormalizer);
-        const promise =  this.instance.get(url)
-            .then(({ data, request: { response }}) => {
-                this.cacheStore.setCachedData(url, response);
-                return medsNormalizer(data);
-            })
+    getMeds(departmentId: number): Promise<IMedicine[]> {
+        return this.instance.get(`api/branch/${departmentId}/drug`)
+            .then(({ data }: any) => medsNormalizer(data))
             .catch(this.defaultErrorHandler());
-        return { cache, promise };
     }
 
     getPositions(): Promise<IPosition[]> {
@@ -287,8 +281,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    updateCommonSettings(settings: ISalarySettings) {
-        return this.instance.put('/api/settings', settings)
+    updateCommonSettings({ kpi, payments }: ISalarySettings) {
+        const data: any = {
+            default_amount_kpi: kpi,
+            payments
+        };
+        return this.instance.put('/api/settings', data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

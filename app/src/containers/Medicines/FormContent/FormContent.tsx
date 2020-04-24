@@ -39,19 +39,21 @@ interface IValidatorSettings {
     text: string;
 }
 
+export interface IFormValues {
+    name: string;
+    releaseForm: string;
+    dosage: string;
+    manufacturer: string;
+    barcode: string;
+    mark: string;
+    price: string;
+}
+
 @observer
 class FormContent extends Component<IProps> {
     lengthValidator: Validator;
+    barcodeLengthValidator: Validator;
     readonly validatorSettings: Record<InputType, IValidatorSettings[]>;
-    readonly values: any = {
-        name: 'name',
-        releaseForm: 'releaseForm',
-        dosage: 'dosage',
-        manufacturer: 'manufacturer',
-        bonus: 'bonus',
-        price: 'price',
-        barcode: 'barcode'
-    };
 
     constructor(props: IProps) {
         super(props);
@@ -59,22 +61,27 @@ class FormContent extends Component<IProps> {
             return !!value && value.length >= 3;
         };
 
+        this.barcodeLengthValidator = (value: string): boolean => {
+            return !!value && value.length === 13;
+        };
+
         this.validatorSettings = {
             string: [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }],
             money: [{ validator: stringValidator, text: 'Пусті значення недопустимі' }, { validator: moneyValidator, text: 'Неправильне числове значення' }],
             number: [{ validator: numberValidator, text: 'Неправильне числове значення' }, { validator: stringValidator, text: 'Пусті значення недопустимі' }],
-            barcode: [{ validator: onlyNumbersValidator, text: 'Допустимі лише цифри' }]
+            barcode: [{ validator: onlyNumbersValidator, text: 'Допустимі лише цифри' }, { validator: this.barcodeLengthValidator, text: 'Штрихкод має бути завдовжки 13 символів'}]
         };
     }
 
-    @observable formValues: any = {};
-    @observable fieldsErrorStatuses: any = {
+    @observable formValues: Partial<IFormValues> = {};
+    @observable fieldsErrorStatuses: Record<keyof IFormValues, boolean> = {
         name: false,
         releaseForm: false,
         dosage: false,
         manufacturer: false,
-        bonus: false,
+        mark: false,
         price: false,
+        barcode: false
     };
 
     @computed
@@ -85,7 +92,7 @@ class FormContent extends Component<IProps> {
         return allValuesExist && allValuesValid && imageAdded;
     }
 
-    changeHandler = (propName: string, type: InputType = 'string') =>
+    changeHandler = (propName: keyof IFormValues, type: InputType = 'string') =>
         ({ target: { value }}: any) => {
             this.formValues[propName] = value;
             const validatorSetting = this.validatorSettings[type];
@@ -142,47 +149,47 @@ class FormContent extends Component<IProps> {
                     <Grid direction='column' className={classes.columnFirst} xs container item>
                         <FormRow
                             label='Назва'
-                            value={this.formValues[this.values.name] || ''}
-                            onChange={this.changeHandler(this.values.name)}
-                            error={this.fieldsErrorStatuses[this.values.name]}
+                            value={this.formValues.name || ''}
+                            error={this.fieldsErrorStatuses.name}
+                            onChange={this.changeHandler('name')}
                         />
                         <FormRow
                             label='Дозування, мг'
-                            value={this.formValues[this.values.dosage] || ''}
-                            onChange={this.changeHandler(this.values.dosage, 'number')}
-                            error={this.fieldsErrorStatuses[this.values.dosage]}
+                            value={this.formValues.dosage || ''}
+                            onChange={this.changeHandler('dosage', 'number')}
+                            error={this.fieldsErrorStatuses.dosage}
                         />
                         <FormRow
                             label='Штрихкод'
-                            value={this.formValues[this.values.barcode] || ''}
-                            onChange={this.changeHandler(this.values.barcode, 'barcode')}
-                            error={this.fieldsErrorStatuses[this.values.barcode]}
+                            value={this.formValues.barcode || ''}
+                            onChange={this.changeHandler('barcode', 'barcode')}
+                            error={this.fieldsErrorStatuses.barcode}
                         />
                         <FormRow
                             label='Балл'
-                            value={this.formValues[this.values.bonus] || ''}
-                            onChange={this.changeHandler(this.values.bonus, 'money')}
-                            error={this.fieldsErrorStatuses[this.values.bonus]}
+                            value={this.formValues.mark || ''}
+                            onChange={this.changeHandler('mark', 'money')}
+                            error={this.fieldsErrorStatuses.mark}
                         />
                     </Grid>
                     <Grid direction='column' xs container item>
                         <FormRow
                             label='Форма выпуску'
-                            value={this.formValues[this.values.releaseForm] || ''}
-                            onChange={this.changeHandler(this.values.releaseForm)}
-                            error={this.fieldsErrorStatuses[this.values.releaseForm]}
+                            value={this.formValues.releaseForm || ''}
+                            onChange={this.changeHandler('releaseForm')}
+                            error={this.fieldsErrorStatuses.releaseForm}
                         />
                         <FormRow
                             label='Виробник'
-                            value={this.formValues[this.values.manufacturer] || ''}
-                            onChange={this.changeHandler(this.values.manufacturer)}
-                            error={this.fieldsErrorStatuses[this.values.manufacturer]}
+                            value={this.formValues.manufacturer || ''}
+                            onChange={this.changeHandler('manufacturer')}
+                            error={this.fieldsErrorStatuses.manufacturer}
                         />
                         <FormRow
                             label='Ціна, грн'
-                            value={this.formValues[this.values.price] || ''}
-                            onChange={this.changeHandler(this.values.price, 'money')}
-                            error={this.fieldsErrorStatuses[this.values.price]}
+                            value={this.formValues.price || ''}
+                            onChange={this.changeHandler('price', 'money')}
+                            error={this.fieldsErrorStatuses.price}
                         />
                     </Grid>
                 </Grid>

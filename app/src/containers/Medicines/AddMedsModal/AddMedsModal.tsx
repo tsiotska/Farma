@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import { ADD_MEDICINE_MODAL } from '../../../constants/Modals';
 import Dialog from '../../../components/Dialog';
 import FormContent from '../FormContent';
@@ -8,6 +8,7 @@ import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
 import Dropzone from '../Dropzone';
+import { IFormValues } from '../FormContent/FormContent';
 
 interface IProps {
     openedModal?: string;
@@ -61,14 +62,14 @@ class AddMedsModal extends Component<IProps> {
         this.openSnackbar = false;
     }
 
-    submitHandler = async (data: any) => {
+    submitHandler = async (data: IFormValues) => {
         const { addMedicine } = this.props;
 
-        const intValues = ['dosage', 'bonus', 'price'];
-        const namesMap: Readonly<any> = {
+        const intValues = ['dosage', 'mark', 'price'];
+        const namesMap: Readonly<IFormValues> = {
             name: 'name',
             dosage: 'dosage',
-            bonus: 'mark',
+            mark: 'mark',
             releaseForm: 'release_form',
             manufacturer: 'manufacturer',
             price: 'price',
