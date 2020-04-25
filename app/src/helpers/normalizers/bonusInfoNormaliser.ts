@@ -10,7 +10,7 @@ const defaultDrugSale: IDrugSale = {
 
 const defaultMark: IMark = {
     drugId: null,
-    // mark: null,
+    mark: null,
     payments: null,
     deposit: null,
 };
@@ -48,14 +48,14 @@ const drugSaleValuesMap: IValuesMap = {
 
 const marksValuesMap: IValuesMap = {
     drug: 'drugId',
-    // drug_mark: 'mark',
+    drug_mark: 'mark',
     payments: 'payments',
     deposit: 'deposit',
 };
 
 const agentsValuesMap: IValuesMap = {
     id: 'id',
-    last_payment: 'lastPayment',
+    last_payments: 'lastPayment',
     last_deposit: 'lastDeposit',
 };
 
@@ -91,25 +91,24 @@ export const bonusesDataNormalizer = ({
     ).map(x => ([ x.id, x ]));
 
     const groupedMarks = groupBy(marks, 'agent');
-    console.log('gpmarks: ', groupedMarks);
 
-    // const normalizedAgents: IAgentInfo[] = objectArrayNormalizer(
-    //     agents,
-    //     defaultAgentInfo,
-    //     agentsValuesMap,
-    //     { requiredProps: [ 'id', 'lastPayment', 'lastDeposit' ] }
-    // ).map(agent => {
-    const normalizedAgents = [{
-        id: 4,
-        lastPayment: 3,
-        lastDeposit: 5,
-        marks: new Map(),
-    }, {
-        id: 5,
-        lastPayment: 3,
-        lastDeposit: 5,
-        marks: new Map(),
-    }].map(agent => {
+    const normalizedAgents: IAgentInfo[] = objectArrayNormalizer(
+        agents,
+        defaultAgentInfo,
+        agentsValuesMap,
+        { requiredProps: [ 'id', 'last_payments', 'last_deposit' ] }
+    ).map(agent => {
+    // const normalizedAgents = [{
+    //     id: 4,
+    //     lastPayment: 3,
+    //     lastDeposit: 5,
+    //     marks: new Map(),
+    // }, {
+    //     id: 5,
+    //     lastPayment: 3,
+    //     lastDeposit: 5,
+    //     marks: new Map(),
+    // }].map(agent => {
         const agentMarks = groupedMarks[agent.id];
 
         if (agentMarks) {
@@ -118,8 +117,7 @@ export const bonusesDataNormalizer = ({
                 defaultMark,
                 marksValuesMap,
                 {}
-            ).map((x, i) => ([15 + i, x]));
-            // ).map(x => ([x.drugId, x]));
+            ).map(x => ([x.drugId, x]));
 
             agent.marks = new Map(normalizedMarks);
         }

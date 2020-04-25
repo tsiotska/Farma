@@ -64,19 +64,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         : USER_ROLE.UNKNOWN;
     }
 
-    @computed
-    get drugsMarks(): Map<number, number> {
-        const res = new Map();
-
-        if (this.previewBonus) {
-            this.previewBonus.sales.forEach(({ mark, id }) => {
-                res.set(id, mark);
-            });
-        }
-
-        return res;
-    }
-
     @action.bound
     setPreviewBonus = (bonusInfo: IBonusInfo) => {
         const shouldLoadData = bonusInfo !== this.previewBonus;
@@ -135,7 +122,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ? this.previewBonus.id
             : null;
         const isDataRelevant = currentBonusId === bonusId;
-        console.log('relevant: ', isDataRelevant);
+
         // console.log('mock data!');
         // this.previewBonus.agents = [{
         //     id: 4,
@@ -159,7 +146,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         if (!res || !isDataRelevant) return;
         console.log(
-            'loaded: ',
+            'loaded bonus info: ',
             res.sales,
             res.agents
         );

@@ -20,6 +20,7 @@ import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -39,6 +40,8 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadLocationsAgents?: () => void;
     previewBonus?: IBonusInfo;
+    role?: USER_ROLE;
+    loadDoctors?: () => void;
 }
 
 @inject(({
@@ -48,9 +51,11 @@ interface IProps extends WithStyles<typeof styles> {
             bonuses,
             getAsyncStatus,
             previewBonus,
+            role
         },
         departmentsStore: {
             loadLocationsAgents,
+            loadDoctors
         }
     }
 }) => ({
@@ -59,6 +64,8 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonus,
     getAsyncStatus,
     loadLocationsAgents,
+    loadDoctors,
+    role
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -92,14 +99,6 @@ class Marks extends Component<IProps> {
     @computed
     get agents(): IAgentInfo[] {
         const { previewBonus } = this.props;
-        // return [
-        //     {
-        //         id: 1,
-        //         lastPayment: 3,
-        //         lastDeposit: 5,
-        //         marks: new Map(),
-        //     }
-        // ];
         return previewBonus
             ? previewBonus.agents
             : [];
@@ -114,18 +113,61 @@ class Marks extends Component<IProps> {
     }
 
     @computed
-    get showLpuColumn(): boolean {
-        return true;
+    get totalSoldCount(): {[key: number]: number} {
+        const { previewBonus } = this.props;
+
+        if (!previewBonus) return {};
+
+        const agentsMarks = previewBonus.agents.map(({ marks }) => (
+            [...marks.values()]
+        )).reduce((total, curr) => {
+                total.push(...curr);
+                return total;
+            }, []
+        );
+
+        const obj: any = agentsMarks.reduce(
+            (total, curr) => {
+                const { deposit, payments, drugId } = curr;
+                total[drugId] = (total[drugId] || 0) + deposit + payments;
+                return total;
+            },
+            {}
+        );
+
+        return obj;
     }
 
-    async componentDidMount() {
-        this.props.loadBonuses();
-        this.props.loadLocationsAgents();
+    @computed
+    get showLpuColumn(): boolean {
+        return this.props.role === USER_ROLE.MEDICAL_AGENT;
+    }
+
+    componentDidUpdate({ role: prevRole }: IProps) {
+        const { role: currentRole, loadDoctors, loadLocationsAgents } = this.props;
+
+        if (prevRole === currentRole) return;
+
+        if (currentRole === USER_ROLE.MEDICAL_AGENT) {
+            loadDoctors();
+        } else {
+            loadLocationsAgents();
+        }
+    }
+
+    componentDidMount() {
+        const { role, loadBonuses, loadLocationsAgents, loadDoctors } = this.props;
+        loadBonuses();
+        if (role === USER_ROLE.MEDICAL_AGENT) {
+            loadDoctors();
+        } else {
+            loadLocationsAgents();
+        }
     }
 
     render() {
         const { bonuses, classes } = this.props;
-        console.log('bonuses: ', toJS(bonuses));
+        console.log('total sold: ', toJS(this.totalSoldCount))
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
@@ -162,8 +204,16 @@ class Marks extends Component<IProps> {
                             Додати лікаря
                         </Button>
                     </Grid>
-                    <TableHeader showLpu={this.showLpuColumn} sales={this.sales} />
-                    <Table showLpu={this.showLpuColumn} agents={this.agents} />
+                    <TableHeader
+                        showLpu={this.showLpuColumn}
+                        sales={this.sales}
+                        totalSold={this.totalSoldCount}
+                    />
+                    <Table
+                        sales={this.sales}
+                        totalSold={this.totalSoldCount}
+                        showLpu={this.showLpuColumn}
+                        agents={this.agents} />
                 </Paper>
             </Grid>
         );

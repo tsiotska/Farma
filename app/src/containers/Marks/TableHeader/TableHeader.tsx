@@ -62,6 +62,7 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: IMedicine[];
     showLpu: boolean;
     sales?: Map<number, IDrugSale>;
+    totalSold?: { [key: number]: number };
 }
 
 @inject(({
@@ -76,7 +77,13 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableHeader extends Component<IProps> {
     render() {
-        const { classes, meds, showLpu, sales } = this.props;
+        const {
+            classes,
+            meds,
+            showLpu,
+            sales,
+            totalSold
+        } = this.props;
 
         return (
             <TableContainer className={classes.container}>
@@ -113,7 +120,9 @@ class TableHeader extends Component<IProps> {
                                                 { x.name }
                                             </Typography>
                                             <Typography variant='subtitle1' className={classes.salesStat}>
-                                                <span className={classes.span}>10</span>
+                                                <span className={classes.span}>
+                                                    { totalSold[x.id] || 0 }
+                                                </span>
                                                 <span>/</span>
                                                 <span className={classes.span}>
                                                     {

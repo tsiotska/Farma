@@ -5,14 +5,16 @@ import {
     TableRow as MuiTableRow,
     TableCell,
     Grid,
-    Divider
+    Divider,
+    Tooltip
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import cx from 'classnames';
-import { IAgentInfo } from '../../../interfaces/IBonusInfo';
+import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
 import { IMedicine } from '../../../interfaces/IMedicine';
+import HoverableCell from '../HoverableCell';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -49,6 +51,14 @@ const styles = (theme: any) => createStyles({
         border: '1px  solid black',
         width: 'auto',
         minWidth: 30
+    },
+    tooltip: {
+        border: '1px solid #27A7DD',
+        borderRadius: '4px',
+        backgroundColor: 'white',
+        color: 'black',
+        // margin: 0,
+        marginTop: -2
     }
 });
 
@@ -56,8 +66,9 @@ interface IProps extends WithStyles<typeof styles> {
     agent: IAgentInfo;
     showLpu: boolean;
     agentName: string;
+    lpuName: string;
     meds?: IMedicine[];
-    drugsMarks?: Map<number, number>;
+    tooltips: { [key: number]: string };
 }
 
 @inject(({
@@ -65,30 +76,33 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             currentDepartmentMeds: meds
         },
-        userStore: {
-            drugsMarks
-        }
     }
 }) => ({
     meds,
-    drugsMarks
 }))
 @observer
 class TableRow extends Component<IProps> {
     @computed
     get medsContent(): JSX.Element[] | JSX.Element {
-        const { classes, meds, agent: { marks }} = this.props;
+        const { classes, meds, tooltips, agent: { marks }} = this.props;
 
         return meds.length
         ? meds.map(({ id }) => {
             const mark = marks.get(id);
-            return <TableCell key={id} className={classes.cell}>
-                <Grid direction='column' alignItems='center' container>
-                    <span className={classes.span}>{mark ? mark.payments : 0}</span>
-                    <Divider className={classes.divider} />
-                    <span className={classes.span}>{mark ? mark.deposit : 0}</span>
-                </Grid>
-            </TableCell>;
+
+            return (
+                <HoverableCell
+                    key={id}
+                    mark={mark}
+                    tooltip={tooltips[id] || ''}
+                    classes={{
+                        cell: classes.cell,
+                        tooltip: classes.tooltip,
+                        divider: classes.divider,
+                        span: classes.span,
+                    }}
+                />
+            );
           })
         : <TableCell />;
     }
@@ -112,16 +126,15 @@ class TableRow extends Component<IProps> {
 
     @computed
     get total(): [number, number] {
-        const { meds, drugsMarks, agent: { marks }} = this.props;
+        const { meds, agent: { marks }} = this.props;
 
         return meds.length
             ? meds.reduce((total, { id }) => {
                 const mark = marks.get(id);
-                const multiplier = drugsMarks.get(id);
 
                 if (mark) {
-                    total[0] += mark.payments * multiplier;
-                    total[1] += mark.deposit * multiplier;
+                    total[0] += mark.payments * mark.mark;
+                    total[1] += mark.deposit * mark.mark;
                 }
 
                 return total;
@@ -134,11 +147,10 @@ class TableRow extends Component<IProps> {
             classes,
             showLpu,
             agentName,
+            lpuName,
             agent: {
-                id,
                 lastDeposit,
                 lastPayment,
-                marks
             }
         } = this.props;
 
@@ -149,7 +161,7 @@ class TableRow extends Component<IProps> {
                     <TableCell
                         padding='none'
                         className={cx(classes.cell, classes.wideColumn)}>
-                        -
+                        { lpuName }
                     </TableCell>
                 }
                 <TableCell
