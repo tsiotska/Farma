@@ -78,14 +78,14 @@ class Marks extends Component<IProps> {
     @computed
     get agents(): IAgentInfo[] {
         const { previewBonus } = this.props;
-        return [
-            {
-                id: 1,
-                lastPayment: 3,
-                lastDeposit: 5,
-                marks: new Map(),
-            }
-        ];
+        // return [
+        //     {
+        //         id: 1,
+        //         lastPayment: 3,
+        //         lastDeposit: 5,
+        //         marks: new Map(),
+        //     }
+        // ];
         return previewBonus
             ? previewBonus.agents
             : [];

@@ -70,6 +70,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.previewBonus = bonusInfo;
         if (shouldLoadData) {
             console.log('should load adta');
+            this.loadBonusesData();
         }
     }
 
@@ -121,6 +122,15 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ? this.previewUser.id
             : null;
         const isDataRelevant = currentBonusId === bonusId;
+
+        // console.log('mock data!')
+        // this.previewBonus.agents = [{
+        //     id: 1,
+        //     lastPayment: 3,
+        //     lastDeposit: 5,
+        //     marks: new Map(),
+        // }];
+        this.previewBonus.sales = res.sales;
 
         if (!res || !isDataRelevant) return;
 
