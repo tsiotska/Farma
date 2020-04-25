@@ -4,17 +4,25 @@ import {
     WithStyles,
     Grid,
     IconButton,
-    Typography
+    Typography,
+    Button
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { Delete, Edit } from '@material-ui/icons';
 import ImageLoader from '../../../components/ImageLoader';
 import Config from '../../../../Config';
+import RestoreButton from '../RestoreButton';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
+    wrapper: {
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center'
+    },
     root: {
         minHeight: 86,
         backgroundColor: '#f5f5f5',
@@ -22,14 +30,33 @@ const styles = (theme: any) => createStyles({
         '&:nth-child(even)': {
             backgroundColor: theme.palette.primary.white
         },
+        '& .MuiGrid-item': {
+            minWidth: 80,
+            '&:last-child': {
+                marginRight: ({ medicine: { deleted }}: any) => deleted ? 88 : 0
+            }
+        }
+    },
+    rounded: {
         '&:first-child': {
             borderRadius: '4px 4px 0 0'
         },
         '&:last-child': {
-            borderRadius: '0 0 4px 4px'
+            borderRadius: '0 0 4px 4px',
         },
-        '& .MuiGrid-item': {
-            minWidth: 80
+    },
+    deletedItem: {
+        '& > div': {
+            opacity: .5,
+            borderStyle: 'solid',
+            borderColor: 'red',
+            borderWidth: '1px 1px 0px 1px',
+            borderRadius: 0,
+        },
+        '&:last-of-type': {
+            '& > div': {
+                borderWidth: '1px 1px 1px 1px',
+            }
         }
     },
     image: {
@@ -42,6 +69,17 @@ const styles = (theme: any) => createStyles({
     },
     colorGreen: {
         color: theme.palette.primary.green.main
+    },
+    restoreButton: {
+        position: 'absolute',
+        right: 12,
+        backgroundColor: '#647cfe',
+        color: 'white',
+        height: 36,
+        width: 100,
+        '&:hover': {
+            backgroundColor: '#8d9eff'
+        }
     }
 });
 
@@ -54,19 +92,23 @@ class ListItem extends Component<IProps> {
     render() {
         const {
             classes,
-            medicine: {
-                name,
-                barcode,
-                image,
-                releaseForm,
-                dosage,
-                manufacturer,
-                mark,
-                price,
-        } } = this.props;
+            medicine
+        } = this.props;
+        const {
+            name,
+            barcode,
+            image,
+            releaseForm,
+            dosage,
+            manufacturer,
+            mark,
+            price,
+            deleted
+        } = medicine;
 
         return (
-            <Grid className={classes.root} wrap='nowrap' alignItems='center' container>
+            <div className={cx(classes.wrapper, {[classes.deletedItem]: deleted})}>
+            <Grid className={cx(classes.root, {[classes.rounded]: deleted === false})} wrap='nowrap' alignItems='center' container>
                 <ImageLoader
                     className={classes.image}
                     loadPlaceholder={<p className={classes.image} />}
@@ -109,14 +151,24 @@ class ListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                <IconButton className={classes.colorGreen}>
-                    <Edit fontSize='small' />
-                </IconButton>
+                {
+                    deleted === false &&
+                    <>
+                        <IconButton className={classes.colorGreen}>
+                            <Edit fontSize='small' />
+                        </IconButton>
+                        <IconButton>
+                            <Delete fontSize='small' />
+                        </IconButton>
+                    </>
+                }
 
-                <IconButton>
-                    <Delete fontSize='small' />
-                </IconButton>
             </Grid>
+            {
+                deleted === true &&
+                <RestoreButton medicine={medicine} className={classes.restoreButton} />
+            }
+            </div>
         );
     }
 }

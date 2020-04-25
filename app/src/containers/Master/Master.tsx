@@ -55,6 +55,7 @@ const styles = (theme: any) => createStyles({
     contentWrapper: {
         width: '100%',
         maxWidth: 1220,
+        paddingBottom: 60,
         [`@media (max-width:${ theme.breakpoints.width('lg') +  theme.overrides.MuiDrawer.paper.width + 5}px)`]: {
             maxWidth: 'none',
             marginLeft: theme.overrides.MuiDrawer.paper.width,

@@ -190,6 +190,12 @@ export class APIRequester {
         return { cache, promise };
     }
 
+    restoreMedicine(depId: number, medId: number) {
+        return this.instance.put(`/api/branch/${depId}/drug/${medId}/restore`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
     getSalesStat(url: string): ICachedPromise<ISalesStat[]> {
         const cache = this.cacheStore.getCachedData(url, salesStatNormalizer);
         const promise = this.instance.get(url)

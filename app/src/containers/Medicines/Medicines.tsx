@@ -16,6 +16,7 @@ import ListHeader from './ListHeader';
 import List from './List';
 import { ADD_MEDICINE_MODAL } from '../../constants/Modals';
 import AddMedsModal from './AddMedsModal';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -56,14 +57,27 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Medicines extends Component<IProps> {
+    @computed
     get isMedsLoading(): boolean {
         return this.props.getAsyncStatus('loadMeds').loading;
+    }
+
+    @computed
+    get sortedMeds(): IMedicine[] {
+        return this.props.currentDepartmentMeds.sort((a, b) => {
+            const isDeletedA = a.deleted;
+            const isDeletedB = b.deleted;
+            if (isDeletedA === isDeletedB) return 0;
+            return isDeletedA === true
+                ? 1
+                : -1;
+        });
     }
 
     addMedsClickHandler = () => this.props.openModal(ADD_MEDICINE_MODAL);
 
     render() {
-        const { classes, currentDepartmentMeds } = this.props;
+        const { classes } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -81,8 +95,8 @@ class Medicines extends Component<IProps> {
 
                 <ListHeader />
                 {
-                    currentDepartmentMeds.length
-                    ? <List meds={currentDepartmentMeds} />
+                    this.sortedMeds.length
+                    ? <List meds={this.sortedMeds} />
                     : this.isMedsLoading
                         ? <LoadingMask color='primary' />
                         : null

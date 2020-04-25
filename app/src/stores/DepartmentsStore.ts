@@ -329,6 +329,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async restoreMedicine(medicine: IMedicine) {
+        if (!this.currentDepartmentId) return;
+        const { api } = this.rootStore;
+
+        const isRestored = await this.dispatchRequest(
+            api.restoreMedicine(this.currentDepartmentId, medicine.id),
+            'restoreMedicine'
+        );
+
+        medicine.deleted = !isRestored;
+    }
+
+    @action.bound
     async addMedicine(data: any) {
         const requestName = 'addMedicine';
         const { api } = this.rootStore;

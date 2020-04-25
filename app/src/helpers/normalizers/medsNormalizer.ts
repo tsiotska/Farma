@@ -12,6 +12,7 @@ const defaultMedicine: IMedicine = {
     mark: null,
     barcode: null,
     price: null,
+    deleted: false
 };
 
 const valuesMap: IValuesMap = {
@@ -24,6 +25,7 @@ const valuesMap: IValuesMap = {
     mark: 'mark',
     barcode: 'barcode',
     price: 'price',
+    deleted: 'deleted'
 };
 
 export const medsNormalizer = ({ data }: any) => objectArrayNormalizer(
@@ -40,7 +42,9 @@ export const medsNormalizer = ({ data }: any) => objectArrayNormalizer(
 
                 if (!propName) continue;
 
-                normalizedObject[propName] = dataObject[prop];
+                normalizedObject[propName] = propName === valuesMap.deleted
+                    ? !!dataObject[prop]
+                    : dataObject[prop];
             }
 
             return normalizedObject;

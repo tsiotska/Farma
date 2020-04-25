@@ -9,6 +9,7 @@ export interface IMedicine {
     barcode: string;
     mark: number;
     price: number;
+    deleted: boolean;
 
     color?: string;
 }
