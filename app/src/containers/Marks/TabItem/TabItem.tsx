@@ -17,7 +17,12 @@ const styles = (theme: any) => createStyles({
         height: 64,
         backgroundColor: ({ selected }: any) => selected
             ? 'white'
-            : 'transparent'
+            : 'transparent',
+        '&:hover': {
+            backgroundColor: ({ selected }: any) => selected
+                ? '#f9f9f9'
+                : '#3333330a'
+        }
     },
     icon: {
         fill: ({ selected }: any) => selected

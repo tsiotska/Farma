@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography, LinearProgress, Paper, IconButton, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IBonusInfo, IAgentInfo } from '../../interfaces/IBonusInfo';
+import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
 import TabItem from './TabItem';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
+import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -28,6 +29,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadBonuses?: () => void;
     bonuses?: IBonusInfo[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    loadLocationsAgents?: () => void;
     previewBonus?: IBonusInfo;
 }
 
@@ -38,13 +40,17 @@ interface IProps extends WithStyles<typeof styles> {
             bonuses,
             getAsyncStatus,
             previewBonus,
+        },
+        departmentsStore: {
+            loadLocationsAgents,
         }
     }
 }) => ({
     loadBonuses,
     bonuses,
     previewBonus,
-    getAsyncStatus
+    getAsyncStatus,
+    loadLocationsAgents,
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -92,26 +98,43 @@ class Marks extends Component<IProps> {
     }
 
     @computed
+    get sales(): Map<number, IDrugSale>  {
+        const { previewBonus } = this.props;
+        return previewBonus
+            ? previewBonus.sales
+            : new Map();
+    }
+
+    @computed
     get showLpuColumn(): boolean {
         return true;
     }
 
     async componentDidMount() {
         this.props.loadBonuses();
+        this.props.loadLocationsAgents();
     }
 
     render() {
         const { bonuses, classes } = this.props;
-
+        console.log('bonuses: ', toJS(bonuses));
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
                     Бонуси
                 </Typography>
+
                 {
-                    bonuses && bonuses.map(bonusInfo => (
-                        <TabItem key={bonusInfo.id} bonus={bonusInfo} selected={this.previewBonusId === bonusInfo.id}/>
-                    ))
+                    bonuses && <Grid container alignItems='center'>
+                        {
+                            bonuses.map(bonusInfo => (
+                                <TabItem
+                                    key={bonusInfo.id}
+                                    bonus={bonusInfo}
+                                    selected={this.previewBonusId === bonusInfo.id}/>
+                            ))
+                        }
+                    </Grid>
                 }
                 {
                     (this.isBonusDataLoading || this.isBonusesLoading) &&
@@ -132,7 +155,7 @@ class Marks extends Component<IProps> {
                             Додати лікаря
                         </Button>
                     </Grid>
-                    <TableHeader showLpu={this.showLpuColumn} />
+                    <TableHeader showLpu={this.showLpuColumn} sales={this.sales} />
                     <Table showLpu={this.showLpuColumn} agents={this.agents} />
                 </Paper>
             </Grid>

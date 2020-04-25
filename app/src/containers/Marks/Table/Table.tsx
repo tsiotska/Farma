@@ -1,22 +1,33 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, TableContainer, TableBody, Table as MuiTable } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAgentInfo } from '../../../interfaces/IBonusInfo';
 import { toJS } from 'mobx';
 import TableRow from '../TableRow';
+import { IUser } from '../../../interfaces';
 
 const styles = (theme: any) => createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
     agents: IAgentInfo[];
     showLpu: boolean;
+    locationsAgents?: Map<number, IUser>;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            locationsAgents
+        }
+    }
+}) => ({
+    locationsAgents
+}))
 @observer
 class Table extends Component<IProps> {
     render() {
-        const { agents, classes, showLpu } = this.props;
+        const { agents, classes, showLpu, locationsAgents } = this.props;
         console.log('agents: ', toJS(agents));
         return (
             <TableContainer>
@@ -28,6 +39,11 @@ class Table extends Component<IProps> {
                                     key={x.id}
                                     showLpu={showLpu}
                                     agent={x}
+                                    agentName={
+                                        locationsAgents.has(x.id)
+                                        ? locationsAgents.get(x.id).name
+                                        : null
+                                    }
                                 />
                             ))
                         }

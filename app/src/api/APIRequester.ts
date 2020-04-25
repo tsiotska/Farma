@@ -343,13 +343,29 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getBonusesData(depId: number, userId: number, year: number, month: number):
-    Promise<{
+    getBonusesData(
+        depId: number,
+        { position, id }: IUser,
+        year: number,
+        month: number
+    ): Promise<{
         sales: Map<number, IDrugSale>,
         agents: IAgentInfo[]
     }> {
-        return this.instance.get(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}`)
+        const urlParams = `?year=${year}&month=${month}`;
+
+        const urls: { [key: number]: string } = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: `/api/branch/${depId}/ffm/mark${urlParams}`,
+            [USER_ROLE.REGIONAL_MANAGER]: `/api/branch/${depId}/rm/${id}/mark${urlParams}`,
+            [USER_ROLE.MEDICAL_AGENT]: `/api/branch/${depId}/mp/${id}/mark${urlParams}`,
+        };
+
+        const url = urls[position];
+
+        return url
+        ? this.instance.get(url)
             .then(bonusesDataNormalizer)
-            .catch(this.defaultErrorHandler());
+            .catch(this.defaultErrorHandler())
+        : null;
     }
 }
