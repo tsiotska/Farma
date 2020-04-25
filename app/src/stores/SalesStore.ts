@@ -369,17 +369,37 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (url) api.getExcel(url);
     }
 
-    private getAgentStatUrl(departmentId: number) {
+    @action.bound
+    async loadLocationsExcel() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getLocationStatUrl(currentDepartmentId, true);
+        if (currentDepartmentId === null || !url) return;
+        api.getExcel(url);
+    }
+
+    @action.bound
+    async loadAgentsSalesExcel() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const url = this.getAgentStatUrl(currentDepartmentId, true);
+        if (currentDepartmentId === null || !url) return;
+        api.getExcel(url);
+    }
+
+    private getAgentStatUrl(departmentId: number, excel?: boolean) {
         const { userStore: { role, previewUser }} = this.rootStore;
+
+        const params: any = {
+            from: format(this.dateFrom, this.apiDateMask),
+            to: format(this.dateTo, this.apiDateMask),
+        };
+
+        if (excel) params.excel = 1;
+
+        const urlParams = stringify(params);
 
         const userId = previewUser
         ? previewUser.id
         : -1;
-
-        const urlParams = stringify({
-            from: format(this.dateFrom, this.apiDateMask),
-            to: format(this.dateTo, this.apiDateMask),
-        });
 
         switch (role) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
@@ -390,17 +410,21 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         }
     }
 
-    private getLocationStatUrl(departmentId: number): string {
+    private getLocationStatUrl(departmentId: number, excel?: boolean): string {
         const { userStore: { role, previewUser }} = this.rootStore;
+
+        const params: any = {
+            from: format(this.dateFrom, this.apiDateMask),
+            to: format(this.dateTo, this.apiDateMask),
+        };
+
+        if (excel) params.excel = 1;
+
+        const urlParams = stringify(params);
 
         const userId = previewUser
         ? previewUser.id
         : -1;
-
-        const urlParams = stringify({
-            from: format(this.dateFrom, this.apiDateMask),
-            to: format(this.dateTo, this.apiDateMask),
-        });
 
         switch (role) {
             case USER_ROLE.FIELD_FORCE_MANAGER:

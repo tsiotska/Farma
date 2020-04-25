@@ -25,6 +25,9 @@ interface IProps {
     pharmaciesMap?: Map<number, ILPU>;
     ignoredLocations?: Set<number>;
     ignoredAgents?: Set<number>;
+    regions?: Map<number, ILocation>;
+    loadAgentsSalesExcel?: () => void;
+    loadLocationsExcel?: () => void;
 }
 
 export enum GROUP_BY {
@@ -47,10 +50,13 @@ export enum GROUP_BY {
             loadLocaleSalesStat,
             loadAgentSalesStat,
             pharmaciesMap,
-            locations
+            locations,
+            loadAgentsSalesExcel,
+            loadLocationsExcel
         },
         departmentsStore: {
-            locationsAgents
+            locationsAgents,
+            regions
         }
     }
 }) => ({
@@ -60,12 +66,15 @@ export enum GROUP_BY {
     locationSalesStat,
     agentSalesStat,
     locations,
+    regions,
     locationsAgents,
     ignoredLocations,
     ignoredAgents,
     loadLocaleSalesStat,
     loadAgentSalesStat,
-    pharmaciesMap
+    pharmaciesMap,
+    loadAgentsSalesExcel,
+    loadLocationsExcel
 }))
 @observer
 class TableStat extends Component<IProps> {
@@ -118,16 +127,16 @@ class TableStat extends Component<IProps> {
     }
 
     getTitle(): string {
-        const { role, locations, previewUser } = this.props;
+        const { role, regions, previewUser } = this.props;
         if (role === USER_ROLE.REGIONAL_MANAGER) {
             const region = previewUser
             ? previewUser.region
             : null;
 
-            const userRegion = locations.get(region);
-
+            const userRegion = regions.get(region);
+            console.log('user region: ', toJS(userRegion), toJS(previewUser));
             return userRegion
-            ? userRegion.name
+            ? `${userRegion.name} регіон`
             : '';
         }
 
@@ -157,7 +166,9 @@ class TableStat extends Component<IProps> {
             locationSalesStat,
             locationsAgents,
             ignoredAgents,
-            ignoredLocations
+            ignoredLocations,
+            loadAgentsSalesExcel,
+            loadLocationsExcel
         } = this.props;
 
         return (
@@ -165,6 +176,7 @@ class TableStat extends Component<IProps> {
                 {
                     this.showAgentStat &&
                     <DrugsTable
+                        excelClickHandler={loadAgentsSalesExcel}
                         isLoading={this.isLoading}
                         salesStat={agentSalesStat}
                         labelData={locationsAgents}
@@ -180,6 +192,7 @@ class TableStat extends Component<IProps> {
                     />
                 }
                 <DrugsTable
+                    excelClickHandler={loadLocationsExcel}
                     isLoading={this.isLoading}
                     salesStat={locationSalesStat}
                     labelData={this.locationsLabels}

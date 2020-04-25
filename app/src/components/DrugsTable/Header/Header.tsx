@@ -7,7 +7,9 @@ import {
     TableHead,
     TableRow,
     TableCell,
-    Grid
+    Grid,
+    IconButton,
+    Typography
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import HeaderItem from '../HeaderItem';
@@ -15,14 +17,14 @@ import { IMedicine } from '../../../interfaces/IMedicine';
 import differenceBy from 'lodash/differenceBy';
 import ommitBy from 'lodash/omitBy';
 import cx from 'classnames';
+import ExcelIcon from '../../ExcelIcon';
 
 const styles = createStyles({
-    // displayNone: {
-    //     display: 'none'
-    // },
     container: {},
     table: {},
     thCell: {},
+    iconButton: {},
+    totalText: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -30,6 +32,7 @@ interface IProps extends WithStyles<typeof styles> {
     medsArray: IMedicine[];
     shouldCalculateHeight?: boolean;
     ignoredMeds: number[];
+    excelClickHandler: () => void;
 
     salesHeaderHeight?: number;
     setSalesHeaderHeight?: (value: number) => void;
@@ -118,7 +121,8 @@ class Header extends Component<IProps> {
     }
 
     render() {
-        const { classes, headerPrepend } = this.props;
+        const { classes, headerPrepend, excelClickHandler } = this.props;
+
         return(
             <TableContainer
                 style={{ paddingTop: this.marginTop }}
@@ -135,7 +139,16 @@ class Header extends Component<IProps> {
                             {
                                 this.showTotal &&
                                 <TableCell className={classes.thCell}>
-                                    Сума
+                                    <Grid justify='space-between' wrap='nowrap' container>
+                                        <Typography className={classes.totalText}>
+                                            Сума
+                                        </Typography>
+                                        <IconButton
+                                            onClick={excelClickHandler}
+                                            className={classes.iconButton}>
+                                            <ExcelIcon />
+                                        </IconButton>
+                                    </Grid>
                                 </TableCell>
                             }
                         </TableRow>

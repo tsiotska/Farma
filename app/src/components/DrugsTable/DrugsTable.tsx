@@ -71,6 +71,13 @@ const styles = (theme: any) => createStyles({
     },
     marginBottom: {
         marginBottom: 40
+    },
+    iconButton: {
+        padding: 4,
+        borderRadius: 2
+    },
+    totalText: {
+        width: '100%'
     }
 });
 
@@ -86,6 +93,7 @@ interface IProps extends WithStyles<typeof styles> {
     headerPrepend: any;
     rowPrepend: any;
     labelData: Map<number, ILocation | IUserCommonInfo>;
+    excelClickHandler: () => void;
     onRetry: () => void;
 }
 
@@ -168,13 +176,15 @@ class DrugsTable extends Component<IProps> {
             onRetry,
             labelData,
             ignoredItems,
-            shouldCalculateOffset
+            shouldCalculateOffset,
+            excelClickHandler
         } = this.props;
 
         return (
             <>
             {/* hack to make table head sticky */}
             <Header
+                excelClickHandler={excelClickHandler}
                 headerPrepend={headerPrepend}
                 medsArray={this.medsArray}
                 ignoredMeds={this.ignoredIds}
@@ -182,7 +192,9 @@ class DrugsTable extends Component<IProps> {
                 classes={{
                     container: classes.container,
                     table: classes.table,
-                    thCell: classes.thCell
+                    thCell: classes.thCell,
+                    iconButton: classes.iconButton,
+                    totalText: classes.totalText
                 }}
             />
             <TableContainer ref={this.ref} className={cx(classes.container, classes.marginBottom)}>
