@@ -6,7 +6,7 @@ export interface IDrugSale {
 
 export interface IMark {
     drugId: number;
-    mark: number;
+    // mark: number;
     payments: number;
     deposit: number;
 }

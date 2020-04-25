@@ -64,6 +64,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
         : USER_ROLE.UNKNOWN;
     }
 
+    @computed
+    get drugsMarks(): Map<number, number> {
+        const res = new Map();
+
+        if (this.previewBonus) {
+            this.previewBonus.sales.forEach(({ mark, id }) => {
+                res.set(id, mark);
+            });
+        }
+
+        return res;
+    }
+
     @action.bound
     setPreviewBonus = (bonusInfo: IBonusInfo) => {
         const shouldLoadData = bonusInfo !== this.previewBonus;
@@ -118,29 +131,40 @@ export default class UserStore extends AsyncStore implements IUserStore {
             'loadBonusesData'
         );
 
-        const currentBonusId = this.previewUser
-            ? this.previewUser.id
+        const currentBonusId = this.previewBonus
+            ? this.previewBonus.id
             : null;
         const isDataRelevant = currentBonusId === bonusId;
-
-        console.log('mock data!');
-        this.previewBonus.agents = [{
-            id: 4,
-            lastPayment: 3,
-            lastDeposit: 5,
-            marks: new Map(),
-        }, {
-            id: 5,
-            lastPayment: 3,
-            lastDeposit: 5,
-            marks: new Map(),
-        }];
-        this.previewBonus.sales = res.sales;
-
-        // if (!res || !isDataRelevant) return;
-
-        // this.previewBonus.agents = res.agents;
+        console.log('relevant: ', isDataRelevant);
+        // console.log('mock data!');
+        // this.previewBonus.agents = [{
+        //     id: 4,
+        //     lastPayment: 3,
+        //     lastDeposit: 5,
+        //     marks: new Map(
+        //         {
+        //             drugId: number;
+        //             mark: number;
+        //             payments: number;
+        //             deposit: number;
+        //         }
+        //     ),
+        // }, {
+        //     id: 5,
+        //     lastPayment: 3,
+        //     lastDeposit: 5,
+        //     marks: new Map(),
+        // }];
         // this.previewBonus.sales = res.sales;
+
+        if (!res || !isDataRelevant) return;
+        console.log(
+            'loaded: ',
+            res.sales,
+            res.agents
+        );
+        this.previewBonus.agents = res.agents;
+        this.previewBonus.sales = res.sales;
     }
 
     @action.bound

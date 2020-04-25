@@ -10,7 +10,7 @@ const defaultDrugSale: IDrugSale = {
 
 const defaultMark: IMark = {
     drugId: null,
-    mark: null,
+    // mark: null,
     payments: null,
     deposit: null,
 };
@@ -48,7 +48,7 @@ const drugSaleValuesMap: IValuesMap = {
 
 const marksValuesMap: IValuesMap = {
     drug: 'drugId',
-    drug_mark: 'mark',
+    // drug_mark: 'mark',
     payments: 'payments',
     deposit: 'deposit',
 };
@@ -91,13 +91,25 @@ export const bonusesDataNormalizer = ({
     ).map(x => ([ x.id, x ]));
 
     const groupedMarks = groupBy(marks, 'agent');
+    console.log('gpmarks: ', groupedMarks);
 
-    const normalizedAgents: IAgentInfo[] = objectArrayNormalizer(
-        agents,
-        defaultAgentInfo,
-        agentsValuesMap,
-        { requiredProps: [ 'id', 'lastPayment', 'lastDeposit' ] }
-    ).map(agent => {
+    // const normalizedAgents: IAgentInfo[] = objectArrayNormalizer(
+    //     agents,
+    //     defaultAgentInfo,
+    //     agentsValuesMap,
+    //     { requiredProps: [ 'id', 'lastPayment', 'lastDeposit' ] }
+    // ).map(agent => {
+    const normalizedAgents = [{
+        id: 4,
+        lastPayment: 3,
+        lastDeposit: 5,
+        marks: new Map(),
+    }, {
+        id: 5,
+        lastPayment: 3,
+        lastDeposit: 5,
+        marks: new Map(),
+    }].map(agent => {
         const agentMarks = groupedMarks[agent.id];
 
         if (agentMarks) {
@@ -106,7 +118,8 @@ export const bonusesDataNormalizer = ({
                 defaultMark,
                 marksValuesMap,
                 {}
-            ).map(x => ([x.drugId, x]));
+            ).map((x, i) => ([15 + i, x]));
+            // ).map(x => ([x.drugId, x]));
 
             agent.marks = new Map(normalizedMarks);
         }

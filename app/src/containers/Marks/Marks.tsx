@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography, LinearProgress, Paper, IconButton, Button } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    Grid,
+    Typography,
+    LinearProgress,
+    Paper,
+    IconButton,
+    Button
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
@@ -11,7 +20,6 @@ import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
-import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -123,7 +131,6 @@ class Marks extends Component<IProps> {
                 <Typography variant='h5' className={classes.title}>
                     Бонуси
                 </Typography>
-
                 {
                     bonuses && <Grid container alignItems='center'>
                         {

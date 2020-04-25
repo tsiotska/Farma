@@ -42,16 +42,7 @@ const styles = (theme: any) => createStyles({
     span: {
 
     },
-    lastPayment: {
-        // width: '100%',
-        // borderStyle: 'solid',
-        // borderColor: 'black',
-        // borderWidth: '1px 1px 0',
-        textAlign: 'center'
-    },
-    lastDeposit: {
-        // width: '100%',
-        // border: '1px solid black',
+    alignCenter: {
         textAlign: 'center'
     },
     paymentsContainer: {
@@ -64,18 +55,23 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     agent: IAgentInfo;
     showLpu: boolean;
-    meds?: IMedicine[];
     agentName: string;
+    meds?: IMedicine[];
+    drugsMarks?: Map<number, number>;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             currentDepartmentMeds: meds
+        },
+        userStore: {
+            drugsMarks
         }
     }
 }) => ({
-    meds
+    meds,
+    drugsMarks
 }))
 @observer
 class TableRow extends Component<IProps> {
@@ -95,6 +91,42 @@ class TableRow extends Component<IProps> {
             </TableCell>;
           })
         : <TableCell />;
+    }
+
+    @computed
+    get packs(): [number, number] {
+        const { meds, agent: { marks }} = this.props;
+        return meds.length
+            ? meds.reduce((total, { id }) => {
+                const mark = marks.get(id);
+
+                if (mark) {
+                    total[0] += mark.payments;
+                    total[1] += mark.deposit;
+                }
+
+                return total;
+              }, [0, 0])
+            : [0, 0];
+    }
+
+    @computed
+    get total(): [number, number] {
+        const { meds, drugsMarks, agent: { marks }} = this.props;
+
+        return meds.length
+            ? meds.reduce((total, { id }) => {
+                const mark = marks.get(id);
+                const multiplier = drugsMarks.get(id);
+
+                if (mark) {
+                    total[0] += mark.payments * multiplier;
+                    total[1] += mark.deposit * multiplier;
+                }
+
+                return total;
+              }, [0, 0])
+            : [0, 0];
     }
 
     render() {
@@ -135,9 +167,13 @@ class TableRow extends Component<IProps> {
                     padding='none'
                     className={cx(classes.cell, classes.column)}>
                     <Grid direction='column' alignItems='center' container>
-                        <span className={classes.span}>0</span>
+                        <span className={classes.span}>
+                            {this.packs[0]}
+                        </span>
                         <Divider className={classes.divider} />
-                        <span className={classes.span}>0</span>
+                        <span className={classes.span}>
+                            {this.packs[1]}
+                        </span>
                     </Grid>
                 </TableCell>
                 <TableCell
@@ -145,9 +181,9 @@ class TableRow extends Component<IProps> {
                     padding='none'
                     className={cx(classes.cell, classes.column)}>
                     <Grid direction='column' alignItems='center' container>
-                        <span className={classes.span}>0</span>
+                        <span className={classes.span}>{lastPayment}</span>
                         <Divider className={classes.divider} />
-                        <span className={classes.span}>0</span>
+                        <span className={classes.span}>{lastDeposit}</span>
                     </Grid>
                 </TableCell>
                 <TableCell
@@ -161,12 +197,12 @@ class TableRow extends Component<IProps> {
                                 container
                                 direction='column'
                                 className={classes.paymentsContainer}>
-                                <span className={classes.lastPayment}>
-                                    {lastPayment}
+                                <span className={classes.alignCenter}>
+                                    {this.total[0]}
                                 </span>
                                 <Divider className={classes.divider2} />
-                                <span className={classes.lastDeposit}>
-                                    {lastDeposit}
+                                <span className={classes.alignCenter}>
+                                    {this.total[1]}
                                 </span>
                             </Grid>
                     </Grid>
