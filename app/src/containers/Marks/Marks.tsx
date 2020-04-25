@@ -167,7 +167,7 @@ class Marks extends Component<IProps> {
 
     render() {
         const { bonuses, classes } = this.props;
-        console.log('total sold: ', toJS(this.totalSoldCount))
+
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>

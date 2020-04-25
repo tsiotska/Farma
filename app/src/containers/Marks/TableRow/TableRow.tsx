@@ -6,7 +6,6 @@ import {
     TableCell,
     Grid,
     Divider,
-    Tooltip
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -69,6 +68,7 @@ interface IProps extends WithStyles<typeof styles> {
     lpuName: string;
     meds?: IMedicine[];
     tooltips: { [key: number]: string };
+    itemRef?: any;
 }
 
 @inject(({
@@ -148,6 +148,7 @@ class TableRow extends Component<IProps> {
             showLpu,
             agentName,
             lpuName,
+            itemRef,
             agent: {
                 lastDeposit,
                 lastPayment,
@@ -155,7 +156,7 @@ class TableRow extends Component<IProps> {
         } = this.props;
 
         return (
-            <MuiTableRow className={classes.root}>
+            <MuiTableRow ref={itemRef} className={classes.root}>
                 {
                     showLpu &&
                     <TableCell
