@@ -13,6 +13,16 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { INotification } from '../interfaces/iNotification';
 import uniq from 'lodash/uniq';
 
+export interface IMarkFraction {
+    payments: number;
+    deposit: number;
+}
+
+export interface ITotalMarks {
+    packs: IMarkFraction;
+    marks: IMarkFraction;
+}
+
 export default class UserStore extends AsyncStore implements IUserStore {
     rootStore: IRootStore;
     @observable user: IUser;
@@ -25,6 +35,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @observable bonuses: IBonusInfo[] = null;
     @observable previewBonus: IBonusInfo = null;
+    @observable previewBonusTotal: ITotalMarks = null;
 
     notificationsUpdateInterval: any = null;
 
@@ -62,6 +73,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    setPreviewBonusTotal(packs: IMarkFraction, marks: IMarkFraction) {
+        this.previewBonusTotal = {
+            packs,
+            marks
+        };
+    }
+
+    @action.bound
+    clearPreviewBonusTotal() {
+        this.previewBonusTotal = null;
     }
 
     @action.bound

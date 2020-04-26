@@ -23,10 +23,10 @@ const styles = (theme: any) => createStyles({});
 interface IProps extends WithStyles<typeof styles> {
     agents: IAgentInfo[];
     showLpu: boolean;
+    sales: Map<number, IDrugSale>;
     locationsAgents?: Map<number, IUser>;
     doctors?: IDoctor[];
     role?: USER_ROLE;
-    sales: Map<number, IDrugSale>;
     totalSold: { [key: number]: number };
 }
 

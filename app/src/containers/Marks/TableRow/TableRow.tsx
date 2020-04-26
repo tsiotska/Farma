@@ -116,7 +116,12 @@ class TableRow extends Component<IProps> {
 
     @computed
     get medsContent(): JSX.Element[] | JSX.Element {
-        const { classes, meds, tooltips, agent: { marks }} = this.props;
+        const {
+            classes,
+            meds,
+            tooltips,
+            agent: { marks }
+        } = this.props;
 
         return meds.length
         ? meds.map(({ id }) => {

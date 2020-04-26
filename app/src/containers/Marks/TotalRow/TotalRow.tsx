@@ -12,7 +12,8 @@ import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 import { IAgentInfo, IMark } from '../../../interfaces/IBonusInfo';
-import { computed } from 'mobx';
+import { computed, reaction } from 'mobx';
+import { IMarkFraction } from '../../../stores/UserStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -47,6 +48,8 @@ interface IProps extends WithStyles<typeof styles> {
     position: 'initial' | 'fixed';
     showLpu: boolean;
     agents: IAgentInfo[];
+    setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
+    clearPreviewBonusTotal?: () => void;
 }
 
 @inject(({
@@ -54,12 +57,20 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             currentDepartmentMeds: meds
         },
+        userStore: {
+            setPreviewBonusTotal,
+            clearPreviewBonusTotal
+        }
     }
 }) => ({
     meds,
+    setPreviewBonusTotal,
+    clearPreviewBonusTotal
 }))
 @observer
 class TotalRow extends Component<IProps> {
+    reactionDisposer: any;
+
     @computed
     get flattenMedsInfo(): IMark[] {
         const { agents } = this.props;
@@ -70,7 +81,7 @@ class TotalRow extends Component<IProps> {
     }
 
     @computed
-    get summedMeds(): {[key: number]: { payments: number, deposit: number }} {
+    get summedMeds(): {[key: number]: IMarkFraction} {
         return this.flattenMedsInfo.reduce((acc, curr) => {
             const { drugId, deposit, mark, payments } = curr;
 
@@ -89,7 +100,7 @@ class TotalRow extends Component<IProps> {
     }
 
     @computed
-    get summedPacks(): { payments: number, deposit: number } {
+    get summedPacks(): IMarkFraction {
         return this.flattenMedsInfo.reduce((acc, curr) => {
             const { deposit, payments } = curr;
             acc.payments += payments;
@@ -102,7 +113,7 @@ class TotalRow extends Component<IProps> {
     }
 
     @computed
-    get summedTotal(): { payments: number, deposit: number } {
+    get summedTotal(): IMarkFraction {
         return this.flattenMedsInfo.reduce((acc, curr) => {
             const { deposit, payments, mark } = curr;
             acc.payments += payments * mark;
@@ -115,7 +126,7 @@ class TotalRow extends Component<IProps> {
     }
 
     @computed
-    get summedBonuses(): { payments: number, deposit: number } {
+    get summedBonuses(): IMarkFraction {
         return this.props.agents.reduce((acc, curr) => {
             const { lastDeposit, lastPayment } = curr;
 
@@ -127,6 +138,23 @@ class TotalRow extends Component<IProps> {
             payments: 0,
             deposit: 0
         });
+    }
+
+    componentDidMount() {
+        const { setPreviewBonusTotal } = this.props;
+        this.reactionDisposer = reaction(
+            () => ([ this.summedPacks, this.summedTotal ]),
+            ([ summedPacks, summedTotal ]: [ IMarkFraction, IMarkFraction ]) => {
+                setPreviewBonusTotal(summedPacks, summedTotal);
+            }, {
+                fireImmediately: true
+            }
+        );
+    }
+
+    componentWillUnmount() {
+        if (this.reactionDisposer) this.reactionDisposer();
+        this.props.clearPreviewBonusTotal();
     }
 
     render() {

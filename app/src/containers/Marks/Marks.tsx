@@ -14,7 +14,7 @@ import { withStyles } from '@material-ui/styles';
 import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
 import TabItem from './TabItem';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
@@ -69,6 +69,8 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Marks extends Component<IProps> {
+    @observable changedAgents: IAgentInfo[] = [];
+
     @computed
     get isBonusesLoading(): boolean {
         return this.props.getAsyncStatus('').loading;
