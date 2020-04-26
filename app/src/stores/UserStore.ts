@@ -122,7 +122,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const url = urls[this.role]
         ? `${urls[this.role][mode]}?from=${format(dateFrom, apiDateMask)}&to=${format(dateTo, apiDateMask)}`
         : null;
-        console.log('hi: ', mode);
+
         if (month === null || userId === null || !url) return;
 
         api.getExcel(url, name.trim());
@@ -179,7 +179,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
+        const { sales } = this.previewBonus;
         const { marks } = agent;
+
+        const salesObj = sales.get(medId);
+
+        const mark = salesObj
+            ? salesObj.mark
+            : null;
 
         const targetMark = marks.get(medId);
         if (targetMark) {
@@ -189,7 +196,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 deposit: propName === 'deposit' ? value : 0,
                 payments: propName === 'payments' ? value : 0,
                 drugId: medId,
-                mark: null,
+                mark,
             };
             marks.set(medId, newMark);
         }
@@ -231,7 +238,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         this.bonuses = await this.dispatchRequest(
-            api.getBonusInfo(currentDepartmentId, this.bonusesYear),
+            api.getBonusInfo(currentDepartmentId, this.bonusesYear, this.previewUser),
             'loadBonuses'
         );
 

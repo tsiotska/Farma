@@ -340,8 +340,18 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getBonusInfo(depId: number, year: number) {
-        return this.instance.get(`/api/branch/${depId}/mark?year=${year}`)
+    getBonusInfo(depId: number, year: number, { id, position }: IUser) {
+        const urls: any = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: `api/branch/${depId}/ffm/marks`,
+            [USER_ROLE.REGIONAL_MANAGER]: `api/branch/${depId}/rm/${id}/marks`,
+            [USER_ROLE.MEDICAL_AGENT]: `api/branch/${depId}/mp/${id}/marks`,
+        };
+
+        const url = urls[position];
+
+        if (!url) return null;
+
+        return this.instance.get(`${url}?year=${year}`)
             .then(bonusInfoNormalizer)
             .catch(this.defaultErrorHandler());
     }

@@ -16,6 +16,9 @@ import { LOCATION_TITLE } from './List/List';
 import ExcelIcon from '../../components/ExcelIcon';
 
 const styles = (theme: any) => createStyles({
+    root: {
+        padding: '0 20px'
+    },
     indicator: {
         backgroundColor: theme.palette.primary.blue
     },
@@ -151,7 +154,7 @@ class Workers extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid direction='column' container>
+            <Grid className={classes.root} direction='column' container>
                 <Tabs
                     classes={{
                         root: classes.tabs,

@@ -12,7 +12,7 @@ import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 import { IAgentInfo, IMark } from '../../../interfaces/IBonusInfo';
-import { computed, reaction } from 'mobx';
+import { computed, reaction, toJS } from 'mobx';
 import { IMarkFraction } from '../../../stores/UserStore';
 
 const styles = (theme: any) => createStyles({
@@ -73,8 +73,7 @@ class TotalRow extends Component<IProps> {
 
     @computed
     get flattenMedsInfo(): IMark[] {
-        const { agents } = this.props;
-        return agents.reduce((acc, curr) => {
+        return this.props.agents.reduce((acc, curr) => {
             const { marks } = curr;
             return [...acc, ...marks.values()];
         }, []);

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
+import { createStyles, WithStyles, Grid } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import Header from './Header';
 
 const styles = (theme: any) => createStyles({});
 
@@ -13,9 +14,9 @@ interface IProps extends WithStyles<typeof styles> {
 class Salary extends Component<IProps> {
     render() {
         return (
-            <div>
-                Salary
-            </div>
+            <Grid container direction='column'>
+                <Header />
+            </Grid>
         );
     }
 }
