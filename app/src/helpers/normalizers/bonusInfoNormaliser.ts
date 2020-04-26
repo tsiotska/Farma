@@ -37,7 +37,7 @@ const bonusInfoValuesMap: IValuesMap = {
     month: 'month',
     payments: 'payments',
     deposit: 'deposit',
-    status: 'status'
+    status_ok: 'status'
 };
 
 const drugSaleValuesMap: IValuesMap = {

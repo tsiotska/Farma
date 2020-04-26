@@ -50,6 +50,7 @@ interface IProps extends WithStyles<typeof styles> {
     bonusesYear?: number;
     setBonusesYear?: (value: number, shouldPostData: boolean) => void;
     updateBonuses?: () => void;
+    loadBonusesExcel?: () => void;
 }
 
 @inject(({
@@ -62,7 +63,8 @@ interface IProps extends WithStyles<typeof styles> {
             role,
             bonusesYear,
             setBonusesYear,
-            updateBonuses
+            updateBonuses,
+            loadBonusesExcel
 
         },
         departmentsStore: {
@@ -80,7 +82,8 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     bonusesYear,
     setBonusesYear,
-    updateBonuses
+    updateBonuses,
+    loadBonusesExcel
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -201,7 +204,13 @@ class Marks extends Component<IProps> {
     }
 
     render() {
-        const { bonuses, classes, bonusesYear, updateBonuses } = this.props;
+        const {
+                bonuses,
+                classes,
+                bonusesYear,
+                updateBonuses,
+                loadBonusesExcel
+            } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -241,7 +250,7 @@ class Marks extends Component<IProps> {
                         <Typography variant='h5'>
                             Виплати { this.monthName && ` за ${this.monthName}` }
                         </Typography>
-                        <IconButton>
+                        <IconButton onClick={loadBonusesExcel}>
                             <ExcelIcon />
                         </IconButton>
                     </Grid>

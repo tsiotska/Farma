@@ -93,7 +93,7 @@ class TabItem extends Component<IProps> {
     }
 
     render() {
-        const { classes, bonus: { deposit, payments, month } } = this.props;
+        const { classes, bonus: { deposit, payments, month, status } } = this.props;
 
         return (
             <Button onClick={this.clickHandler} className={classes.root}>
@@ -108,8 +108,8 @@ class TabItem extends Component<IProps> {
                 </Grid>
 
                 <Grid className={classes.temporaryContainer} container direction='column'>
-                    <Close fontSize='small' className={classes.closeIcon}/>
-                    <Check fontSize='small' className={classes.checkIcon}/>
+                    { status === true && <Check fontSize='small' className={classes.checkIcon}/> }
+                    { status === false && <Close fontSize='small' className={classes.closeIcon}/> }
                 </Grid>
             </Button>
         );

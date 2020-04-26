@@ -77,6 +77,35 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    loadBonusesExcel() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        const month = this.previewBonus
+        ? this.previewBonus.month
+        : null;
+
+        const userId = this.previewUser
+        ? this.previewUser.id
+        : null;
+
+        if (month === null || userId === null) return;
+
+        const urlParams = `?year=${this.bonusesYear}&month=${month}&excel=1`;
+
+        const urls: { [key: number]: string } = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: `/api/branch/${currentDepartmentId}/ffm/mark${urlParams}`,
+            [USER_ROLE.REGIONAL_MANAGER]: `/api/branch/${currentDepartmentId}/rm/${userId}/mark${urlParams}`,
+            [USER_ROLE.MEDICAL_AGENT]: `/api/branch/${currentDepartmentId}/mp/${userId}/mark${urlParams}`,
+        };
+
+        const url = urls[this.role];
+
+        if (!url) return;
+
+        api.getExcel(url);
+    }
+
+    @action.bound
     updateBonuses() {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
