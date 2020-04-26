@@ -31,19 +31,19 @@ const valuesMap: IValuesMap = {
 
 const requiredProps = [ 'id', 'full_name',  'position' ];
 
-const UserValueNormalizers = {
-    position: (position: number) => {
-        switch (position) {
-            case USER_ROLE.ADMIN: return USER_ROLE.ADMIN;
-            case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.FIELD_FORCE_MANAGER;
-            case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
-            case USER_ROLE.MEDICAL_AGENT: return USER_ROLE.MEDICAL_AGENT;
-            case USER_ROLE.SUPER_ADMIN: return USER_ROLE.SUPER_ADMIN;
-            case USER_ROLE.PRODUCT_MANAGER: return USER_ROLE.PRODUCT_MANAGER;
-            default: return USER_ROLE.UNKNOWN;
-        }
+export const positionNormalizer = (position: number) => {
+    switch (position) {
+        case USER_ROLE.ADMIN: return USER_ROLE.ADMIN;
+        case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.FIELD_FORCE_MANAGER;
+        case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
+        case USER_ROLE.MEDICAL_AGENT: return USER_ROLE.MEDICAL_AGENT;
+        case USER_ROLE.SUPER_ADMIN: return USER_ROLE.SUPER_ADMIN;
+        case USER_ROLE.PRODUCT_MANAGER: return USER_ROLE.PRODUCT_MANAGER;
+        default: return USER_ROLE.UNKNOWN;
     }
 };
+
+const UserValueNormalizers = { position: positionNormalizer };
 
 export const userNormalizer = ({ data: { data }}: any) => requiredProps.every(prop => prop in data)
 ? defaultUserNormalizer(data, defaultUser, valuesMap, UserValueNormalizers)

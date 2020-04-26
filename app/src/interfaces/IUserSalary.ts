@@ -9,4 +9,5 @@ export interface IUserSalary {
     money: number;
     total: number;
     position: USER_ROLE;
+    subSalaries: IUserSalary[];
 }

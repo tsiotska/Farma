@@ -14,6 +14,7 @@ import flattenDeep from 'lodash/flattenDeep';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IDoctor } from '../interfaces/IDoctor';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
+import { IUserSalary } from '../interfaces/IUserSalary';
 
 export enum SORT_ORDER {
     ASCENDING, // a-z
@@ -64,6 +65,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @observable departments: IDepartment[] = [];
     @observable currentDepartment: IDepartment = null;
+
+    @observable salaries: IUserSalary[] = null;
+    @observable expandedSalary: IUserSalary = null;
 
     @observable workers: IWorker[] = [];
     @observable expandedWorker: IExpandedWorker = null;
@@ -144,6 +148,45 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map();
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+        this.clearSalaries();
+    }
+
+    @action.bound
+    async loadSalaries(year: number, month: number) {
+        const { api } = this.rootStore;
+        this.salaries = await this.dispatchRequest(
+            api.getRMsSalaries(
+                this.currentDepartmentId,
+                year,
+                month
+            ),
+            'loadSalaries'
+        );
+    }
+
+    @action.bound
+    async setExpandedSalary(salary: IUserSalary, year: number, month: number) {
+        const { api } = this.rootStore;
+
+        this.expandedSalary = salary;
+
+        if (salary === null) return;
+
+        salary.subSalaries = await this.dispatchRequest(
+            api.getMPsSalaries(
+                this.currentDepartmentId,
+                salary.id,
+                year,
+                month
+            ),
+            'loadSubsalaries'
+        );
+    }
+
+    @action.bound
+    clearSalaries() {
+        this.salaries = null;
+        this.expandedSalary = null;
     }
 
     @action.bound

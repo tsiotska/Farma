@@ -1,3 +1,4 @@
+import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
 import { workersNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
 import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer';
@@ -30,6 +31,7 @@ import { IDoctor } from '../interfaces/IDoctor';
 import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
+import { IUserSalary } from '../interfaces/IUserSalary';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -392,5 +394,17 @@ export class APIRequester {
         return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}`, data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
+    }
+
+    getRMsSalaries(branchId: number, year: number, month: number): Promise<IUserSalary[]> {
+        return this.instance.get(`/api/branch/${branchId}/ffm/salary?year=${year}&month=${month}`)
+            .then(salariesNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getMPsSalaries(branchId: number, userId: number, year: number, month: number): Promise<IUserSalary[]> {
+        return this.instance.get(`/api/branch/${branchId}/rm/${userId}/salary?year=${year}&month=${month}`)
+        .then(salariesNormalizer)
+        .catch(this.defaultErrorHandler());
     }
 }
