@@ -320,7 +320,7 @@ export class APIRequester {
 
     getDoctors(departmentId: number, mpId: number, unconfirmed?: boolean): Promise<IDoctor[]> {
         const query = unconfirmed
-            ? '&unconfirmed=1'
+            ? '?unconfirmed=1'
             : '';
 
         return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
