@@ -20,7 +20,6 @@ const styles = (theme: any) => createStyles({
         height: 42
     },
     title: {
-        fontFamily: 'Source Sans Pro SemiBold',
         color: '#555555'
     }
 });

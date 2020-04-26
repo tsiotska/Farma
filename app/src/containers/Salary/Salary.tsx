@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, LinearProgress } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, LinearProgress, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
@@ -7,6 +7,8 @@ import { observable, computed } from 'mobx';
 import ListHeader from './ListHeader';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
+import ListItem from './ListItem';
+import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({});
 
@@ -15,6 +17,8 @@ interface IProps extends WithStyles<typeof styles> {
     clearSalaries?: () => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     salaries?: IUserSalary[];
+    loadLocationsAgents?: () => void;
+    locationsAgents: Map<number, IUser>;
 }
 
 @inject(({
@@ -23,14 +27,18 @@ interface IProps extends WithStyles<typeof styles> {
             loadSalaries,
             clearSalaries,
             getAsyncStatus,
-            salaries
+            salaries,
+            loadLocationsAgents,
+            locationsAgents
         }
     }
 }) => ({
     loadSalaries,
     clearSalaries,
     getAsyncStatus,
-    salaries
+    salaries,
+    loadLocationsAgents,
+    locationsAgents
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -73,8 +81,9 @@ class Salary extends Component<IProps> {
     }
 
     componentDidMount() {
-        const { loadSalaries } = this.props;
+        const { loadSalaries, loadLocationsAgents } = this.props;
         loadSalaries(this.year, this.month + 1);
+        loadLocationsAgents();
     }
 
     componentWillUnmount() {
@@ -83,6 +92,8 @@ class Salary extends Component<IProps> {
     }
 
     render() {
+        const { salaries, locationsAgents } = this.props;
+
         return (
             <Grid container direction='column'>
                 <Header
@@ -94,7 +105,24 @@ class Salary extends Component<IProps> {
                 />
                 <ListHeader />
                 { this.isLoading && <LinearProgress />}
-
+                {
+                    salaries
+                    ? salaries.length
+                        ? salaries.map(x => (
+                            <ListItem
+                                key={x.id}
+                                user={locationsAgents.get(x.id)}
+                                expandable={true}
+                                isExpanded={false}
+                                position='РМ'
+                                userSalary={x}
+                            />
+                        ))
+                        : <Typography>
+                            Список зарплат пустий
+                          </Typography>
+                    : null
+                }
             </Grid>
         );
     }

@@ -16,6 +16,9 @@ const styles = (theme: any) => createStyles({
         color: '#868698',
         fontFamily: 'Source Sans Pro SemiBold',
         textAlign: 'left',
+    },
+    constantCol: {
+        width: 300
     }
 });
 
@@ -29,7 +32,7 @@ class ListHeader extends Component<IProps> {
         const { classes } = this.props;
         return (
             <Grid className={classes.root} wrap='nowrap' alignItems='flex-end' container>
-                <Grid xs={3} alignItems='flex-end' container item>
+                <Grid className={classes.constantCol} alignItems='flex-end' container item>
                     <Typography className={classes.textBold}>
                         Регіональні менеджери
                     </Typography>
