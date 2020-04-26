@@ -53,8 +53,13 @@ const styles = (theme: any) => createStyles({
         borderRadius: '4px',
         backgroundColor: 'white',
         color: 'black',
-        // margin: 0,
         marginTop: -2
+    },
+    input: {
+        minWidth: 0,
+        '& > *': {
+            textAlign: 'center'
+        }
     }
 });
 
@@ -120,22 +125,23 @@ class TableRow extends Component<IProps> {
             classes,
             meds,
             tooltips,
-            agent: { marks }
+            agent
         } = this.props;
 
         return meds.length
         ? meds.map(({ id }) => {
-            const mark = marks.get(id);
 
             return (
                 <HoverableCell
                     key={id}
-                    mark={mark}
+                    agent={agent}
+                    medId={id}
                     tooltip={tooltips[id] || ''}
                     classes={{
                         cell: classes.cell,
                         tooltip: classes.tooltip,
                         divider: classes.divider,
+                        input: classes.input
                     }}
                 />
             );

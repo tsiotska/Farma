@@ -1,4 +1,4 @@
-import { IBonusInfo } from './../interfaces/IBonusInfo';
+import { IBonusInfo, IAgentInfo, IMark } from './../interfaces/IBonusInfo';
 import { computed, action, observable, toJS } from 'mobx';
 
 import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
@@ -74,6 +74,24 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @action.bound
+    previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
+        const { marks } = agent;
+
+        const targetMark = marks.get(medId);
+        if (targetMark) {
+            targetMark[propName] = value;
+        } else {
+            const newMark: IMark = {
+                deposit: propName === 'deposit' ? value : 0,
+                payments: propName === 'payments' ? value : 0,
+                drugId: medId,
+                mark: null,
+            };
+            marks.set(medId, newMark);
+        }
     }
 
     @action.bound
