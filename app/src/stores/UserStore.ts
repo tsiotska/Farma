@@ -36,6 +36,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable bonuses: IBonusInfo[] = null;
     @observable previewBonus: IBonusInfo = null;
     @observable previewBonusTotal: ITotalMarks = null;
+    @observable bonusesYear: number = new Date().getFullYear();
 
     notificationsUpdateInterval: any = null;
 
@@ -76,6 +77,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    setBonusesYear(value: number) {
+        this.bonusesYear = value;
+        this.clearPreviewBonusTotal();
+        this.loadBonuses();
+    }
+
+    @action.bound
     setPreviewBonusTotal(packs: IMarkFraction, marks: IMarkFraction) {
         this.previewBonusTotal = {
             packs,
@@ -92,7 +100,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     setPreviewBonus = (bonusInfo: IBonusInfo) => {
         const shouldLoadData = bonusInfo !== this.previewBonus;
         this.previewBonus = bonusInfo;
-        if (shouldLoadData) {
+        if (shouldLoadData && !!this.previewBonus) {
             console.log('should load adta');
             this.loadBonusesData();
         }
@@ -101,9 +109,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadBonuses() {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-        const tmpDate = new Date();
+
         this.bonuses = await this.dispatchRequest(
-            api.getBonusInfo(currentDepartmentId, tmpDate.getFullYear()),
+            api.getBonusInfo(currentDepartmentId, this.bonusesYear),
             'loadBonuses'
         );
 
@@ -124,7 +132,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadBonusesData() {
         const { api, departmentsStore: { currentDepartmentId }} = this.rootStore;
-        const tmpDate = new Date();
 
         if (!currentDepartmentId || !this.previewUser) return;
 
@@ -133,7 +140,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const request = api.getBonusesData(
             currentDepartmentId,
             this.previewUser,
-            tmpDate.getFullYear(),
+            this.bonusesYear,
             this.previewBonus.month
         );
 
@@ -147,33 +154,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
             : null;
         const isDataRelevant = currentBonusId === bonusId;
 
-        // console.log('mock data!');
-        // this.previewBonus.agents = [{
-        //     id: 4,
-        //     lastPayment: 3,
-        //     lastDeposit: 5,
-        //     marks: new Map(
-        //         {
-        //             drugId: number;
-        //             mark: number;
-        //             payments: number;
-        //             deposit: number;
-        //         }
-        //     ),
-        // }, {
-        //     id: 5,
-        //     lastPayment: 3,
-        //     lastDeposit: 5,
-        //     marks: new Map(),
-        // }];
-        // this.previewBonus.sales = res.sales;
-
         if (!res || !isDataRelevant) return;
-        console.log(
-            'loaded bonus info: ',
-            res.sales,
-            res.agents
-        );
+
         this.previewBonus.agents = res.agents;
         this.previewBonus.sales = res.sales;
     }

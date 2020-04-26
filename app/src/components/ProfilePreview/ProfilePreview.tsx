@@ -61,7 +61,7 @@ const styles = (theme: any) => createStyles({
         padding: '8px 0 8px 16px'
     },
     credsContainer: {
-        minWidth: 280
+        minWidth: 300
     },
     dividerVertical: {
         minHeight: 100

@@ -9,6 +9,7 @@ import {
     IconButton,
     Button
 } from '@material-ui/core';
+import { ArrowLeft, ArrowRight } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
@@ -31,6 +32,10 @@ const styles = (theme: any) => createStyles({
     },
     paper: {
         padding: 20
+    },
+    iconButton: {
+        borderRadius: 2,
+        minHeight: 64
     }
 });
 
@@ -42,6 +47,8 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonus?: IBonusInfo;
     role?: USER_ROLE;
     loadDoctors?: () => void;
+    bonusesYear?: number;
+    setBonusesYear?: (value: number) => void;
 }
 
 @inject(({
@@ -51,7 +58,9 @@ interface IProps extends WithStyles<typeof styles> {
             bonuses,
             getAsyncStatus,
             previewBonus,
-            role
+            role,
+            bonusesYear,
+            setBonusesYear
         },
         departmentsStore: {
             loadLocationsAgents,
@@ -65,10 +74,14 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus,
     loadLocationsAgents,
     loadDoctors,
-    role
+    role,
+    bonusesYear,
+    setBonusesYear
 }))
 @observer
 class Marks extends Component<IProps> {
+    readonly currentYear = new Date().getFullYear();
+
     @observable changedAgents: IAgentInfo[] = [];
 
     @computed
@@ -145,6 +158,16 @@ class Marks extends Component<IProps> {
         return this.props.role === USER_ROLE.MEDICAL_AGENT;
     }
 
+    incrementYear = () => {
+        const { setBonusesYear, bonusesYear } = this.props;
+        setBonusesYear(bonusesYear + 1);
+    }
+
+    decrementYear = () => {
+        const { setBonusesYear, bonusesYear } = this.props;
+        setBonusesYear(bonusesYear - 1);
+    }
+
     componentDidUpdate({ role: prevRole }: IProps) {
         const { role: currentRole, loadDoctors, loadLocationsAgents } = this.props;
 
@@ -168,25 +191,37 @@ class Marks extends Component<IProps> {
     }
 
     render() {
-        const { bonuses, classes } = this.props;
+        const { bonuses, classes, bonusesYear } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
-                    Бонуси
+                    Бонуси за {bonusesYear} рік
                 </Typography>
-                {
-                    bonuses && <Grid container alignItems='center'>
-                        {
-                            bonuses.map(bonusInfo => (
-                                <TabItem
-                                    key={bonusInfo.id}
-                                    bonus={bonusInfo}
-                                    selected={this.previewBonusId === bonusInfo.id}/>
-                            ))
-                        }
-                    </Grid>
-                }
+                <Grid container alignItems='center'>
+                    <IconButton
+                        onClick={this.decrementYear}
+                        disabled={!bonuses || !bonuses.length}
+                        className={classes.iconButton}>
+                        <ArrowLeft fontSize='small' />
+                    </IconButton>
+                    {
+                        bonuses && bonuses.map(bonusInfo => (
+                            <TabItem
+                                key={bonusInfo.id}
+                                bonus={bonusInfo}
+                                selected={this.previewBonusId === bonusInfo.id}
+                            />
+                        ))
+                    }
+                    <IconButton
+                        disabled={bonusesYear >= this.currentYear}
+                        onClick={this.incrementYear}
+                        className={classes.iconButton}>
+                        <ArrowRight fontSize='small' />
+                    </IconButton>
+                </Grid>
+
                 {
                     (this.isBonusDataLoading || this.isBonusesLoading) &&
                     <LinearProgress />
