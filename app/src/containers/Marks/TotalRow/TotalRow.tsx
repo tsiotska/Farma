@@ -1,16 +1,29 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, TableRow, TableCell } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    TableRow,
+    TableCell,
+    Grid,
+    Divider
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
+import { IAgentInfo, IMark } from '../../../interfaces/IBonusInfo';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
-        position: ({ position }: any) => position || 'initial',
-        bottom: 0
+        height: 48
     },
     firstColumn: {
+        width: ({ position, showLpu }: any) => position === 'fixed'
+        ? showLpu
+            ? 340
+            : 290
+        : 'auto',
     },
     column: {
         width: 70
@@ -18,7 +31,14 @@ const styles = (theme: any) => createStyles({
     cell: {
         verticalAlign: 'center',
         border: 'none',
-        textAlign: 'center'
+        textAlign: 'center',
+        '&:first-of-type': {
+            textAlign: 'left'
+        }
+    },
+    divider: {
+        minWidth: 30,
+        width: '50%'
     }
 });
 
@@ -26,6 +46,7 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: IMedicine[];
     position: 'initial' | 'fixed';
     showLpu: boolean;
+    agents: IAgentInfo[];
 }
 
 @inject(({
@@ -39,26 +60,175 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class TotalRow extends Component<IProps> {
+    @computed
+    get flattenMedsInfo(): IMark[] {
+        const { agents } = this.props;
+        return agents.reduce((acc, curr) => {
+            const { marks } = curr;
+            return [...acc, ...marks.values()];
+        }, []);
+    }
+
+    @computed
+    get summedMeds(): {[key: number]: { payments: number, deposit: number }} {
+        return this.flattenMedsInfo.reduce((acc, curr) => {
+            const { drugId, deposit, mark, payments } = curr;
+
+            if (drugId in acc) {
+                acc[drugId].payments += payments * mark;
+                acc[drugId].deposit += deposit * mark;
+            } else {
+                acc[drugId] = {
+                    payments: payments * mark,
+                    deposit: deposit * mark,
+                };
+            }
+
+            return acc;
+        }, {});
+    }
+
+    @computed
+    get summedPacks(): { payments: number, deposit: number } {
+        return this.flattenMedsInfo.reduce((acc, curr) => {
+            const { deposit, payments } = curr;
+            acc.payments += payments;
+            acc.deposit += deposit;
+            return acc;
+        }, {
+            payments: 0,
+            deposit: 0
+        });
+    }
+
+    @computed
+    get summedTotal(): { payments: number, deposit: number } {
+        return this.flattenMedsInfo.reduce((acc, curr) => {
+            const { deposit, payments, mark } = curr;
+            acc.payments += payments * mark;
+            acc.deposit += deposit * mark;
+            return acc;
+        }, {
+            payments: 0,
+            deposit: 0
+        });
+    }
+
+    @computed
+    get summedBonuses(): { payments: number, deposit: number } {
+        return this.props.agents.reduce((acc, curr) => {
+            const { lastDeposit, lastPayment } = curr;
+
+            acc.payments += lastPayment;
+            acc.deposit += lastDeposit;
+
+            return acc;
+        }, {
+            payments: 0,
+            deposit: 0
+        });
+    }
+
     render() {
-        const {classes, meds, showLpu} = this.props;
+        const {classes, meds, position, showLpu} = this.props;
+
+        const colSpan = position === 'fixed'
+        ? 1
+        : showLpu
+            ? 2
+            : 1;
 
         return (
             <TableRow className={classes.root}>
                 <TableCell
-                    colSpan={showLpu ? 2 : 1}
+                    align='center'
+                    padding='none'
+                    colSpan={colSpan}
                     className={cx(classes.cell, classes.firstColumn)}>
-                    hello
+                    В сумі
                 </TableCell>
                 {
-                    meds.map(x => (
-                        <TableCell key={x.id} className={classes.cell}>
-                            { x.id }
-                        </TableCell>
-                    ))
+                    meds.map(x => {
+                        const data = this.summedMeds[x.id];
+                        const deposit = data
+                            ? data.deposit
+                            : 0;
+                        const payments = data
+                            ? data.payments
+                            : 0;
+                        return (
+                            <TableCell
+                                key={x.id}
+                                align='center'
+                                padding='none'
+                                className={classes.cell}>
+                                    <Grid
+                                        alignItems='center'
+                                        direction='column'
+                                        container>
+                                        <span>
+                                            { payments }
+                                        </span>
+                                        <Divider className={classes.divider} />
+                                        <span>
+                                            { deposit }
+                                        </span>
+                                    </Grid>
+                            </TableCell>
+                        );
+                    })
                 }
-                <TableCell className={cx(classes.cell, classes.column)}>1</TableCell>
-                <TableCell className={cx(classes.cell, classes.column)}>1</TableCell>
-                <TableCell className={cx(classes.cell, classes.column)}>1</TableCell>
+                <TableCell
+                    className={cx(classes.cell, classes.column)}
+                    align='center'
+                    padding='none'>
+                    <Grid
+                        alignItems='center'
+                        direction='column'
+                        container>
+                        <span>
+                            { this.summedPacks.payments }
+                        </span>
+                        <Divider className={classes.divider} />
+                        <span>
+                            { this.summedPacks.deposit }
+                        </span>
+                    </Grid>
+                </TableCell>
+                <TableCell
+                    className={cx(classes.cell, classes.column)}
+                    align='center'
+                    padding='none'>
+                    <Grid
+                        alignItems='center'
+                        direction='column'
+                        container>
+                        <span>
+                            { this.summedBonuses.payments }
+                        </span>
+                        <Divider className={classes.divider} />
+                        <span>
+                            { this.summedBonuses.deposit }
+                        </span>
+                    </Grid>
+                </TableCell>
+                <TableCell
+                    className={cx(classes.cell, classes.column)}
+                    align='center'
+                    padding='none'>
+                    <Grid
+                        alignItems='center'
+                        direction='column'
+                        container>
+                        <span>
+                            { this.summedTotal.payments }
+                        </span>
+                        <Divider className={classes.divider} />
+                        <span>
+                            { this.summedTotal.deposit }
+                        </span>
+                    </Grid>
+                </TableCell>
             </TableRow>
         );
     }

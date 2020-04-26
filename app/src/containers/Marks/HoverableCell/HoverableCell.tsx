@@ -14,7 +14,6 @@ const styles = {
     cell: {},
     tooltip: {},
     divider: {},
-    span: {}
 };
 
 interface IProps extends WithStyles<typeof styles> {
@@ -45,7 +44,7 @@ class HoverableCell extends Component<IProps> {
                     direction='column'
                     alignItems='center'
                     container>
-                    <span className={classes.span}>
+                    <span>
                         {
                             mark
                             ? mark.payments
@@ -65,7 +64,7 @@ class HoverableCell extends Component<IProps> {
                         classes={{ tooltip: classes.tooltip }}>
                         <Divider className={classes.divider} />
                     </Tooltip>
-                    <span className={classes.span}>
+                    <span>
                         {
                             mark
                             ? mark.deposit

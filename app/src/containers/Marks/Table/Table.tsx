@@ -6,7 +6,8 @@ import {
     TableBody,
     Table as MuiTable,
     TableCell,
-    TableRow as MuiTableRow } from '@material-ui/core';
+    TableRow as MuiTableRow,
+    Paper} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
@@ -47,7 +48,15 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class Table extends Component<IProps> {
     readonly totalRowHeight: number = 48;
-    @observable totalRowPosition: 'initial' | 'fixed' = null;
+    @observable totalRowPosition: 'initial' | 'fixed' = 'fixed';
+    @observable tableWidth: number = 0;
+    @observable leftOffset: number = 0;
+
+    @computed
+    get showTotalRow(): boolean {
+        const { agents } = this.props;
+        return !!agents.length;
+    }
 
     @computed
     get docsMap(): Map<number, IDoctor> {
@@ -85,7 +94,8 @@ class Table extends Component<IProps> {
         const lastIndex = agents.length - 1;
 
         return (
-            <TableContainer style={{ marginTop: 0 }}>
+            <>
+            <TableContainer>
                 <MuiTable padding='none'>
                     <TableBody>
                         {
@@ -99,7 +109,11 @@ class Table extends Component<IProps> {
                                         itemRef={
                                             (el: any) => {
                                                 if (!el || i !== lastIndex) return;
-                                                const lastItemBottom = el.getBoundingClientRect().bottom;
+                                                const lastItemRect = el.getBoundingClientRect();
+                                                this.tableWidth = lastItemRect.width + 40;
+                                                this.leftOffset = lastItemRect.left - 20;
+
+                                                const lastItemBottom = lastItemRect.bottom;
                                                 const availableHeight = window.innerHeight - lastItemBottom;
                                                 this.totalRowPosition = availableHeight > this.totalRowHeight
                                                     ? 'initial'
@@ -122,13 +136,41 @@ class Table extends Component<IProps> {
                                 );
                             })
                         }
-                        <TotalRow
-                            position={this.totalRowPosition}
-                            showLpu={showLpu}
-                        />
+                        {
+                            (this.showTotalRow && this.totalRowPosition === 'initial') &&
+                            <TotalRow
+                                agents={agents}
+                                position={this.totalRowPosition}
+                                showLpu={showLpu}
+                            />
+                        }
                     </TableBody>
                 </MuiTable>
             </TableContainer>
+            {
+                (this.showTotalRow && this.totalRowPosition === 'fixed') &&
+                <TableContainer
+                    component={Paper}
+                    style={{
+                        width: this.tableWidth,
+                        left: this.leftOffset,
+                        position: 'fixed',
+                        tableLayout: 'fixed',
+                        padding: '0 20px',
+                        bottom: 0,
+                    }}>
+                    <MuiTable padding='none'>
+                        <TableBody>
+                            <TotalRow
+                                position={this.totalRowPosition}
+                                agents={agents}
+                                showLpu={showLpu}
+                            />
+                        </TableBody>
+                    </MuiTable>
+                </TableContainer>
+            }
+            </>
         );
     }
 }

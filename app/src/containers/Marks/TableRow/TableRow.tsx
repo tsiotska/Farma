@@ -40,9 +40,6 @@ const styles = (theme: any) => createStyles({
     divider2: {
         backgroundColor: '#797979'
     },
-    span: {
-
-    },
     alignCenter: {
         textAlign: 'center'
     },
@@ -83,31 +80,6 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableRow extends Component<IProps> {
     @computed
-    get medsContent(): JSX.Element[] | JSX.Element {
-        const { classes, meds, tooltips, agent: { marks }} = this.props;
-
-        return meds.length
-        ? meds.map(({ id }) => {
-            const mark = marks.get(id);
-
-            return (
-                <HoverableCell
-                    key={id}
-                    mark={mark}
-                    tooltip={tooltips[id] || ''}
-                    classes={{
-                        cell: classes.cell,
-                        tooltip: classes.tooltip,
-                        divider: classes.divider,
-                        span: classes.span,
-                    }}
-                />
-            );
-          })
-        : <TableCell />;
-    }
-
-    @computed
     get packs(): [number, number] {
         const { meds, agent: { marks }} = this.props;
         return meds.length
@@ -140,6 +112,30 @@ class TableRow extends Component<IProps> {
                 return total;
               }, [0, 0])
             : [0, 0];
+    }
+
+    @computed
+    get medsContent(): JSX.Element[] | JSX.Element {
+        const { classes, meds, tooltips, agent: { marks }} = this.props;
+
+        return meds.length
+        ? meds.map(({ id }) => {
+            const mark = marks.get(id);
+
+            return (
+                <HoverableCell
+                    key={id}
+                    mark={mark}
+                    tooltip={tooltips[id] || ''}
+                    classes={{
+                        cell: classes.cell,
+                        tooltip: classes.tooltip,
+                        divider: classes.divider,
+                    }}
+                />
+            );
+          })
+        : <TableCell />;
     }
 
     render() {
@@ -180,11 +176,11 @@ class TableRow extends Component<IProps> {
                     padding='none'
                     className={cx(classes.cell, classes.column)}>
                     <Grid direction='column' alignItems='center' container>
-                        <span className={classes.span}>
+                        <span>
                             {this.packs[0]}
                         </span>
                         <Divider className={classes.divider} />
-                        <span className={classes.span}>
+                        <span>
                             {this.packs[1]}
                         </span>
                     </Grid>
@@ -194,9 +190,9 @@ class TableRow extends Component<IProps> {
                     padding='none'
                     className={cx(classes.cell, classes.column)}>
                     <Grid direction='column' alignItems='center' container>
-                        <span className={classes.span}>{lastPayment}</span>
+                        <span>{lastPayment}</span>
                         <Divider className={classes.divider} />
-                        <span className={classes.span}>{lastDeposit}</span>
+                        <span>{lastDeposit}</span>
                     </Grid>
                 </TableCell>
                 <TableCell
