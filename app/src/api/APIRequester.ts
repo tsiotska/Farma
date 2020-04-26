@@ -407,4 +407,10 @@ export class APIRequester {
         .then(salariesNormalizer)
         .catch(this.defaultErrorHandler());
     }
+
+    calculateSalaries(branchId: number, year: number, month: number): Promise<boolean> {
+        return this.instance.post(`/api/branch/${branchId}/salary?month=${month}&year=${year}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

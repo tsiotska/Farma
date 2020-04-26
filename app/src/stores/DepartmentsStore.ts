@@ -152,6 +152,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async calculateSalaries(year: number, month: number) {
+        const { api } = this.rootStore;
+
+        await api.calculateSalaries(this.currentDepartmentId, year, month);
+
+        this.loadSalaries(year, month);
+    }
+
+    @action.bound
     async loadSalaries(year: number, month: number) {
         const { api } = this.rootStore;
         this.salaries = await this.dispatchRequest(
@@ -162,6 +171,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ),
             'loadSalaries'
         );
+        console.log(toJS(this.salaries));
+        return this.salaries && this.salaries.length;
     }
 
     @action.bound
