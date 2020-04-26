@@ -368,4 +368,16 @@ export class APIRequester {
             .catch(this.defaultErrorHandler())
         : null;
     }
+
+    updateBonusesData(
+        depId: number,
+        userId: number,
+        year: number,
+        month: number,
+        data: any
+    ): Promise<boolean> {
+        return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}`, data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

@@ -48,7 +48,8 @@ interface IProps extends WithStyles<typeof styles> {
     role?: USER_ROLE;
     loadDoctors?: () => void;
     bonusesYear?: number;
-    setBonusesYear?: (value: number) => void;
+    setBonusesYear?: (value: number, shouldPostData: boolean) => void;
+    updateBonuses?: () => void;
 }
 
 @inject(({
@@ -60,7 +61,9 @@ interface IProps extends WithStyles<typeof styles> {
             previewBonus,
             role,
             bonusesYear,
-            setBonusesYear
+            setBonusesYear,
+            updateBonuses
+
         },
         departmentsStore: {
             loadLocationsAgents,
@@ -76,7 +79,8 @@ interface IProps extends WithStyles<typeof styles> {
     loadDoctors,
     role,
     bonusesYear,
-    setBonusesYear
+    setBonusesYear,
+    updateBonuses
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -159,13 +163,13 @@ class Marks extends Component<IProps> {
     }
 
     incrementYear = () => {
-        const { setBonusesYear, bonusesYear } = this.props;
-        setBonusesYear(bonusesYear + 1);
+        const { setBonusesYear, bonusesYear, role } = this.props;
+        setBonusesYear(bonusesYear + 1, role === USER_ROLE.MEDICAL_AGENT);
     }
 
     decrementYear = () => {
-        const { setBonusesYear, bonusesYear } = this.props;
-        setBonusesYear(bonusesYear - 1);
+        const { setBonusesYear, bonusesYear, role } = this.props;
+        setBonusesYear(bonusesYear - 1, role === USER_ROLE.MEDICAL_AGENT);
     }
 
     componentDidUpdate({ role: prevRole }: IProps) {
@@ -190,8 +194,14 @@ class Marks extends Component<IProps> {
         }
     }
 
+    componentWillUnmount() {
+        const { updateBonuses, role, setBonusesYear } = this.props;
+        if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
+        setBonusesYear(new Date().getFullYear(), role === USER_ROLE.MEDICAL_AGENT);
+    }
+
     render() {
-        const { bonuses, classes, bonusesYear } = this.props;
+        const { bonuses, classes, bonusesYear, updateBonuses } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -236,7 +246,7 @@ class Marks extends Component<IProps> {
                         </IconButton>
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
-                        <TransferBlock />
+                        <TransferBlock updateBonuses={updateBonuses} />
                         <Button>
                             Додати лікаря
                         </Button>

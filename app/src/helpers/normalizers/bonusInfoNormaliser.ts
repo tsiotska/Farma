@@ -65,9 +65,7 @@ export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayN
     bonusInfoValuesMap,
     {
         requiredProps: [ 'id', 'month', 'payments', 'deposit' ],
-        valueNormalizers: {
-            status: (value: number) => !!value
-        }
+        valueNormalizers: { status: (value: number) => !!value }
     }
 );
 
@@ -98,17 +96,6 @@ export const bonusesDataNormalizer = ({
         agentsValuesMap,
         { requiredProps: [ 'id', 'last_payments', 'last_deposit' ] }
     ).map(agent => {
-    // const normalizedAgents = [{
-    //     id: 4,
-    //     lastPayment: 3,
-    //     lastDeposit: 5,
-    //     marks: new Map(),
-    // }, {
-    //     id: 5,
-    //     lastPayment: 3,
-    //     lastDeposit: 5,
-    //     marks: new Map(),
-    // }].map(agent => {
         const agentMarks = groupedMarks[agent.id];
 
         if (agentMarks) {

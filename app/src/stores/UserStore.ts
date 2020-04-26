@@ -77,6 +77,55 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    updateBonuses() {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        const id = this.previewUser
+        ? this.previewUser.id
+        : null;
+
+        if (!this.previewBonus || id === null || currentDepartmentId === null) return;
+
+        const { month, agents } = this.previewBonus;
+
+        const marks = agents.reduce((acc, curr) => {
+            const { marks: agentMarks, id: agent } = curr;
+            const preparedMarks = [...agentMarks.values()].map(({
+                deposit,
+                drugId,
+                mark,
+                payments
+            }) => ({
+                agent,
+                drug: drugId,
+                payments: payments,
+                deposit: deposit,
+                drug_mark: mark,
+            }));
+            return [...acc, ...preparedMarks];
+        }, []);
+
+        if (!marks.length) return;
+
+        const data: any = {
+            marks,
+            deposit: this.previewBonusTotal.packs.deposit,
+            payments: this.previewBonusTotal.packs.payments
+        };
+
+        this.dispatchRequest(
+            api.updateBonusesData(
+                currentDepartmentId,
+                id,
+                this.bonusesYear,
+                month,
+                data
+            ),
+            'updateBonuses'
+        );
+    }
+
+    @action.bound
     previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
         const { marks } = agent;
 
@@ -95,7 +144,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    setBonusesYear(value: number) {
+    setBonusesYear(value: number, shouldPostData: boolean) {
+        if (shouldPostData) this.updateBonuses();
         this.bonusesYear = value;
         this.clearPreviewBonusTotal();
         this.loadBonuses();
