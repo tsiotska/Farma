@@ -12,6 +12,7 @@ import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { INotification } from '../interfaces/iNotification';
 import uniq from 'lodash/uniq';
+import format from 'date-fns/format';
 
 export interface IMarkFraction {
     payments: number;
@@ -77,7 +78,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    loadBonusesExcel() {
+    loadBonusesExcel(name: string, mode: 'payment' | 'deposit') {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         const month = this.previewBonus
@@ -88,21 +89,43 @@ export default class UserStore extends AsyncStore implements IUserStore {
         ? this.previewUser.id
         : null;
 
-        if (month === null || userId === null) return;
-
-        const urlParams = `?year=${this.bonusesYear}&month=${month}&excel=1`;
-
-        const urls: { [key: number]: string } = {
-            [USER_ROLE.FIELD_FORCE_MANAGER]: `/api/branch/${currentDepartmentId}/ffm/mark${urlParams}`,
-            [USER_ROLE.REGIONAL_MANAGER]: `/api/branch/${currentDepartmentId}/rm/${userId}/mark${urlParams}`,
-            [USER_ROLE.MEDICAL_AGENT]: `/api/branch/${currentDepartmentId}/mp/${userId}/mark${urlParams}`,
+        const urls: any = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: {
+                payment: `/api/branch/${currentDepartmentId}/ffm/payment`,
+                deposit: `/api/branch/${currentDepartmentId}/ffm/deposit`
+            },
+            [USER_ROLE.REGIONAL_MANAGER]: {
+                payment: `api/branch/${currentDepartmentId}/rm/${userId}/payment`,
+                deposit: `api/branch/${currentDepartmentId}/rm/${userId}/deposit`
+            },
         };
 
-        const url = urls[this.role];
+        // received months starts from 1, not from 0 like in javascript
+        const monthFrom = month === 0
+            ? 11
+            : month - 1;
 
-        if (!url) return;
+        const dateFrom = new Date(this.bonusesYear, monthFrom);
 
-        api.getExcel(url);
+        const yearTo = month === 12
+        ? this.bonusesYear + 1
+        : this.bonusesYear;
+
+        const monthTo = month === 12
+            ? 0
+            : month;
+
+        const dateTo = new Date(yearTo, monthTo);
+
+        const apiDateMask: string = 'yyyy-MM-dd';
+
+        const url = urls[this.role]
+        ? `${urls[this.role][mode]}?from=${format(dateFrom, apiDateMask)}&to=${format(dateTo, apiDateMask)}`
+        : null;
+        console.log('hi: ', mode);
+        if (month === null || userId === null || !url) return;
+
+        api.getExcel(url, name.trim());
     }
 
     @action.bound

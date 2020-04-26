@@ -22,6 +22,7 @@ import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';
+import ExcelLoadPopper from './ExcelLoadPoppper';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -50,7 +51,6 @@ interface IProps extends WithStyles<typeof styles> {
     bonusesYear?: number;
     setBonusesYear?: (value: number, shouldPostData: boolean) => void;
     updateBonuses?: () => void;
-    loadBonusesExcel?: () => void;
 }
 
 @inject(({
@@ -64,7 +64,6 @@ interface IProps extends WithStyles<typeof styles> {
             bonusesYear,
             setBonusesYear,
             updateBonuses,
-            loadBonusesExcel
 
         },
         departmentsStore: {
@@ -83,12 +82,12 @@ interface IProps extends WithStyles<typeof styles> {
     bonusesYear,
     setBonusesYear,
     updateBonuses,
-    loadBonusesExcel
 }))
 @observer
 class Marks extends Component<IProps> {
     readonly currentYear = new Date().getFullYear();
 
+    @observable excelPopperAnchor: HTMLElement = null;
     @observable changedAgents: IAgentInfo[] = [];
 
     @computed
@@ -175,6 +174,14 @@ class Marks extends Component<IProps> {
         setBonusesYear(bonusesYear - 1, role === USER_ROLE.MEDICAL_AGENT);
     }
 
+    openExcelPopper = ({ target }: any) => {
+        this.excelPopperAnchor = target;
+    }
+
+    closeExcelPopper = () => {
+        this.excelPopperAnchor = null;
+    }
+
     componentDidUpdate({ role: prevRole }: IProps) {
         const { role: currentRole, loadDoctors, loadLocationsAgents } = this.props;
 
@@ -209,7 +216,7 @@ class Marks extends Component<IProps> {
                 classes,
                 bonusesYear,
                 updateBonuses,
-                loadBonusesExcel
+                role
             } = this.props;
 
         return (
@@ -250,9 +257,22 @@ class Marks extends Component<IProps> {
                         <Typography variant='h5'>
                             Виплати { this.monthName && ` за ${this.monthName}` }
                         </Typography>
-                        <IconButton onClick={loadBonusesExcel}>
-                            <ExcelIcon />
-                        </IconButton>
+                        {
+                            role !== USER_ROLE.MEDICAL_AGENT &&
+                            <>
+                            <IconButton onClick={
+                                this.excelPopperAnchor
+                                    ? this.closeExcelPopper
+                                    : this.openExcelPopper
+                                }>
+                                <ExcelIcon />
+                            </IconButton>
+                            <ExcelLoadPopper
+                                anchor={this.excelPopperAnchor}
+                                closeHandler={this.closeExcelPopper}
+                            />
+                            </>
+                        }
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
                         <TransferBlock updateBonuses={updateBonuses} />

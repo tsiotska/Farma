@@ -235,7 +235,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getExcel(url: string): Promise<any> {
+    getExcel(url: string, customFileName?: string): Promise<any> {
+        const defaultFileName = 'file.xlsx';
         return this.instance.get(url, { responseType: 'blob' })
         .then(({ headers, data }) => {
             const headerValue = headers['content-disposition'];
@@ -247,9 +248,11 @@ export class APIRequester {
             link.href = fileUrl;
             link.setAttribute(
                 'download',
-                (fileName && fileName.match(/.xlsx$/))
+                customFileName || (
+                    (fileName && fileName.match(/.xlsx$/))
                     ? fileName
-                    : 'file.xlsx'
+                    : defaultFileName
+                )
             );
             document.body.appendChild(link);
             link.click();
