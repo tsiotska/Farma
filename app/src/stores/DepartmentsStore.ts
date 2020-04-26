@@ -13,6 +13,22 @@ import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IDoctor } from '../interfaces/IDoctor';
+import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
+
+export enum SORT_ORDER {
+    ASCENDING, // a-z
+    DESCENDING // z-a
+}
+
+export interface ISortBy {
+    order: SORT_ORDER;
+    propName: SortableProps;
+}
+
+export interface IFilterBy {
+    propName: SortableProps;
+    value: string;
+}
 
 export interface IExpandedWorker {
     id: number;
@@ -40,6 +56,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable pharmacies: ILPU[] = null;
     @observable pharmacyDemand: boolean = false;
     @observable loadedPharmacyUrl: string = null;
+
+    @observable LpuSortSettings: ISortBy = null;
+    @observable LpuFilterSettings: IFilterBy = null;
 
     @observable locationsAgents: Map<number, IUser> = new Map();
 
@@ -70,6 +89,40 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @computed
+    get sortedLpus(): ILPU[] {
+        if (!this.LpuSortSettings) return this.LPUs;
+        const { order, propName } = this.LpuSortSettings;
+
+        if (['name', 'oblast'].includes(propName)) {
+            const callback = order === SORT_ORDER.ASCENDING
+                // @ts-ignore
+                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
+                // @ts-ignore
+                 : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+            return this.LPUs.sort(callback);
+        } else {
+            return this.LPUs;
+        }
+    }
+
+    @computed
+    get sortedPharmacies(): ILPU[] {
+        if (!this.LpuSortSettings) return this.pharmacies;
+        const { order, propName } = this.LpuSortSettings;
+
+        if (['name', 'oblast'].includes(propName)) {
+            const callback = order === SORT_ORDER.ASCENDING
+                // @ts-ignore
+                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
+                // @ts-ignore
+                 : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+            return this.pharmacies.sort(callback);
+        } else {
+            return this.pharmacies;
+        }
+    }
+
+    @computed
     get currentDepartmentId(): number {
         return this.currentDepartment
         ? this.currentDepartment.id
@@ -91,6 +144,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map();
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+    }
+
+    @action.bound
+    sortLpuBy(propName: SortableProps, order: SORT_ORDER) {
+        this.LpuSortSettings = { propName, order };
+    }
+
+    @action.bound
+    clearLpuSorting() {
+        this.LpuSortSettings = null;
+    }
+
+    @action.bound
+    filterLpuBy(propName: SortableProps, value: string) {
+        this.LpuFilterSettings = { propName, value };
+    }
+
+    @action.bound
+    clearLpuFilters() {
+        this.LpuFilterSettings = null;
     }
 
     @action.bound

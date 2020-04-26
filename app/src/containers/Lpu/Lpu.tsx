@@ -58,7 +58,7 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             getAsyncStatus,
             loadLPUs,
-            LPUs,
+            sortedLpus: LPUs,
             currentDepartmentId,
             loadUnconfirmedLPUs,
             unconfirmedLPUs
@@ -105,6 +105,7 @@ class Lpu extends Component<IProps> {
     @computed
     get preparedLPUs(): ILPU[] {
         const { LPUs, itemsPerPage, currentPage } = this.props;
+        console.log('size: ', LPUs && LPUs.length);
         const begin = itemsPerPage * currentPage;
         return Array.isArray(LPUs)
         ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
@@ -143,7 +144,7 @@ class Lpu extends Component<IProps> {
             setCurrentPage,
             unconfirmedLPUs
         } = this.props;
-
+        console.log(toJS(this.preparedLPUs));
         return (
             <Grid direction='column' className={classes.root} container>
                 {
@@ -173,6 +174,7 @@ class Lpu extends Component<IProps> {
                     ? <LinearProgress />
                     : <HCFList data={this.preparedLPUs} showHeader />
                 }
+                {/* <HCFList data={this.preparedLPUs} showHeader /> */}
                 {
                     this.requestStatus.error &&
                     <>

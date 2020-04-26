@@ -10,7 +10,6 @@ import {
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import UncommitedPharmacies from './UncommitedPharmacies';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
@@ -59,7 +58,7 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             getAsyncStatus,
             loadPharmacies,
-            pharmacies,
+            sortedPharmacies: pharmacies,
             setPharmacyDemand,
             unconfirmedPharmacies,
             loadUnconfirmedPharmacies
@@ -144,7 +143,7 @@ class Pharmacy extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані аптеки
                         </Typography>
-                        <HCFList data={unconfirmedPharmacies} />
+                        <HCFList data={unconfirmedPharmacies} unconfirmed/>
                     </Grid>
                 }
                 {
