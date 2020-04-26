@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Select, MenuItem } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    Select,
+    MenuItem
+} from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { computed } from 'mobx';

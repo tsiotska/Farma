@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
 import { observable } from 'mobx';
+import ListHeader from './ListHeader';
 
 const styles = (theme: any) => createStyles({});
 
@@ -23,6 +24,7 @@ class Salary extends Component<IProps> {
         return (
             <Grid container direction='column'>
                 <Header year={this.year} changeYear={this.changeYear} />
+                <ListHeader />
             </Grid>
         );
     }
