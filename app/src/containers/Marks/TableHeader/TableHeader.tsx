@@ -67,8 +67,8 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        departmentsStore: {
-            currentDepartmentMeds: meds
+        userStore: {
+            filteredMeds: meds
         }
     }
 }) => ({
@@ -108,33 +108,33 @@ class TableHeader extends Component<IProps> {
                             </TableCell>
                             {
                                 meds.length
-                                ? meds.map(x => (
-                                    <TableCell
-                                        key={x.id}
-                                        padding='none'
-                                        className={classes.cell}>
-                                        <Grid
-                                            direction='column'
-                                            container>
-                                            <Typography className={classes.medItem}>
-                                                { x.name }
-                                            </Typography>
-                                            <Typography variant='subtitle1' className={classes.salesStat}>
-                                                <span className={classes.span}>
-                                                    { totalSold[x.id] || 0 }
-                                                </span>
-                                                <span>/</span>
-                                                <span className={classes.span}>
-                                                    {
-                                                        sales.has(x.id)
-                                                        ? sales.get(x.id).amount
-                                                        : '-'
-                                                    }
-                                                </span>
-                                            </Typography>
-                                        </Grid>
-                                    </TableCell>
-                                ))
+                                ? meds.map(x => {
+                                    const saleInfo = sales.get(x.id);
+
+                                    return (
+                                        <TableCell
+                                            key={x.id}
+                                            padding='none'
+                                            className={classes.cell}>
+                                            <Grid
+                                                direction='column'
+                                                container>
+                                                <Typography className={classes.medItem}>
+                                                    { x.name }
+                                                </Typography>
+                                                <Typography variant='subtitle1' className={classes.salesStat}>
+                                                    <span className={classes.span}>
+                                                        { totalSold[x.id] || 0 }
+                                                    </span>
+                                                    <span>/</span>
+                                                    <span className={classes.span}>
+                                                        { saleInfo ? saleInfo.amount : '-' }
+                                                    </span>
+                                                </Typography>
+                                            </Grid>
+                                        </TableCell>
+                                    );
+                                })
                                 : <TableCell />
                             }
                             <TableCell

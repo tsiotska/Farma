@@ -13,6 +13,7 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { INotification } from '../interfaces/iNotification';
 import uniq from 'lodash/uniq';
 import format from 'date-fns/format';
+import { IMedicine } from '../interfaces/IMedicine';
 
 export interface IMarkFraction {
     payments: number;
@@ -75,6 +76,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
         return this.previewUser
         ? this.previewUser.position
         : USER_ROLE.UNKNOWN;
+    }
+
+    @computed
+    get filteredMeds(): IMedicine[] {
+        const { departmentsStore: { currentDepartmentMeds }} = this.rootStore;
+        if (!this.previewBonus) return [];
+        const { sales } = this.previewBonus;
+        return currentDepartmentMeds.filter(x => sales.has(x.id));
     }
 
     @action.bound

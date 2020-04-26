@@ -75,8 +75,8 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        departmentsStore: {
-            currentDepartmentMeds: meds
+        userStore: {
+            filteredMeds: meds
         },
     }
 }) => ({

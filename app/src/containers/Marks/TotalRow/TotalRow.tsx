@@ -54,12 +54,10 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        departmentsStore: {
-            currentDepartmentMeds: meds
-        },
         userStore: {
             setPreviewBonusTotal,
-            clearPreviewBonusTotal
+            clearPreviewBonusTotal,
+            filteredMeds: meds
         }
     }
 }) => ({
