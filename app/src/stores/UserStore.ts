@@ -252,11 +252,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
         );
 
         if (this.bonuses && this.bonuses.length) {
-            const currentPreviewBonusId = this.previewBonus
-                ? this.previewBonus.id
+            const currentPreviewBonusMonth = this.previewBonus
+                ? this.previewBonus.month
                 : null;
-            const updatedBonus = currentPreviewBonusId
-                ? this.bonuses.find(({ id }) => id === currentPreviewBonusId)
+            const updatedBonus = currentPreviewBonusMonth
+                ? this.bonuses.find(({ month }) => month === currentPreviewBonusMonth)
                 : null;
             const itemToSet = updatedBonus || this.bonuses[this.bonuses.length - 1];
             this.setPreviewBonus(itemToSet);
@@ -271,7 +271,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         if (!currentDepartmentId || !this.previewUser) return;
 
-        const bonusId = this.previewBonus.id;
+        const bonusMonth = this.previewBonus.month;
 
         const request = api.getBonusesData(
             currentDepartmentId,
@@ -285,10 +285,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
             'loadBonusesData'
         );
 
-        const currentBonusId = this.previewBonus
-            ? this.previewBonus.id
+        const currentBonusMonth = this.previewBonus
+            ? this.previewBonus.month
             : null;
-        const isDataRelevant = currentBonusId === bonusId;
+        const isDataRelevant = currentBonusMonth === bonusMonth;
 
         if (!res || !isDataRelevant) return;
 

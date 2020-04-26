@@ -23,7 +23,6 @@ const defaultAgentInfo: IAgentInfo = {
 };
 
 const defaultBonusInfo: IBonusInfo = {
-    id: null,
     month: null,
     payments: null,
     deposit: null,
@@ -33,7 +32,6 @@ const defaultBonusInfo: IBonusInfo = {
 };
 
 const bonusInfoValuesMap: IValuesMap = {
-    id: 'id',
     month: 'month',
     payments: 'payments',
     deposit: 'deposit',
@@ -64,7 +62,7 @@ export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayN
     defaultBonusInfo,
     bonusInfoValuesMap,
     {
-        requiredProps: [ 'id', 'month', 'payments', 'deposit' ],
+        requiredProps: ['month', 'payments', 'deposit' ],
         valueNormalizers: { status: (value: number) => !!value }
     }
 );

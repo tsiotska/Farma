@@ -92,7 +92,10 @@ class Table extends Component<IProps> {
         const { agents, showLpu } = this.props;
 
         const lastIndex = agents.length - 1;
-
+        console.log(
+            'agents: ', toJS(agents),
+            'targetAgents: ', toJS(this.targetAgents)
+        );
         return (
             <>
             <TableContainer>

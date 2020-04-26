@@ -19,7 +19,6 @@ export interface IAgentInfo {
 }
 
 export interface IBonusInfo {
-    id: number;
     month: number;
     payments: number;
     deposit: number;

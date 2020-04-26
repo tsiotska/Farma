@@ -101,10 +101,10 @@ class Marks extends Component<IProps> {
     }
 
     @computed
-    get previewBonusId(): number {
+    get previewBonusMonth(): number {
         const { previewBonus } = this.props;
         return previewBonus
-            ? previewBonus.id
+            ? previewBonus.month
             : null;
     }
 
@@ -183,7 +183,7 @@ class Marks extends Component<IProps> {
     }
 
     componentDidUpdate({ role: prevRole }: IProps) {
-        const { role: currentRole, loadDoctors, loadLocationsAgents } = this.props;
+        const { role: currentRole, loadDoctors, loadLocationsAgents, loadBonuses } = this.props;
 
         if (prevRole === currentRole) return;
 
@@ -192,6 +192,7 @@ class Marks extends Component<IProps> {
         } else {
             loadLocationsAgents();
         }
+        loadBonuses();
     }
 
     componentDidMount() {
@@ -216,7 +217,7 @@ class Marks extends Component<IProps> {
                 classes,
                 bonusesYear,
                 updateBonuses,
-                role
+                role,
             } = this.props;
 
         return (
@@ -234,9 +235,9 @@ class Marks extends Component<IProps> {
                     {
                         bonuses && bonuses.map(bonusInfo => (
                             <TabItem
-                                key={bonusInfo.id}
+                                key={bonusInfo.month}
                                 bonus={bonusInfo}
-                                selected={this.previewBonusId === bonusInfo.id}
+                                selected={this.previewBonusMonth === bonusInfo.month}
                             />
                         ))
                     }
