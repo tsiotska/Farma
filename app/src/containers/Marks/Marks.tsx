@@ -166,7 +166,7 @@ class Marks extends Component<IProps> {
 
     incrementYear = () => {
         const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear + 1, role === USER_ROLE.MEDICAL_AGENT);
+        setBonusesYear(bonusesYear, role === USER_ROLE.MEDICAL_AGENT);
     }
 
     decrementYear = () => {

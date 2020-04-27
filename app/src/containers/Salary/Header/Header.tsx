@@ -57,7 +57,7 @@ class Header extends Component<IProps> {
     calculateClickHandler = async () => {
         const { year, month, calculateSalaries } = this.props;
         this.isSalaryCalculating = true;
-        await calculateSalaries(year + 1, month + 1);
+        await calculateSalaries(year, month + 1);
         this.isSalaryCalculating = false;
     }
 

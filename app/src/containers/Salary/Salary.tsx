@@ -20,6 +20,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents?: () => void;
     setExpandedSalary?: (salary: IUserSalary, year: number, month: number) => void;
     expandedSalary?: IUserSalary;
+    loadSubLocationAgents?: () => void;
 }
 
 @inject(({
@@ -31,7 +32,8 @@ interface IProps extends WithStyles<typeof styles> {
             salaries,
             loadLocationsAgents,
             setExpandedSalary,
-            expandedSalary
+            expandedSalary,
+            loadSubLocationAgents
         }
     }
 }) => ({
@@ -41,7 +43,8 @@ interface IProps extends WithStyles<typeof styles> {
     salaries,
     loadLocationsAgents,
     setExpandedSalary,
-    expandedSalary
+    expandedSalary,
+    loadSubLocationAgents
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -94,10 +97,11 @@ class Salary extends Component<IProps> {
         );
     }
 
-    componentDidMount() {
-        const { loadSalaries, loadLocationsAgents } = this.props;
+    async componentDidMount() {
+        const { loadSalaries, loadLocationsAgents, loadSubLocationAgents } = this.props;
         loadSalaries(this.year, this.month + 1);
-        loadLocationsAgents();
+        await loadLocationsAgents();
+        loadSubLocationAgents();
     }
 
     componentWillUnmount() {
