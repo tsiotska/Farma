@@ -413,4 +413,10 @@ export class APIRequester {
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
+
+    removeDrug(departmentId: number, drugId: number): Promise<boolean> {
+        return this.instance.delete(`/api/branch/${departmentId}/drug/${drugId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

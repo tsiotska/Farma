@@ -505,6 +505,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async removeMeds(medId: number) {
+        const { api } = this.rootStore;
+        const depId = this.currentDepartmentId;
+        if (!depId) return false;
+        const removed =  await api.removeDrug(depId, medId);
+        if (removed) {
+            const depMeds = this.meds.get(depId);
+            const med = depMeds
+            ? null
+            : depMeds.find(({ id }) => id === medId);
+
+            if (med) med.deleted = true;
+        }
+    }
+
+    @action.bound
     async loadAllMeds() {
         const requestName = 'loadAllMeds';
 
@@ -672,6 +688,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const createdFFM = await api.createFFM(createdDepartment.id, FFMData);
 
         if (createdFFM) initialReport.isFFMCreated = true;
+
+        const callback = createdDepartment && createdFFM
+            ? async () => {
+                await this.loadDepartments();
+                this.loadFFMs();
+            }
+            : null;
+        if (callback) callback();
+
         return initialReport;
     }
 

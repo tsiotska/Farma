@@ -1,7 +1,8 @@
+import { IUser } from './IUser';
+import { IPosition } from './IPosition';
+
 export interface IWithRestriction {
-    // farmPermissions?: Map<number, string[]>; // userStore
-    // companyPermissions?: Map<number, string[]>; // userStore
-    // currentFarm?: number; // farmsStore
-    // currentCompany?: number; // userStore
+    user?: IUser;
+    positions?: Map<number, IPosition>;
     isAllowed?: boolean; // prop passed from withRestriction decorator
 }

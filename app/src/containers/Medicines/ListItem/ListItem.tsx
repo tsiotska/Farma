@@ -85,15 +85,33 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     medicine: IMedicine;
+    allowEdit: boolean;
+    removeMeds?: (id: number) => void;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            removeMeds
+        }
+    }
+}) => ({
+    removeMeds
+}))
 @observer
 class ListItem extends Component<IProps> {
+    removeClickHandler = () => {
+        const { removeMeds, medicine: { id } } = this.props;
+        removeMeds(id);
+    }
+
     render() {
         const {
             classes,
-            medicine
+            medicine,
+            allowEdit
         } = this.props;
+
         const {
             name,
             barcode,
@@ -154,10 +172,13 @@ class ListItem extends Component<IProps> {
                 {
                     deleted === false &&
                     <>
-                        <IconButton className={classes.colorGreen}>
-                            <Edit fontSize='small' />
-                        </IconButton>
-                        <IconButton>
+                        {
+                            allowEdit &&
+                            <IconButton className={classes.colorGreen}>
+                                <Edit fontSize='small' />
+                            </IconButton>
+                        }
+                        <IconButton onClick={this.removeClickHandler}>
                             <Delete fontSize='small' />
                         </IconButton>
                     </>
@@ -165,7 +186,7 @@ class ListItem extends Component<IProps> {
 
             </Grid>
             {
-                deleted === true &&
+                deleted === true && allowEdit === true &&
                 <RestoreButton medicine={medicine} className={classes.restoreButton} />
             }
             </div>

@@ -11,6 +11,7 @@ import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import LoadingMask from '../../../components/LoadingMask';
 import Snackbar from '../../../components/Snackbar';
 import { emailValidator } from '../../../helpers/validators';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     subtitle: {
@@ -80,11 +81,13 @@ interface ISnackbarSettings {
 }))
 @observer
 class AddDepartmentModal extends Component<IProps> {
+    readonly requiredDepartmentProps: string[] = ['name'];
     readonly initialDepartmentData: IDepartmentData = {
         image: null,
         name: ''
     };
 
+    readonly requiredFfmData: string[] = [ 'name', 'email', 'password' ];
     readonly initialFfmData: IFFMData = {
         image: null,
         name: '',
@@ -98,6 +101,8 @@ class AddDepartmentModal extends Component<IProps> {
     readonly validators: Partial<Record<keyof IFFMData & IDepartmentData, any>> = {
         email: emailValidator,
         image: (value: File) => !!value,
+        phone: (value: string) => value && (value.length === 10 || value.length === 13),
+        card: (value: string) => value && (value.length === 13)
     };
 
     @observable departmentData: IDepartmentData = {...this.initialDepartmentData};
@@ -171,6 +176,7 @@ class AddDepartmentModal extends Component<IProps> {
             password: password,
             work_phone: workPhone,
             mobile_phone: mobilePhone,
+            position: USER_ROLE.FIELD_FORCE_MANAGER
         });
         ffmFormData.append('json', json);
 
@@ -209,14 +215,24 @@ class AddDepartmentModal extends Component<IProps> {
         this.invalidFFMFields.clear();
         Object.entries(this.ffmData).forEach(([ prop, value ]: [keyof IFFMData, any]) => {
             const validator = this.validators[prop] || this.defaultValueValidator;
-            const isValid = validator(value);
+            const isRequired = this.requiredFfmData.includes(prop);
+            const isValid = isRequired
+                ? validator(value)
+                : value
+                    ? validator(value)
+                    : true;
             if (!isValid) this.invalidFFMFields.add(prop);
         });
 
         this.invalidDepartmentFields.clear();
         Object.entries(this.departmentData).forEach(([ prop, value ]: [keyof IDepartmentData, any]) => {
             const validator = this.validators[prop] || this.defaultValueValidator;
-            const isValid = validator(value);
+            const isRequired = this.requiredDepartmentProps.includes(prop);
+            const isValid = isRequired
+                ? validator(value)
+                : value
+                    ? validator(value)
+                    : true;
             if (!isValid) this.invalidDepartmentFields.add(prop);
         });
 
