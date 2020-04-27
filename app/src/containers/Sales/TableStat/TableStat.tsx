@@ -88,7 +88,7 @@ class TableStat extends Component<IProps> {
             [GROUP_BY.LOCATION]: 'Регіони',
         },
         [USER_ROLE.MEDICAL_AGENT]: {
-            [GROUP_BY.LOCATION]: 'ЛПУ / Аптека',
+            [GROUP_BY.LOCATION]: 'Аптеки',
         }
     };
 

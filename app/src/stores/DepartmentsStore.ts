@@ -646,10 +646,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const data = [...permissionsMap.entries()]
             .map(([ id, permissions ]) => ({ permissions, id }));
 
-        return await this.dispatchRequest(
+        const res = await this.dispatchRequest(
             api.updatePermissions(data),
             requestName
         );
+
+        if (res) this.loadPositions();
+
+        return res;
     }
 
     @action.bound

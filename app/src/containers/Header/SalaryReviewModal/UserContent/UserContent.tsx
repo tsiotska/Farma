@@ -255,7 +255,7 @@ class UserContent extends Component<IProps> {
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={this.userMoneyDeficit}
-                    emptyPlaceholder=''
+                    // emptyPlaceholder=''
                 />
                 <SumRow
                     title='Зарплата по рейтингу'

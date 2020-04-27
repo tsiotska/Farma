@@ -609,9 +609,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
             const dataObject: any = {
                 drugs,
-                salary,
-                kpi,
-                add_costs: extraCosts,
+                salary: salary || 0,
+                kpi: kpi || 0,
+                add_costs: extraCosts || 0,
             };
 
             res[`${levelName}${num}`] = dataObject;
