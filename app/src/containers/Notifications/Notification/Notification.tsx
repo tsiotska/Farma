@@ -27,7 +27,8 @@ const styles = (theme: any) => createStyles({
     },
     subjectRow: {
         height: 48,
-        backgroundColor: '#fafbfc'
+        backgroundColor: '#fafbfc',
+        overflow: 'hidden'
     },
     icon: {
         width: 40,
@@ -86,8 +87,9 @@ class Notification extends Component<IProps> {
             <Paper className={classes.root}>
                 <Grid className={cx(classes.row, classes.titleRow)} alignItems='center' container>
                     {
-                        this.iconSrc &&
-                        <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon} />
+                        this.iconSrc
+                        ? <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon} />
+                        : <span className={classes.icon} />
                     }
                     <Divider className={classes.divider} orientation='vertical' />
                     <Grid xs={4} wrap='nowrap' alignItems='center' zeroMinWidth container item>

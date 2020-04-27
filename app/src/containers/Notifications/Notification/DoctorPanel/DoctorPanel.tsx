@@ -65,7 +65,7 @@ class DoctorPanel extends Component<IProps> {
 
         return (
             <>
-                <Grid xs container item>
+                <Grid xs wrap='nowrap' alignItems='center' container item>
                     <CommitBadge committed={FFMCommit} title='ФФМ' className={classes.badge} />
                     <CommitBadge committed={RMCommit} title='РМ' className={classes.badge} />
                     <Typography variant='body2'>
