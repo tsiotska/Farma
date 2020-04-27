@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { observable, computed, toJS } from 'mobx';
-import { ADD_MEDICINE_MODAL } from '../../../constants/Modals';
+import { ADD_MEDICINE_MODAL, MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 import Dialog from '../../../components/Dialog';
 import FormContent from '../FormContent';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
@@ -15,6 +15,7 @@ interface IProps {
     openModal?: (modalName: string) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     addMedicine?: (data: any) => boolean;
+    modalPayload?: any;
 }
 
 @inject(({
@@ -22,6 +23,7 @@ interface IProps {
         uiStore: {
             openedModal,
             openModal,
+            modalPayload
         },
         departmentsStore: {
             addMedicine,
@@ -32,7 +34,8 @@ interface IProps {
     openedModal,
     openModal,
     getAsyncStatus,
-    addMedicine
+    addMedicine,
+    modalPayload
 }))
 @observer
 class AddMedsModal extends Component<IProps> {
@@ -44,6 +47,12 @@ class AddMedsModal extends Component<IProps> {
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('addMedicine').loading;
+    }
+
+    @computed
+    get isOpen(): boolean {
+        const {openedModal} = this.props;
+        return openedModal === ADD_MEDICINE_MODAL || openedModal === MEDICINE_EDIT_MODAL;
     }
 
     appendImage = (image: File) => {
@@ -107,10 +116,10 @@ class AddMedsModal extends Component<IProps> {
     componentDidUpdate(prevProps: IProps) {
         if (!this.contentRef) return;
         const { openedModal: prevOpenedModal} = prevProps;
-        const { openedModal} = this.props;
+        const { openedModal, modalPayload } = this.props;
 
-        const wasOpen = prevOpenedModal === ADD_MEDICINE_MODAL;
-        const isOpen = openedModal === ADD_MEDICINE_MODAL;
+        const wasOpen = prevOpenedModal === ADD_MEDICINE_MODAL || prevOpenedModal === MEDICINE_EDIT_MODAL;
+        const isOpen = openedModal === ADD_MEDICINE_MODAL || openedModal === MEDICINE_EDIT_MODAL;
 
         const becomeClosed = wasOpen && !isOpen;
         const becomeOpen = !wasOpen && isOpen;
@@ -121,17 +130,21 @@ class AddMedsModal extends Component<IProps> {
             this.contentRef.removeEventListener();
         } else if (becomeOpen) {
             this.contentRef.addEventListener();
+            if (openedModal === MEDICINE_EDIT_MODAL) {
+                const { image } = modalPayload;
+                this.image = image;
+            }
         }
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { modalPayload } = this.props;
 
         return (
             <>
                 <Dialog
                     disablePortal
-                    open={openedModal === ADD_MEDICINE_MODAL}
+                    open={this.isOpen}
                     onClose={this.closeHandler}
                     maxWidth='md'
                     title='Додати препарат'>

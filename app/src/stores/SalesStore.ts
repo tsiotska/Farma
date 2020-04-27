@@ -124,7 +124,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     resetStore() {
-        this.dateTo = endOfMonth(subMonths(new Date(), 1));
+        // this.dateTo = endOfMonth(subMonths(new Date(), 1));
+
+        this.dateTo = new Date();
 
         const fromYear = this.dateTo.getMonth() === 0
         ? this.dateTo.getFullYear() - 1

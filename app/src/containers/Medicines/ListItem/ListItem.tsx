@@ -16,6 +16,7 @@ import ImageLoader from '../../../components/ImageLoader';
 import Config from '../../../../Config';
 import RestoreButton from '../RestoreButton';
 import cx from 'classnames';
+import { MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     wrapper: {
@@ -87,22 +88,32 @@ interface IProps extends WithStyles<typeof styles> {
     medicine: IMedicine;
     allowEdit: boolean;
     removeMeds?: (id: number) => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             removeMeds
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
-    removeMeds
+    removeMeds,
+    openModal
 }))
 @observer
 class ListItem extends Component<IProps> {
     removeClickHandler = () => {
         const { removeMeds, medicine: { id } } = this.props;
         removeMeds(id);
+    }
+
+    editClickHandler = () => {
+        const { openModal, medicine } = this.props;
+        openModal(MEDICINE_EDIT_MODAL, medicine);
     }
 
     render() {
@@ -174,7 +185,7 @@ class ListItem extends Component<IProps> {
                     <>
                         {
                             allowEdit &&
-                            <IconButton className={classes.colorGreen}>
+                            <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
                                 <Edit fontSize='small' />
                             </IconButton>
                         }

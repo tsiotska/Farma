@@ -4,19 +4,27 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { useDropzone } from 'react-dropzone';
 import cx from 'classnames';
+import Config from '../../../Config';
 
 const styles = (theme: any) => createStyles({
     dropzone: {},
     input: {},
     background: {
-        background: ({ file }: any) => file
-        ? `url(${URL.createObjectURL(file)}) center / cover no-repeat`
-        : 'transparent',
+        background: ({ file }: any) => {
+            if (!file) return 'transparent';
+            return typeof file === 'string'
+                ? `url(${Config.ASSETS_URL}/${file}) center / cover no-repeat`
+                : `url(${URL.createObjectURL(file)}) center / cover no-repeat`;
+        }
+            // if (typeof file === 'string')
+        //     file
+        // ? `url(${URL.createObjectURL(file)}) center / cover no-repeat`
+        // : 'transparent',
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    file: File;
+    file: string | File;
     appendFile: (file: File) => void;
     children?: (isHovered: boolean, isDragActive: boolean, openHandler: () => void) => any;
 }
