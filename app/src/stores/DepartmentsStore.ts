@@ -195,6 +195,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadSalariesExcel(year: number, month: number) {
+        const { api } = this.rootStore;
+        api.getExcel(`/api/branch/${this.currentDepartmentId}/ffm/salary?year=${year}&month=${month + 1}&excel=1`);
+    }
+
+    @action.bound
     clearSalaries() {
         this.salaries = null;
         this.expandedSalary = null;

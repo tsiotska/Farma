@@ -52,9 +52,6 @@ const styles = (theme: any) => createStyles({
     summaryRoot: {
         padding: 0,
         minHeight: '48px !important',
-        // border: ({ worker: { isVacancy }}: any) => isVacancy
-        //     ? '1px solid #f3ca47'
-        //     : '1px solid transparent',
     },
     gridItem: {
         overflow: 'hidden',
@@ -92,6 +89,9 @@ const styles = (theme: any) => createStyles({
         fontSize: '14px',
         fontFamily: 'Source Sans Pro',
         color: theme.palette.primary.gray.mainLight
+    },
+    emptyPlaceholder: {
+        marginTop: 10
     }
 });
 
@@ -144,21 +144,10 @@ class ListItem extends Component<IProps> {
                 kpi,
                 money,
                 total,
-                // subSalaries,
+                subSalaries,
             },
         } = this.props;
-        const subSalaries: IUserSalary[] = [{
-            bonus: 3608.66,
-            extraCosts: 0,
-            id: 4,
-            kpi: 0,
-            level: 1,
-            money: 89223.8,
-            position: 3,
-            salary: 0,
-            total: 3608.66,
-            subSalaries: []
-        }];
+
         return (
             <ExpansionPanel
                 onChange={this.expandChangeHandler}
@@ -240,7 +229,7 @@ class ListItem extends Component<IProps> {
                             ))
                             : this.isLoading
                                 ? <LinearProgress />
-                                : <Typography>
+                                : <Typography variant='body2' className={classes.emptyPlaceholder}>
                                     Список МП пустий
                                 </Typography>
 

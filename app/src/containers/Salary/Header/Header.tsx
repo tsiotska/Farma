@@ -31,20 +31,28 @@ interface IProps extends WithStyles<typeof styles> {
     changeYear: (value: number) => void;
     changeMonth: (value: number) => void;
     calculateSalaries?: (year: number, month: number) => void;
+    loadSalariesExcel?: (year: number, month: number) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
-            calculateSalaries
+            calculateSalaries,
+            loadSalariesExcel
         }
     }
 }) => ({
-    calculateSalaries
+    calculateSalaries,
+    loadSalariesExcel
 }))
 @observer
 class Header extends Component<IProps> {
     @observable isSalaryCalculating: boolean = false;
+
+    excelClickHandler = () => {
+        const { loadSalariesExcel, year, month } = this.props;
+        loadSalariesExcel(year, month);
+    }
 
     calculateClickHandler = async () => {
         const { year, month, calculateSalaries } = this.props;
@@ -86,7 +94,7 @@ class Header extends Component<IProps> {
                             }
                     </Button>
                 }
-                <IconButton className={classes.iconButton}>
+                <IconButton onClick={this.excelClickHandler} className={classes.iconButton}>
                     <ExcelIcon />
                 </IconButton>
             </Grid>
