@@ -155,6 +155,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async calculateSalaries(year: number, month: number) {
         const { api } = this.rootStore;
 
+        await when(() => !!this.currentDepartmentId);
+
         await api.calculateSalaries(this.currentDepartmentId, year, month);
 
         this.loadSalaries(year, month);
@@ -163,6 +165,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadSalaries(year: number, month: number) {
         const { api } = this.rootStore;
+
+        await when(() => !!this.currentDepartmentId);
+
         this.salaries = await this.dispatchRequest(
             api.getRMsSalaries(
                 this.currentDepartmentId,
@@ -171,7 +176,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ),
             'loadSalaries'
         );
-        console.log(toJS(this.salaries));
+
         return this.salaries && this.salaries.length;
     }
 
@@ -182,6 +187,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.expandedSalary = salary;
 
         if (salary === null) return;
+
+        await when(() => !!this.currentDepartmentId);
 
         salary.subSalaries = await this.dispatchRequest(
             api.getMPsSalaries(
