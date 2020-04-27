@@ -122,7 +122,7 @@ class DoctorListItem extends Component<IProps> {
                           </Button>
                         : <>
                             <Typography className={cx(classes.deposit, classes.text)}>
-                                { deposit }
+                                { deposit || 0 }
                             </Typography>
                             <IconButton>
                                 <Edit className={classes.editIcon} fontSize='small' />

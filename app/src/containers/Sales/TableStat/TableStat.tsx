@@ -134,7 +134,7 @@ class TableStat extends Component<IProps> {
             : null;
 
             const userRegion = regions.get(region);
-            console.log('user region: ', toJS(userRegion), toJS(previewUser));
+
             return userRegion
             ? `${userRegion.name} регіон`
             : '';

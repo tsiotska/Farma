@@ -4,8 +4,9 @@ import { observer, inject } from 'mobx-react';
 import { USER_ROLE } from '../../constants/Roles';
 import Level from '../ProfilePreview/Level';
 import { IUser } from '../../interfaces';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import { IPosition } from '../../interfaces/IPosition';
+import Config from '../../../Config';
 
 const styles = createStyles({
     avatar: {
@@ -46,7 +47,7 @@ class UserShortInfo extends Component<IProps> {
         if (!user) return {};
 
         return user.avatar
-        ? { src: user.avatar }
+        ? { src: `${Config.ASSETS_URL}/${user.avatar}` }
         : { children: this.userName[0] };
     }
 
@@ -83,7 +84,7 @@ class UserShortInfo extends Component<IProps> {
     }
 
     render() {
-        const { classes, user, disableClick, hideLevel } = this.props;
+        const { classes, user, disableClick } = this.props;
 
         return (
             <>

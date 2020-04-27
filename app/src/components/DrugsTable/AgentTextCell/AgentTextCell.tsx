@@ -72,7 +72,7 @@ class AgentTextCell extends Component<IProps> {
     }
 
     render() {
-        const { classes, isIgnored } = this.props;
+        const { classes, isIgnored, label } = this.props;
 
         return (
             <FormControlLabel
