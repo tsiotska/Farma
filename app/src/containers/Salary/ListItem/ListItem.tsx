@@ -212,7 +212,7 @@ class ListItem extends Component<IProps> {
                     position === 'РМ' &&
                     <ExpansionPanelDetails className={classes.details}>
                         <Typography>
-                            Медицинські представники
+                            Медичні представники
                         </Typography>
                         {
                             (subSalaries && subSalaries.length)

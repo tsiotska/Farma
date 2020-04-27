@@ -32,6 +32,8 @@ import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
+import { ISpecialty } from '../interfaces/ISpecialty';
+import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -418,5 +420,11 @@ export class APIRequester {
         return this.instance.delete(`/api/branch/${departmentId}/drug/${drugId}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
+    }
+
+    getSpecialties(): Promise<ISpecialty[]> {
+        return this.instance.get('/api/agent/speciality')
+            .then(specialtyNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 }

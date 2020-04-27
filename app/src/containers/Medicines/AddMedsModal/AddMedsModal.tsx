@@ -138,8 +138,6 @@ class AddMedsModal extends Component<IProps> {
     }
 
     render() {
-        const { modalPayload } = this.props;
-
         return (
             <>
                 <Dialog

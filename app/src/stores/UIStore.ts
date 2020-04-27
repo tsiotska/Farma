@@ -21,6 +21,7 @@ export class UIStore implements IUIStore {
     @action.bound
     openModal(modalName: string, payload: any = null) {
         this.openedModal = modalName;
+        // console.log('open modal: ', modalName);
         this.modalPayload = modalName === null
         ? null
         : payload;

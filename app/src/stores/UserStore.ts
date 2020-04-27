@@ -237,7 +237,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const shouldLoadData = bonusInfo !== this.previewBonus;
         this.previewBonus = bonusInfo;
         if (shouldLoadData && !!this.previewBonus) {
-            console.log('should load adta');
             this.loadBonusesData();
         }
     }

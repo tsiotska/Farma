@@ -105,7 +105,6 @@ class Lpu extends Component<IProps> {
     @computed
     get preparedLPUs(): ILPU[] {
         const { LPUs, itemsPerPage, currentPage } = this.props;
-        console.log('size: ', LPUs && LPUs.length);
         const begin = itemsPerPage * currentPage;
         return Array.isArray(LPUs)
         ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
@@ -121,9 +120,10 @@ class Lpu extends Component<IProps> {
     }
 
     componentDidMount() {
-        const { loading, success } = this.requestStatus;
-        const shouldLoadLPUs = loading === false && success === false;
-        if (shouldLoadLPUs) this.loadData();
+        // const { loading, success } = this.requestStatus;
+        // const shouldLoadLPUs = loading === false && success === false;
+        // if (shouldLoadLPUs) this.loadData();
+        this.loadData();
     }
 
     componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
@@ -144,7 +144,7 @@ class Lpu extends Component<IProps> {
             setCurrentPage,
             unconfirmedLPUs
         } = this.props;
-        console.log(toJS(this.preparedLPUs));
+
         return (
             <Grid direction='column' className={classes.root} container>
                 {

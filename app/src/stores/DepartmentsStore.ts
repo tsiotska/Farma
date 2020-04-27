@@ -15,6 +15,7 @@ import { PERMISSIONS } from '../constants/Permissions';
 import { IDoctor } from '../interfaces/IDoctor';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { IUserSalary } from '../interfaces/IUserSalary';
+import { ISpecialty } from '../interfaces/ISpecialty';
 
 export enum SORT_ORDER {
     ASCENDING, // a-z
@@ -49,6 +50,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable positions: Map<number, IPosition> = new Map();
     @observable regions: Map<number, ILocation> = new Map();
     @observable cities: Map<number, ILocation> = new Map();
+    @observable specialties: ISpecialty[] = [];
 
     @observable LPUs: ILPU[] = null;
     @observable unconfirmedLPUs: ILPU[] = null;
@@ -149,6 +151,20 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
         this.clearSalaries();
+    }
+
+    @action.bound
+    async loadSpecialties() {
+        const { api } = this.rootStore;
+
+        const res = await this.dispatchRequest(
+            api.getSpecialties(),
+            'loadSpecialties'
+        );
+
+        if (res && res.length) {
+            this.specialties = res;
+        }
     }
 
     @action.bound

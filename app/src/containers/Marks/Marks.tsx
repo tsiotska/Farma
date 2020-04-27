@@ -23,6 +23,8 @@ import TableHeader from './TableHeader';
 import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';
 import ExcelLoadPopper from './ExcelLoadPoppper';
+import { ADD_DOC_MODAL } from '../../constants/Modals';
+import AddDocsModal from './AddDocsModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,6 +39,9 @@ const styles = (theme: any) => createStyles({
     iconButton: {
         borderRadius: 2,
         minHeight: 64
+    },
+    addDocButton: {
+
     }
 });
 
@@ -51,6 +56,7 @@ interface IProps extends WithStyles<typeof styles> {
     bonusesYear?: number;
     setBonusesYear?: (value: number, shouldPostData: boolean) => void;
     updateBonuses?: () => void;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -69,6 +75,9 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             loadLocationsAgents,
             loadDoctors
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
@@ -79,6 +88,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents,
     loadDoctors,
     role,
+    openModal,
     bonusesYear,
     setBonusesYear,
     updateBonuses,
@@ -182,6 +192,8 @@ class Marks extends Component<IProps> {
         this.excelPopperAnchor = null;
     }
 
+    openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
+
     componentDidUpdate({ role: prevRole }: IProps) {
         const { role: currentRole, loadDoctors, loadLocationsAgents, loadBonuses } = this.props;
 
@@ -277,9 +289,14 @@ class Marks extends Component<IProps> {
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
                         <TransferBlock updateBonuses={updateBonuses} />
-                        <Button>
-                            Додати лікаря
-                        </Button>
+                        {
+                            role === USER_ROLE.MEDICAL_AGENT &&
+                            <Button
+                                className={classes.addDocButton}
+                                onClick={this.openAddDocModal}>
+                                Додати лікаря
+                            </Button>
+                        }
                     </Grid>
                     <TableHeader
                         showLpu={this.showLpuColumn}
@@ -292,6 +309,7 @@ class Marks extends Component<IProps> {
                         showLpu={this.showLpuColumn}
                         agents={this.agents} />
                 </Paper>
+                <AddDocsModal />
             </Grid>
         );
     }
