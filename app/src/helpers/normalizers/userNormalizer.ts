@@ -9,10 +9,13 @@ export const defaultUser: IUser = {
     avatar: null,
     doctorsCount: null,
     pharmacyCount: null,
+    lpuCount: null,
     region: null,
     level: null,
     city: null,
-    department: null
+    department: null,
+    depositMinus: null,
+    depositPlus: null
 };
 
 const valuesMap: IValuesMap = {
@@ -22,11 +25,15 @@ const valuesMap: IValuesMap = {
     avatar: 'avatar',
     count_doctor: 'doctorsCount',
     count_pharmacy: 'pharmacyCount',
+    count_hcf: 'lpuCount',
     region: 'region',
 
     branch: 'department',
     level: 'level',
     city: 'city',
+
+    count_deposit_plus: 'depositPlus',
+    count_deposit_minus: 'depositMinus',
 };
 
 const requiredProps = [ 'id', 'full_name',  'position' ];

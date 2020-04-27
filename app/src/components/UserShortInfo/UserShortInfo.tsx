@@ -14,7 +14,8 @@ const styles = createStyles({
         width: 100,
     },
     textContainer: {
-        padding: '8px 0 8px 16px'
+        padding: '8px 0 8px 16px',
+        justifyContent: 'space-around'
     },
     credentials: {
         fontFamily: 'Source Sans Pro SemiBold'
@@ -91,7 +92,6 @@ class UserShortInfo extends Component<IProps> {
                 <Avatar className={classes.avatar} {...this.avatarProps} />
                 <Grid
                     className={classes.textContainer}
-                    justify='space-around'
                     direction='column'
                     container>
                     <Typography className={classes.credentials} color='textPrimary'>

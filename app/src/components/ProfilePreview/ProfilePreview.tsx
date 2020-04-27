@@ -47,8 +47,11 @@ const styles = (theme: any) => createStyles({
     },
     gridContainer: {
         padding: '8px 0',
+        '&:not(:first-of-type)': {
+            alignItems: 'center',
+        },
         [theme.breakpoints.up('sm')]: {
-            padding: '0 16px',
+            padding: '0 8px',
             '&:first-of-type': {
                 paddingLeft: 0
             },
@@ -58,13 +61,20 @@ const styles = (theme: any) => createStyles({
         }
     },
     textContainer: {
-        padding: '8px 0 8px 16px'
+        padding: '0 8px'
+        // padding: '8px 0 8px 16px'
     },
     credsContainer: {
         minWidth: 300
     },
     dividerVertical: {
         minHeight: 100
+    },
+    profileTextContainer: {
+        justifyContent: 'flex-start'
+    },
+    text: {
+        marginTop: 8
     }
 });
 
@@ -180,7 +190,7 @@ class ProfilePreview extends Component<IProps> {
 
     render() {
         const { classes, user } = this.props;
-        const { doctorsCount, pharmacyCount } = user;
+        const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
 
         return (
             <div
@@ -197,15 +207,22 @@ class ProfilePreview extends Component<IProps> {
                     component={Paper}
                     className={cx(classes.container)}
                     justify='center'
+                    wrap='nowrap'
                     container>
 
                     <Grid
-                        xs={4}
+                        // xs={4}
                         className={cx(classes.gridContainer, classes.credsContainer)}
                         wrap='nowrap'
                         container
                         item>
-                            <UserShortInfo user={user} />
+                            <UserShortInfo
+                                classes={{
+                                    textContainer: classes.profileTextContainer,
+                                    credentials: classes.text,
+                                    position: classes.text,
+                                }}
+                                user={user} />
                     </Grid>
 
                     {
@@ -215,9 +232,9 @@ class ProfilePreview extends Component<IProps> {
                                 <Divider className={classes.dividerVertical} orientation='vertical' />
                             </Hidden>
                             <Grid
-                                xs={2}
+                                // xs={2}
                                 className={cx(classes.gridContainer, classes.textContainer)}
-                                justify='space-around'
+                                // justify='space-around'
                                 direction='column'
                                 container
                                 zeroMinWidth
@@ -225,10 +242,10 @@ class ProfilePreview extends Component<IProps> {
                                     {
                                         this.userRole === USER_ROLE.REGIONAL_MANAGER &&
                                         <>
-                                            <Typography>
+                                            <Typography className={classes.text}>
                                                 Регіон
                                             </Typography>
-                                            <Typography>
+                                            <Typography className={classes.text}>
                                                 { this.region }
                                             </Typography>
                                         </>
@@ -236,10 +253,10 @@ class ProfilePreview extends Component<IProps> {
                                     {
                                         this.userRole === USER_ROLE.MEDICAL_AGENT &&
                                         <>
-                                            <Typography>
+                                            <Typography className={classes.text}>
                                                 { this.region }
                                             </Typography>
-                                            <Typography>
+                                            <Typography className={classes.text}>
                                                 { this.city }
                                             </Typography>
                                         </>
@@ -254,17 +271,17 @@ class ProfilePreview extends Component<IProps> {
                     </Hidden>
 
                     <Grid
-                        xs={2}
+                        // xs={2}
                         className={cx(classes.gridContainer, classes.textContainer)}
-                        justify='space-around'
+                        // justify='space-around'
                         direction='column'
                         container
                         zeroMinWidth
                         item>
-                            <Typography>
+                            <Typography className={classes.text}>
                                 Лікарів
                             </Typography>
-                            <Typography>
+                            <Typography className={classes.text}>
                                 { doctorsCount === null ? '-' : doctorsCount }
                             </Typography>
                     </Grid>
@@ -274,19 +291,63 @@ class ProfilePreview extends Component<IProps> {
                     </Hidden>
 
                     <Grid
-                        xs
+                        // xs
                         className={cx(classes.gridContainer, classes.textContainer)}
-                        justify='space-around'
+                        // justify='space-around'
                         direction='column'
                         container
                         item>
-                            <Typography>
-                                ЛПУ/Aптеки
+                            <Typography className={classes.text}>
+                                ЛПУ
                             </Typography>
-                            <Typography>
+                            <Typography className={classes.text}>
+                                { lpuCount === null ? '-' : lpuCount }
+                            </Typography>
+                    </Grid>
+
+                    <Hidden smDown>
+                        <Divider className={classes.dividerVertical} orientation='vertical' />
+                    </Hidden>
+
+                    <Grid
+                        // xs
+                        className={cx(classes.gridContainer, classes.textContainer)}
+                        // justify='space-around'
+                        direction='column'
+                        container
+                        item>
+                            <Typography className={classes.text}>
+                                Аптеки
+                            </Typography>
+                            <Typography className={classes.text}>
                                 { pharmacyCount === null ? '-' : pharmacyCount }
                             </Typography>
                     </Grid>
+                    {
+                        this.userRole === USER_ROLE.FIELD_FORCE_MANAGER &&
+                        <>
+                            <Hidden smDown>
+                                <Divider className={classes.dividerVertical} orientation='vertical' />
+                            </Hidden>
+                            <Grid
+                                className={cx(classes.gridContainer, classes.textContainer)}
+                                // justify='space-around'
+                                wrap='nowrap'
+                                direction='column'
+                                container
+                                item>
+                                    <Typography className={classes.text}>
+                                        Депозити
+                                    </Typography>
+                                    <Typography className={classes.text}>
+                                        { depositPlus || 0 }
+                                    </Typography>
+                                    <Typography className={classes.text}>
+                                        { depositMinus || 0}
+                                    </Typography>
+                            </Grid>
+                        </>
+                    }
                 </Grid>
             </div>
         );

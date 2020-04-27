@@ -16,9 +16,14 @@ export interface IUserCommonInfo {
 export interface IUser extends IUserCommonInfo {
     position: USER_ROLE;
     doctorsCount?: number;
+
     pharmacyCount?: number;
+    lpuCount: number;
 
     level?: number;
 
     department?: number;
+
+    depositMinus?: number;
+    depositPlus?: number;
 }
