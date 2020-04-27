@@ -187,8 +187,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             api.getMPsSalaries(
                 this.currentDepartmentId,
                 salary.id,
-                year,
-                month
+                year + 1,
+                month + 1
             ),
             'loadSubSalaries'
         );

@@ -170,8 +170,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         const data: any = {
             marks,
-            deposit: this.previewBonusTotal.packs.deposit,
-            payments: this.previewBonusTotal.packs.payments
+            deposit: this.previewBonusTotal.marks.deposit,
+            payments: this.previewBonusTotal.marks.payments
         };
 
         this.dispatchRequest(
