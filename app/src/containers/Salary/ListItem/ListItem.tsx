@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Grid } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, WithStyles, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Grid, Typography, LinearProgress } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IUserSalary } from '../../../interfaces/IUserSalary';
 import { KeyboardArrowDown } from '@material-ui/icons';
 import { IUser } from '../../../interfaces';
 import UserShortInfo from '../../../components/UserShortInfo';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
+import { computed } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -23,7 +25,8 @@ const styles = (theme: any) => createStyles({
         }
     },
     expanded: {
-        marginTop: '0 !important'
+        marginTop: '0 !important',
+        marginBottom: '0 !important'
     },
     avatar: {
         width: 32,
@@ -65,7 +68,9 @@ const styles = (theme: any) => createStyles({
     },
     details: {
         padding: '8px 0 24px 32px',
-        backgroundColor: '#f5f5f5'
+        backgroundColor: '#f5f5f5',
+        display: 'flex',
+        flexDirection: 'column'
     },
     placeholderImage: {
         margin: '8px 6px 8px 10px'
@@ -94,26 +99,41 @@ interface IProps extends WithStyles<typeof styles> {
     expandable: boolean;
     isExpanded: boolean;
     userSalary: IUserSalary;
-    user: IUser;
-    children?: any;
     position: 'РМ' | 'МП';
+    locationsAgents: Map<number, IUser>;
     onExpand?: (userSalary: IUserSalary, e: any, expanded: boolean) => void;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            getAsyncStatus,
+            locationsAgents
+        }
+    }
+}) => ({
+    getAsyncStatus,
+    locationsAgents
+}))
 @observer
 class ListItem extends Component<IProps> {
+    @computed
+    get isLoading(): boolean {
+        return this.props.getAsyncStatus('loadSubSalaries').loading;
+    }
+
     expandChangeHandler = (e: any, expanded: boolean) => {
-        console.log('expand');
+        const { onExpand, userSalary } = this.props;
+        if (onExpand) onExpand(userSalary, e, expanded);
     }
 
     render() {
         const {
             expandable,
             isExpanded,
-            children,
-            onExpand,
             classes,
-            user,
+            locationsAgents,
             position,
             userSalary: {
                 id,
@@ -124,10 +144,21 @@ class ListItem extends Component<IProps> {
                 kpi,
                 money,
                 total,
-                subSalaries,
+                // subSalaries,
             },
         } = this.props;
-        console.log('user: ', user);
+        const subSalaries: IUserSalary[] = [{
+            bonus: 3608.66,
+            extraCosts: 0,
+            id: 4,
+            kpi: 0,
+            level: 1,
+            money: 89223.8,
+            position: 3,
+            salary: 0,
+            total: 3608.66,
+            subSalaries: []
+        }];
         return (
             <ExpansionPanel
                 onChange={this.expandChangeHandler}
@@ -150,7 +181,7 @@ class ListItem extends Component<IProps> {
                     }}>
                         <Grid className={classes.contantCol} wrap='nowrap' container item>
                             <UserShortInfo
-                                user={user}
+                                user={locationsAgents.get(id)}
                                 classes={{
                                     avatar: classes.icon,
                                     textContainer: classes.userTextContainer,
@@ -189,9 +220,31 @@ class ListItem extends Component<IProps> {
 
                 </ExpansionPanelSummary>
                 {
-                    children &&
+                    position === 'РМ' &&
                     <ExpansionPanelDetails className={classes.details}>
-                        { children }
+                        <Typography>
+                            Медицинські представники
+                        </Typography>
+                        {
+                            (subSalaries && subSalaries.length)
+                            ? subSalaries.map(x => (
+                                <ListItem
+                                    key={x.id}
+                                    classes={classes}
+                                    locationsAgents={locationsAgents}
+                                    expandable={false}
+                                    isExpanded={false}
+                                    userSalary={x}
+                                    position='МП'
+                                />
+                            ))
+                            : this.isLoading
+                                ? <LinearProgress />
+                                : <Typography>
+                                    Список МП пустий
+                                </Typography>
+
+                        }
                     </ExpansionPanelDetails>
                 }
             </ExpansionPanel>

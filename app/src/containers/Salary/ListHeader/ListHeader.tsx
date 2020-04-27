@@ -4,7 +4,9 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 
 const styles = (theme: any) => createStyles({
-    root: {},
+    root: {
+        margin: '5px 0'
+    },
     text: {
         fontSize: 14,
         color: '#aaa',

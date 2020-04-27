@@ -1,4 +1,4 @@
-import { observable, action, reaction, toJS, computed, when, flow } from 'mobx';
+import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -190,7 +190,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 year,
                 month
             ),
-            'loadSubsalaries'
+            'loadSubSalaries'
         );
     }
 
@@ -550,6 +550,20 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
         this.cities = new Map(await loadCitiesPromise);
         this.regions = new Map(await loadRegionsPromise);
+    }
+
+    @action.bound
+    async loadSubLocationAgents() {
+        const { api } = this.rootStore;
+        const res = await api.getAgents(this.currentDepartmentId, USER_ROLE.MEDICAL_AGENT);
+
+        if (!res) return;
+
+        transaction(() => {
+            res.forEach(x => {
+                this.locationsAgents.set(x.id, x);
+            });
+        });
     }
 
     @action.bound

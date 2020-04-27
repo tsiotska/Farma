@@ -18,7 +18,8 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     salaries?: IUserSalary[];
     loadLocationsAgents?: () => void;
-    locationsAgents: Map<number, IUser>;
+    setExpandedSalary?: (salary: IUserSalary, year: number, month: number) => void;
+    expandedSalary?: IUserSalary;
 }
 
 @inject(({
@@ -29,7 +30,8 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             salaries,
             loadLocationsAgents,
-            locationsAgents
+            setExpandedSalary,
+            expandedSalary
         }
     }
 }) => ({
@@ -38,7 +40,8 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus,
     salaries,
     loadLocationsAgents,
-    locationsAgents
+    setExpandedSalary,
+    expandedSalary
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -80,6 +83,17 @@ class Salary extends Component<IProps> {
         loadSalaries(this.year, this.month + 1);
     }
 
+    expandHandler = (userSalary: IUserSalary, e: any, expanded: boolean) => {
+        const { setExpandedSalary } = this.props;
+        setExpandedSalary(
+            expanded
+            ? userSalary
+            : null,
+            this.year,
+            this.month
+        );
+    }
+
     componentDidMount() {
         const { loadSalaries, loadLocationsAgents } = this.props;
         loadSalaries(this.year, this.month + 1);
@@ -92,7 +106,7 @@ class Salary extends Component<IProps> {
     }
 
     render() {
-        const { salaries, locationsAgents } = this.props;
+        const { salaries, expandedSalary } = this.props;
 
         return (
             <Grid container direction='column'>
@@ -111,11 +125,11 @@ class Salary extends Component<IProps> {
                         ? salaries.map(x => (
                             <ListItem
                                 key={x.id}
-                                user={locationsAgents.get(x.id)}
                                 expandable={true}
-                                isExpanded={false}
+                                isExpanded={x === expandedSalary}
                                 position='РМ'
                                 userSalary={x}
+                                onExpand={this.expandHandler}
                             />
                         ))
                         : <Typography>
