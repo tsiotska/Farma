@@ -17,6 +17,7 @@ const defaultMark: IMark = {
 
 const defaultAgentInfo: IAgentInfo = {
     id: null,
+    deposit: null,
     lastPayment: null,
     lastDeposit: null,
     marks: new Map(),
@@ -53,6 +54,7 @@ const marksValuesMap: IValuesMap = {
 
 const agentsValuesMap: IValuesMap = {
     id: 'id',
+    deposit: 'deposit',
     last_payments: 'lastPayment',
     last_deposit: 'lastDeposit',
 };

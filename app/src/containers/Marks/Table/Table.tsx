@@ -5,13 +5,12 @@ import {
     TableContainer,
     TableBody,
     Table as MuiTable,
-    TableCell,
-    TableRow as MuiTableRow,
-    Paper} from '@material-ui/core';
+    Paper
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
-import { toJS, computed, observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import TableRow from '../TableRow';
 import { IUser } from '../../../interfaces';
 import { IDoctor } from '../../../interfaces/IDoctor';
@@ -113,11 +112,15 @@ class Table extends Component<IProps> {
                                                 this.tableWidth = lastItemRect.width + 40;
                                                 this.leftOffset = lastItemRect.left - 20;
 
-                                                const lastItemBottom = lastItemRect.bottom;
-                                                const availableHeight = window.innerHeight - lastItemBottom;
-                                                this.totalRowPosition = availableHeight > this.totalRowHeight
-                                                    ? 'initial'
-                                                    : 'fixed';
+                                                this.totalRowPosition = window.innerHeight < document.body.offsetHeight
+                                                ? 'fixed'
+                                                : 'initial';
+                                                // const lastItemBottom = lastItemRect.bottom;
+                                                // console.log(lastItemBottom, window.innerHeight, document.body.offsetHeight)
+                                                // const availableHeight = window.innerHeight - lastItemBottom;
+                                                // this.totalRowPosition = availableHeight > this.totalRowHeight
+                                                //     ? 'initial'
+                                                //     : 'fixed';
                                             }
                                         }
                                         showLpu={showLpu}

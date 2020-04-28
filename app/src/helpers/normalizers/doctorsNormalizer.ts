@@ -39,5 +39,10 @@ export const doctorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectAr
     data,
     defaultDoctor,
     doctorValuesMap,
-    { requiredProps: [ 'id' ] }
+    {
+        requiredProps: [ 'id' ],
+        valueNormalizers: {
+            name: (value: string) => value ? value.toLowerCase() : null
+        }
+    }
 );

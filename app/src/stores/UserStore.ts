@@ -1,3 +1,4 @@
+import { IDoctor } from './../interfaces/IDoctor';
 import { IBonusInfo, IAgentInfo, IMark } from './../interfaces/IBonusInfo';
 import { computed, action, observable, toJS } from 'mobx';
 
@@ -135,6 +136,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (month === null || userId === null || !url) return;
 
         api.getExcel(url, name.trim());
+    }
+
+    @action.bound
+    addDocsToBonus(docs: IDoctor[]) {
+        const preparedDocs: IAgentInfo[] = docs.map(({ id, deposit }) => ({
+            id,
+            deposit,
+            lastPayment: 0,
+            lastDeposit: 0,
+            marks: new Map(),
+        }));
+        this.previewBonus.agents.push(...preparedDocs);
     }
 
     @action.bound
