@@ -3,10 +3,8 @@ import {
     createStyles,
     WithStyles,
     Grid,
-    Avatar,
     Typography,
     Divider,
-    LinearProgress,
     Hidden,
     Paper
 } from '@material-ui/core';
@@ -15,15 +13,13 @@ import { withStyles } from '@material-ui/styles';
 import { observable, computed, toJS } from 'mobx';
 import cx from 'classnames';
 import { IUser } from '../../interfaces';
-import { IPosition } from '../../interfaces/IPosition';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
-import Level from './Level';
 import UserShortInfo from '../UserShortInfo';
 
 const styles = (theme: any) => createStyles({
     backface: {
-        position: 'absolute',
+        position: ({ scaleIndex }: any) => scaleIndex === 0 ? 'relative' : 'absolute',
         width: '100%',
         transformOrigin: 'left',
         transition: '0.3s',
@@ -40,7 +36,6 @@ const styles = (theme: any) => createStyles({
     },
     container: {
         padding: '14px 20px',
-        maxHeight: 128,
         '&:hover': {
             opacity: 1
         }
@@ -62,19 +57,23 @@ const styles = (theme: any) => createStyles({
     },
     textContainer: {
         padding: '0 8px'
-        // padding: '8px 0 8px 16px'
     },
     credsContainer: {
-        minWidth: 300
-    },
-    dividerVertical: {
-        minHeight: 100
+        minWidth: 390
     },
     profileTextContainer: {
         justifyContent: 'flex-start'
     },
     text: {
         marginTop: 8
+    },
+    depositPlus: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        color: '#25D174',
+    },
+    depositMinus: {
+        fontFamily: 'Source Sans Pro SemiBold',
+        color: '#E25353',
     }
 });
 
@@ -211,7 +210,6 @@ class ProfilePreview extends Component<IProps> {
                     container>
 
                     <Grid
-                        // xs={4}
                         className={cx(classes.gridContainer, classes.credsContainer)}
                         wrap='nowrap'
                         container
@@ -229,12 +227,10 @@ class ProfilePreview extends Component<IProps> {
                         this.userRole !== USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
                             <Hidden xsDown>
-                                <Divider className={classes.dividerVertical} orientation='vertical' />
+                                <Divider flexItem orientation='vertical' />
                             </Hidden>
                             <Grid
-                                // xs={2}
                                 className={cx(classes.gridContainer, classes.textContainer)}
-                                // justify='space-around'
                                 direction='column'
                                 container
                                 zeroMinWidth
@@ -267,13 +263,11 @@ class ProfilePreview extends Component<IProps> {
                     }
 
                     <Hidden xsDown>
-                        <Divider className={classes.dividerVertical} orientation='vertical' />
+                        <Divider flexItem orientation='vertical' />
                     </Hidden>
 
                     <Grid
-                        // xs={2}
                         className={cx(classes.gridContainer, classes.textContainer)}
-                        // justify='space-around'
                         direction='column'
                         container
                         zeroMinWidth
@@ -287,13 +281,11 @@ class ProfilePreview extends Component<IProps> {
                     </Grid>
 
                     <Hidden smDown>
-                        <Divider className={classes.dividerVertical} orientation='vertical' />
+                        <Divider flexItem orientation='vertical' />
                     </Hidden>
 
                     <Grid
-                        // xs
                         className={cx(classes.gridContainer, classes.textContainer)}
-                        // justify='space-around'
                         direction='column'
                         container
                         item>
@@ -306,13 +298,11 @@ class ProfilePreview extends Component<IProps> {
                     </Grid>
 
                     <Hidden smDown>
-                        <Divider className={classes.dividerVertical} orientation='vertical' />
+                        <Divider flexItem orientation='vertical' />
                     </Hidden>
 
                     <Grid
-                        // xs
                         className={cx(classes.gridContainer, classes.textContainer)}
-                        // justify='space-around'
                         direction='column'
                         container
                         item>
@@ -327,11 +317,10 @@ class ProfilePreview extends Component<IProps> {
                         this.userRole === USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
                             <Hidden smDown>
-                                <Divider className={classes.dividerVertical} orientation='vertical' />
+                                <Divider flexItem orientation='vertical' />
                             </Hidden>
                             <Grid
                                 className={cx(classes.gridContainer, classes.textContainer)}
-                                // justify='space-around'
                                 wrap='nowrap'
                                 direction='column'
                                 container
@@ -339,10 +328,10 @@ class ProfilePreview extends Component<IProps> {
                                     <Typography className={classes.text}>
                                         Депозити
                                     </Typography>
-                                    <Typography className={classes.text}>
+                                    <Typography className={cx(classes.text, classes.depositPlus)}>
                                         { depositPlus || 0 }
                                     </Typography>
-                                    <Typography className={classes.text}>
+                                    <Typography className={cx(classes.text, classes.depositMinus)}>
                                         { depositMinus || 0}
                                     </Typography>
                             </Grid>

@@ -6,7 +6,7 @@ import ProfilePreview from '../../components/ProfilePreview';
 
 const styles = createStyles({
     navContainer: {
-        height: 128,
+        // height: 128,
         position: 'relative',
         overflow: 'hidden'
     },
