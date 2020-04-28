@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography, Button, IconButton } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    Grid,
+    Typography,
+    Button,
+    IconButton
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import ExcelIcon from '../../../components/ExcelIcon';
-import DateSelect from '../DateSelect';
 import { observable } from 'mobx';
+
+import ExcelIcon from '../../../components/ExcelIcon';
 import LoadingMask from '../../../components/LoadingMask';
+import DateSelectPopper from '../DateSelectPopper';
 
 const styles = (theme: any) => createStyles({
     iconButton: {
@@ -76,11 +84,12 @@ class Header extends Component<IProps> {
                 <Typography variant='h5' className={classes.title}>
                     Заробітня плата
                 </Typography>
-                <DateSelect
+                <DateSelectPopper
                     year={year}
                     month={month}
                     changeMonth={changeMonth}
-                    changeYear={changeYear} />
+                    changeYear={changeYear}
+                />
                 {
                     showCalculateButton &&
                     <Button

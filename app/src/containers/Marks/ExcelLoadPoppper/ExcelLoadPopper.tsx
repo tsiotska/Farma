@@ -5,20 +5,17 @@ import {
     Popper,
     Grid,
     Paper,
-    Button,
-    FormControlLabel,
-    Checkbox,
-    Typography,
-    Input
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable } from 'mobx';
+import DatePickers from './DatePickers';
+import DefaultContent from './DefaultContent';
 
 const styles = (theme: any) => createStyles({
     root: {
         padding: 16,
-        width: 220
+        minWidth: 220
     },
     row: {
         margin: '10px 0'
@@ -51,38 +48,40 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;
     closeHandler: () => void;
-    loadBonusesExcel?: (name: string, mode: string) => void;
 }
 
-@inject(({
-    appState: {
-        userStore: {
-            loadBonusesExcel
-        }
-    }
-}) => ({
-    loadBonusesExcel
-}))
 @observer
 class ExcelLoadPopper extends Component<IProps> {
-    @observable activeMode: 'payment' | 'deposit' = 'payment';
-    @observable name: string = '';
+    @observable dateFrom: Date = new Date();
+    @observable dateTo: Date = new Date();
+    @observable mode: 'datePick' | 'default' = 'default';
 
-    nameChangeHandler = ({ target: { value }}: any) => {
-        this.name = value;
+    constructor(props: IProps) {
+        super(props);
+        this.dateTo = new Date();
+        const prevMonth = this.dateTo.getMonth() - 1;
+        this.dateFrom = new Date(
+            prevMonth >= 0
+            ? this.dateTo.getFullYear()
+            : this.dateTo.getFullYear() - 1,
+            prevMonth >= 0
+            ? prevMonth
+            : 11
+        );
     }
 
-    depositChangeHandler = () => {
-        this.activeMode = 'deposit';
+    changeDates = (dateFrom: Date, dateTo: Date) => {
+        this.dateFrom = dateFrom;
+        this.dateTo = dateTo;
+        this.mode = 'default';
     }
 
-    paymentsChangeHandler = () => {
-        this.activeMode = 'payment';
+    setDefaultMode = () => {
+        this.mode = 'default';
     }
 
-    submitHandler = () => {
-        const { loadBonusesExcel } = this.props;
-        loadBonusesExcel(name, this.activeMode);
+    setDateMode = () => {
+        this.mode = 'datePick';
     }
 
     render() {
@@ -90,49 +89,30 @@ class ExcelLoadPopper extends Component<IProps> {
 
         return (
             <Popper
-                placement='bottom-end'
+                placement='left'
                 open={!!anchor}
                 anchorEl={anchor}>
-                    <Grid elevation={20} className={classes.root} component={Paper} container direction='column'>
-                        <Typography>
-                            Звіт
-                        </Typography>
-                        <Grid
-                            className={classes.row}
-                            wrap='nowrap'
-                            alignContent='center'
-                            justify='space-between'
-                            container>
-                            <FormControlLabel
-                                control={<Checkbox checked={this.activeMode === 'payment'} onChange={this.paymentsChangeHandler} size='small' color='default' />}
-                                className={classes.label}
-                                label={<Typography variant='subtitle1'>Бали</Typography>}
-                            />
-                            <FormControlLabel
-                                className={classes.label}
-                                control={<Checkbox  checked={this.activeMode === 'deposit'} onChange={this.depositChangeHandler} size='small' color='default' />}
-                                label={<Typography variant='subtitle1'>Депозити</Typography>}
-                            />
-                        </Grid>
-                        <Grid
-                            className={classes.row}
-                            wrap='nowrap' alignItems='center' container>
-                            <Input placeholder='Назва' value={this.name} onChange={this.nameChangeHandler} disableUnderline className={classes.input} />
-                            <Typography variant='subtitle1'>
-                                .xlsx
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            className={classes.row}
-                            wrap='nowrap'
-                            justify='space-between' container>
-                            <Button className={classes.closeButton} onClick={closeHandler}>
-                                Закрити
-                            </Button>
-                            <Button onClick={this.submitHandler} className={classes.loadButton}>
-                                Завантажити
-                            </Button>
-                        </Grid>
+                    <Grid
+                        className={classes.root}
+                        elevation={20}
+                        component={Paper}
+                        direction='column'
+                        container>
+                            {
+                                this.mode === 'datePick'
+                                ? <DatePickers
+                                    dateFrom={this.dateFrom}
+                                    dateTo={this.dateTo}
+                                    applyHandler={this.changeDates}
+                                    closeHandler={this.setDefaultMode}
+                                  />
+                                : <DefaultContent
+                                    onDateClick={this.setDateMode}
+                                    closeHandler={closeHandler}
+                                    from={this.dateFrom}
+                                    to={this.dateTo}
+                                />
+                            }
                     </Grid>
             </Popper>
         );

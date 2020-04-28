@@ -88,12 +88,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    loadBonusesExcel(name: string, mode: 'payment' | 'deposit') {
+    loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-
-        const month = this.previewBonus
-        ? this.previewBonus.month
-        : null;
 
         const userId = this.previewUser
         ? this.previewUser.id
@@ -110,32 +106,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
             },
         };
 
-        // received months starts from 1, not from 0 like in javascript
-        const monthFrom = month === 0
-            ? 11
-            : month - 1;
+        const monthFrom = dateFrom.getMonth() + 1;
+        const monthTo = dateTo.getMonth() + 1;
 
-        const dateFrom = new Date(this.bonusesYear, monthFrom);
-
-        const yearTo = month === 12
-        ? this.bonusesYear + 1
-        : this.bonusesYear;
-
-        const monthTo = month === 12
-            ? 0
-            : month;
-
-        const dateTo = new Date(yearTo, monthTo);
-
-        const apiDateMask: string = 'yyyy-MM-dd';
+        const dateFromString = format(dateTo, `yyyy-'${monthFrom}'-dd`);
+        const dateToString = format(dateTo, `yyyy-'${monthTo}'-dd`);
 
         const url = urls[this.role]
-        ? `${urls[this.role][mode]}?from=${format(dateFrom, apiDateMask)}&to=${format(dateTo, apiDateMask)}`
+        ? `${urls[this.role][mode]}?from=${dateFromString}&to=${dateToString}`
         : null;
 
-        if (month === null || userId === null || !url) return;
+        if (userId === null || !url) return;
 
-        api.getExcel(url, name.trim());
+        api.getExcel(url);
     }
 
     @action.bound
