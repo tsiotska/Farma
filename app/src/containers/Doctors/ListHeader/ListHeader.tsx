@@ -40,7 +40,7 @@ class ListHeader extends Component<IProps> {
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid xs={3} container item>
                     <Typography variant='body2' color='textSecondary'>
-                        ЛПУ/Аптека
+                        ЛПУ
                     </Typography>
                 </Grid>
                 <Grid xs={3} container item>

@@ -235,7 +235,7 @@ class Marks extends Component<IProps> {
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
-                    Бонуси за {bonusesYear} рік
+                    Бали за {bonusesYear} рік
                 </Typography>
                 <Grid container alignItems='center'>
                     <IconButton
@@ -268,7 +268,7 @@ class Marks extends Component<IProps> {
                 <Paper className={classes.paper}>
                     <Grid alignItems='center' justify='space-between' container>
                         <Typography variant='h5'>
-                            Виплати { this.monthName && ` за ${this.monthName}` }
+                            Бали { this.monthName && ` за ${this.monthName}` }
                         </Typography>
                         {
                             role !== USER_ROLE.MEDICAL_AGENT &&

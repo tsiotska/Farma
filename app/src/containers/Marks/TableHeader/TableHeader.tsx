@@ -95,7 +95,7 @@ class TableHeader extends Component<IProps> {
                                 <TableCell
                                     padding='none'
                                     className={cx(classes.cell, classes.wideColumn)}>
-                                    ЛПУ/Аптека
+                                    ЛПУ
                                 </TableCell>
                             }
                             <TableCell

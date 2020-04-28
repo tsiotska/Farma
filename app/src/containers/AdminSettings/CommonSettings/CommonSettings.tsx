@@ -16,11 +16,6 @@ const styles = createStyles({
         width: 'auto',
         minWidth: 353,
     },
-    header: {
-        marginBottom: 15,
-        fontFamily: 'Source Sans Pro SemiBold'
-    },
-    text: {},
     input: {
         textAlign: 'center',
         width: 45,
@@ -28,9 +23,6 @@ const styles = createStyles({
         borderRadius: 2,
         margin: '0 10px'
     },
-    inputRoot: {
-    },
-    inputError: {},
     submitButton: {
         margin: '20px auto 20px 0 '
     }
@@ -133,16 +125,13 @@ class CommonSettings extends Component<IProps> {
     }
 
     render() {
-        const { classes, salarySettings } = this.props;
+        const { classes } = this.props;
 
         return (
             <Grid direction='column' container>
-                <Typography variant='h6' className={classes.header}>
-                    Бонуси
-                </Typography>
                 <Grid className={classes.row} alignItems='center' container>
-                    <Typography className={classes.text}>
-                        Розподіл бонусів, %
+                    <Typography>
+                        Розподіл балів, %
                     </Typography>
                     <Input
                         value={
@@ -150,34 +139,26 @@ class CommonSettings extends Component<IProps> {
                             ? this.bonuses[0].toFixed(0)
                             : ''
                         }
-                        classes={{
-                            input: classes.input,
-                            root: classes.inputRoot,
-                            error: classes.inputError
-                        }}
+                        classes={{ input: classes.input }}
                         onFocus={this.inputFocusHandler}
                         disabled={this.bonuses === null}
                         onChange={this.bonusChangeHandler}
                         disableUnderline />
-                    <Typography className={classes.text}>на</Typography>
+                    <Typography>на</Typography>
                     <Input
                         value={
                             this.bonuses
                             ? this.bonuses[1].toFixed(0)
                             : ''
                         }
-                        classes={{
-                            input: classes.input,
-                            root: classes.inputRoot,
-                            error: classes.inputError
-                        }}
+                        classes={{ input: classes.input }}
                         onFocus={this.inputFocusHandler}
                         disabled={this.bonuses === null}
                         onChange={this.bonusRestChangeHandler}
                         disableUnderline />
                 </Grid>
                 <Grid className={classes.row} alignItems='center' container>
-                    <Typography className={classes.text}>
+                    <Typography>
                         Ліміт товарів для нарахування бонусів
                     </Typography>
                     <Input
@@ -186,11 +167,7 @@ class CommonSettings extends Component<IProps> {
                             ? this.initialKpi
                             : this.changedValues.kpi
                         }
-                        classes={{
-                            input: classes.input,
-                            root: classes.inputRoot,
-                            error: classes.inputError
-                        }}
+                        classes={{ input: classes.input }}
                         onChange={this.kpiChangeHandler}
                         disableUnderline />
                 </Grid>

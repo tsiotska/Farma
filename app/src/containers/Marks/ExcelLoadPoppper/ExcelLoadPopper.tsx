@@ -106,7 +106,7 @@ class ExcelLoadPopper extends Component<IProps> {
                             <FormControlLabel
                                 control={<Checkbox checked={this.activeMode === 'payment'} onChange={this.paymentsChangeHandler} size='small' color='default' />}
                                 className={classes.label}
-                                label={<Typography variant='subtitle1'>Виплати</Typography>}
+                                label={<Typography variant='subtitle1'>Бали</Typography>}
                             />
                             <FormControlLabel
                                 className={classes.label}
