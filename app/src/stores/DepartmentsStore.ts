@@ -96,7 +96,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        if (!this.LpuSortSettings) return this.LPUs;
+        if (!this.LpuSortSettings || !this.LPUs) return this.LPUs;
+
         const { order, propName } = this.LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
@@ -113,7 +114,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        if (!this.LpuSortSettings) return this.pharmacies;
+        if (!this.LpuSortSettings || !this.pharmacies) return this.pharmacies;
+
         const { order, propName } = this.LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
