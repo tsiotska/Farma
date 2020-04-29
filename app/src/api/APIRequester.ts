@@ -154,6 +154,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    editMedicine(depId: number, medId: number, data: FormData): Promise<boolean> {
+        return this.instance.put(`/api/branch/${depId}/drug/${medId}`, data)
+            .then(() => true)
+            .catch(() => false);
+    }
+
     getPositions(): Promise<IPosition[]> {
         return this.requestRepeater(
             this.instance.get('api/position'),

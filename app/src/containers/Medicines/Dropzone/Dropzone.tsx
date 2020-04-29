@@ -26,7 +26,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    image: File;
+    image: File | string;
     appendImage: (image: File) => void;
     removeImage: () => void;
 }

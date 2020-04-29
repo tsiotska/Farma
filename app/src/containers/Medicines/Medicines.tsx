@@ -17,6 +17,7 @@ import List from './List';
 import { ADD_MEDICINE_MODAL } from '../../constants/Modals';
 import AddMedsModal from './AddMedsModal';
 import { computed } from 'mobx';
+import EditMedsModal from './EditMedsModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -101,7 +102,7 @@ class Medicines extends Component<IProps> {
                         ? <LoadingMask color='primary' />
                         : null
                 }
-
+                <EditMedsModal />
                 <AddMedsModal />
             </Grid>
         );

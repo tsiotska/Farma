@@ -2,10 +2,18 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Button } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import FormRow from '../FormRow';
-import { Validator, stringValidator, moneyValidator, numberValidator, lengthValidator, onlyNumbersValidator } from '../../../helpers/validators';
+import {
+    Validator,
+    stringValidator,
+    moneyValidator,
+    numberValidator,
+    lengthValidator,
+    onlyNumbersValidator
+} from '../../../helpers/validators';
 import LoadingMask from '../../../components/LoadingMask';
+import { IMedicine } from '../../../interfaces/IMedicine';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -28,12 +36,11 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     ref?: any;
-    file: File;
+    file: File | string;
     submitHandler: (data: any) => void;
     isLoading: boolean;
 }
 
-type InputType = 'string' | 'number' | 'money' | 'barcode';
 interface IValidatorSettings {
     validator: Validator;
     text: string;
@@ -51,28 +58,6 @@ export interface IFormValues {
 
 @observer
 class FormContent extends Component<IProps> {
-    lengthValidator: Validator;
-    barcodeLengthValidator: Validator;
-    readonly validatorSettings: Record<InputType, IValidatorSettings[]>;
-
-    constructor(props: IProps) {
-        super(props);
-        this.lengthValidator = (value: string): boolean => {
-            return !!value && value.length >= 3;
-        };
-
-        this.barcodeLengthValidator = (value: string): boolean => {
-            return !!value && value.length === 13;
-        };
-
-        this.validatorSettings = {
-            string: [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }],
-            money: [{ validator: stringValidator, text: 'Пусті значення недопустимі' }, { validator: moneyValidator, text: 'Неправильне числове значення' }],
-            number: [{ validator: numberValidator, text: 'Неправильне числове значення' }, { validator: stringValidator, text: 'Пусті значення недопустимі' }],
-            barcode: [{ validator: onlyNumbersValidator, text: 'Допустимі лише цифри' }, { validator: this.barcodeLengthValidator, text: 'Штрихкод має бути завдовжки 13 символів'}]
-        };
-    }
-
     @observable formValues: Partial<IFormValues> = {};
     @observable fieldsErrorStatuses: Record<keyof IFormValues, boolean> = {
         name: false,
@@ -84,6 +69,45 @@ class FormContent extends Component<IProps> {
         barcode: false
     };
 
+    lengthValidator: Validator;
+    barcodeLengthValidator: Validator;
+    readonly validators: Record<keyof IFormValues, IValidatorSettings[]> = null;
+
+    constructor(props: IProps) {
+        super(props);
+        this.lengthValidator = (value: string): boolean => {
+            return !!value && value.length >= 3;
+        };
+
+        this.barcodeLengthValidator = (value: string): boolean => {
+            return !!value && value.length === 13;
+        };
+
+        const stringValidators =  [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }];
+        const moneyValidators =  [
+            { validator: stringValidator, text: 'Пусті значення недопустимі' },
+            { validator: moneyValidator, text: 'Неправильне числове значення' }
+        ];
+        const numberValidators =  [
+            { validator: numberValidator, text: 'Неправильне числове значення' },
+            { validator: stringValidator, text: 'Пусті значення недопустимі' }
+        ];
+        const barcodeValidators =  [
+            { validator: onlyNumbersValidator, text: 'Допустимі лише цифри' },
+            { validator: this.barcodeLengthValidator, text: 'Штрихкод має бути завдовжки 13 символів'}
+        ];
+
+        this.validators = {
+            name: stringValidators,
+            releaseForm: stringValidators,
+            dosage: numberValidators,
+            manufacturer: stringValidators,
+            mark: moneyValidators,
+            price: moneyValidators,
+            barcode: barcodeValidators,
+        };
+    }
+
     @computed
     get isSubmitAllowed(): boolean {
         const allValuesExist = Object.keys(this.fieldsErrorStatuses).length === Object.keys(this.formValues).length;
@@ -92,29 +116,31 @@ class FormContent extends Component<IProps> {
         return allValuesExist && allValuesValid && imageAdded;
     }
 
-    changeHandler = (propName: keyof IFormValues, type: InputType = 'string') =>
-        ({ target: { value }}: any) => {
-            this.formValues[propName] = value;
-            const validatorSetting = this.validatorSettings[type];
+    validate = (propName: keyof IFormValues, value: string) => {
+        const validatorSetting = this.validators[propName];
+        const { isValid, errorMessage } = validatorSetting.reduce(
+            (total, { validator, text }) => {
+                const valid = validator(value);
+                const newErrorMessage = valid
+                    ? null
+                    : text;
+                return {
+                    isValid: total.isValid && valid,
+                    errorMessage: total.errorMessage || newErrorMessage
+                };
+            },
+            { isValid: true, errorMessage: null }
+        );
 
-            const { isValid, errorMessage } = validatorSetting.reduce(
-                (total, { validator, text }) => {
-                    const valid = validator(value);
-                    const newErrorMessage = valid
-                        ? null
-                        : text;
-                    return {
-                        isValid: total.isValid && valid,
-                        errorMessage: total.errorMessage || newErrorMessage
-                    };
-                },
-                { isValid: true, errorMessage: null }
-            );
+        this.fieldsErrorStatuses[propName] = isValid
+            ? false
+            : errorMessage;
+    }
 
-            this.fieldsErrorStatuses[propName] = isValid
-                ? false
-                : errorMessage;
-        }
+    changeHandler = (propName: keyof IFormValues) => ({ target: { value }}: any) => {
+        this.formValues[propName] = value;
+        this.validate(propName, value);
+    }
 
     enterPressHandler = (ev: KeyboardEvent) => {
         if (ev.keyCode === 13) this.submitHandler();
@@ -128,8 +154,33 @@ class FormContent extends Component<IProps> {
         window.removeEventListener('keypress', this.enterPressHandler);
     }
 
-    resetValues = () => {
-        this.formValues = {};
+    resetValues = (defaultMedicine?: IMedicine) => {
+        if (defaultMedicine) {
+            const {
+                name,
+                releaseForm,
+                dosage,
+                manufacturer,
+                barcode,
+                mark,
+                price,
+            } = defaultMedicine;
+
+            this.formValues = {
+                name: name || '',
+                releaseForm: releaseForm || '',
+                manufacturer: manufacturer || '',
+                barcode: barcode || '',
+                dosage: `${dosage || ''}`,
+                mark: `${mark || ''}`,
+                price: `${price || ''}`,
+            };
+
+            Object.entries(this.formValues)
+                .forEach(([ propName, value ]: [keyof IFormValues, string]) => this.validate(propName, value));
+        } else {
+            this.formValues = {};
+        }
     }
 
     submitHandler = () => {
@@ -156,19 +207,19 @@ class FormContent extends Component<IProps> {
                         <FormRow
                             label='Дозування, мг'
                             value={this.formValues.dosage || ''}
-                            onChange={this.changeHandler('dosage', 'number')}
+                            onChange={this.changeHandler('dosage')}
                             error={this.fieldsErrorStatuses.dosage}
                         />
                         <FormRow
                             label='Штрихкод'
                             value={this.formValues.barcode || ''}
-                            onChange={this.changeHandler('barcode', 'barcode')}
+                            onChange={this.changeHandler('barcode')}
                             error={this.fieldsErrorStatuses.barcode}
                         />
                         <FormRow
                             label='Балл'
                             value={this.formValues.mark || ''}
-                            onChange={this.changeHandler('mark', 'money')}
+                            onChange={this.changeHandler('mark')}
                             error={this.fieldsErrorStatuses.mark}
                         />
                     </Grid>
@@ -188,7 +239,7 @@ class FormContent extends Component<IProps> {
                         <FormRow
                             label='Ціна, грн'
                             value={this.formValues.price || ''}
-                            onChange={this.changeHandler('price', 'money')}
+                            onChange={this.changeHandler('price')}
                             error={this.fieldsErrorStatuses.price}
                         />
                     </Grid>

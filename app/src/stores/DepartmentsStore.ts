@@ -1,3 +1,4 @@
+import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
 import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
@@ -16,6 +17,7 @@ import { IDoctor } from '../interfaces/IDoctor';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
+import { invert } from 'lodash';
 
 export enum SORT_ORDER {
     ASCENDING, // a-z
@@ -520,6 +522,65 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.loadMeds(depId);
 
         return !!medicine;
+    }
+
+    @action.bound
+    async editMedicine(medicine: IMedicine, data: IFormValues, image: File | string) {
+        const intValues = ['dosage', 'mark', 'price'];
+        const namesMap: Readonly<IFormValues> = {
+            name: 'name',
+            dosage: 'dosage',
+            mark: 'mark',
+            releaseForm: 'release_form',
+            manufacturer: 'manufacturer',
+            price: 'price',
+            barcode: 'barcode'
+        };
+        const { api } = this.rootStore;
+
+        const preparedData: any = Object.entries(data).reduce(
+            (total, [ key, value ]) => {
+                const newKey = namesMap[key];
+
+                const converted = intValues.includes(key)
+                ? +value
+                : value;
+
+                const isChanged = medicine[key] !== converted;
+
+                return (!!newKey && !!converted && isChanged)
+                ? { ...total, [newKey]: converted }
+                : total;
+            },
+            {}
+        );
+
+        const payload = new FormData();
+        payload.set('json', JSON.stringify(preparedData));
+        if (image !== medicine.image) {
+            payload.set('image', image || '');
+        }
+
+        const isUpdated = await this.dispatchRequest(
+            api.editMedicine(
+                this.currentDepartmentId,
+                medicine.id,
+                payload
+            ),
+            'editMedicine'
+        );
+
+        if (isUpdated) {
+            const invertedMap = invert(namesMap);
+            Object.entries(preparedData).forEach(([ propName, value ]) => {
+                const restoredPropName = invertedMap[propName];
+                if (restoredPropName) {
+                    medicine[restoredPropName] = value;
+                }
+            });
+        }
+
+        return isUpdated;
     }
 
     @action.bound

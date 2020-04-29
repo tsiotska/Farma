@@ -16,10 +16,6 @@ const styles = (theme: any) => createStyles({
                 ? `url(${Config.ASSETS_URL}/${file}) center / cover no-repeat`
                 : `url(${URL.createObjectURL(file)}) center / cover no-repeat`;
         }
-            // if (typeof file === 'string')
-        //     file
-        // ? `url(${URL.createObjectURL(file)}) center / cover no-repeat`
-        // : 'transparent',
     }
 });
 

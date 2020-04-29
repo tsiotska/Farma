@@ -119,7 +119,7 @@ class TransferBlock extends Component<IProps> {
                 {
                     role === USER_ROLE.MEDICAL_AGENT &&
                     <Button onClick={updateBonuses} className={classes.submitButton}>
-                        Перевести
+                        Зберегти
                     </Button>
                 }
             </Grid>

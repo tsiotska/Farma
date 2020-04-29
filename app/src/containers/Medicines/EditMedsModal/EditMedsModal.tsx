@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { observable, computed, toJS } from 'mobx';
-import { ADD_MEDICINE_MODAL } from '../../../constants/Modals';
+import { ADD_MEDICINE_MODAL, MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
 import { IFormValues } from '../FormContent/FormContent';
 import MedsModal from '../MedsModal';
+import { IMedicine } from '../../../interfaces/IMedicine';
 
 interface IProps {
     openedModal?: string;
     openModal?: (modalName: string) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    addMedicine?: (data: any) => boolean;
+    editMedicine?: (medicine: IMedicine, data: IFormValues, image: File | string) => Promise<boolean>;
+    modalPayload?: any;
 }
 
 @inject(({
@@ -20,20 +22,22 @@ interface IProps {
         uiStore: {
             openedModal,
             openModal,
+            modalPayload
         },
         departmentsStore: {
-            addMedicine,
+            editMedicine,
             getAsyncStatus
         }
     }
 }) => ({
+    getAsyncStatus,
+    editMedicine,
+    modalPayload,
     openedModal,
     openModal,
-    getAsyncStatus,
-    addMedicine,
 }))
 @observer
-class AddMedsModal extends Component<IProps> {
+class EditMedsModal extends Component<IProps> {
     @observable openSnackbar: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
 
@@ -48,59 +52,27 @@ class AddMedsModal extends Component<IProps> {
         this.openSnackbar = false;
     }
 
-    submitHandler = async (image: File, data: IFormValues) => {
-        const { addMedicine } = this.props;
-
-        const intValues = ['dosage', 'mark', 'price'];
-        const namesMap: Readonly<IFormValues> = {
-            name: 'name',
-            dosage: 'dosage',
-            mark: 'mark',
-            releaseForm: 'release_form',
-            manufacturer: 'manufacturer',
-            price: 'price',
-            barcode: 'barcode'
-        };
-
-        const preparedData: any = Object.entries(data).reduce(
-            (total, [ key, value ]) => {
-                const newKey = namesMap[key];
-
-                const converted = intValues.includes(key)
-                ? +value
-                : value;
-
-                return (!!newKey && !!converted)
-                ? { ...total, [newKey]: converted }
-                : total;
-            },
-            {}
-        );
-
-        const json = JSON.stringify(preparedData);
-
-        const payload = new FormData();
-        payload.set('image', image);
-        payload.set('json', json);
-
-        const medicineAdded = await addMedicine(payload);
+    submitHandler = async (image: File | string, data: IFormValues) => {
+        const { editMedicine, modalPayload } = this.props;
+        const medicineChanged = await editMedicine(modalPayload, data, image);
         this.openSnackbar = true;
-        this.snackbarType = medicineAdded
+        this.snackbarType = medicineChanged
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { openedModal, modalPayload } = this.props;
 
         return (
             <>
                 <MedsModal
-                    open={openedModal === ADD_MEDICINE_MODAL}
-                    title='Додати препарат'
+                    open={openedModal === MEDICINE_EDIT_MODAL}
+                    title='Редагувати препарат'
                     isLoading={this.isLoading}
                     onClose={this.closeHandler}
                     onSubmit={this.submitHandler}
+                    defaultMedicine={modalPayload}
                 />
                 <Snackbar
                     open={!!this.openSnackbar}
@@ -110,8 +82,8 @@ class AddMedsModal extends Component<IProps> {
                     anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                        ? 'Медикамент успішно додано'
-                        : 'Неможливо додати медикамент'
+                        ? 'Медикамент успішно змінено'
+                        : 'Неможливо змінити медикамент'
                     }
                 />
             </>
@@ -119,4 +91,4 @@ class AddMedsModal extends Component<IProps> {
     }
 }
 
-export default AddMedsModal;
+export default EditMedsModal;

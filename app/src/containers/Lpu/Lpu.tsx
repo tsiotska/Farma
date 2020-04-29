@@ -174,7 +174,6 @@ class Lpu extends Component<IProps> {
                     ? <LinearProgress />
                     : <HCFList data={this.preparedLPUs} showHeader />
                 }
-                {/* <HCFList data={this.preparedLPUs} showHeader /> */}
                 {
                     this.requestStatus.error &&
                     <>
