@@ -4,7 +4,8 @@ import {
     FormControl,
     InputLabel,
     Input,
-    FormHelperText
+    FormHelperText,
+    Select
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -15,6 +16,7 @@ interface IProps extends WithStyles<typeof styles> {
     value: string;
     error: boolean | string;
     onChange: (e: any) => void;
+    children?: any;
 }
 
 @observer
@@ -24,6 +26,7 @@ class FormRow extends Component<IProps> {
             classes,
             label,
             value,
+            children,
             onChange,
             error
         } = this.props;
@@ -33,11 +36,13 @@ class FormRow extends Component<IProps> {
                 <InputLabel className={classes.labelRoot} disableAnimation shrink>
                     { label }
                 </InputLabel>
-                <Input
+                <Select
                     className={classes.input}
-                    value={value}
                     onChange={onChange}
-                    disableUnderline />
+                    disableUnderline
+                    value={value}>
+                    { children }
+                </Select>
                 {
                     !!error && typeof error === 'string' &&
                     <FormHelperText className={classes.helperText}>{error}</FormHelperText>

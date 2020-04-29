@@ -502,39 +502,64 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async addMedicine(data: any) {
-        const requestName = 'addMedicine';
-        const { api } = this.rootStore;
-        const depId = this.currentDepartmentId;
-
-        if (!depId) return;
-
-        const medicine = await this.dispatchRequest(
-            api.addMedicine(this.currentDepartmentId, data),
-            requestName
-        );
-
-        if (medicine) {
-            const targetMeds = this.meds.get(depId);
-            if (targetMeds) targetMeds.push(medicine);
-        }
-
-        this.loadMeds(depId);
-
-        return !!medicine;
-    }
-
-    @action.bound
-    async editMedicine(medicine: IMedicine, data: IFormValues, image: File | string) {
+    async addMedicine(data: IFormValues, image: File) {
         const intValues = ['dosage', 'mark', 'price'];
-        const namesMap: Readonly<IFormValues> = {
+        const namesMap: Readonly<Partial<IFormValues>> = {
             name: 'name',
             dosage: 'dosage',
             mark: 'mark',
             releaseForm: 'release_form',
             manufacturer: 'manufacturer',
             price: 'price',
-            barcode: 'barcode'
+            barcode: 'barcode',
+        };
+        const { api } = this.rootStore;
+
+        const preparedData: any = Object.entries(data).reduce(
+            (total, [ key, value ]) => {
+                const newKey = namesMap[key];
+
+                const converted = intValues.includes(key)
+                ? +value
+                : value;
+
+                return (!!newKey && !!converted)
+                ? { ...total, [newKey]: converted }
+                : total;
+            },
+            {}
+        );
+
+        const payload = new FormData();
+        payload.set('json', JSON.stringify(preparedData));
+        payload.set('image', image || '');
+
+        const department = +data.department || this.currentDepartmentId;
+
+        const newMedicine = await this.dispatchRequest(
+            api.addMedicine(department, data),
+            'addMedicine'
+        );
+
+        if (newMedicine) {
+            const targetMeds = this.meds.get(department);
+            if (targetMeds) targetMeds.push(newMedicine);
+        }
+
+        return !!newMedicine;
+    }
+
+    @action.bound
+    async editMedicine(medicine: IMedicine, data: IFormValues, image: File | string) {
+        const intValues = ['dosage', 'mark', 'price'];
+        const namesMap: Readonly<Partial<IFormValues>> = {
+            name: 'name',
+            dosage: 'dosage',
+            mark: 'mark',
+            releaseForm: 'release_form',
+            manufacturer: 'manufacturer',
+            price: 'price',
+            barcode: 'barcode',
         };
         const { api } = this.rootStore;
 
@@ -561,9 +586,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             payload.set('image', image || '');
         }
 
+        const department = +data.department || this.currentDepartmentId;
+
         const isUpdated = await this.dispatchRequest(
             api.editMedicine(
-                this.currentDepartmentId,
+                department,
                 medicine.id,
                 payload
             ),

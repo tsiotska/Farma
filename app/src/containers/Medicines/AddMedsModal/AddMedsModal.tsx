@@ -12,7 +12,7 @@ interface IProps {
     openedModal?: string;
     openModal?: (modalName: string) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    addMedicine?: (data: any) => boolean;
+    addMedicine?: (data: IFormValues, image: File) => boolean;
 }
 
 @inject(({
@@ -50,40 +50,7 @@ class AddMedsModal extends Component<IProps> {
 
     submitHandler = async (image: File, data: IFormValues) => {
         const { addMedicine } = this.props;
-
-        const intValues = ['dosage', 'mark', 'price'];
-        const namesMap: Readonly<IFormValues> = {
-            name: 'name',
-            dosage: 'dosage',
-            mark: 'mark',
-            releaseForm: 'release_form',
-            manufacturer: 'manufacturer',
-            price: 'price',
-            barcode: 'barcode'
-        };
-
-        const preparedData: any = Object.entries(data).reduce(
-            (total, [ key, value ]) => {
-                const newKey = namesMap[key];
-
-                const converted = intValues.includes(key)
-                ? +value
-                : value;
-
-                return (!!newKey && !!converted)
-                ? { ...total, [newKey]: converted }
-                : total;
-            },
-            {}
-        );
-
-        const json = JSON.stringify(preparedData);
-
-        const payload = new FormData();
-        payload.set('image', image);
-        payload.set('json', json);
-
-        const medicineAdded = await addMedicine(payload);
+        const medicineAdded = await addMedicine(data, image);
         this.openSnackbar = true;
         this.snackbarType = medicineAdded
             ? SNACKBAR_TYPE.SUCCESS

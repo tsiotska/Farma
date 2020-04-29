@@ -65,7 +65,7 @@ class Medicines extends Component<IProps> {
 
     @computed
     get sortedMeds(): IMedicine[] {
-        return this.props.currentDepartmentMeds.sort((a, b) => {
+        return this.props.currentDepartmentMeds.slice().sort((a, b) => {
             const isDeletedA = a.deleted;
             const isDeletedB = b.deleted;
             if (isDeletedA === isDeletedB) return 0;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Button } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, WithStyles, Grid, Button, MenuItem } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, computed, toJS } from 'mobx';
 import FormRow from '../FormRow';
@@ -14,6 +14,8 @@ import {
 } from '../../../helpers/validators';
 import LoadingMask from '../../../components/LoadingMask';
 import { IMedicine } from '../../../interfaces/IMedicine';
+import SelectFormRow from '../FormRow/SelectFormRow';
+import { IDepartment } from '../../../interfaces/IDepartment';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -32,6 +34,9 @@ const styles = (theme: any) => createStyles({
         margin: '8px 0 0 auto',
         padding: '4px 16px',
     },
+    menuItem: {
+        height: 36
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -39,6 +44,8 @@ interface IProps extends WithStyles<typeof styles> {
     file: File | string;
     submitHandler: (data: any) => void;
     isLoading: boolean;
+    departments?: IDepartment[];
+    currentDepartment?: IDepartment;
 }
 
 interface IValidatorSettings {
@@ -54,8 +61,20 @@ export interface IFormValues {
     barcode: string;
     mark: string;
     price: string;
+    department: string;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            departments,
+            currentDepartment
+        }
+    }
+}) => ({
+    departments,
+    currentDepartment
+}))
 @observer
 class FormContent extends Component<IProps> {
     @observable formValues: Partial<IFormValues> = {};
@@ -66,7 +85,8 @@ class FormContent extends Component<IProps> {
         manufacturer: false,
         mark: false,
         price: false,
-        barcode: false
+        barcode: false,
+        department: false
     };
 
     lengthValidator: Validator;
@@ -105,6 +125,7 @@ class FormContent extends Component<IProps> {
             mark: moneyValidators,
             price: moneyValidators,
             barcode: barcodeValidators,
+            department: []
         };
     }
 
@@ -114,6 +135,22 @@ class FormContent extends Component<IProps> {
         const allValuesValid = Object.values(this.fieldsErrorStatuses).every(x => x === false);
         const imageAdded = !!this.props.file;
         return allValuesExist && allValuesValid && imageAdded;
+    }
+
+    @computed
+    get departmentOptions(): Array<{ key: number, value: string }> {
+        return (this.props.departments || []).map(({ id, name }) => ({
+            key: id,
+            value: name
+        }));
+    }
+
+    @computed
+    get defaultDepartmentName(): string {
+        const { currentDepartment } = this.props;
+        return currentDepartment
+        ? currentDepartment.name
+        : '';
     }
 
     validate = (propName: keyof IFormValues, value: string) => {
@@ -192,7 +229,8 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading } = this.props;
+        const { classes, isLoading, departments } = this.props;
+        console.log(toJS(departments));
 
         return (
             <>
@@ -242,6 +280,19 @@ class FormContent extends Component<IProps> {
                             onChange={this.changeHandler('price')}
                             error={this.fieldsErrorStatuses.price}
                         />
+                        <SelectFormRow
+                            label='qwer'
+                            value={this.formValues.department || this.defaultDepartmentName}
+                            onChange={this.changeHandler('department')}
+                            error={this.fieldsErrorStatuses.department}>
+                            {
+                                departments && departments.map(({ id, name }) => (
+                                    <MenuItem key={id} className={classes.menuItem} value={name}>
+                                        { name }
+                                    </MenuItem>
+                                ))
+                            }
+                        </SelectFormRow>
                     </Grid>
                 </Grid>
                 <Button
