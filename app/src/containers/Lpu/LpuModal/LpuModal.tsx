@@ -320,9 +320,7 @@ class LpuModal extends Component<IProps> {
                         color='primary'
                         className={classes.submitButton}
                         onClick={this.submitHandler}
-                        disabled={!this.allowSubmit}
-                        // disabled={!this.allowSubmit || !this.valuesChanged}
-                        >
+                        disabled={!this.allowSubmit}>
                         Зберегти
                     </Button>
             </Dialog>
