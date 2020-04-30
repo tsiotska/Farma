@@ -14,6 +14,8 @@ import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
 import { computed, toJS } from 'mobx';
+import { ADD_LPU_MODAL } from '../../constants/Modals';
+import AddLpu from './AddLpu';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -51,6 +53,7 @@ interface IProps extends WithStyles<typeof styles> {
     currentPage?: number;
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -64,6 +67,7 @@ interface IProps extends WithStyles<typeof styles> {
             unconfirmedLPUs
         },
         uiStore: {
+            openModal,
             setCurrentPage,
             currentPage,
             itemsPerPage
@@ -78,7 +82,8 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage,
     currentDepartmentId,
     loadUnconfirmedLPUs,
-    unconfirmedLPUs
+    unconfirmedLPUs,
+    openModal
 }))
 @observer
 class Lpu extends Component<IProps> {
@@ -119,10 +124,9 @@ class Lpu extends Component<IProps> {
         await loadLPUs();
     }
 
+    openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
+
     componentDidMount() {
-        // const { loading, success } = this.requestStatus;
-        // const shouldLoadLPUs = loading === false && success === false;
-        // if (shouldLoadLPUs) this.loadData();
         this.loadData();
     }
 
@@ -165,7 +169,7 @@ class Lpu extends Component<IProps> {
                     <Typography variant='h5'>
                         ЛПУ
                     </Typography>
-                    <Button>
+                    <Button onClick={this.openAddLpuModal}>
                         Додати ЛПУ
                     </Button>
                 </Grid>
@@ -201,6 +205,7 @@ class Lpu extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
+                <AddLpu />
             </Grid>
         );
     }

@@ -83,26 +83,30 @@ export class APIRequester {
             : successCallback(request);
         }
 
-        if (hasError) {
-            return (request.response && request.response.config)
-            ? new Promise<T>(async (resolve) => {
-                setTimeout(
-                    () => resolve(
-                        this.requestRepeater(
-                                axios(request.response.config),
-                                successCallback,
-                                errorCallback,
-                                retryCount - 1,
-                                retryInterval
-                            )
-                        ),
-                    retryInterval
-                );
-              })
-            : errorCallback(request);
-        } else {
-            return successCallback(request);
+        if (hasError === false) {
+            try {
+                return successCallback(request);
+            } catch {
+                return errorCallback(request);
+            }
         }
+
+        return (request.response && request.response.config)
+        ? new Promise<T>(async (resolve) => {
+            setTimeout(
+                () => resolve(
+                    this.requestRepeater(
+                            axios(request.response.config),
+                            successCallback,
+                            errorCallback,
+                            retryCount - 1,
+                            retryInterval
+                        )
+                    ),
+                retryInterval
+            );
+        })
+        : errorCallback(request);
     }
 
     login({ email, password }: IUserCredentials): Promise<boolean> {
@@ -189,6 +193,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    addLpu(postData: any): Promise<ILPU> {
+        return this.instance.post('/api/hcf', postData)
+            .then(({ data: { data }}) => lpuNormalizer({ data: [ data ]}))
+            .catch(this.defaultErrorHandler());
+    }
+
     getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
         const cache = this.cacheStore.getCachedData(url, medsStatNormalizer);
         const promise = this.instance.get(url)
@@ -221,6 +231,20 @@ export class APIRequester {
         return this.instance.get(url)
             .then(workersNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    getOblasti(): Promise<ILocation[]> {
+        return this.instance.get('/api/oblast')
+        .then(({ data: { data } }) => (
+            Array.isArray(data)
+            ? data.map(
+                (name: string, id: number) => ({
+                    id,
+                    name
+                }))
+            : []
+        ))
+        .catch(this.defaultErrorHandler([]));
     }
 
     getLocations(url: string): Promise<ILocation[]> {
@@ -432,5 +456,15 @@ export class APIRequester {
         return this.instance.get('/api/agent/speciality')
             .then(specialtyNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    getTypes(targetProp: 'hcf' | 'pharmacy'): Promise<string[]> {
+        return this.instance.get(`api/${targetProp}/type`)
+            .then(({ data: { data }}) => (
+                Array.isArray(data)
+                ? data
+                : []
+            ))
+            .catch(this.defaultErrorHandler([]));
     }
 }

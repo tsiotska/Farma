@@ -1,3 +1,4 @@
+import { IValuesMap } from './../helpers/normalizers/normalizer';
 import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
 import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
 import { ILPU } from './../interfaces/ILPU';
@@ -18,6 +19,7 @@ import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { invert } from 'lodash';
+import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
 
 export enum SORT_ORDER {
     ASCENDING, // a-z
@@ -50,7 +52,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     // util data
     @observable meds: Map<number, IMedicine[]> = new Map();
     @observable positions: Map<number, IPosition> = new Map();
+    @observable oblasti: Map<number, ILocation> = new Map();
     @observable regions: Map<number, ILocation> = new Map();
+
     @observable cities: Map<number, ILocation> = new Map();
     @observable specialties: ISpecialty[] = [];
 
@@ -416,6 +420,40 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async addLpu(data: ILpuModalValues): Promise<boolean> {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            name: 'name',
+            hcf_type: 'type',
+            oblast: 'oblast',
+            city: 'city',
+            address: 'address',
+            phone1: 'phone1',
+            phone2: 'phone2',
+        };
+
+        const payload: any = Object.entries(data)
+        .reduce((acc, [propName, value ]) => {
+            const newPropName = namesMap[propName];
+            return newPropName
+            ? { ...acc, [newPropName]: value }
+            : acc;
+        }, {});
+
+        const newLpu  = await this.dispatchRequest(
+            api.addLpu(payload),
+            'addLpu'
+        );
+
+        if (newLpu) {
+            this.LPUs.push(newLpu);
+        }
+
+        return !!newLpu;
+    }
+
+    @action.bound
     async loadDocsExcel() {
         const { api, userStore: { previewUser } } = this.rootStore;
         const userId = previewUser
@@ -675,6 +713,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    loadSpecificCities(oblastName: string) {
+        return this.rootStore.api.getLocations(`api/city?oblast=${oblastName}`);
+    }
+
+    @action.bound
+    loadTypes(targetProp: 'hcf' | 'pharmacy') {
+        return this.rootStore.api.getTypes(targetProp);
+    }
+
+    @action.bound
     async loadLocations() {
         const { api } = this.rootStore;
 
@@ -683,8 +731,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
         const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
+        const loadOblastiPromise = api.getOblasti().then(getMapped);
+
         this.cities = new Map(await loadCitiesPromise);
         this.regions = new Map(await loadRegionsPromise);
+        this.oblasti = new Map(await loadOblastiPromise);
     }
 
     @action.bound

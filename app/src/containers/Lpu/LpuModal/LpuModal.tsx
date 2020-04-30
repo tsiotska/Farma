@@ -1,0 +1,291 @@
+
+import React, { Component } from 'react';
+import {
+    createStyles,
+    WithStyles,
+    Grid,
+    MenuItem,
+    Button
+} from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
+import { withStyles } from '@material-ui/styles';
+import { ILPU } from '../../../interfaces/ILPU';
+import Dialog from '../../../components/Dialog';
+import FormRow from '../FormRow';
+import { observable, toJS, computed, reaction } from 'mobx';
+import SelectFormRow from '../FormRow/SelectFormRow';
+import { ILocation } from '../../../interfaces/ILocation';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
+
+const styles = (theme: any) => createStyles({
+    submitButton: {
+        marginLeft: 'auto',
+    }
+});
+
+interface IProps extends WithStyles<typeof styles> {
+    open: boolean;
+    isLoading: boolean;
+    onClose: () => void;
+    onSubmit: () => void;
+    initialLpu?: ILPU;
+    title: string;
+    oblasti?: Map<number, ILocation>;
+    loadSpecificCities?: (oblastName: string) => Promise<ILocation[]>;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
+    addLpu?: (data: ILpuModalValues) => Promise<boolean> ;
+}
+
+export interface ILpuModalValues {
+    name: string;
+    oblast: string;
+    city: string;
+    type: string;
+    address: string;
+    phone1: string;
+    phone2: string;
+}
+
+@inject(({
+    appState: {
+        departmentsStore: {
+            oblasti,
+            loadSpecificCities,
+            loadTypes,
+            addLpu
+        }
+    }
+}) => ({
+    oblasti,
+    loadSpecificCities,
+    loadTypes,
+    addLpu
+}))
+@observer
+class LpuModal extends Component<IProps> {
+    reactionDisposer: any;
+    @observable cities: ILocation[] = [];
+    @observable types: string[] = [];
+
+    @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
+    @observable optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
+    @observable formValues: ILpuModalValues = {
+        name: '',
+        oblast: '',
+        city: '',
+        type: '',
+        address: '',
+        phone1: '',
+        phone2: '',
+    };
+
+    @observable openSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
+    readonly errorMessages: {[key: string]: string} = {
+        phone1: 'Телефон має скададатись з 10 або 12 цифр',
+        phone2: 'Телефон має скададатись з 10 або 12 цифр',
+        default: 'Значення має містити не менше 3 символів'
+    };
+
+    @computed
+    get oblastListItems(): string[] {
+        const { oblasti } = this.props;
+        const res: any = [];
+
+        oblasti.forEach(({ name }) => {
+            res.push(name);
+        });
+
+        return res;
+    }
+
+    @computed
+    get allowSubmit(): boolean {
+        const allProps = Object.keys(this.formValues);
+        const requiredProps = allProps
+        .filter((x) => (this.optionalFields as string[]).includes(x) === false);
+        const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
+        const isAllPropsValid = allProps.every(x => !(this.errors as Map<string, any>).get(x));
+        return hasRequiredProps && isAllPropsValid;
+    }
+
+    // false -> is valid
+    // true -> is invalid
+    // string -> is invalid and string is error message to display
+    valueValidator = (value: string, propName: keyof ILpuModalValues): string | boolean => {
+        if (this.optionalFields.some(name => name === propName)) {
+            // phones are the only optional fields, so if they are empty, they are valid
+            if (!value) return false;
+            // accepts string composed only with nums and with length === 10 or length === 12
+            const isInvalid = !value.match(/^(\d{10}|\d{12})$/);
+            return isInvalid && this.errorMessages[propName];
+        } else {
+            const isInvalid = !value || value.length < 3;
+            return isInvalid && this.errorMessages.default;
+        }
+    }
+
+    validate = (propName: keyof ILpuModalValues, value: string) => {
+        const hasError = this.valueValidator(value, propName);
+        console.log(propName, value, hasError);
+        this.errors.set(propName, hasError);
+    }
+
+    changeHandler = (propName: keyof ILpuModalValues, value: string) => {
+        this.formValues[propName] = value;
+        this.validate(propName, value);
+    }
+
+    snackbarCloseHandler = () => {
+        this.openSnackbar = false;
+    }
+
+    submitHandler = async () => {
+        const { addLpu } = this.props;
+        const lpuCreated = await addLpu(this.formValues);
+        this.openSnackbar = true;
+        this.snackbarType = !!lpuCreated
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+    }
+
+    async componentDidMount() {
+        const { loadSpecificCities, loadTypes } = this.props;
+        this.reactionDisposer = reaction(
+            () => this.formValues.oblast,
+            async (oblastName: string) => {
+                this.formValues.city = '';
+                this.cities = [];
+                this.cities = await loadSpecificCities(oblastName);
+            }
+        );
+        this.types = await loadTypes('hcf');
+    }
+
+    componentWillUnmount() {
+        this.reactionDisposer();
+    }
+
+    render() {
+        const {
+            open,
+            onClose,
+            title,
+            classes
+        } = this.props;
+
+        return (
+            <>
+            <Dialog
+                open={open}
+                onClose={onClose}
+                title={title}
+                maxWidth='sm'>
+                    <FormRow
+                        label='Назва'
+                        values={this.formValues}
+                        onChange={this.changeHandler}
+                        propName='name'
+                        error={this.errors.get('name')}
+                        required
+                    />
+                    <Grid justify='space-between' container>
+                        <SelectFormRow
+                            label='Область'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='oblast'
+                            required
+                            error={this.errors.get('oblast')}>
+                                {
+                                    this.oblastListItems.map(name => (
+                                        <MenuItem key={name} value={name}>
+                                            { name }
+                                        </MenuItem>
+                                    ))
+                                }
+                        </SelectFormRow>
+                        <FormRow
+                            required
+                            label='Адрес'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='address'
+                            error={this.errors.get('address')}
+                        />
+                        <SelectFormRow
+                            required
+                            disabled={!this.formValues.oblast}
+                            label='Місто'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='city'
+                            error={this.errors.get('city')}>
+                                {
+                                    this.cities.map(({ id, name }) => (
+                                        <MenuItem key={id} value={name}>
+                                            { name }
+                                        </MenuItem>
+                                    ))
+                                }
+                        </SelectFormRow>
+                        <FormRow
+                            label='Основний телефон'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='phone1'
+                            error={this.errors.get('phone1')}
+                        />
+                        <SelectFormRow
+                            required
+                            disabled={!this.types.length}
+                            label='Тип'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='type'
+                            error={this.errors.get('type')}>
+                                {
+                                    this.types.map(name => (
+                                        <MenuItem key={name} value={name}>
+                                            { name }
+                                        </MenuItem>
+                                    ))
+                                }
+                        </SelectFormRow>
+                        <FormRow
+                            label='Запасний телефон'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='phone2'
+                            error={this.errors.get('phone2')}
+                        />
+                    </Grid>
+                    <Button
+                        variant='contained'
+                        color='primary'
+                        className={classes.submitButton}
+                        onClick={this.submitHandler}
+                        disabled={!this.allowSubmit}>
+                        Зберегти
+                    </Button>
+            </Dialog>
+            <Snackbar
+                open={!!this.openSnackbar}
+                onClose={this.snackbarCloseHandler}
+                type={this.snackbarType}
+                autoHideDuration={6000}
+                anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+                message={
+                    this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                    ? 'ЛПУ успішно створено'
+                    : 'Неможливо додати ЛПУ'
+                }
+            />
+            </>
+        );
+    }
+}
+
+export default withStyles(styles)(LpuModal);
