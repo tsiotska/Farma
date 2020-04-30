@@ -1,3 +1,4 @@
+import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
 import { ADD_PHARMACY_MODAL } from './../constants/Modals';
 import { IValuesMap } from './../helpers/normalizers/normalizer';
 import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
@@ -390,7 +391,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const namesMap: IValuesMap = {
             name: 'name',
-            hcf_type: 'type',
+            type: 'hcf_type',
             oblast: 'oblast',
             city: 'city',
             address: 'address',
@@ -412,7 +413,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (newLpu) {
-            this.LPUs.push(newLpu);
+            if (this.LPUs) {
+                this.LPUs.push(newLpu);
+            } else {
+                this.LPUs = [newLpu];
+            }
         }
 
         return !!newLpu;
@@ -466,7 +471,41 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async addPharmacy() {
+    async addPharmacy(data: IPharmacyModalValues) {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            name: 'name',
+            oblast: 'oblast',
+            city: 'city',
+            lpu: 'hcf',
+            address: 'address',
+            phone1: 'phone1',
+            phone2: 'phone2',
+            type: 'org_type',
+        };
+
+        const payload: any = Object.entries(data)
+        .reduce((acc, [propName, value ]) => {
+            const newPropName = namesMap[propName];
+            return newPropName
+            ? { ...acc, [newPropName]: value }
+            : acc;
+        }, {});
+
+        const newPharmacy = await this.dispatchRequest(
+            api.addPharmacy(payload),
+            'addPharmacy'
+        );
+
+        if (newPharmacy) {
+            if (this.pharmacies) {
+                this.pharmacies.push(newPharmacy);
+            } else {
+                this.pharmacies = [newPharmacy];
+            }
+        }
+
         console.log('add pharmacy');
     }
 

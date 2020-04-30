@@ -205,6 +205,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    addPharmacy(postData: any): Promise<ILPU> {
+        return this.instance(`/api/pharmacy`, postData)
+            .then(({ data: { data }}) => lpuNormalizer({ data: [ data ]}))
+            .catch(this.defaultErrorHandler());
+    }
+
     editLpu(id: number, data: any): Promise<boolean> {
         return this.instance.put(`/api/hcf/${id}`, data)
             .then(() => true)
