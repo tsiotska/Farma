@@ -37,28 +37,22 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     hcf: ILPU;
     regions?: Map<number, ILocation>;
-    cities?: Map<number, ILocation>;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             regions,
-            cities
         }
     }
 }) => ({
     regions,
-    cities
 }))
 @observer
 class HCFPanel extends Component<IProps> {
     get cityName(): string {
-        const { cities, hcf: { city } } = this.props;
-        const targetCity = cities.get(city);
-        return targetCity
-            ? targetCity.name
-            : '-';
+        const { hcf: { city } } = this.props;
+        return city || '-';
     }
 
     get regionName(): string {

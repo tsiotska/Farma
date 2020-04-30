@@ -199,6 +199,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    editLpu(id: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/hcf/${id}`, data)
+            .then(() => true)
+            .catch(() => false);
+    }
+
     getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
         const cache = this.cacheStore.getCachedData(url, medsStatNormalizer);
         const promise = this.instance.get(url)

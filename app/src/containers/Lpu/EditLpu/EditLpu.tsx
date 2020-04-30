@@ -1,39 +1,43 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import LpuModal from '../LpuModal';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import { ADD_LPU_MODAL } from '../../../constants/Modals';
+import { ADD_LPU_MODAL, EDIT_LPU_MODAL } from '../../../constants/Modals';
 import Snackbar from '../../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import { ILpuModalValues } from '../LpuModal/LpuModal';
+import { ILPU } from '../../../interfaces/ILPU';
 
 interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
-    addLpu?: (data: ILpuModalValues) => Promise<boolean> ;
+    editLpu?: (initialLpu: ILPU, data: ILpuModalValues) => Promise<boolean>;
+    modalPayload?: ILPU;
 }
 
 @inject(({
     appState: {
         uiStore: {
             openedModal,
-            openModal
+            openModal,
+            modalPayload
         },
         departmentsStore: {
             getAsyncStatus,
-            addLpu
+            editLpu
         }
     }
 }) => ({
     openedModal,
     openModal,
     getAsyncStatus,
-    addLpu
+    modalPayload,
+    editLpu
 }))
 @observer
-class AddLpu extends Component<IProps> {
+class EditLpu extends Component<IProps> {
     @observable openSnackbar: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
 
@@ -49,25 +53,26 @@ class AddLpu extends Component<IProps> {
     closeHandler = () => this.props.openModal(null);
 
     submitHandler = async (formValues: ILpuModalValues) => {
-        const { addLpu } = this.props;
-        const lpuCreated = await addLpu(formValues);
+        const { editLpu, modalPayload } = this.props;
+        const lpuEdited = await editLpu(modalPayload, formValues);
         this.openSnackbar = true;
-        this.snackbarType = !!lpuCreated
+        this.snackbarType = !!lpuEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { openedModal, modalPayload } = this.props;
 
         return (
             <>
             <LpuModal
-                open={openedModal === ADD_LPU_MODAL}
+                open={openedModal === EDIT_LPU_MODAL}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}
                 onSubmit={this.submitHandler}
-                title='Додати ЛПУ'
+                title='Редагувати ЛПУ'
+                initialLpu={modalPayload}
             />
             <Snackbar
                 open={!!this.openSnackbar}
@@ -86,4 +91,4 @@ class AddLpu extends Component<IProps> {
     }
 }
 
-export default AddLpu;
+export default EditLpu;

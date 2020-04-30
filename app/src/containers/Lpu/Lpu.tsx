@@ -16,6 +16,7 @@ import { ILPU } from '../../interfaces/ILPU';
 import { computed, toJS } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
+import EditLpu from './EditLpu';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -206,6 +207,7 @@ class Lpu extends Component<IProps> {
                     className={classes.pagination}
                 />
                 <AddLpu />
+                <EditLpu />
             </Grid>
         );
     }

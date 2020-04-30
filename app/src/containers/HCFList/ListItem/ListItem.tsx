@@ -80,18 +80,11 @@ interface IProps extends WithStyles<typeof styles> {
     pharmacy: ILPU;
     unconfirmed: boolean;
     region: ILocation;
-    city: ILocation;
+    editClickHandler?: (lpu: ILPU) => void;
 }
 
 @observer
 class ListItem extends Component<IProps> {
-    get cityName(): string {
-        const { city, } = this.props;
-        return city
-            ? city.name
-            : '-';
-    }
-
     get regionName(): string {
         const { region } = this.props;
         return region
@@ -99,10 +92,16 @@ class ListItem extends Component<IProps> {
             : '-';
     }
 
+    onEditClick = () => {
+        const { editClickHandler, pharmacy } = this.props;
+        if (editClickHandler) editClickHandler(pharmacy);
+    }
+
     render() {
         const {
             classes,
             unconfirmed,
+            editClickHandler,
             pharmacy: {
                 name,
                 type,
@@ -143,7 +142,7 @@ class ListItem extends Component<IProps> {
                 </Grid>
                 <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { this.cityName }
+                        { city }
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
@@ -167,7 +166,7 @@ class ListItem extends Component<IProps> {
                         ? <Button variant='outlined' className={classes.confirmButton}>
                             Підтвердити
                           </Button>
-                        : <IconButton className={classes.iconButton}>
+                        : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
                             <Edit className={classes.icon} />
                           </IconButton>
                     }

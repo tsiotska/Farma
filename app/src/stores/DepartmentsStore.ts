@@ -454,6 +454,42 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            name: 'name',
+            type: 'hcf_type',
+            oblast: 'oblast',
+            city: 'city',
+            address: 'address',
+            phone1: 'phone1',
+            phone2: 'phone2',
+        };
+
+        const payload: any = Object.entries(data)
+        .reduce((acc, [propName, value ]) => {
+            const newPropName = namesMap[propName];
+            return newPropName
+            ? { ...acc, [newPropName]: value }
+            : acc;
+        }, {});
+
+        const isLpuEdited  = await this.dispatchRequest(
+            api.editLpu(initialLpu.id, payload),
+            'addLpu'
+        );
+
+        if (isLpuEdited) {
+            Object.entries(data).forEach(([ propName, value ]) => {
+                initialLpu[propName] = value;
+            });
+        }
+
+        return isLpuEdited;
+    }
+
+    @action.bound
     async loadDocsExcel() {
         const { api, userStore: { previewUser } } = this.rootStore;
         const userId = previewUser

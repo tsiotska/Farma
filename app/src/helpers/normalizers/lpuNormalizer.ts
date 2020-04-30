@@ -18,7 +18,7 @@ export const defaultLPU: ILPU = {
 export const lpuValuesMap: IValuesMap = {
     id: 'id',
     name: 'name',
-    hcf_type: 'type',
+    org_type: 'type',
     region: 'region',
     city: 'city',
     address: 'address',

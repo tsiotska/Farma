@@ -98,13 +98,32 @@ class LpuModal extends Component<IProps> {
     }
 
     @computed
+    get allProps(): Array<keyof ILpuModalValues> {
+        return [...Object.keys(this.formValues)] as Array<keyof ILpuModalValues>;
+    }
+
+    @computed
+    get valuesChanged(): boolean {
+        const { initialLpu } = this.props;
+
+        if (!initialLpu) {
+            return this.allProps.some(x => !this.formValues[x]);
+        }
+
+        return this.allProps.some(x => {
+            const { [x as keyof ILpuModalValues]: initialValue } = initialLpu;
+            const { [x as keyof ILpuModalValues]: currentValue } = this.formValues;
+            return (initialValue || '') !== currentValue;
+        });
+    }
+
+    @computed
     get allowSubmit(): boolean {
-        const allProps = Object.keys(this.formValues);
-        const requiredProps = allProps
+        const requiredProps = this.allProps
         .filter((x) => (this.optionalFields as string[]).includes(x) === false);
         const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
-        const isAllPropsValid = allProps.every(x => !(this.errors as Map<string, any>).get(x));
-        return hasRequiredProps && isAllPropsValid;
+        const isAllPropsValid = this.allProps.every(x => !(this.errors as Map<string, any>).get(x));
+        return hasRequiredProps && isAllPropsValid && this.valuesChanged;
     }
 
     // false -> is valid
@@ -125,7 +144,6 @@ class LpuModal extends Component<IProps> {
 
     validate = (propName: keyof ILpuModalValues, value: string) => {
         const hasError = this.valueValidator(value, propName);
-        console.log(propName, value, hasError);
         this.errors.set(propName, hasError);
     }
 
@@ -136,16 +154,65 @@ class LpuModal extends Component<IProps> {
 
     submitHandler = () => this.props.onSubmit(this.formValues);
 
+    loadSpecificCities = async (oblastName: string) => {
+        this.cities = await this.props.loadSpecificCities(oblastName);
+    }
+
+    initFromInitial = async () => {
+        const { initialLpu } = this.props;
+
+        if (initialLpu) {
+            const {
+                name,
+                oblast,
+                city,
+                type,
+                address,
+                phone1,
+                phone2,
+            } = initialLpu;
+
+            this.formValues = {
+                name: name || '',
+                oblast: oblast || '',
+                city: '',
+                type: type || '',
+                address: address || '',
+                phone1: phone1 || '',
+                phone2: phone2 || '',
+            };
+
+            await this.loadSpecificCities(oblast);
+
+            this.formValues.city = city || '';
+        }
+    }
+
+    componentDidUpdate(prevProps: IProps) {
+        const { initialLpu: prevInitial } = prevProps;
+        const { open: isOpen, initialLpu } = this.props;
+
+        const shouldSetInitial = !prevInitial && !!initialLpu;
+
+        if (isOpen && shouldSetInitial) {
+            this.initFromInitial();
+        }
+    }
+
     async componentDidMount() {
-        const { loadSpecificCities, loadTypes } = this.props;
+        const { loadTypes} = this.props;
+
+        this.initFromInitial();
+
         this.reactionDisposer = reaction(
             () => this.formValues.oblast,
             async (oblastName: string) => {
                 this.formValues.city = '';
                 this.cities = [];
-                this.cities = await loadSpecificCities(oblastName);
+                this.loadSpecificCities(oblastName);
             }
         );
+
         this.types = await loadTypes('hcf');
     }
 
@@ -160,7 +227,7 @@ class LpuModal extends Component<IProps> {
             title,
             classes
         } = this.props;
-
+        // console.log(toJS(this.valuesChanged));
         return (
             <>
             <Dialog
@@ -253,7 +320,9 @@ class LpuModal extends Component<IProps> {
                         color='primary'
                         className={classes.submitButton}
                         onClick={this.submitHandler}
-                        disabled={!this.allowSubmit}>
+                        disabled={!this.allowSubmit}
+                        // disabled={!this.allowSubmit || !this.valuesChanged}
+                        >
                         Зберегти
                     </Button>
             </Dialog>
