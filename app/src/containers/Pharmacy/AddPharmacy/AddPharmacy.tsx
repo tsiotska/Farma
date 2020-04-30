@@ -7,10 +7,9 @@ import { observable, computed } from 'mobx';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import PharmacyModal, { IPharmacyModalValues } from '../PharmacyModal/PharmacyModal';
 import { ADD_PHARMACY_MODAL } from '../../../constants/Modals';
+import Snackbar from '../../../components/Snackbar';
 
-const styles = (theme: any) => createStyles({});
-
-interface IProps extends WithStyles<typeof styles> {
+interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
@@ -71,9 +70,21 @@ class AddPharmacy extends Component<IProps> {
                     onClose={this.closeHandler}
                     onSubmit={this.submitHandler}
                 />
+                <Snackbar
+                    open={!!this.openSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    autoHideDuration={6000}
+                    anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Аптека успішно створена'
+                        : 'Неможливо створити аптеку'
+                    }
+                />
             </>
         );
     }
 }
 
-export default withStyles(styles)(AddPharmacy);
+export default AddPharmacy;

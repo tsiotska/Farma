@@ -16,6 +16,7 @@ export const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     label: string;
+    value?: number | string;
     values: IPharmacyModalValues;
     propName: keyof IPharmacyModalValues;
     onChange: (propName: keyof IPharmacyModalValues, value: string) => void;
@@ -40,7 +41,8 @@ class FormRow extends Component<IProps> {
             propName,
             children,
             disabled,
-            required
+            required,
+            value
         } = this.props;
 
         return (
@@ -53,7 +55,11 @@ class FormRow extends Component<IProps> {
                     className={classes.input}
                     onChange={this.changeHandler}
                     disableUnderline
-                    value={values[propName]}>
+                    value={
+                        value === undefined
+                        ? values[propName]
+                        : value
+                    }>
                     { children }
                 </Select>
                 {

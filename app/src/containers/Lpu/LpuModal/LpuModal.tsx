@@ -130,7 +130,7 @@ class LpuModal extends Component<IProps> {
     // true -> is invalid
     // string -> is invalid and string is error message to display
     valueValidator = (value: string, propName: keyof ILpuModalValues): string | boolean => {
-        if (this.optionalFields.some(name => name === propName)) {
+        if (this.optionalFields.includes(propName)) {
             // phones are the only optional fields, so if they are empty, they are valid
             if (!value) return false;
             // accepts string composed only with nums and with length === 10 or length === 12

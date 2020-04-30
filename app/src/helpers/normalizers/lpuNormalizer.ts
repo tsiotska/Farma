@@ -13,6 +13,8 @@ export const defaultLPU: ILPU = {
     phone2: null,
     ffmConfirm: null,
     rmConfirm: null,
+    lpuName: null,
+    lpu: null
 };
 
 export const lpuValuesMap: IValuesMap = {
@@ -28,6 +30,8 @@ export const lpuValuesMap: IValuesMap = {
     phone2: 'phone2',
     ffm_confirmed: 'ffmConfirm',
     rm_confirmed: 'rmConfirm',
+    hcf: 'lpu',
+    hcf_name: 'lpuName'
 };
 
 export const lpuNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
