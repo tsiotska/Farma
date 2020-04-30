@@ -62,7 +62,7 @@ class DatePickers extends Component<IProps> {
 
     render() {
         const { classes, closeHandler } = this.props;
-        console.log(toJS(this.dateFrom), this.dateFrom.getFullYear());
+
         return (
             <>
                 <Typography className={classes.text}>

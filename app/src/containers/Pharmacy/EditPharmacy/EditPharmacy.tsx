@@ -5,7 +5,10 @@ import { withStyles } from '@material-ui/styles';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { observable, computed } from 'mobx';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
-import { IPharmacyModalValues } from '../PharmacyModal/PharmacyModal';
+import PharmacyModal, { IPharmacyModalValues } from '../PharmacyModal/PharmacyModal';
+import Snackbar from '../../../components/Snackbar';
+import { EDIT_PHARMACY_MODAL } from '../../../constants/Modals';
+import { ILPU } from '../../../interfaces/ILPU';
 
 const styles = (theme: any) => createStyles({});
 
@@ -14,13 +17,15 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     openedModal?: string;
     editPharmacy?: (data: any) => boolean;
+    modalPayload?: ILPU;
 }
 
 @inject(({
     appState: {
         uiStore: {
             openModal,
-            openedModal
+            openedModal,
+            modalPayload
         },
         departmentsStore: {
             getAsyncStatus,
@@ -32,6 +37,7 @@ interface IProps extends WithStyles<typeof styles> {
     openModal,
     openedModal,
     editPharmacy,
+    modalPayload
 }))
 @observer
 class EditPharmacy extends Component<IProps> {
@@ -59,10 +65,31 @@ class EditPharmacy extends Component<IProps> {
     }
 
     render() {
+        const { openedModal, modalPayload } = this.props;
+
         return (
-            <div>
-                EditPharmacy
-            </div>
+            <>
+                <PharmacyModal
+                    open={openedModal === EDIT_PHARMACY_MODAL}
+                    isLoading={this.isLoading}
+                    title='Редагувати аптеку'
+                    onClose={this.closeHandler}
+                    onSubmit={this.submitHandler}
+                    initialPharmacy={modalPayload}
+                />
+                <Snackbar
+                    open={!!this.openSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    autoHideDuration={6000}
+                    anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Аптека успішно відредагована'
+                        : 'Неможливо редагувати аптеку'
+                    }
+                />
+            </>
         );
     }
 }

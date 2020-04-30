@@ -506,7 +506,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             }
         }
 
-        console.log('add pharmacy');
+        return !!newPharmacy;
     }
 
     @action.bound

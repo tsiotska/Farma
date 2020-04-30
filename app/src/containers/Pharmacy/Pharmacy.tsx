@@ -16,6 +16,7 @@ import { ILPU } from '../../interfaces/ILPU';
 import { computed } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
+import EditPharmacy from './EditPharmacy';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -201,6 +202,7 @@ class Pharmacy extends Component<IProps> {
                     className={classes.pagination}
                 />
                 <AddPharmacy />
+                <EditPharmacy />
             </Grid>
         );
     }

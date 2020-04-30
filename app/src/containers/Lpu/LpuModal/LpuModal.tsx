@@ -161,31 +161,31 @@ class LpuModal extends Component<IProps> {
     initFromInitial = async () => {
         const { initialLpu } = this.props;
 
-        if (initialLpu) {
-            const {
-                name,
-                oblast,
-                city,
-                type,
-                address,
-                phone1,
-                phone2,
-            } = initialLpu;
+        if (!initialLpu) return;
 
-            this.formValues = {
-                name: name || '',
-                oblast: oblast || '',
-                city: '',
-                type: type || '',
-                address: address || '',
-                phone1: phone1 || '',
-                phone2: phone2 || '',
-            };
+        const {
+            name,
+            oblast,
+            city,
+            type,
+            address,
+            phone1,
+            phone2,
+        } = initialLpu;
 
-            await this.loadSpecificCities(oblast);
+        this.formValues = {
+            name: name || '',
+            oblast: oblast || '',
+            city: '',
+            type: type || '',
+            address: address || '',
+            phone1: phone1 || '',
+            phone2: phone2 || '',
+        };
 
-            this.formValues.city = city || '';
-        }
+        await this.loadSpecificCities(oblast);
+
+        this.formValues.city = city || '';
     }
 
     componentDidUpdate(prevProps: IProps) {

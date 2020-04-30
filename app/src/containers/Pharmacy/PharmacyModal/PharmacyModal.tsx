@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Button, MenuItem } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable, computed, reaction } from 'mobx';
+import { observable, computed, reaction, when } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
@@ -177,6 +177,47 @@ class PharmacyModal extends Component<IProps> {
         this.lpus = await this.props.loadSpecificLpus(cityId);
     }
 
+    initFromInitial = async () => {
+        const { initialPharmacy } = this.props;
+
+        if (!initialPharmacy) return;
+
+        const {
+            name,
+            oblast,
+            lpuName,
+            city,
+            type,
+            address,
+            phone1,
+            phone2,
+        } = initialPharmacy;
+
+        this.formValues = {
+            name: name || '',
+            oblast: oblast || '',
+            lpu: '',
+            city: null,
+            type: type || '',
+            address: address || '',
+            phone1: phone1 || '',
+            phone2: phone2 || '',
+        };
+
+        // if (oblast) await this.loadSpecificCities(oblast);
+        if (city) {
+            await when(() => !!this.cities.length);
+            const targetCity = this.cities.find(x => x.name === city);
+            if (targetCity) this.formValues.city = this.formValues.city = targetCity;
+        }
+        if (lpuName) {
+            await when(() => !!this.lpus.length);
+            const targetLpu = this.lpus.find(x => x.name === lpuName);
+            if (targetLpu) this.formValues.lpu = lpuName;
+
+        }
+    }
+
     async componentDidMount() {
         const { loadTypes } = this.props;
 
@@ -200,6 +241,15 @@ class PharmacyModal extends Component<IProps> {
         );
 
         this.types = await loadTypes('pharmacy');
+    }
+
+    componentDidUpdate(prevProps: IProps) {
+        const { initialPharmacy: prevInitial } = prevProps;
+        const { open, initialPharmacy } = this.props;
+
+        const shouldSetInititial = !prevInitial && !!initialPharmacy;
+
+        if (open && shouldSetInititial) this.initFromInitial();
     }
 
     componentWillUnmount() {
