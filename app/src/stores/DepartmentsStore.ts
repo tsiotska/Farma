@@ -15,26 +15,11 @@ import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IDoctor } from '../interfaces/IDoctor';
-import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { invert } from 'lodash';
 import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
-
-export enum SORT_ORDER {
-    ASCENDING, // a-z
-    DESCENDING // z-a
-}
-
-export interface ISortBy {
-    order: SORT_ORDER;
-    propName: SortableProps;
-}
-
-export interface IFilterBy {
-    propName: SortableProps;
-    value: string;
-}
+import { SORT_ORDER } from './UIStore';
 
 export interface IExpandedWorker {
     id: number;
@@ -50,37 +35,34 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
 
     // util data
-    @observable meds: Map<number, IMedicine[]> = new Map();
-    @observable positions: Map<number, IPosition> = new Map();
-    @observable oblasti: Map<number, ILocation> = new Map();
-    @observable regions: Map<number, ILocation> = new Map();
+    @observable meds: Map<number, IMedicine[]> = new Map(); // meds store
+    @observable positions: Map<number, IPosition> = new Map(); // user store
+    @observable oblasti: Map<number, ILocation> = new Map(); // agents store
+    @observable regions: Map<number, ILocation> = new Map(); // agents store
 
-    @observable cities: Map<number, ILocation> = new Map();
-    @observable specialties: ISpecialty[] = [];
+    @observable cities: Map<number, ILocation> = new Map(); // agents store
+    @observable specialties: ISpecialty[] = []; // agents store
 
-    @observable LPUs: ILPU[] = null;
-    @observable unconfirmedLPUs: ILPU[] = null;
+    @observable LPUs: ILPU[] = null; // agents store
+    @observable unconfirmedLPUs: ILPU[] = null; // agents store
 
-    @observable unconfirmedPharmacies: ILPU[] = null;
-    @observable pharmacies: ILPU[] = null;
-    @observable pharmacyDemand: boolean = false;
-    @observable loadedPharmacyUrl: string = null;
+    @observable unconfirmedPharmacies: ILPU[] = null; // agents store
+    @observable pharmacies: ILPU[] = null; // agents store
+    @observable pharmacyDemand: boolean = false; // agents store
+    @observable loadedPharmacyUrl: string = null; // agents store
 
-    @observable LpuSortSettings: ISortBy = null;
-    @observable LpuFilterSettings: IFilterBy = null;
-
-    @observable locationsAgents: Map<number, IUser> = new Map();
+    @observable locationsAgents: Map<number, IUser> = new Map(); // agents store
 
     @observable departments: IDepartment[] = [];
     @observable currentDepartment: IDepartment = null;
 
-    @observable salaries: IUserSalary[] = null;
-    @observable expandedSalary: IUserSalary = null;
+    @observable salaries: IUserSalary[] = null; // user store
+    @observable expandedSalary: IUserSalary = null; // user store
 
-    @observable workers: IWorker[] = [];
-    @observable expandedWorker: IExpandedWorker = null;
-    @observable firedWorkers: IWorker[] = [];
-    @observable doctors: IDoctor[] = [];
+    @observable workers: IWorker[] = []; // agents store
+    @observable expandedWorker: IExpandedWorker = null;  // agents store
+    @observable firedWorkers: IWorker[] = []; // agents store
+    @observable doctors: IDoctor[] = []; // docs store
 
     constructor(rootStore: IRootStore) {
         super();
@@ -102,9 +84,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        if (!this.LpuSortSettings || !this.LPUs) return this.LPUs;
+        const { uiStore: { LpuSortSettings }} = this.rootStore;
+        if (!LpuSortSettings || !this.LPUs) return this.LPUs;
 
-        const { order, propName } = this.LpuSortSettings;
+        const { order, propName } = LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
             const callback = order === SORT_ORDER.ASCENDING
@@ -120,9 +103,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        if (!this.LpuSortSettings || !this.pharmacies) return this.pharmacies;
+        const { uiStore: { LpuSortSettings }} = this.rootStore;
+        if (!LpuSortSettings || !this.pharmacies) return this.pharmacies;
 
-        const { order, propName } = this.LpuSortSettings;
+        const { order, propName } = LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
             const callback = order === SORT_ORDER.ASCENDING
@@ -235,26 +219,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     clearSalaries() {
         this.salaries = null;
         this.expandedSalary = null;
-    }
-
-    @action.bound
-    sortLpuBy(propName: SortableProps, order: SORT_ORDER) {
-        this.LpuSortSettings = { propName, order };
-    }
-
-    @action.bound
-    clearLpuSorting() {
-        this.LpuSortSettings = null;
-    }
-
-    @action.bound
-    filterLpuBy(propName: SortableProps, value: string) {
-        this.LpuFilterSettings = { propName, value };
-    }
-
-    @action.bound
-    clearLpuFilters() {
-        this.LpuFilterSettings = null;
     }
 
     @action.bound

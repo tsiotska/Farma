@@ -10,8 +10,8 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { SORT_ORDER, ISortBy } from '../../stores/DepartmentsStore';
 import cx from 'classnames';
+import { SORT_ORDER, ISortBy } from '../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     input: {
@@ -45,7 +45,7 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        departmentsStore: {
+        uiStore: {
             sortLpuBy,
             LpuSortSettings
         }

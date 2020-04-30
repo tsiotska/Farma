@@ -205,6 +205,12 @@ export class APIRequester {
             .catch(() => false);
     }
 
+    removeLpu(id: number): Promise<boolean> {
+        return this.instance.delete(`/api/hcf/${id}`)
+            .then(() => true)
+            .catch(() => false);
+    }
+
     getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
         const cache = this.cacheStore.getCachedData(url, medsStatNormalizer);
         const promise = this.instance.get(url)
