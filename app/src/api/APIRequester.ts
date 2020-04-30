@@ -205,8 +205,14 @@ export class APIRequester {
             .catch(() => false);
     }
 
-    removeLpu(id: number): Promise<boolean> {
+    deleteLpu(id: number): Promise<boolean> {
         return this.instance.delete(`/api/hcf/${id}`)
+            .then(() => true)
+            .catch(() => false);
+    }
+
+    deletePharmacy(id: number): Promise<boolean> {
+        return this.instance.delete(`/api/pharmacy/${id}`)
             .then(() => true)
             .catch(() => false);
     }
@@ -458,7 +464,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    removeDrug(departmentId: number, drugId: number): Promise<boolean> {
+    deleteDrug(departmentId: number, drugId: number): Promise<boolean> {
         return this.instance.delete(`/api/branch/${departmentId}/drug/${drugId}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { withStyles, WithStyles, createStyles, Grid, LinearProgress } from '@material-ui/core';
+import { withStyles, WithStyles, createStyles, Grid } from '@material-ui/core';
 import { ILPU } from '../../../interfaces/ILPU';
 import ListItem from '../ListItem';
 import { ILocation } from '../../../interfaces/ILocation';
@@ -15,12 +15,16 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     unconfirmed: boolean;
     regions?: Map<number, ILocation>;
     openModal?: (modalName: string, payload: any) => void;
+    deleteLpu?: (lpu: ILPU) => void;
+    deletePharmacy?: (lpu: ILPU) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             regions,
+            deleteLpu,
+            deletePharmacy
         },
         uiStore: {
             openModal
@@ -28,7 +32,9 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     }
 }) => ({
     regions,
-    openModal
+    openModal,
+    deleteLpu,
+    deletePharmacy
 }))
 @withRouter
 @observer
@@ -39,6 +45,12 @@ class PharmaciesList extends Component<IProps> {
         if (!!matchPath(pathname, LPU_ROUTE)) targetModal = EDIT_LPU_MODAL;
         if (!!matchPath(pathname, PHARMACY_ROUTE)) targetModal = EDIT_PHARMACY_MODAL;
         if (targetModal) openModal(targetModal, lpu);
+    }
+
+    deleteClickHandler = (lpu: ILPU) => {
+        const { deleteLpu, deletePharmacy, history: { location: { pathname }} } = this.props;
+        if (!!matchPath(pathname, LPU_ROUTE)) deleteLpu(lpu);
+        if (!!matchPath(pathname, PHARMACY_ROUTE)) deletePharmacy(lpu);
     }
 
     // TODO: pagination, sort, search
@@ -60,6 +72,7 @@ class PharmaciesList extends Component<IProps> {
                                 unconfirmed={unconfirmed}
                                 region={regions.get(pharmacy.region)}
                                 editClickHandler={this.editClickHandler}
+                                deleteClickHandler={this.deleteClickHandler}
                             />
                         ))
                     }

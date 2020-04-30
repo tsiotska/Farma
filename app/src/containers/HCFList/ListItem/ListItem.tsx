@@ -81,6 +81,7 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmed: boolean;
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
+    deleteClickHandler?: (lpu: ILPU) => void;
 }
 
 @observer
@@ -95,6 +96,11 @@ class ListItem extends Component<IProps> {
     onEditClick = () => {
         const { editClickHandler, pharmacy } = this.props;
         if (editClickHandler) editClickHandler(pharmacy);
+    }
+
+    deleteClickHandler = () => {
+        const { deleteClickHandler, pharmacy } = this.props;
+        if (deleteClickHandler) deleteClickHandler(pharmacy);
     }
 
     render() {
@@ -170,7 +176,7 @@ class ListItem extends Component<IProps> {
                             <Edit className={classes.icon} />
                           </IconButton>
                     }
-                    <IconButton className={classes.iconButton}>
+                    <IconButton onClick={this.deleteClickHandler} className={classes.iconButton}>
                         <Delete className={classes.icon} />
                     </IconButton>
                 </Grid>

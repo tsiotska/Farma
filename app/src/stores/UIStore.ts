@@ -27,8 +27,8 @@ export class UIStore implements IUIStore {
     @observable itemsPerPage: Readonly<number> = 50;
     @observable currentPage: number = 0;
 
-    @observable LpuSortSettings: ISortBy = null; // ui store
-    @observable LpuFilterSettings: IFilterBy = null; // ui store
+    @observable LpuSortSettings: ISortBy = null;
+    @observable LpuFilterSettings: IFilterBy = null;
 
     @action.bound
     setSalesHeaderHeight(value: number) {
@@ -40,7 +40,6 @@ export class UIStore implements IUIStore {
     @action.bound
     openModal(modalName: string, payload: any = null) {
         this.openedModal = modalName;
-        // console.log('open modal: ', modalName);
         this.modalPayload = modalName === null
         ? null
         : payload;

@@ -454,6 +454,28 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async deleteLpu(lpu: ILPU) {
+        const { api } = this.rootStore;
+        const isDeleted = await api.deleteLpu(lpu.id);
+
+        if (isDeleted) {
+            const index = this.LPUs.indexOf(lpu);
+            if (index !== -1) this.LPUs.splice(index, 1);
+        }
+    }
+
+    @action.bound
+    async deletePharmacy(lpu: ILPU) {
+        const { api } = this.rootStore;
+        const isDeleted = await api.deleteLpu(lpu.id);
+
+        if (isDeleted) {
+            const index = this.pharmacies.indexOf(lpu);
+            if (index !== -1) this.pharmacies.splice(index, 1);
+        }
+    }
+
+    @action.bound
     async loadDocsExcel() {
         const { api, userStore: { previewUser } } = this.rootStore;
         const userId = previewUser
@@ -653,7 +675,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
         const depId = this.currentDepartmentId;
         if (!depId) return false;
-        const removed =  await api.removeDrug(depId, medId);
+        const removed =  await api.deleteDrug(depId, medId);
         if (removed) {
             const depMeds = this.meds.get(depId);
             const med = depMeds
