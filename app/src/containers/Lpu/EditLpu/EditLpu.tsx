@@ -43,7 +43,7 @@ class EditLpu extends Component<IProps> {
 
     @computed
     get isLoading(): boolean {
-        return this.props.getAsyncStatus('').loading;
+        return this.props.getAsyncStatus('editLpu').loading;
     }
 
     snackbarCloseHandler = () => {

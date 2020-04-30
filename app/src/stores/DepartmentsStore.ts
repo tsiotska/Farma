@@ -1,3 +1,4 @@
+import { ADD_PHARMACY_MODAL } from './../constants/Modals';
 import { IValuesMap } from './../helpers/normalizers/normalizer';
 import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
 import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
@@ -441,7 +442,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const isLpuEdited  = await this.dispatchRequest(
             api.editLpu(initialLpu.id, payload),
-            'addLpu'
+            'editLpu'
         );
 
         if (isLpuEdited) {
@@ -462,6 +463,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const index = this.LPUs.indexOf(lpu);
             if (index !== -1) this.LPUs.splice(index, 1);
         }
+    }
+
+    @action.bound
+    async addPharmacy() {
+        console.log('add pharmacy');
+    }
+
+    @action.bound
+    async editPharmacy() {
+        console.log('edit pharmacy');
     }
 
     @action.bound
@@ -737,6 +748,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     loadSpecificCities(oblastName: string) {
         return this.rootStore.api.getLocations(`api/city?oblast=${oblastName}`);
+    }
+
+    @action.bound
+    loadSpecificLpus(cityId: number) {
+        return this.rootStore.api.getInCityLpus(this.currentDepartmentId, cityId);
     }
 
     @action.bound

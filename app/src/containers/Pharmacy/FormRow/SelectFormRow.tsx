@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
+import { createStyles, WithStyles, FormControl, InputLabel, Input, FormHelperText, Select } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IPharmacyModalValues } from '../PharmacyModal/PharmacyModal';
@@ -20,6 +20,7 @@ interface IProps extends WithStyles<typeof styles> {
     propName: keyof IPharmacyModalValues;
     onChange: (propName: keyof IPharmacyModalValues, value: string) => void;
     error: boolean | string;
+    disabled?: boolean;
     required?: boolean;
 }
 
@@ -37,20 +38,24 @@ class FormRow extends Component<IProps> {
             error,
             label,
             propName,
+            children,
+            disabled,
             required
         } = this.props;
 
         return (
-            <FormControl className={classes.root} error={!!error}>
+            <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
                     { label }
                 </InputLabel>
-                <Input
+                <Select
+                    displayEmpty
                     className={classes.input}
-                    value={values[propName]}
                     onChange={this.changeHandler}
                     disableUnderline
-                />
+                    value={values[propName]}>
+                    { children }
+                </Select>
                 {
                     !!error && typeof error === 'string' &&
                     <FormHelperText className={classes.helperText}>

@@ -14,6 +14,8 @@ import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
 import { computed } from 'mobx';
+import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
+import AddPharmacy from './AddPharmacy';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -51,6 +53,7 @@ interface IProps extends WithStyles<typeof styles> {
     currentPage?: number;
     itemsPerPage?: number;
     setPharmacyDemand?: (value: boolean) => void;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -66,7 +69,8 @@ interface IProps extends WithStyles<typeof styles> {
         uiStore: {
             setCurrentPage,
             currentPage,
-            itemsPerPage
+            itemsPerPage,
+            openModal
         }
     }
 }) => ({
@@ -78,7 +82,8 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage,
     setPharmacyDemand,
     unconfirmedPharmacies,
-    loadUnconfirmedPharmacies
+    loadUnconfirmedPharmacies,
+    openModal
 }))
 @observer
 class Pharmacy extends Component<IProps> {
@@ -114,6 +119,8 @@ class Pharmacy extends Component<IProps> {
     retryClickHandler = () => {
         this.props.loadPharmacies(true);
     }
+
+    addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
 
     componentDidMount() {
         this.props.setPharmacyDemand(true);
@@ -157,7 +164,7 @@ class Pharmacy extends Component<IProps> {
                     <Typography variant='h5'>
                         Аптеки
                     </Typography>
-                    <Button>
+                    <Button onClick={this.addPharmacyClickHandler}>
                         Додати Аптеку
                     </Button>
                 </Grid>
@@ -193,6 +200,7 @@ class Pharmacy extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
+                <AddPharmacy />
             </Grid>
         );
     }

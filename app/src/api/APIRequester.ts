@@ -174,6 +174,12 @@ export class APIRequester {
         );
     }
 
+    getInCityLpus(depId: number, cityId: number): Promise<ILPU[]> {
+        return this.instance.get(`/api/branch/${depId}/ffm/hcf?city=${cityId}`)
+            .then(lpuNormalizer)
+            .catch(this.defaultErrorHandler([]));
+    }
+
     getMedicalDepartments(departmentId: number, user: IUser, unconfirmed: boolean = false): Promise<ILPU[]> {
         const { position, id } = user;
 

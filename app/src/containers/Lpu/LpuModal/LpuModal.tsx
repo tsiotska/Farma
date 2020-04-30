@@ -12,7 +12,7 @@ import { withStyles } from '@material-ui/styles';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
 import FormRow from '../FormRow';
-import { observable, toJS, computed, reaction } from 'mobx';
+import { observable, computed, reaction } from 'mobx';
 import SelectFormRow from '../FormRow/SelectFormRow';
 import { ILocation } from '../../../interfaces/ILocation';
 
@@ -227,7 +227,7 @@ class LpuModal extends Component<IProps> {
             title,
             classes
         } = this.props;
-        // console.log(toJS(this.valuesChanged));
+
         return (
             <>
             <Dialog
@@ -235,6 +235,7 @@ class LpuModal extends Component<IProps> {
                 open={open}
                 onClose={onClose}
                 title={title}
+                fullWidth
                 maxWidth='sm'>
                     <FormRow
                         label='Назва'
