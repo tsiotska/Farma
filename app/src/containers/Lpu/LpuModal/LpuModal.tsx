@@ -15,12 +15,13 @@ import FormRow from '../FormRow';
 import { observable, toJS, computed, reaction } from 'mobx';
 import SelectFormRow from '../FormRow/SelectFormRow';
 import { ILocation } from '../../../interfaces/ILocation';
-import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
-import Snackbar from '../../../components/Snackbar';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
         marginLeft: 'auto',
+    },
+    header: {
+        marginBottom: 10
     }
 });
 
@@ -28,13 +29,13 @@ interface IProps extends WithStyles<typeof styles> {
     open: boolean;
     isLoading: boolean;
     onClose: () => void;
-    onSubmit: () => void;
+    onSubmit: (value: ILpuModalValues) => void;
+
     initialLpu?: ILPU;
     title: string;
     oblasti?: Map<number, ILocation>;
     loadSpecificCities?: (oblastName: string) => Promise<ILocation[]>;
     loadTypes?: (targetProp: string) => Promise<string[]>;
-    addLpu?: (data: ILpuModalValues) => Promise<boolean> ;
 }
 
 export interface ILpuModalValues {
@@ -53,14 +54,12 @@ export interface ILpuModalValues {
             oblasti,
             loadSpecificCities,
             loadTypes,
-            addLpu
         }
     }
 }) => ({
     oblasti,
     loadSpecificCities,
     loadTypes,
-    addLpu
 }))
 @observer
 class LpuModal extends Component<IProps> {
@@ -79,9 +78,6 @@ class LpuModal extends Component<IProps> {
         phone1: '',
         phone2: '',
     };
-
-    @observable openSnackbar: boolean = false;
-    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
 
     readonly errorMessages: {[key: string]: string} = {
         phone1: 'Телефон має скададатись з 10 або 12 цифр',
@@ -138,18 +134,7 @@ class LpuModal extends Component<IProps> {
         this.validate(propName, value);
     }
 
-    snackbarCloseHandler = () => {
-        this.openSnackbar = false;
-    }
-
-    submitHandler = async () => {
-        const { addLpu } = this.props;
-        const lpuCreated = await addLpu(this.formValues);
-        this.openSnackbar = true;
-        this.snackbarType = !!lpuCreated
-            ? SNACKBAR_TYPE.SUCCESS
-            : SNACKBAR_TYPE.ERROR;
-    }
+    submitHandler = () => this.props.onSubmit(this.formValues);
 
     async componentDidMount() {
         const { loadSpecificCities, loadTypes } = this.props;
@@ -179,6 +164,7 @@ class LpuModal extends Component<IProps> {
         return (
             <>
             <Dialog
+                classes={{ title: classes.header }}
                 open={open}
                 onClose={onClose}
                 title={title}
@@ -271,18 +257,6 @@ class LpuModal extends Component<IProps> {
                         Зберегти
                     </Button>
             </Dialog>
-            <Snackbar
-                open={!!this.openSnackbar}
-                onClose={this.snackbarCloseHandler}
-                type={this.snackbarType}
-                autoHideDuration={6000}
-                anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
-                message={
-                    this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                    ? 'ЛПУ успішно створено'
-                    : 'Неможливо додати ЛПУ'
-                }
-            />
             </>
         );
     }

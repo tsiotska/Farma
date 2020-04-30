@@ -6,7 +6,7 @@ import { SALARY_PREVIEW_MODAL, ADD_DEPARTMENT_MODAL } from '../constants/Modals'
 
 export class UIStore implements IUIStore {
     @observable salesHeaderHeight: number;
-    @observable openedModal: string = ADD_LPU_MODAL;
+    @observable openedModal: string;
     @observable modalPayload: any;
     @observable itemsPerPage: Readonly<number> = 50;
     @observable currentPage: number = 0;
