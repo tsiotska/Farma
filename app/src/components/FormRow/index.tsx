@@ -26,6 +26,7 @@ export interface IProps<T> extends WithStyles<typeof styles> {
     disabled?: boolean;
     required?: boolean;
     fullWidth?: boolean;
+    password?: boolean;
 }
 
 interface IFormRowProps<T> extends IProps<T> {

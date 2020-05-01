@@ -62,12 +62,18 @@ export interface ILpuModalValues {
 }))
 @observer
 class LpuModal extends Component<IProps> {
+    readonly optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
+    readonly errorMessages: {[key: string]: string} = {
+        phone1: 'Телефон має скададатись з 10 або 12 цифр',
+        phone2: 'Телефон має скададатись з 10 або 12 цифр',
+        default: 'Значення має містити не менше 3 символів'
+    };
+
     reactionDisposer: any;
     @observable cities: ILocation[] = [];
     @observable types: string[] = [];
 
     @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
-    @observable optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
     @observable formValues: ILpuModalValues = {
         name: '',
         oblast: '',
@@ -76,12 +82,6 @@ class LpuModal extends Component<IProps> {
         address: '',
         phone1: '',
         phone2: '',
-    };
-
-    readonly errorMessages: {[key: string]: string} = {
-        phone1: 'Телефон має скададатись з 10 або 12 цифр',
-        phone2: 'Телефон має скададатись з 10 або 12 цифр',
-        default: 'Значення має містити не менше 3 символів'
     };
 
     @computed

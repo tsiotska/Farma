@@ -5,11 +5,14 @@ import { withStyles } from '@material-ui/styles';
 import WorkerModal from '../WorkerModal';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { computed } from 'mobx';
+import { ADD_WORKER_MODAL } from '../../../constants/Modals';
+import { IPosition } from '../../../interfaces/IPosition';
 
 interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
+    positions?: Map<number, IPosition>;
 }
 
 @inject(({
@@ -20,18 +23,31 @@ interface IProps {
         },
         departmentsStore: {
             getAsyncStatus,
+            positions
         }
     }
 }) => ({
     openedModal,
     openModal,
     getAsyncStatus,
+    positions
 }))
 @observer
 class AddWorkerModal extends Component<IProps> {
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('').loading;
+    }
+
+    @computed
+    get positions(): IPosition[] {
+        const res: IPosition[] = [];
+
+        this.props.positions.forEach(x => {
+            res.push(x);
+        });
+
+        return res;
     }
 
     closeHandler = () => this.props.openModal(null);
@@ -45,11 +61,12 @@ class AddWorkerModal extends Component<IProps> {
 
         return (
             <WorkerModal
-                open={false}
+                open={openedModal === ADD_WORKER_MODAL}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}
                 onSubmit={this.submitHandler}
                 title='Додати працівника'
+                positions={this.positions}
             />
         );
     }

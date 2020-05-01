@@ -24,6 +24,7 @@ class InputFormRow<T> extends Component<IProps<T>> {
             propName,
             required,
             value,
+            password
         } = this.props;
 
         return (
@@ -36,14 +37,19 @@ class InputFormRow<T> extends Component<IProps<T>> {
                     { label }
                 </InputLabel>
                 <Input
+                    onChange={this.changeHandler}
                     className={classes.input}
+                    disableUnderline
+                    type={
+                        password
+                        ? 'password'
+                        : 'text'
+                    }
                     value={
                         value === undefined
                         ? values[propName]
                         : value
                     }
-                    onChange={this.changeHandler}
-                    disableUnderline
                 />
                 {
                     !!error && typeof error === 'string' &&

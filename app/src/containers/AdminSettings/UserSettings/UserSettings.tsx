@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, Button } from '@material-ui/core';
+import {
+    createStyles,
+    withStyles,
+    WithStyles,
+    Grid,
+    Button
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IWorker } from '../../../interfaces/IWorker';
 import ListHeader from './ListHeader';
 import ListItem from './ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
+import { ADD_WORKER_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -20,6 +27,7 @@ interface IProps extends WithStyles<typeof styles> {
     workers?: IWorker[];
     loadAdminWorkers?: () => void;
     positions?: Map<number, IPosition>;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
@@ -28,15 +36,21 @@ interface IProps extends WithStyles<typeof styles> {
             workers,
             loadAdminWorkers,
             positions
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
     workers,
     loadAdminWorkers,
-    positions
+    positions,
+    openModal
 }))
 @observer
 class UserSettings extends Component<IProps> {
+    openAddWorkerModal = () => this.props.openModal(ADD_WORKER_MODAL);
+
     componentDidMount() {
         this.props.loadAdminWorkers();
     }
@@ -56,7 +70,10 @@ class UserSettings extends Component<IProps> {
                         />
                     ))
                 }
-                <Button variant='outlined' className={classes.submitButton}>
+                <Button
+                    onClick={this.openAddWorkerModal}
+                    className={classes.submitButton}
+                    variant='outlined'>
                     Додати користувача
                 </Button>
             </Grid>
