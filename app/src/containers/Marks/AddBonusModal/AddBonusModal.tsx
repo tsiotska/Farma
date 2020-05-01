@@ -7,8 +7,14 @@ import isFuture from 'date-fns/isFuture';
 import Dialog from '../../../components/Dialog';
 import { ADD_BONUS_MODAL } from '../../../constants/Modals';
 import DateSelect from '../../../components/DateSelect';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
+    title: {
+        margin: '6px 6px 0'
+    },
     dateSelectContainer: {
         margin: '14px auto',
         width: '100%',
@@ -36,23 +42,31 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     openedModal?: string;
+    createBonus?: (year: number, month: number) => boolean;
 }
 
 @inject(({
     appState: {
         uiStore: {
             openModal,
-            openedModal
+            openedModal,
+        },
+        userStore: {
+            createBonus
         }
     }
 }) => ({
     openModal,
-    openedModal
+    openedModal,
+    createBonus
 }))
 @observer
 class AddBonusModal extends Component<IProps> {
     @observable year: number = new Date().getFullYear();
     @observable month: number = new Date().getMonth();
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable isLoading: boolean = false;
 
     @computed
     get isFuture(): boolean {
@@ -60,6 +74,18 @@ class AddBonusModal extends Component<IProps> {
             this.year,
             this.month
         ));
+    }
+
+    submitHandler = async () => {
+        const { createBonus } = this.props;
+        this.isLoading = true;
+        const created = await createBonus(this.year, this.month);
+        this.isLoading = false;
+        this.showSnackbar = true;
+        this.snackbarType = created
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        if (created) this.closeHandler();
     }
 
     yearChangeHandler = (value: number) => {
@@ -72,11 +98,17 @@ class AddBonusModal extends Component<IProps> {
 
     closeHandler = () => this.props.openModal(null);
 
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
+    }
+
     render() {
         const { openedModal, classes } = this.props;
 
         return (
+            <>
             <Dialog
+                classes={{ title: classes.title }}
                 open={openedModal === ADD_BONUS_MODAL}
                 onClose={this.closeHandler}
                 title='Створити розподіл бонусів'
@@ -90,11 +122,16 @@ class AddBonusModal extends Component<IProps> {
                         changeMonth={this.monthChangeHandler}
                     />
                     <Button
-                        disabled={this.isFuture}
+                        onClick={this.submitHandler}
+                        disabled={this.isFuture || this.isLoading}
                         className={classes.submitButton}
                         variant='contained'
                         color='primary'>
-                        Створити
+                            {
+                                this.isLoading
+                                ? <LoadingMask size={20} />
+                                : 'Створити'
+                            }
                     </Button>
                     {
                         this.isFuture &&
@@ -103,6 +140,19 @@ class AddBonusModal extends Component<IProps> {
                         </Typography>
                     }
             </Dialog>
+            <Snackbar
+                open={this.showSnackbar}
+                onClose={this.snackbarCloseHandler}
+                type={this.snackbarType}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                autoHideDuration={6000}
+                message={
+                    this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Розподіл балів створено'
+                        : 'Неможливо створити розподіл балів'
+                }
+            />
+            </>
         );
     }
 }

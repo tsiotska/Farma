@@ -135,6 +135,44 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
+    async createBonus(year: number, month: number): Promise<boolean> {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        const userId = this.previewUser
+            ? this.previewUser.id
+            : null;
+
+        if (!userId || !currentDepartmentId) return false;
+
+        const isCreated = await api.updateBonusesData(
+            currentDepartmentId,
+            userId,
+            year + 1,
+            month + 1,
+            {}
+        );
+
+        if (isCreated) {
+            const newBonusInfo: IBonusInfo = {
+                month: month,
+                payments: null,
+                deposit: null,
+                status: false,
+                sales: new Map(),
+                agents: [],
+            };
+
+            if (this.bonuses) this.bonuses.push(newBonusInfo);
+            else this.bonuses = [newBonusInfo];
+
+            this.setPreviewBonus(newBonusInfo);
+            this.setBonusesYear(year, false);
+        }
+
+        return isCreated;
+    }
+
+    @action.bound
     updateBonuses() {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 

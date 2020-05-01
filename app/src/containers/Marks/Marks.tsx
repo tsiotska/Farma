@@ -223,7 +223,10 @@ class Marks extends Component<IProps> {
     componentWillUnmount() {
         const { updateBonuses, role, setBonusesYear } = this.props;
         if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
-        setBonusesYear(new Date().getFullYear(), role === USER_ROLE.MEDICAL_AGENT);
+        setBonusesYear(
+            new Date().getFullYear(),
+            role === USER_ROLE.MEDICAL_AGENT
+        );
     }
 
     render() {
