@@ -510,8 +510,57 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async editPharmacy() {
+    async editPharmacy(initialPharmacy: ILPU, data: IPharmacyModalValues) {
         console.log('edit pharmacy');
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            name: 'name',
+            oblast: 'oblast',
+            city: 'city',
+            lpu: 'hcf',
+            address: 'address',
+            phone1: 'phone1',
+            phone2: 'phone2',
+            type: 'org_type',
+        };
+
+        const payload: any = Object.entries(data)
+        .reduce((acc, [propName, value ]) => {
+            const newPropName = namesMap[propName];
+
+            if (propName === 'city') {
+                const name = value
+                    ? value.name
+                    : '';
+
+                return name
+                    ? { ...acc, [newPropName]: name }
+                    : acc;
+            }
+
+            return newPropName && !!value
+                ? { ...acc, [newPropName]: value }
+                : acc;
+        }, {});
+
+        const isPharmacyEdited = await this.dispatchRequest(
+            api.editPharmacy(this.currentDepartmentId, payload),
+            'editPharmacy'
+        );
+
+        if (isPharmacyEdited) {
+            const invertedNames = invert(namesMap);
+            Object.entries(payload).forEach(([ key, value ]) => {
+                const propName = invertedNames[key];
+                const valueChanged = initialPharmacy[propName] !== value;
+                if (propName && valueChanged) {
+                    initialPharmacy[propName] = value;
+                }
+            });
+        }
+
+        return isPharmacyEdited;
     }
 
     @action.bound

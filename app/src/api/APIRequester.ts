@@ -214,19 +214,25 @@ export class APIRequester {
     editLpu(id: number, data: any): Promise<boolean> {
         return this.instance.put(`/api/hcf/${id}`, data)
             .then(() => true)
-            .catch(() => false);
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    editPharmacy(depId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/pharmacy/${depId}`, data)
+        .then(() => true)
+        .catch(this.defaultErrorHandler(false));
     }
 
     deleteLpu(id: number): Promise<boolean> {
         return this.instance.delete(`/api/hcf/${id}`)
             .then(() => true)
-            .catch(() => false);
+            .catch(this.defaultErrorHandler(false));
     }
 
     deletePharmacy(id: number): Promise<boolean> {
         return this.instance.delete(`/api/pharmacy/${id}`)
             .then(() => true)
-            .catch(() => false);
+            .catch(this.defaultErrorHandler(false));
     }
 
     getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
