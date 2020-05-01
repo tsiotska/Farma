@@ -402,7 +402,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload: any = Object.entries(data)
         .reduce((acc, [propName, value ]) => {
             const newPropName = namesMap[propName];
-            return newPropName
+            return (newPropName && !!value)
             ? { ...acc, [newPropName]: value }
             : acc;
         }, {});
@@ -440,7 +440,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload: any = Object.entries(data)
         .reduce((acc, [propName, value ]) => {
             const newPropName = namesMap[propName];
-            return newPropName
+
+            return (newPropName && !!value)
             ? { ...acc, [newPropName]: value }
             : acc;
         }, {});
@@ -488,7 +489,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload: any = Object.entries(data)
         .reduce((acc, [propName, value ]) => {
             const newPropName = namesMap[propName];
-            return newPropName
+            return (newPropName && !!value)
             ? { ...acc, [newPropName]: value }
             : acc;
         }, {});
@@ -539,7 +540,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     : acc;
             }
 
-            return newPropName && !!value
+            return (newPropName && !!value)
                 ? { ...acc, [newPropName]: value }
                 : acc;
         }, {});

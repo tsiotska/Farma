@@ -102,12 +102,12 @@ class Marks extends Component<IProps> {
 
     @computed
     get isBonusesLoading(): boolean {
-        return this.props.getAsyncStatus('').loading;
+        return this.props.getAsyncStatus('loadBonuses').loading;
     }
 
     @computed
     get isBonusDataLoading(): boolean {
-        return this.props.getAsyncStatus('').loading;
+        return this.props.getAsyncStatus('loadBonusesData').loading;
     }
 
     @computed
