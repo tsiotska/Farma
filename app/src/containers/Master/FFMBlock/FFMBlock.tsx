@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { WithStyles, withStyles, createStyles, Grid, TextField, Typography } from '@material-ui/core';
 import { observer } from 'mobx-react';
-import FFMDropzone from '../FFMDropzone';
+import AvatarDropzone from '../../../components/AvatarDropzone';
 import { IFFMData } from '../AddDepartmentModal/AddDepartmentModal';
 
 const styles = createStyles({
@@ -55,7 +55,7 @@ class FFMBlock extends Component<IProps> {
 
         return (
             <Grid wrap='nowrap' className={classes.root} container>
-                <FFMDropzone
+                <AvatarDropzone
                     file={image}
                     appendFile={this.imageAddHandler}
                     removeIcon={this.imageRemoveHandler}

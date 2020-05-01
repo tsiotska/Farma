@@ -229,7 +229,6 @@ class LpuModal extends Component<IProps> {
         } = this.props;
 
         return (
-            <>
             <Dialog
                 classes={{ title: classes.header }}
                 open={open}
@@ -325,7 +324,6 @@ class LpuModal extends Component<IProps> {
                         Зберегти
                     </Button>
             </Dialog>
-            </>
         );
     }
 }

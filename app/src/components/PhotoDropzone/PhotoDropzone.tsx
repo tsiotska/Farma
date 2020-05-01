@@ -26,13 +26,26 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children }) => {
+    const [isHovered, setHoverStatus] = useState(false);
+
+    const onMouseEnter = useCallback(
+        () => setHoverStatus(true),
+        [setHoverStatus]
+    );
+
+    const onMouseLeave = useCallback(
+        () => setHoverStatus(false),
+        [setHoverStatus]
+    );
+
     const onDrop = useCallback((files: File[]) => {
         if (files.length) {
             appendFile(files[0]);
             setHoverStatus(false);
         }
-    }, []);
+    }, [appendFile, setHoverStatus]);
 
+    // TODO: play with maxSize property(2MB is max)
     const {
         getRootProps,
         getInputProps,
@@ -42,14 +55,8 @@ export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children 
         onDrop,
         accept: 'image/*',
         multiple: false,
-        noClick: true
+        noClick: true,
     });
-
-    const [isHovered, setHoverStatus] = useState(false);
-
-    const onMouseEnter = () => setHoverStatus(true);
-
-    const onMouseLeave = () => setHoverStatus(false);
 
     return (
         <div {...getRootProps({

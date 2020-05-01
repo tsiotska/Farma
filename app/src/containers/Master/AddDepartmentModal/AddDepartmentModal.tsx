@@ -136,7 +136,7 @@ class AddDepartmentModal extends Component<IProps> {
         }
     }
 
-    deparmentNameChangeHandler = ({ target: { value }}: any) => {
+    departmentNameChangeHandler = ({ target: { value }}: any) => {
         this.departmentData.name = value;
     }
 
@@ -168,7 +168,6 @@ class AddDepartmentModal extends Component<IProps> {
 
         ffmFormData.append('image', image);
 
-        // variant1
         const json = JSON.stringify({
             bank_card: card,
             email: email,
@@ -180,14 +179,6 @@ class AddDepartmentModal extends Component<IProps> {
         });
         ffmFormData.append('json', json);
 
-        // variant2
-        // ffmFormData.append('bank_card', card);
-        // ffmFormData.append('email', email);
-        // ffmFormData.append('full_name', name);
-        // ffmFormData.append('password', password);
-        // ffmFormData.append('work_phone', workPhone);
-        // ffmFormData.append('mobile_phone', mobilePhone);
-
         return ffmFormData;
     }
 
@@ -198,17 +189,17 @@ class AddDepartmentModal extends Component<IProps> {
                 type: SNACKBAR_TYPE.SUCCESS,
                 text: 'Відділення і ФФМ успішно створені'
             };
-        }
-
-        const text: string = !isDepartmentCreated
+        } else {
+            const text: string = !isDepartmentCreated
             ? 'Неможливо створити відділення'
             : 'неможливо стоврити ФФМ`а';
 
-        this.snackbarSettings = {
-            isOpen: true,
-            type: SNACKBAR_TYPE.ERROR,
-            text
-        };
+            this.snackbarSettings = {
+                isOpen: true,
+                type: SNACKBAR_TYPE.ERROR,
+                text
+            };
+        }
     }
 
     validate = (): boolean => {
@@ -284,7 +275,7 @@ class AddDepartmentModal extends Component<IProps> {
                 title='Додати відділення'>
                     <DepartmentBlock
                         values={this.departmentData}
-                        onNameChange={this.deparmentNameChangeHandler}
+                        onNameChange={this.departmentNameChangeHandler}
                         removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
                         appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)}
                         invalidFields={this.invalidDepartmentFields}

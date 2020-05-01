@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { WithStyles, withStyles, createStyles, Backdrop, Grid, Button } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Button } from '@material-ui/core';
 import { observer } from 'mobx-react';
-import PhotoDropzone from '../../../components/PhotoDropzone';
+import { withStyles } from '@material-ui/styles';
 import { ArrowDownward, AddAPhotoOutlined } from '@material-ui/icons';
+import PhotoDropzone from '../PhotoDropzone';
 
 const styles = (theme: any) => createStyles({
     dropzone: {
@@ -41,7 +42,7 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @observer
-class DepartmentDropzone extends Component<IProps> {
+class AvatarDropzone extends Component<IProps> {
     addImageClickHandler = () => {
         const { appendFile } = this.props;
         const input = document.createElement('input');
@@ -97,4 +98,4 @@ class DepartmentDropzone extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(DepartmentDropzone);
+export default withStyles(styles)(AvatarDropzone);
