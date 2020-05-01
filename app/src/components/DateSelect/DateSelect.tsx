@@ -86,7 +86,7 @@ class DateSelect extends Component<IProps> {
                         ))
                     }
                 </Grid>
-                <Divider className={classes.divider} orientation='vertical' />
+                <Divider className={classes.divider} flexItem orientation='vertical' />
                 <Grid wrap='nowrap' className={classes.monthColumn} container direction='column'>
                     {
                         uaMonthsNames.map((value, i) => (

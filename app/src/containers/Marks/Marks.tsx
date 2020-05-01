@@ -9,7 +9,7 @@ import {
     IconButton,
     Button
 } from '@material-ui/core';
-import { ArrowLeft, ArrowRight } from '@material-ui/icons';
+import { ArrowLeft, ArrowRight, Add } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
@@ -23,8 +23,9 @@ import TableHeader from './TableHeader';
 import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';
 import ExcelLoadPopper from './ExcelLoadPoppper';
-import { ADD_DOC_MODAL } from '../../constants/Modals';
+import { ADD_DOC_MODAL, ADD_BONUS_MODAL } from '../../constants/Modals';
 import AddDocsModal from './AddDocsModal';
+import AddBonusModal from './AddBonusModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -192,6 +193,8 @@ class Marks extends Component<IProps> {
         this.excelPopperAnchor = null;
     }
 
+    createBonus = () => this.props.openModal(ADD_BONUS_MODAL);
+
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     componentDidUpdate({ role: prevRole }: IProps) {
@@ -225,13 +228,14 @@ class Marks extends Component<IProps> {
 
     render() {
         const {
-                bonuses,
-                classes,
-                bonusesYear,
-                updateBonuses,
-                role,
-            } = this.props;
-
+            bonuses,
+            classes,
+            bonusesYear,
+            updateBonuses,
+            role,
+            previewBonus
+        } = this.props;
+        console.log('previewBonus: ', toJS(previewBonus));
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
@@ -243,6 +247,12 @@ class Marks extends Component<IProps> {
                         disabled={!bonuses || !bonuses.length}
                         className={classes.iconButton}>
                         <ArrowLeft fontSize='small' />
+                    </IconButton>
+                    <IconButton
+                        onClick={this.createBonus}
+                        disabled={this.isBonusesLoading || this.isBonusDataLoading}
+                        className={classes.iconButton}>
+                        <Add fontSize='small' />
                     </IconButton>
                     {
                         bonuses && bonuses.map(bonusInfo => (
@@ -310,6 +320,7 @@ class Marks extends Component<IProps> {
                         agents={this.agents} />
                 </Paper>
                 <AddDocsModal />
+                <AddBonusModal />
             </Grid>
         );
     }

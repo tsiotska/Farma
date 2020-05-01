@@ -8,3 +8,4 @@ export const ADD_LPU_MODAL: string = 'ADD_LPU_MODAL';
 export const EDIT_LPU_MODAL: string = 'EDIT_LPU_MODAL';
 export const ADD_PHARMACY_MODAL: string = 'ADD_PHARMACY_MODAL';
 export const EDIT_PHARMACY_MODAL: string = 'EDIT_PHARMACY_MODAL';
+export const ADD_BONUS_MODAL: string = 'ADD_BONUS_MODAL';
