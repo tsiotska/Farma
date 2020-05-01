@@ -7,7 +7,9 @@ import SelectFormRow from './SelectFormRow';
 export const styles = (theme: any) => createStyles({
     root: {
         margin: '10px 0 6px',
-        width: '48%',
+        width: ({ fullWidth }: any) => fullWidth
+            ? '100%'
+            : '48%',
     },
     input: {},
     labelRoot: {},
@@ -23,6 +25,7 @@ export interface IProps<T> extends WithStyles<typeof styles> {
     error: boolean | string;
     disabled?: boolean;
     required?: boolean;
+    fullWidth?: boolean;
 }
 
 interface IFormRowProps<T> extends IProps<T> {

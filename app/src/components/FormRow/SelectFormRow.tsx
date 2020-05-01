@@ -18,14 +18,14 @@ class SelectFormRow<T> extends Component<IProps<T>> {
     public render() {
         const {
             classes,
-            values,
             error,
             label,
             propName,
             children,
             disabled,
             required,
-            value
+            value,
+            values
         } = this.props;
 
         return (

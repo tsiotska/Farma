@@ -3,7 +3,6 @@ import { createStyles, WithStyles, Grid, Button, MenuItem } from '@material-ui/c
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, computed, toJS } from 'mobx';
-import FormRow from '../FormRow';
 import {
     Validator,
     stringValidator,
@@ -14,8 +13,8 @@ import {
 } from '../../../helpers/validators';
 import LoadingMask from '../../../components/LoadingMask';
 import { IMedicine } from '../../../interfaces/IMedicine';
-import SelectFormRow from '../FormRow/SelectFormRow';
 import { IDepartment } from '../../../interfaces/IDepartment';
+import FormRow from '../../../components/FormRow';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -77,7 +76,18 @@ export interface IFormValues {
 }))
 @observer
 class FormContent extends Component<IProps> {
-    @observable formValues: Partial<IFormValues> = {};
+    readonly initialValue: IFormValues = {
+        name: '',
+        releaseForm: '',
+        dosage: '',
+        manufacturer: '',
+        mark: '',
+        price: '',
+        barcode: '',
+        department: '',
+    };
+    @observable formValues: IFormValues = {...this.initialValue};
+
     @observable fieldsErrorStatuses: Record<keyof IFormValues, boolean> = {
         name: false,
         releaseForm: false,
@@ -174,7 +184,7 @@ class FormContent extends Component<IProps> {
             : errorMessage;
     }
 
-    changeHandler = (propName: keyof IFormValues) => ({ target: { value }}: any) => {
+    changeHandler = (propName: keyof IFormValues, value: string) => {
         this.formValues[propName] = value;
         this.validate(propName, value);
     }
@@ -192,6 +202,12 @@ class FormContent extends Component<IProps> {
     }
 
     resetValues = (defaultMedicine?: IMedicine) => {
+        const { currentDepartment } = this.props;
+
+        const department = currentDepartment
+        ? currentDepartment.name
+        : '';
+
         if (defaultMedicine) {
             const {
                 name,
@@ -211,12 +227,13 @@ class FormContent extends Component<IProps> {
                 dosage: `${dosage || ''}`,
                 mark: `${mark || ''}`,
                 price: `${price || ''}`,
+                department
             };
 
             Object.entries(this.formValues)
                 .forEach(([ propName, value ]: [keyof IFormValues, string]) => this.validate(propName, value));
         } else {
-            this.formValues = {};
+            this.formValues = { ...this.initialValue, department };
         }
     }
 
@@ -238,53 +255,72 @@ class FormContent extends Component<IProps> {
                     <Grid direction='column' className={classes.columnFirst} xs container item>
                         <FormRow
                             label='Назва'
-                            value={this.formValues.name || ''}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='name'
                             error={this.fieldsErrorStatuses.name}
-                            onChange={this.changeHandler('name')}
+                            fullWidth
                         />
                         <FormRow
                             label='Дозування, мг'
-                            value={this.formValues.dosage || ''}
-                            onChange={this.changeHandler('dosage')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='dosage'
                             error={this.fieldsErrorStatuses.dosage}
+                            fullWidth
                         />
                         <FormRow
                             label='Штрихкод'
-                            value={this.formValues.barcode || ''}
-                            onChange={this.changeHandler('barcode')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='barcode'
                             error={this.fieldsErrorStatuses.barcode}
+                            fullWidth
                         />
                         <FormRow
                             label='Балл'
-                            value={this.formValues.mark || ''}
-                            onChange={this.changeHandler('mark')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='mark'
                             error={this.fieldsErrorStatuses.mark}
+                            fullWidth
                         />
                     </Grid>
-                    <Grid direction='column' xs container item>
+                   <Grid direction='column' xs container item>
                         <FormRow
                             label='Форма выпуску'
-                            value={this.formValues.releaseForm || ''}
-                            onChange={this.changeHandler('releaseForm')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='releaseForm'
                             error={this.fieldsErrorStatuses.releaseForm}
+                            fullWidth
                         />
                         <FormRow
                             label='Виробник'
-                            value={this.formValues.manufacturer || ''}
-                            onChange={this.changeHandler('manufacturer')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='manufacturer'
                             error={this.fieldsErrorStatuses.manufacturer}
+                            fullWidth
                         />
                         <FormRow
                             label='Ціна, грн'
-                            value={this.formValues.price || ''}
-                            onChange={this.changeHandler('price')}
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='price'
                             error={this.fieldsErrorStatuses.price}
+                            fullWidth
                         />
-                        <SelectFormRow
-                            label='qwer'
-                            value={this.formValues.department || this.defaultDepartmentName}
-                            onChange={this.changeHandler('department')}
-                            error={this.fieldsErrorStatuses.department}>
+                        <FormRow
+                            select
+                            label='Віділення'
+                            values={this.formValues}
+                            onChange={this.changeHandler}
+                            propName='department'
+                            disabled={!departments || !departments.length}
+                            error={this.fieldsErrorStatuses.department}
+                            fullWidth
+                        >
                             {
                                 departments && departments.map(({ id, name }) => (
                                     <MenuItem key={id} className={classes.menuItem} value={name}>
@@ -292,7 +328,7 @@ class FormContent extends Component<IProps> {
                                     </MenuItem>
                                 ))
                             }
-                        </SelectFormRow>
+                        </FormRow>
                     </Grid>
                 </Grid>
                 <Button

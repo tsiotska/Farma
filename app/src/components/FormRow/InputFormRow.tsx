@@ -23,7 +23,7 @@ class InputFormRow<T> extends Component<IProps<T>> {
             label,
             propName,
             required,
-            value
+            value,
         } = this.props;
 
         return (

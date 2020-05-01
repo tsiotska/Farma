@@ -45,7 +45,7 @@ class AddWorkerModal extends Component<IProps> {
 
         return (
             <WorkerModal
-                open={true}
+                open={false}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}
                 onSubmit={this.submitHandler}

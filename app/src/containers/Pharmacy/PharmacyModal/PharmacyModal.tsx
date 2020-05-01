@@ -6,9 +6,8 @@ import { observable, computed, reaction, when } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import FormRow from '../FormRow';
 import { ILpuModalValues } from '../../Lpu/LpuModal/LpuModal';
-import SelectFormRow from '../FormRow/SelectFormRow';
+import FormRow from '../../../components/FormRow';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -284,7 +283,8 @@ class PharmacyModal extends Component<IProps> {
                         required
                     />
                     <Grid justify='space-between' container>
-                        <SelectFormRow
+                        <FormRow
+                            select
                             label='Область'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -299,7 +299,7 @@ class PharmacyModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             label='Адрес'
                             values={this.formValues}
@@ -308,7 +308,8 @@ class PharmacyModal extends Component<IProps> {
                             error={this.errors.get('address')}
                             required
                         />
-                        <SelectFormRow
+                        <FormRow
+                            select
                             label='Місто'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -328,7 +329,7 @@ class PharmacyModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             label='Телефон 1'
                             values={this.formValues}
@@ -336,7 +337,8 @@ class PharmacyModal extends Component<IProps> {
                             propName='phone1'
                             error={this.errors.get('phone1')}
                         />
-                        <SelectFormRow
+                        <FormRow
+                            select
                             label='ЛПУ'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -351,7 +353,7 @@ class PharmacyModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             label='Телефон 2'
                             values={this.formValues}
@@ -359,7 +361,8 @@ class PharmacyModal extends Component<IProps> {
                             propName='phone2'
                             error={this.errors.get('phone2')}
                         />
-                        <SelectFormRow
+                        <FormRow
+                            select
                             label='Тип'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -374,7 +377,7 @@ class PharmacyModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                     </Grid>
                     <Button
                         variant='contained'

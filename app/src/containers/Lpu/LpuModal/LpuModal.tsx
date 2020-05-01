@@ -11,10 +11,9 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import FormRow from '../FormRow';
 import { observable, computed, reaction } from 'mobx';
-import SelectFormRow from '../FormRow/SelectFormRow';
 import { ILocation } from '../../../interfaces/ILocation';
+import FormRow from '../../../components/FormRow';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -245,7 +244,8 @@ class LpuModal extends Component<IProps> {
                         required
                     />
                     <Grid justify='space-between' container>
-                        <SelectFormRow
+                        <FormRow
+                            select
                             label='Область'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -259,7 +259,7 @@ class LpuModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             required
                             label='Адрес'
@@ -268,7 +268,8 @@ class LpuModal extends Component<IProps> {
                             propName='address'
                             error={this.errors.get('address')}
                         />
-                        <SelectFormRow
+                        <FormRow
+                            select
                             required
                             disabled={!this.formValues.oblast}
                             label='Місто'
@@ -283,7 +284,7 @@ class LpuModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             label='Основний телефон'
                             values={this.formValues}
@@ -291,7 +292,8 @@ class LpuModal extends Component<IProps> {
                             propName='phone1'
                             error={this.errors.get('phone1')}
                         />
-                        <SelectFormRow
+                        <FormRow
+                            select
                             required
                             disabled={!this.types.length}
                             label='Тип'
@@ -306,7 +308,7 @@ class LpuModal extends Component<IProps> {
                                         </MenuItem>
                                     ))
                                 }
-                        </SelectFormRow>
+                        </FormRow>
                         <FormRow
                             label='Запасний телефон'
                             values={this.formValues}
