@@ -1,30 +1,15 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
+import {
+    FormControl,
+    InputLabel,
+    Input,
+    FormHelperText
+} from '@material-ui/core';
 import { observer } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { ILpuModalValues } from '../LpuModal/LpuModal';
-
-export const styles = (theme: any) => createStyles({
-    root: {
-        margin: '10px 0 6px',
-        width: '48%',
-    },
-    input: {},
-    labelRoot: {},
-    helperText: {}
-});
-
-interface IProps extends WithStyles<typeof styles> {
-    label: string;
-    values: ILpuModalValues;
-    propName: keyof ILpuModalValues;
-    onChange: (propName: keyof ILpuModalValues, value: string) => void;
-    error: boolean | string;
-    required?: boolean;
-}
+import { IProps } from '.';
 
 @observer
-class FormRow extends Component<IProps> {
+class InputFormRow<T> extends Component<IProps<T>> {
     changeHandler = ({ target: { value }}: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
@@ -37,7 +22,8 @@ class FormRow extends Component<IProps> {
             error,
             label,
             propName,
-            required
+            required,
+            value
         } = this.props;
 
         return (
@@ -51,7 +37,11 @@ class FormRow extends Component<IProps> {
                 </InputLabel>
                 <Input
                     className={classes.input}
-                    value={values[propName]}
+                    value={
+                        value === undefined
+                        ? values[propName]
+                        : value
+                    }
                     onChange={this.changeHandler}
                     disableUnderline
                 />
@@ -66,4 +56,4 @@ class FormRow extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(FormRow);
+export default InputFormRow;

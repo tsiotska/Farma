@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Dialog from '../../../components/Dialog';
 import AvatarDropzone from '../../../components/AvatarDropzone';
+import FormRow from '../../../components/FormRow';
 
 const styles = (theme: any) => createStyles({
     modalContent: {
@@ -68,6 +69,18 @@ class WorkerModal extends Component<IProps> {
                             </Grid>
                         </Grid>
                     </Grid>
+                    <FormRow
+                        label=''
+                        values={{
+                            test: ''
+                        }}
+                        propName={'test'}
+                        onChange={() => {
+                            console.log('tmp');
+                        }}
+                        error={false}
+                        select
+                    />
             </Dialog>
         );
     }

@@ -44,8 +44,15 @@ class FormRow extends Component<IProps> {
         } = this.props;
 
         return (
-            <FormControl disabled={disabled} className={classes.root} error={!!error}>
-                <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
+            <FormControl
+                disabled={disabled}
+                className={classes.root}
+                error={!!error}>
+                <InputLabel
+                    className={classes.labelRoot}
+                    required={required}
+                    disableAnimation
+                    shrink>
                     { label }
                 </InputLabel>
                 <Select
