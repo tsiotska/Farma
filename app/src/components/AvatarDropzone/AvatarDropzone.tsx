@@ -36,7 +36,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     file: File;
-    error: boolean;
+    error?: boolean;
     appendFile: (file: File) => void;
     removeIcon: () => void;
 }

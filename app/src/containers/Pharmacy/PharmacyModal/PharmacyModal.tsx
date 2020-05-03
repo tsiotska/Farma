@@ -8,6 +8,7 @@ import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
 import { ILpuModalValues } from '../../Lpu/LpuModal/LpuModal';
 import FormRow from '../../../components/FormRow';
+import { phoneValidator } from '../../../helpers/validators';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -147,7 +148,7 @@ class PharmacyModal extends Component<IProps> {
 
             const isInvalid = propName === 'lpu'
                 ? !value || value.length < 3
-                : !value.match(/^(\d{10}|\d{12})$/);
+                : !phoneValidator(value);
 
             return isInvalid && this.errorMessages[propName];
         } else {

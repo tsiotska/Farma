@@ -27,3 +27,6 @@ export const lengthValidator = (minLength: number, value: string): boolean => {
 };
 
 export const onlyNumbersValidator: Validator = (value: string): boolean => value.match(/^\d+$/) !== null;
+
+// accepts string composed only with nums and with length === 10 or length === 12
+export const phoneValidator: Validator = (value: string): boolean => value.match(/^(\d{10}|\d{12})$/) !== null;

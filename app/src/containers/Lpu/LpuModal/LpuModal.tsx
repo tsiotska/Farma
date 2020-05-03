@@ -14,6 +14,7 @@ import Dialog from '../../../components/Dialog';
 import { observable, computed, reaction } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import FormRow from '../../../components/FormRow';
+import { phoneValidator } from '../../../helpers/validators';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -64,8 +65,8 @@ export interface ILpuModalValues {
 class LpuModal extends Component<IProps> {
     readonly optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
     readonly errorMessages: {[key: string]: string} = {
-        phone1: 'Телефон має скададатись з 10 або 12 цифр',
-        phone2: 'Телефон має скададатись з 10 або 12 цифр',
+        phone1: 'Телефон має склададатись з 10 або 12 цифр',
+        phone2: 'Телефон має склададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
     };
 
@@ -132,8 +133,7 @@ class LpuModal extends Component<IProps> {
         if (this.optionalFields.includes(propName)) {
             // phones are the only optional fields, so if they are empty, they are valid
             if (!value) return false;
-            // accepts string composed only with nums and with length === 10 or length === 12
-            const isInvalid = !value.match(/^(\d{10}|\d{12})$/);
+            const isInvalid = !phoneValidator(value);
             return isInvalid && this.errorMessages[propName];
         } else {
             const isInvalid = !value || value.length < 3;
