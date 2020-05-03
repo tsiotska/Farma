@@ -12,6 +12,7 @@ interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
+    modalPayload?: IPosition[];
     positions?: Map<number, IPosition>;
 }
 
@@ -19,7 +20,8 @@ interface IProps {
     appState: {
         uiStore: {
             openedModal,
-            openModal
+            openModal,
+            modalPayload
         },
         departmentsStore: {
             getAsyncStatus,
@@ -30,7 +32,8 @@ interface IProps {
     openedModal,
     openModal,
     getAsyncStatus,
-    positions
+    positions,
+    modalPayload
 }))
 @observer
 class AddWorkerModal extends Component<IProps> {
@@ -40,14 +43,16 @@ class AddWorkerModal extends Component<IProps> {
     }
 
     @computed
+    get isOpen(): boolean {
+        return this.props.openedModal === ADD_WORKER_MODAL;
+    }
+
+    @computed
     get positions(): IPosition[] {
-        const res: IPosition[] = [];
-
-        this.props.positions.forEach(x => {
-            res.push(x);
-        });
-
-        return res;
+        const { modalPayload, positions } = this.props;
+        return (this.isOpen && Array.isArray(modalPayload))
+            ? modalPayload
+            : [...positions.values()];
     }
 
     closeHandler = () => this.props.openModal(null);
@@ -57,11 +62,9 @@ class AddWorkerModal extends Component<IProps> {
     }
 
     render() {
-        const { openedModal } = this.props;
-
         return (
             <WorkerModal
-                open={openedModal === ADD_WORKER_MODAL}
+                open={this.isOpen}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}
                 onSubmit={this.submitHandler}

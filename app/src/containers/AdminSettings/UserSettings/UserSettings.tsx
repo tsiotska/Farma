@@ -12,6 +12,7 @@ import ListHeader from './ListHeader';
 import ListItem from './ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import { ADD_WORKER_MODAL } from '../../../constants/Modals';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -27,7 +28,7 @@ interface IProps extends WithStyles<typeof styles> {
     workers?: IWorker[];
     loadAdminWorkers?: () => void;
     positions?: Map<number, IPosition>;
-    openModal?: (modalName: string) => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
@@ -49,7 +50,20 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class UserSettings extends Component<IProps> {
-    openAddWorkerModal = () => this.props.openModal(ADD_WORKER_MODAL);
+    openAddWorkerModal = () => {
+        const { openModal, positions } = this.props;
+        const allowedPositions: USER_ROLE[] = [
+            USER_ROLE.ADMIN,
+            USER_ROLE.PRODUCT_MANAGER
+        ];
+        const filteredPositions: IPosition[] = [];
+        positions.forEach((posInfo, id) => {
+            if (allowedPositions.includes(id)) {
+                filteredPositions.push(posInfo);
+            }
+        });
+        openModal(ADD_WORKER_MODAL, filteredPositions);
+    }
 
     componentDidMount() {
         this.props.loadAdminWorkers();
