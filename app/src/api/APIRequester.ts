@@ -1,5 +1,5 @@
 import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
-import { workersNormalizer } from './../helpers/workersNormalizer';
+import { workersNormalizer, workerNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
 import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer';
 import { ILPU } from './../interfaces/ILPU';
@@ -404,7 +404,17 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    createFFM(departmentId: number, ffmData: FormData): Promise<IUser> {
+    createWorker(userData: FormData, departmentId?: number): Promise<IWorker> {
+        const url = departmentId
+        ? `/api/branch/${departmentId}/worker`
+        : '/api/worker';
+
+        return this.instance.post(url, userData)
+            .then(workerNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    createFFM(ffmData: FormData, departmentId: number): Promise<IUser> {
         return this.instance.post(`/api/branch/${departmentId}/worker`, ffmData)
             .then(userNormalizer)
             .catch(this.defaultErrorHandler());

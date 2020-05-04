@@ -30,7 +30,7 @@ import Login from '../Login';
 import AddDepartmentModal from './AddDepartmentModal';
 import { IUser } from '../../interfaces';
 import { USER_ROLE } from '../../constants/Roles';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import AdminPage from '../AdminPage';
 import Sales from '../Sales';
 import Marks from '../Marks';

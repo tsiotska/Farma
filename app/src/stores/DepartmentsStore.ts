@@ -1,3 +1,4 @@
+import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
 import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
 import { ADD_PHARMACY_MODAL } from './../constants/Modals';
 import { IValuesMap } from './../helpers/normalizers/normalizer';
@@ -512,7 +513,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async editPharmacy(initialPharmacy: ILPU, data: IPharmacyModalValues) {
-        console.log('edit pharmacy');
         const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
@@ -969,19 +969,69 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (createdDepartment) initialReport.isDepartmentCreated = true;
         else return initialReport;
 
-        const createdFFM = await api.createFFM(createdDepartment.id, FFMData);
+        const createdFFM = await api.createFFM(FFMData, createdDepartment.id);
 
-        if (createdFFM) initialReport.isFFMCreated = true;
-
-        const callback = createdDepartment && createdFFM
-            ? async () => {
-                await this.loadDepartments();
-                this.loadFFMs();
+        if (createdFFM) {
+            initialReport.isFFMCreated = true;
+            if (createdDepartment) {
+                this.loadDepartments().then(() => this.loadFFMs());
             }
-            : null;
-        if (callback) callback();
+        }
+
+        // const callback = createdDepartment && createdFFM
+        //     ? async () => {
+        //         await this.loadDepartments();
+        //         this.loadFFMs();
+        //     }
+        //     : null;
+        // if (callback) callback();
 
         return initialReport;
+    }
+
+    @action.bound
+    async createWorker(values: IWorkerModalValues, avatar: File, departmentId?: number): Promise<boolean> {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            position: 'position',
+            region: 'region',
+            city: 'city',
+            name: 'full_name',
+            email: 'email',
+            password: 'password',
+            workPhone: 'work_phone',
+            homePhone: 'mobile_phone',
+            card: 'bank_card',
+        };
+
+        const formData = new FormData();
+        if (avatar) formData.set('avatar', avatar);
+        const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
+            const normalizedPropName = namesMap[prop];
+            if (!(value && normalizedPropName)) return acc;
+            if (normalizedPropName === namesMap.card) {
+                const changedValue = [...value].reduce((resultingString, curr, i) => (
+                    (!!i && i % 4 === 0)
+                        ? `${resultingString} ${curr}`
+                        : `${resultingString}${curr}`
+                ), '');
+                return { ...acc, [normalizedPropName]: changedValue };
+            }
+            return { ...acc, [normalizedPropName]: value };
+        }, {});
+        formData.set('json', JSON.stringify(payload));
+
+        const createdWorker = await this.dispatchRequest(
+            api.createWorker(formData, departmentId),
+            'createWorker'
+        );
+
+        if (createdWorker) {
+            this.workers.push(createdWorker);
+        }
+
+        return !!createdWorker;
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {

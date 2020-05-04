@@ -1,4 +1,4 @@
-import { IValuesMap, objectArrayNormalizer } from './normalizers/normalizer';
+import { IValuesMap, objectArrayNormalizer, defaultObjectNormalizer } from './normalizers/normalizer';
 import { IWorker } from '../interfaces/IWorker';
 
 export const defaultWorker: IWorker = {
@@ -35,17 +35,30 @@ export const workerValuesMap: IValuesMap = {
     city: 'city'
 };
 
+const valueNormalizers: any = {
+    fired: (value: string) => new Date(value),
+    hired: (value: string) =>  new Date(value),
+    created: (value: string) =>  new Date(value),
+    isVacancy: (value: any) => !!value
+};
+
+const requiredProps = ['id'];
+
 export const workersNormalizer = ({ data: { data }}: any): IWorker[] => objectArrayNormalizer(
     data,
     defaultWorker,
     workerValuesMap,
     {
-        requiredProps: [ 'id' ],
-        valueNormalizers: {
-            fired: (value: string) => new Date(value),
-            hired: (value: string) =>  new Date(value),
-            created: (value: string) =>  new Date(value),
-            isVacancy: (value: any) => !!value
-        }
+        requiredProps,
+        valueNormalizers
     }
 );
+
+export const workerNormalizer = ({ data: { data }}: any): IWorker =>
+    requiredProps.every(x => x in data)
+    ? defaultObjectNormalizer(
+        data,
+        defaultWorker,
+        workerValuesMap,
+        valueNormalizers
+    ) : null;

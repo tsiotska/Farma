@@ -4,9 +4,12 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import WorkerModal from '../WorkerModal';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { ADD_WORKER_MODAL } from '../../../constants/Modals';
 import { IPosition } from '../../../interfaces/IPosition';
+import { IWorkerModalValues } from '../WorkerModal/WorkerModal';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
 
 interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
@@ -14,6 +17,7 @@ interface IProps {
     openedModal?: string;
     modalPayload?: IPosition[];
     positions?: Map<number, IPosition>;
+    createWorker?: (values: IWorkerModalValues, avatar: File, departmentId?: number) => Promise<boolean>;
 }
 
 @inject(({
@@ -25,7 +29,8 @@ interface IProps {
         },
         departmentsStore: {
             getAsyncStatus,
-            positions
+            positions,
+            createWorker
         }
     }
 }) => ({
@@ -33,13 +38,17 @@ interface IProps {
     openModal,
     getAsyncStatus,
     positions,
-    modalPayload
+    modalPayload,
+    createWorker
 }))
 @observer
 class AddWorkerModal extends Component<IProps> {
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
     @computed
     get isLoading(): boolean {
-        return this.props.getAsyncStatus('').loading;
+        return this.props.getAsyncStatus('createWorker').loading;
     }
 
     @computed
@@ -57,20 +66,41 @@ class AddWorkerModal extends Component<IProps> {
 
     closeHandler = () => this.props.openModal(null);
 
-    submitHandler = () => {
-        console.log('submit');
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
+    }
+
+    submitHandler = async (data: IWorkerModalValues, image: File) => {
+        const { createWorker } = this.props;
+        const workerCreated = await createWorker(data, image);
+        this.showSnackbar = true;
+        this.snackbarType = workerCreated
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
     }
 
     render() {
         return (
-            <WorkerModal
-                open={this.isOpen}
-                isLoading={this.isLoading}
-                onClose={this.closeHandler}
-                onSubmit={this.submitHandler}
-                title='Додати працівника'
-                positions={this.positions}
-            />
+            <>
+                <WorkerModal
+                    open={this.isOpen}
+                    isLoading={this.isLoading}
+                    onClose={this.closeHandler}
+                    onSubmit={this.submitHandler}
+                    title='Додати працівника'
+                    positions={this.positions}
+                />
+                <Snackbar
+                    open={this.showSnackbar}
+                    type={this.snackbarType}
+                    onClose={this.snackbarCloseHandler}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Працівник успішно створений'
+                        : 'Створити працівника неможливо '
+                    }
+                />
+            </>
         );
     }
 }

@@ -80,7 +80,7 @@ class UserSettings extends Component<IProps> {
                         <ListItem
                             key={worker.id}
                             worker={worker}
-                            position={positions.get(worker.id)}
+                            position={positions.get(worker.position)}
                         />
                     ))
                 }

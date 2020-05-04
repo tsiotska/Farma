@@ -141,6 +141,7 @@ class WorkerListItem extends Component<IProps> {
     @computed
     get position(): string {
         const { position } = this.props;
+
         return position
             ? position.alias
             : null;

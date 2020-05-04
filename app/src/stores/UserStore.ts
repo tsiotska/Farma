@@ -130,7 +130,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             lastDeposit: 0,
             marks: new Map(),
         }));
-        console.log(toJS(this.bonuses), toJS(this.previewBonus), preparedDocs);
+
         this.previewBonus.agents.push(...preparedDocs);
     }
 

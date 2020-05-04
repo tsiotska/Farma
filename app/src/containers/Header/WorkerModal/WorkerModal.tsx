@@ -4,7 +4,8 @@ import {
     WithStyles,
     Grid,
     MenuItem,
-    Typography
+    Typography,
+    Button
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -13,9 +14,10 @@ import AvatarDropzone from '../../../components/AvatarDropzone';
 import FormRow from '../../../components/FormRow';
 import { IPosition } from '../../../interfaces/IPosition';
 import { USER_ROLE } from '../../../constants/Roles';
-import { observable, computed } from 'mobx';
-import isEqual from 'lodash/isEqual';
+import { observable, computed, toJS } from 'mobx';
 import { phoneValidator, Validator, emailValidator, stringValidator, lengthValidator } from '../../../helpers/validators';
+import { IUser } from '../../../interfaces';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     modalContent: {
@@ -35,17 +37,22 @@ const styles = (theme: any) => createStyles({
     subheader: {
         width: '100%',
         marginBottom: 12
+    },
+    submitButton: {
+        marginLeft: 'auto',
+        minWidth: 160
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     open: boolean;
-    onSubmit: () => void;
+    onSubmit: (data: IWorkerModalValues, image: File) => void;
     onClose: () => void;
     isLoading: boolean;
     title: string;
     positions: IPosition[];
     showLocationsBlock?: boolean;
+    initialUser?: IUser;
 }
 
 export interface IWorkerModalValues {
@@ -96,7 +103,7 @@ class WorkerModal extends Component<IProps> {
             position: stringValidator,
             name: this.minLengthValidator(3),
             password: this.minLengthValidator(3),
-            card: this.minLengthValidator(13),
+            card: this.minLengthValidator(16),
             city: stringValidator,
             region: stringValidator
         };
@@ -112,7 +119,7 @@ class WorkerModal extends Component<IProps> {
         const { showLocationsBlock } = this.props;
         return [...Object.keys(this.initialValues)].reduce(
             (allow: boolean, propName: keyof IWorkerModalValues) => {
-                if (showLocationsBlock && this.regionRelatedFields.includes(propName)) {
+                if (!showLocationsBlock && this.regionRelatedFields.includes(propName)) {
                     return allow && true;
                 }
 
@@ -122,6 +129,7 @@ class WorkerModal extends Component<IProps> {
                 const flag = valueExist
                     ? isValid
                     : isOptional;
+
                 return allow && flag;
         }, true);
     }
@@ -152,6 +160,12 @@ class WorkerModal extends Component<IProps> {
         this.errors.set(propName, hasError);
     }
 
+    submitHandler = () => {
+        const { onSubmit, isLoading } = this.props;
+        if (isLoading) return;
+        onSubmit(this.formValues, this.image);
+    }
+
     appendFileHandler = (image: File) => {
         this.image = image;
     }
@@ -162,6 +176,8 @@ class WorkerModal extends Component<IProps> {
 
     render() {
         const {
+            initialUser,
+            isLoading,
             open,
             onClose,
             title,
@@ -207,7 +223,7 @@ class WorkerModal extends Component<IProps> {
                                 />
                                 <FormRow
                                     required
-                                    label='Карточка ПБ'
+                                    label='Банківська картка'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
                                     propName='card'
@@ -293,6 +309,20 @@ class WorkerModal extends Component<IProps> {
                             </Grid>
                         </Grid>
                     </Grid>
+                    <Button
+                        color='primary'
+                        variant='contained'
+                        className={classes.submitButton}
+                        onClick={this.submitHandler}
+                        disabled={this.allowSubmit === false}>
+                        {
+                            isLoading
+                            ? <LoadingMask size={20} />
+                            : initialUser
+                                ? 'Зберегти зміни'
+                                : 'Додати користувача'
+                        }
+                    </Button>
             </Dialog>
         );
     }

@@ -4,7 +4,8 @@ import {
     withStyles,
     WithStyles,
     Snackbar as MuiSnackbar,
-    SnackbarProps
+    SnackbarProps,
+    SnackbarOrigin
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { Alert } from '@material-ui/lab';
@@ -25,6 +26,12 @@ interface IProps extends WithStyles<typeof styles>, Omit<SnackbarProps, 'classes
 
 @observer
 class Snackbar extends Component<IProps> {
+    defaultAutoHideDuration: number = 6000;
+    defaultAnchorOrigin: SnackbarOrigin = {
+        vertical: 'top',
+        horizontal: 'center'
+    };
+
     render() {
         const {
             classes,
@@ -39,8 +46,8 @@ class Snackbar extends Component<IProps> {
         return (
             <MuiSnackbar
                 className={classes.root}
-                anchorOrigin={anchorOrigin}
-                autoHideDuration={autoHideDuration}
+                anchorOrigin={anchorOrigin || this.defaultAnchorOrigin}
+                autoHideDuration={autoHideDuration || this.defaultAutoHideDuration}
                 open={open}
                 onClose={onClose}>
                 <Alert onClose={onClose} severity={type}>

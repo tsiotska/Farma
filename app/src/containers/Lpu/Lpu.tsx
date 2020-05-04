@@ -48,7 +48,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
     unconfirmedLPUs?: ILPU[];
-    currentDepartmentId: number;
+    currentDepartmentId?: number;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;

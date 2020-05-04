@@ -247,7 +247,6 @@ class FormContent extends Component<IProps> {
 
     render() {
         const { classes, isLoading, departments } = this.props;
-        console.log(toJS(departments));
 
         return (
             <>
