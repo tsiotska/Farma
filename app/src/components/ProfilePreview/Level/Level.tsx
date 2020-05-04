@@ -13,11 +13,7 @@ const styles = (theme: any) => createStyles({
         cursor: 'pointer',
         marginRight: 'auto',
         width: 'auto',
-        paddingLeft: 5,
         borderRadius: 2,
-        '&:hover': {
-            backgroundColor: ({ disableClick }: any) => disableClick ? 'transparent' : '#f1f1f1'
-        }
     },
     item: {
         width: 30,
@@ -45,19 +41,8 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     user: IUser;
-    openModal?: (modalName: string, payload: any) => void;
-    disableClick?: boolean;
 }
 
-@inject(({
-    appState: {
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
-    openModal
-}))
 @observer
 class Level extends Component<IProps> {
     readonly colors: any;
@@ -76,11 +61,6 @@ class Level extends Component<IProps> {
         return this.colors[position];
     }
 
-    clickHandler = () => {
-        const { disableClick, openModal, user } = this.props;
-        if (!disableClick) openModal(SALARY_PREVIEW_MODAL, user);
-    }
-
     render() {
         const { classes, user: { level } } = this.props;
 
@@ -97,7 +77,11 @@ class Level extends Component<IProps> {
         }
 
         return (
-            <Grid onClick={this.clickHandler} className={classes.root} wrap='nowrap' alignItems='center' container>
+            <Grid
+                className={classes.root}
+                alignItems='center'
+                wrap='nowrap'
+                container>
                 {content}
             </Grid>
         );
