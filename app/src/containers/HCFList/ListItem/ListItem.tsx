@@ -123,7 +123,7 @@ class ListItem extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' container>
+            <Grid className={classes.root} alignItems='flex-start' container>
                 <Grid className={cx(classes.cell, classes.name)} xs alignItems='center' container item>
                     {
                         unconfirmed &&
