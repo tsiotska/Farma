@@ -233,7 +233,7 @@ class WorkerModal extends Component<IProps> {
                                             positions.map(({ id, alias }) => (
                                                 <MenuItem
                                                     key={id}
-                                                    value={id}
+                                                    value={`${id}`}
                                                     className={classes.menuItem}>
                                                     { alias }
                                                 </MenuItem>
