@@ -389,16 +389,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLPUs() {
         const requestName = 'loadLPUs';
-        const { api, userStore: { previewUser } } = this.rootStore;
+        const {api, userStore: {previewUser}} = this.rootStore;
 
         if (this.currentDepartmentId === null || previewUser === null) return;
+        let page = 1;
+        let keepDoing: boolean = true;
 
-        const res = await this.dispatchRequest(
-            api.getMedicalDepartments(this.currentDepartmentId, previewUser),
-            requestName
-        );
-
-        if (res) this.LPUs = res;
+        while (keepDoing) {
+            const part = await this.dispatchRequest(
+                api.getMedicalDepartments(this.currentDepartmentId, previewUser, false, page),
+                requestName
+            );
+            if (part) {
+                if (this.LPUs === null) {
+                    this.LPUs = [];
+                }
+                this.LPUs.push(...part);
+                page++;
+            }
+            keepDoing = !!part && part.length === 1000;
+        }
     }
 
     @action.bound
