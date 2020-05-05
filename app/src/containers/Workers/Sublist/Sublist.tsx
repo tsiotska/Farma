@@ -86,7 +86,6 @@ class Sublist extends Component<IProps> {
         openModal(EDIT_WORKER_MODAL, {
             initialWorker: worker,
             positions: filteredPositions,
-            showLocationsBlock: true
         });
     }
 

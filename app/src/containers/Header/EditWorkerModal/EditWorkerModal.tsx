@@ -9,13 +9,13 @@ import WorkerModal from '../WorkerModal';
 import { IWorkerModalValues } from '../WorkerModal/WorkerModal';
 
 interface IProps {
+    showLocationsBlock: boolean;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
     modalPayload?: {
         initialWorker: IWorker,
         positions: IPosition[],
-        showLocationsBlock: boolean;
     };
 }
 
@@ -70,13 +70,13 @@ class EditWorkerModal extends Component<IProps> {
             : null;
     }
 
-    @computed
-    get showLocationsBlock(): boolean {
-        const { modalPayload } = this.props;
-        return !!modalPayload && 'showLocationsBlock' in modalPayload
-            ? modalPayload.showLocationsBlock
-            : false;
-    }
+    // @computed
+    // get showLocationsBlock(): boolean {
+    //     const { modalPayload } = this.props;
+    //     return !!modalPayload && 'showLocationsBlock' in modalPayload
+    //         ? modalPayload.showLocationsBlock
+    //         : false;
+    // }
 
     closeHandler = () => this.props.openModal(null);
 
@@ -85,8 +85,8 @@ class EditWorkerModal extends Component<IProps> {
     }
 
     render() {
-        const { modalPayload } = this.props;
-        console.log(toJS(modalPayload));
+        const { modalPayload, showLocationsBlock } = this.props;
+        // console.log(toJS(modalPayload));
 
         return (
             <>
@@ -98,7 +98,7 @@ class EditWorkerModal extends Component<IProps> {
                     title='Редагувати працівника'
                     positions={this.positions}
                     initialWorker={this.initialWorker}
-                    showLocationsBlock={this.showLocationsBlock}
+                    showLocationsBlock={showLocationsBlock}
                 />
             </>
         );

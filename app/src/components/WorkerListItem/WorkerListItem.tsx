@@ -26,10 +26,6 @@ import { ILocation } from '../../interfaces/ILocation';
 import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
-import { EDIT_WORKER_MODAL } from '../../constants/Modals';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { matchPath } from 'react-router';
-import { ADMIN_ROUTE, USERS_SETTINGS_ROUTE } from '../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
