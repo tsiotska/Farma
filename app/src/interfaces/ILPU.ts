@@ -11,6 +11,7 @@ export interface ILPU {
 
     ffmConfirm?: boolean;
     rmConfirm?: boolean;
+    confirmed?: boolean;
 
     lpu?: number;
     lpuName: string;

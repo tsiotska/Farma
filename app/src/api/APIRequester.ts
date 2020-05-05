@@ -207,7 +207,7 @@ export class APIRequester {
     }
 
     addPharmacy(postData: any): Promise<ILPU> {
-        return this.instance(`/api/pharmacy`, postData)
+        return this.instance.post(`/api/pharmacy`, postData)
             .then(({ data: { data }}) => lpuNormalizer({ data: [ data ]}))
             .catch(this.defaultErrorHandler());
     }

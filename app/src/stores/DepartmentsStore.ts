@@ -407,7 +407,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const namesMap: IValuesMap = {
             name: 'name',
-            type: 'hcf_type',
+            type: 'org_type',
             oblast: 'oblast',
             city: 'city',
             address: 'address',
@@ -1074,6 +1074,33 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         } else if (status === CONFIRM_STATUS.CONFIRMED) {
             // push doc from unconfirmed to confirmed
             doctor.confirmed = true;
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @action.bound
+    async acceptLpu(lpu: ILPU) {
+        const { api } = this.rootStore;
+        const status = await api.accept(lpu.id, 'hcf');
+
+        if (status === CONFIRM_STATUS.ACCEPTED) {
+            // reload unconfirmed
+            await this.loadUnconfirmedLPUs();
+        } else if (status === CONFIRM_STATUS.CONFIRMED) {
+            // push doc from unconfirmed to confirmed
+            const indexOfLpu = this.unconfirmedLPUs
+                ? this.unconfirmedLPUs.indexOf(lpu)
+                : -1;
+
+            if (indexOfLpu !== -1) {
+                this.unconfirmedLPUs.splice(indexOfLpu, 1);
+            }
+
+            lpu.confirmed = true;
+            if (this.LPUs) this.LPUs.push(lpu);
+            else this.LPUs = [lpu];
         } else {
             return false;
         }
