@@ -1060,7 +1060,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async acceptAgent(doctor: IDoctor) {
         const { api } = this.rootStore;
-        const status = await api.acceptDoctor(doctor.id);
+        const status = await api.accept(doctor.id, 'agent');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
             // reload unconfirmed

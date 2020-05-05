@@ -511,13 +511,13 @@ export class APIRequester {
             .catch(this.defaultErrorHandler([]));
     }
 
-    acceptDoctor(docId: number): Promise<CONFIRM_STATUS> {
-        return this.instance.put(`api/agent/${docId}/accept`)
-            .then(({ status }) => {
-                return status === 200
-                ? CONFIRM_STATUS.ACCEPTED
-                : CONFIRM_STATUS.CONFIRMED;
-            })
-            .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
+    accept(id: number, objectType: 'agent' | 'hcf' | 'pharmacy'): Promise<CONFIRM_STATUS> {
+        return this.instance.put(`api/${objectType}/${id}/accept`)
+        .then(({ status }) => {
+            return status === 200
+            ? CONFIRM_STATUS.ACCEPTED
+            : CONFIRM_STATUS.CONFIRMED;
+        })
+        .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
 }
