@@ -181,18 +181,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler([]));
     }
 
-    getMedicalDepartments(departmentId: number, user: IUser, unconfirmed: boolean = false, page?: number): Promise<ILPU[]> {
-        const {position, id} = user;
-        const urlParam = unconfirmed
-            ? '?unconfirmed=1'
-            : `?page=${page}`;
-        let url: string;
-        if (position === USER_ROLE.FIELD_FORCE_MANAGER) url = `/api/branch/${departmentId}/ffm/hcf${urlParam}`;
-        else if (position === USER_ROLE.REGIONAL_MANAGER) url = `/api/branch/${departmentId}/rm/${id}/hcf${urlParam}`;
-        else if (position === USER_ROLE.MEDICAL_AGENT) url = `/api/branch/${departmentId}/mp/${id}/hcf${urlParam}`;
-
-        if (!url) return;
-        return this.instance.get(url)
+    getMedicalDepartments(url: string): Promise<ILPU[]> {
+    return this.instance.get(url)
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
     }
