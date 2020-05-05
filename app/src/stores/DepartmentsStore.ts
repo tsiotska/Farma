@@ -877,7 +877,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
-            data ? data.map(x => ([ x.id, x ])) : [];
+            data
+            ? data.map((x): [number, ILocation] => ([ x.id, x ]))
+            : [];
 
         const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
         const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
