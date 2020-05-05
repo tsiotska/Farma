@@ -1,29 +1,29 @@
-import {IWorkerModalValues} from './../containers/Header/WorkerModal/WorkerModal';
-import {IPharmacyModalValues} from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
-import {ADD_PHARMACY_MODAL} from './../constants/Modals';
-import {IValuesMap} from './../helpers/normalizers/normalizer';
-import {IFormValues} from './../containers/Medicines/FormContent/FormContent';
-import {observable, action, reaction, toJS, computed, when, flow, transaction} from 'mobx';
-import {ILPU} from '../interfaces/ILPU';
-import {IDepartment} from './../interfaces/IDepartment';
-import {IRootStore} from './../interfaces/IRootStore';
+import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
+import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
+import { ADD_PHARMACY_MODAL } from './../constants/Modals';
+import { IValuesMap } from './../helpers/normalizers/normalizer';
+import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
+import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
+import { ILPU } from '../interfaces/ILPU';
+import { IDepartment } from './../interfaces/IDepartment';
+import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import {IDepartmentsStore} from '../interfaces/IDepartmentsStore';
-import {IMedicine} from '../interfaces/IMedicine';
-import {IPosition} from '../interfaces/IPosition';
-import {IWorker} from '../interfaces/IWorker';
-import {USER_ROLE} from '../constants/Roles';
-import {ILocation} from '../interfaces/ILocation';
-import {IUser} from '../interfaces/IUser';
+import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
+import { IMedicine } from '../interfaces/IMedicine';
+import { IPosition } from '../interfaces/IPosition';
+import { IWorker } from '../interfaces/IWorker';
+import { USER_ROLE } from '../constants/Roles';
+import { ILocation } from '../interfaces/ILocation';
+import { IUser } from '../interfaces/IUser';
 import flattenDeep from 'lodash/flattenDeep';
-import {PERMISSIONS} from '../constants/Permissions';
-import {IDoctor} from '../interfaces/IDoctor';
-import {IUserSalary} from '../interfaces/IUserSalary';
-import {ISpecialty} from '../interfaces/ISpecialty';
-import {invert} from 'lodash';
-import {ILpuModalValues} from '../containers/Lpu/LpuModal/LpuModal';
-import {SORT_ORDER} from './UIStore';
-import {CONFIRM_STATUS} from '../constants/ConfirmationStatuses';
+import { PERMISSIONS } from '../constants/Permissions';
+import { IDoctor } from '../interfaces/IDoctor';
+import { IUserSalary } from '../interfaces/IUserSalary';
+import { ISpecialty } from '../interfaces/ISpecialty';
+import { invert } from 'lodash';
+import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
+import { SORT_ORDER } from './UIStore';
+import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 
 export interface IExpandedWorker {
     id: number;
@@ -88,10 +88,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const {uiStore: {LpuSortSettings}} = this.rootStore;
+        const { uiStore: { LpuSortSettings } } = this.rootStore;
         if (!LpuSortSettings || !this.LPUs) return this.LPUs;
 
-        const {order, propName} = LpuSortSettings;
+        const { order, propName } = LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
             const callback = order === SORT_ORDER.ASCENDING
@@ -107,10 +107,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const {uiStore: {LpuSortSettings}} = this.rootStore;
+        const { uiStore: { LpuSortSettings } } = this.rootStore;
         if (!LpuSortSettings || !this.pharmacies) return this.pharmacies;
 
-        const {order, propName} = LpuSortSettings;
+        const { order, propName } = LpuSortSettings;
 
         if (['name', 'oblast'].includes(propName)) {
             const callback = order === SORT_ORDER.ASCENDING
@@ -151,7 +151,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadSpecialties() {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const res = await this.dispatchRequest(
             api.getSpecialties(),
@@ -165,7 +165,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async calculateSalaries(year: number, month: number) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         await when(() => !!this.currentDepartmentId);
 
@@ -176,7 +176,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadSalaries(year: number, month: number) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         await when(() => !!this.currentDepartmentId);
 
@@ -194,7 +194,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async setExpandedSalary(salary: IUserSalary, year: number, month: number) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         this.expandedSalary = salary;
 
@@ -215,7 +215,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadSalariesExcel(year: number, month: number) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         api.getExcel(`/api/branch/${this.currentDepartmentId}/ffm/salary?year=${year}&month=${month + 1}&excel=1`);
     }
 
@@ -227,7 +227,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
             && previewUser.id
@@ -241,7 +241,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadConfirmedDoctors(): Promise<IDoctor[]> {
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
             && previewUser.id
@@ -301,9 +301,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     setCurrentDepartment(department: number | string | IDepartment) {
         if (typeof department === 'string') {
-            this.currentDepartment = this.departments.find(({name}) => name === department);
+            this.currentDepartment = this.departments.find(({ name }) => name === department);
         } else if (typeof department === 'number') {
-            this.currentDepartment = this.departments.find(({id}) => id === department);
+            this.currentDepartment = this.departments.find(({ id }) => id === department);
         } else {
             this.currentDepartment = department;
         }
@@ -312,16 +312,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadFFMs() {
         const requestName = 'loadFFMs';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         this.setLoading(requestName);
-        const departmentIds = this.departments.map(({id}) => id);
+        const departmentIds = this.departments.map(({ id }) => id);
         const promises = departmentIds.map(id => api.getAgents(id, USER_ROLE.FIELD_FORCE_MANAGER));
         const requestResult = await Promise.all(promises);
         const ffms = flattenDeep(requestResult);
         this.setSuccess(requestName);
         departmentIds.forEach((depId, i) => {
-            const department = this.departments.find(({id}) => id === depId);
+            const department = this.departments.find(({ id }) => id === depId);
             if (department) {
                 department.ffm = ffms[i];
             }
@@ -331,7 +331,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadUnconfirmedPharmacies() {
         const requestName = 'loadUnconfirmedPharmacies';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const url = this.getPharmacyApiUrl(true);
 
         if (!url) return;
@@ -350,7 +350,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadPharmacies(isNeeded: boolean) {
         const requestName = 'loadPharmacies';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         let keepDoing: boolean = true;
         let page: number = 1;
 
@@ -372,13 +372,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 page++;
             }
             keepDoing = !!part && part.length === 1000;
-         }
         }
+    }
 
     @action.bound
     async loadUnconfirmedLPUs() {
         const requestName = 'loadUnconfirmedLPUs';
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
 
         if (this.currentDepartmentId === null || previewUser === null) return;
         const url = this.getMedicalDepartmentsApiUrl(this.currentDepartmentId, previewUser, true);
@@ -393,7 +393,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLPUs() {
         const requestName = 'loadLPUs';
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
 
         if (this.currentDepartmentId === null || previewUser === null) return;
         let page = 1;
@@ -418,7 +418,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async addLpu(data: ILpuModalValues): Promise<boolean> {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
             name: 'name',
@@ -434,7 +434,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             .reduce((acc, [propName, value]) => {
                 const newPropName = namesMap[propName];
                 return (newPropName && !!value)
-                    ? {...acc, [newPropName]: value}
+                    ? { ...acc, [newPropName]: value }
                     : acc;
             }, {});
 
@@ -456,7 +456,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
             name: 'name',
@@ -473,7 +473,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 const newPropName = namesMap[propName];
 
                 return (newPropName && !!value)
-                    ? {...acc, [newPropName]: value}
+                    ? { ...acc, [newPropName]: value }
                     : acc;
             }, {});
 
@@ -493,7 +493,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async deleteLpu(lpu: ILPU) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const isDeleted = await api.deleteLpu(lpu.id);
 
         if (isDeleted) {
@@ -504,7 +504,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async addPharmacy(data: IPharmacyModalValues) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
             name: 'name',
@@ -521,7 +521,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             .reduce((acc, [propName, value]) => {
                 const newPropName = namesMap[propName];
                 return (newPropName && !!value)
-                    ? {...acc, [newPropName]: value}
+                    ? { ...acc, [newPropName]: value }
                     : acc;
             }, {});
 
@@ -543,7 +543,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async editPharmacy(initialPharmacy: ILPU, data: IPharmacyModalValues) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
             name: 'name',
@@ -566,12 +566,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                         : '';
 
                     return name
-                        ? {...acc, [newPropName]: name}
+                        ? { ...acc, [newPropName]: name }
                         : acc;
                 }
 
                 return (newPropName && !!value)
-                    ? {...acc, [newPropName]: value}
+                    ? { ...acc, [newPropName]: value }
                     : acc;
             }, {});
 
@@ -596,7 +596,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async deletePharmacy(lpu: ILPU) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const isDeleted = await api.deleteLpu(lpu.id);
 
         if (isDeleted) {
@@ -607,7 +607,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadDocsExcel() {
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const userId = previewUser
             ? previewUser.id
             : null;
@@ -619,7 +619,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadWorkersExcel() {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const url = this.getWorkersApiUrl(false, true);
         if (!url) return;
         api.getExcel(url);
@@ -628,7 +628,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadAdminWorkers() {
         const requestName = 'loadAdminWorkers';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const res = await this.dispatchRequest(
             api.getWorkers('/api/user'),
@@ -641,7 +641,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadWorkers() {
         const requestName = 'loadWorkers';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const url = this.getWorkersApiUrl();
         if (url === null) return;
@@ -660,7 +660,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadFiredWorkers() {
         const requestName = 'loadFiredWorkers';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const url = this.getWorkersApiUrl(true);
         if (url === null) return;
@@ -672,7 +672,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadDepartments() {
         const requestName = 'loadDepartments';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const res = await this.dispatchRequest(api.getBranches(), requestName);
         if (Array.isArray(res)) this.departments = res;
@@ -681,7 +681,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async restoreMedicine(medicine: IMedicine) {
         if (!this.currentDepartmentId) return;
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const isRestored = await this.dispatchRequest(
             api.restoreMedicine(this.currentDepartmentId, medicine.id),
@@ -703,7 +703,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             price: 'price',
             barcode: 'barcode',
         };
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
@@ -714,7 +714,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     : value;
 
                 return (!!newKey && !!converted)
-                    ? {...total, [newKey]: converted}
+                    ? { ...total, [newKey]: converted }
                     : total;
             },
             {}
@@ -751,7 +751,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             price: 'price',
             barcode: 'barcode',
         };
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
@@ -764,7 +764,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 const isChanged = medicine[key] !== converted;
 
                 return (!!newKey && !!converted && isChanged)
-                    ? {...total, [newKey]: converted}
+                    ? { ...total, [newKey]: converted }
                     : total;
             },
             {}
@@ -802,7 +802,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async removeMeds(medId: number) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const depId = this.currentDepartmentId;
         if (!depId) return false;
         const removed = await api.deleteDrug(depId, medId);
@@ -810,7 +810,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const depMeds = this.meds.get(depId);
             const med = depMeds
                 ? null
-                : depMeds.find(({id}) => id === medId);
+                : depMeds.find(({ id }) => id === medId);
 
             if (med) med.deleted = true;
         }
@@ -832,7 +832,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadMeds(departmentId: number) {
         const requestName = 'loadMeds';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         if (departmentId === null) return;
 
@@ -850,7 +850,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadPositions() {
         const requestName = 'loadPositions';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const res = await this.dispatchRequest(
             api.getPositions(),
@@ -865,7 +865,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities({oblastName, regionName}: {
+    loadSpecificCities({ oblastName, regionName }: {
         oblastName?: string;
         regionName?: string;
     }) {
@@ -889,7 +889,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadLocations() {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
             data
@@ -907,7 +907,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadSubLocationAgents() {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const res = await api.getAgents(this.currentDepartmentId, USER_ROLE.MEDICAL_AGENT);
 
         if (!res) return;
@@ -922,7 +922,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLocationsAgents() {
         const requestName = 'loadLocationsAgents';
-        const {api, userStore: {role}} = this.rootStore;
+        const { api, userStore: { role } } = this.rootStore;
 
         const branchId = this.currentDepartmentId;
         const userRole = role;
@@ -953,7 +953,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadSubworkers() {
         const requestName = 'loadSubworkers';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const workerId = this.expandedWorker
             ? this.expandedWorker.id
@@ -979,12 +979,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async updatePermissions(permissionsMap: Map<USER_ROLE, PERMISSIONS[]>): Promise<boolean> {
         const requestName = 'updatePermissions';
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         if (!permissionsMap.size) return false;
 
         const data = [...permissionsMap.entries()]
-            .map(([id, permissions]) => ({permissions, id}));
+            .map(([id, permissions]) => ({ permissions, id }));
 
         const res = await this.dispatchRequest(
             api.updatePermissions(data),
@@ -998,7 +998,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async createDepartment(departmentData: FormData, FFMData: FormData): Promise<ICreateDepartmentReport> {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const initialReport: ICreateDepartmentReport = {
             isDepartmentCreated: false,
             isFFMCreated: false,
@@ -1031,7 +1031,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async createWorker(values: IWorkerModalValues, avatar: File, departmentId?: number): Promise<boolean> {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
             position: 'position',
@@ -1056,9 +1056,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                         ? `${resultingString} ${curr}`
                         : `${resultingString}${curr}`
                 ), '');
-                return {...acc, [normalizedPropName]: changedValue};
+                return { ...acc, [normalizedPropName]: changedValue };
             }
-            return {...acc, [normalizedPropName]: value};
+            return { ...acc, [normalizedPropName]: value };
         }, {});
         formData.set('json', JSON.stringify(payload));
 
@@ -1076,13 +1076,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptAgent(doctor: IDoctor) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const status = await api.accept(doctor.id, 'agent');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
             // reload unconfirmed
             const loadUnconfirmedPromise = this.loadUnconfirmedDoctors();
-            const allConfirmed = this.doctors.filter(({confirmed}) => confirmed === true);
+            const allConfirmed = this.doctors.filter(({ confirmed }) => confirmed === true);
             const unconfirmed = await loadUnconfirmedPromise;
             this.doctors = [
                 ...unconfirmed,
@@ -1099,7 +1099,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptLpu(lpu: ILPU) {
-        const {api} = this.rootStore;
+        const { api } = this.rootStore;
         const status = await api.accept(lpu.id, 'hcf');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
@@ -1125,7 +1125,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     private getMedicalDepartmentsApiUrl(departmentId: number, user: IUser, unconfirmed: boolean = false, page?: number): string {
-        const {position, id} = user;
+        const { position, id } = user;
         const urlParam = unconfirmed
             ? '?unconfirmed=1'
             : `?page=${page}&count=${this.lpuCount}`;
@@ -1143,7 +1143,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false, page?: number): string {
-        const {userStore: {role, previewUser}} = this.rootStore;
+        const { userStore: { role, previewUser } } = this.rootStore;
 
         const userId = previewUser
             ? previewUser.id
@@ -1173,7 +1173,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     private getWorkersApiUrl(fired: boolean = false, excel: boolean = false): string {
-        const {userStore: {previewUser, role}} = this.rootStore;
+        const { userStore: { previewUser, role } } = this.rootStore;
 
         const userId = previewUser
             ? previewUser.id
