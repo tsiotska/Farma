@@ -82,8 +82,8 @@ class EditLpu extends Component<IProps> {
                 anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
                 message={
                     this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                    ? 'ЛПУ успішно створено'
-                    : 'Неможливо додати ЛПУ'
+                    ? 'ЛПУ успішно змінено'
+                    : 'Неможливо змінити ЛПУ'
                 }
             />
             </>

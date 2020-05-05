@@ -450,7 +450,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const intFields: Array<keyof ILpuModalValues> = [ 'city' ];
         const namesMap: IValuesMap = {
             name: 'name',
-            type: 'hcf_type',
+            type: 'org_type',
             oblast: 'oblast',
             city: 'city',
             address: 'address',

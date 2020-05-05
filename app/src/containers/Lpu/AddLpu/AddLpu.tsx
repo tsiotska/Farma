@@ -55,6 +55,7 @@ class AddLpu extends Component<IProps> {
         this.snackbarType = !!lpuCreated
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuCreated) this.closeHandler();
     }
 
     render() {
