@@ -138,6 +138,8 @@ class LpuModal extends Component<IProps> {
             if (!value) return false;
             const isInvalid = !phoneValidator(value);
             return isInvalid && this.errorMessages[propName];
+        } else if (propName === 'city') {
+            return !value.length;
         } else {
             const isInvalid = !value || value.length < 3;
             return isInvalid && this.errorMessages.default;
@@ -188,7 +190,12 @@ class LpuModal extends Component<IProps> {
 
         await this.loadSpecificCities(oblast);
 
-        this.formValues.city = city || '';
+        const targetCity = this.cities.find(x => x.name === city);
+        const cityValue = targetCity
+            ? `${targetCity.id}`
+            : '';
+
+        this.formValues.city = cityValue;
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -283,7 +290,7 @@ class LpuModal extends Component<IProps> {
                             error={this.errors.get('city')}>
                                 {
                                     this.cities.map(({ id, name }) => (
-                                        <MenuItem key={id} value={name}>
+                                        <MenuItem key={id} value={`${id}`}>
                                             { name }
                                         </MenuItem>
                                     ))

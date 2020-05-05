@@ -405,6 +405,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async addLpu(data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
+        const intFields: Array<keyof ILpuModalValues> = [ 'city' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -416,10 +417,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
+        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
             const newPropName = namesMap[propName];
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
+            const convertedValue = intFields.includes(propName)
+                ? +value
+                : value;
+            return (newPropName && !!convertedValue)
+            ? { ...acc, [newPropName]: convertedValue }
             : acc;
         }, {});
 
