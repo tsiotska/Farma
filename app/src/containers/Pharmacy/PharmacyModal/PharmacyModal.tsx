@@ -102,7 +102,7 @@ class PharmacyModal extends Component<IProps> {
         const { initialPharmacy } = this.props;
 
         if (!initialPharmacy) {
-            return this.allProps.some(x => !this.formValues[x]);
+            return this.allProps.some(x => !!this.formValues[x]);
         }
 
         return this.allProps.some(x => {

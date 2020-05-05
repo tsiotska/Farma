@@ -218,8 +218,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    editPharmacy(depId: number, data: any): Promise<boolean> {
-        return this.instance.put(`/api/pharmacy/${depId}`, data)
+    editPharmacy(id: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/pharmacy/${id}`, data)
         .then(() => true)
         .catch(this.defaultErrorHandler(false));
     }
@@ -275,8 +275,8 @@ export class APIRequester {
         .then(({ data: { data } }) => (
             Array.isArray(data)
             ? data.map(
-                (name: string, id: number) => ({
-                    id,
+                (name: string, i: number) => ({
+                    id: i + 1,
                     name
                 }))
             : []

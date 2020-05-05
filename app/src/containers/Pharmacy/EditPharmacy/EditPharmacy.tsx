@@ -57,11 +57,12 @@ class EditPharmacy extends Component<IProps> {
 
     submitHandler = async (formValues: IPharmacyModalValues) => {
         const { editPharmacy, modalPayload } = this.props;
-        const lpuCreated = await editPharmacy(modalPayload, formValues);
+        const pharmacyEdited = await editPharmacy(modalPayload, formValues);
         this.openSnackbar = true;
-        this.snackbarType = !!lpuCreated
+        this.snackbarType = !!pharmacyEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (pharmacyEdited) this.closeHandler();
     }
 
     render() {

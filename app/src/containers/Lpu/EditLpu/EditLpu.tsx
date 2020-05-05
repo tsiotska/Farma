@@ -59,6 +59,7 @@ class EditLpu extends Component<IProps> {
         this.snackbarType = !!lpuEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuEdited) this.closeHandler();
     }
 
     render() {

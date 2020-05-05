@@ -11,7 +11,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import { observable, computed, reaction } from 'mobx';
+import { observable, computed, reaction, toJS } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import FormRow from '../../../components/FormRow';
 import { phoneValidator } from '../../../helpers/validators';
@@ -111,7 +111,7 @@ class LpuModal extends Component<IProps> {
         const { initialLpu } = this.props;
 
         if (!initialLpu) {
-            return this.allProps.some(x => !this.formValues[x]);
+            return this.allProps.some(x => !!this.formValues[x]);
         }
 
         return this.allProps.some(x => {
@@ -119,15 +119,8 @@ class LpuModal extends Component<IProps> {
             const currentValue = this.formValues[x];
 
             if (this.objectFields.includes(x)) {
-                const id = currentValue
-                    ? (currentValue as ILocation).id
-                    : null;
-                const targetSource = x === 'city'
-                    ? this.cities
-                    : this.oblastListItems;
-                const targetObject = targetSource.find(a => a.id === id);
-                const actualValue = targetObject
-                    ? targetObject.name
+                const actualValue = (currentValue && typeof currentValue === 'object')
+                    ? currentValue.name
                     : null;
                 return initialValue !== actualValue;
             }
@@ -155,7 +148,7 @@ class LpuModal extends Component<IProps> {
             const isInvalid = !phoneValidator(value);
             return isInvalid && this.errorMessages[propName];
         } else if (this.objectFields.includes(propName)) {
-            return !value.length;
+            return !value;
         } else {
             const isInvalid = !value || value.length < 3;
             return isInvalid && this.errorMessages.default;
@@ -170,10 +163,14 @@ class LpuModal extends Component<IProps> {
     changeHandler = (propName: keyof ILpuModalValues, value: string) => {
         if (this.objectFields.includes(propName)) {
             const id = +value;
-            const valuesSource = propName === 'city'
-                ? this.cities
-                : this.oblastListItems;
-            this.formValues[propName] = valuesSource.find(x => x.id === id) || null;
+            if (propName === 'oblast') {
+                const targetOblast = this.oblastListItems.find(x => x.id === id) || null;
+                this.formValues[propName] = targetOblast;
+                this.formValues.city = null;
+                if (targetOblast) this.loadSpecificCities(targetOblast.name);
+            } else if (propName === 'city') {
+                this.formValues[propName] = this.cities.find(x => x.id === id) || null;
+            }
         } else {
             this.formValues[propName] = value;
         }

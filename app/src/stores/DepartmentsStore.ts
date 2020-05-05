@@ -469,8 +469,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
             let actualValue: any = value;
             if (objectFields.includes(propName)) {
-                actualValue = (value && 'id' in value)
-                    ? value.id
+                actualValue = (value && typeof value === 'object')
+                    ? propName === 'city'
+                        ? value.id
+                        : value.name
                     : null;
             }
 
@@ -487,10 +489,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (isLpuEdited) {
             Object.entries(data).forEach(([ propName, value ]) => {
                 if (objectFields.includes(propName)) {
-                    const name = (value && typeof value === 'object')
+                    const actualValue = (value && typeof value === 'object')
                         ? value.name
                         : null;
-                    initialLpu[propName] = name;
+                    initialLpu[propName] = actualValue;
                 } else {
                     initialLpu[propName] = value;
                 }
@@ -589,17 +591,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }, {});
 
         const isPharmacyEdited = await this.dispatchRequest(
-            api.editPharmacy(this.currentDepartmentId, payload),
+            api.editPharmacy(initialPharmacy.id, payload),
             'editPharmacy'
         );
 
         if (isPharmacyEdited) {
-            const invertedNames = invert(namesMap);
-            Object.entries(payload).forEach(([ key, value ]) => {
-                const propName = invertedNames[key];
-                const valueChanged = initialPharmacy[propName] !== value;
-                if (propName && valueChanged) {
-                    initialPharmacy[propName] = value;
+            Object.entries(data).forEach(([ key, value ]) => {
+                if (key === 'city') {
+                    const cityName = value.name;
+                    initialPharmacy[key] = cityName;
+                } else {
+                    initialPharmacy[key] = value;
                 }
             });
         }
