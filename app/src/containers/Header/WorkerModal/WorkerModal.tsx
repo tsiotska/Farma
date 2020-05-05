@@ -7,7 +7,7 @@ import {
     Typography,
     Button
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Dialog from '../../../components/Dialog';
 import AvatarDropzone from '../../../components/AvatarDropzone';
@@ -18,6 +18,8 @@ import { observable, computed, toJS } from 'mobx';
 import { phoneValidator, Validator, emailValidator, stringValidator, lengthValidator } from '../../../helpers/validators';
 import { IUser } from '../../../interfaces';
 import LoadingMask from '../../../components/LoadingMask';
+import { IWorker } from '../../../interfaces/IWorker';
+import { ILocation } from '../../../interfaces/ILocation';
 
 const styles = (theme: any) => createStyles({
     modalContent: {
@@ -52,10 +54,16 @@ interface IProps extends WithStyles<typeof styles> {
     title: string;
     positions: IPosition[];
     showLocationsBlock?: boolean;
-    initialUser?: IUser;
+    initialWorker?: IWorker;
+    loadSpecificCities?: (param: {
+        oblastName?: string;
+        regionName?: string;
+    }) => Promise<ILocation[]>;
+    regions?: Map<number, ILocation>;
 }
 
 export interface IWorkerModalValues {
+    [key: string]: string | number;
     name: string;
     workPhone: string;
     homePhone: string;
@@ -67,8 +75,20 @@ export interface IWorkerModalValues {
     region: string;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            loadSpecificCities,
+            regions
+        }
+    }
+}) => ({
+    loadSpecificCities,
+    regions
+}))
 @observer
 class WorkerModal extends Component<IProps> {
+    readonly intFields: Array<keyof IWorkerModalValues> = [ 'position' ];
     readonly optionalValues: Array<keyof IWorkerModalValues> = ['homePhone', 'workPhone'];
     readonly regionRelatedFields: Array<keyof IWorkerModalValues> = ['city', 'region'];
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
@@ -78,7 +98,7 @@ class WorkerModal extends Component<IProps> {
         name: 'Значення має містити не менше 3 символів',
         password: 'Значення має містити не менше 3 символів',
     };
-    readonly initialValues: IWorkerModalValues = {
+    readonly defaultValues: IWorkerModalValues = {
         name: '',
         workPhone: '',
         homePhone: '',
@@ -90,9 +110,10 @@ class WorkerModal extends Component<IProps> {
         region: '',
     };
 
-    @observable formValues: IWorkerModalValues = {...this.initialValues};
+    @observable formValues: IWorkerModalValues = {...this.defaultValues};
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
     @observable image: File = null;
+    @observable cities: ILocation[] = [];
 
     constructor(props: IProps) {
         super(props);
@@ -117,7 +138,7 @@ class WorkerModal extends Component<IProps> {
     @computed
     get allowSubmit(): boolean {
         const { showLocationsBlock } = this.props;
-        return [...Object.keys(this.initialValues)].reduce(
+        return [...Object.keys(this.defaultValues)].reduce(
             (allow: boolean, propName: keyof IWorkerModalValues) => {
                 if (!showLocationsBlock && this.regionRelatedFields.includes(propName)) {
                     return allow && true;
@@ -132,6 +153,26 @@ class WorkerModal extends Component<IProps> {
 
                 return allow && flag;
         }, true);
+    }
+
+    @computed
+    get regions(): ILocation[] {
+        const { regions, open } = this.props;
+        if (open === false) return [];
+        const res: ILocation[] = [];
+
+        regions.forEach(x => {
+            res.push(x);
+        });
+
+        return res;
+    }
+
+    loadSpecificCities = async () => {
+        const { loadSpecificCities } = this.props;
+        const { region } = this.formValues;
+        const res = await loadSpecificCities({ regionName: region });
+        if (Array.isArray(res)) this.cities = res;
     }
 
     minLengthValidator = (minLength: number) => (value: string) => lengthValidator(minLength, value);
@@ -150,9 +191,13 @@ class WorkerModal extends Component<IProps> {
     }
 
     changeHandler = (propName: keyof IWorkerModalValues, value: string) => {
-        if (propName === 'position') {
+        if (this.intFields.includes(propName)) {
             const converted = +value;
             this.formValues[propName] = converted;
+        } else if (propName === 'region') {
+            this.formValues[propName] = value;
+            this.formValues.city = '';
+            this.loadSpecificCities();
         } else {
             this.formValues[propName] = value;
         }
@@ -174,9 +219,56 @@ class WorkerModal extends Component<IProps> {
         this.image = null;
     }
 
+    componentDidUpdate(prevProps: IProps) {
+        const { open: wasOpen } = prevProps;
+        const { open, initialWorker, showLocationsBlock, regions } = this.props;
+        const becomeOpened = wasOpen === false && open === true;
+        if (becomeOpened && !!initialWorker) {
+            const {
+                name,
+                workPhone,
+                mobilePhone,
+                card,
+                position,
+                email,
+                city,
+                region,
+            } = initialWorker;
+
+            this.formValues = {
+                name: name || this.defaultValues.name,
+                workPhone: workPhone || this.defaultValues.workPhone,
+                homePhone: mobilePhone || this.defaultValues.homePhone,
+                card: card || this.defaultValues.card,
+                position: position || this.defaultValues.position,
+                email: email || this.defaultValues.email,
+
+                password: this.defaultValues.password,
+                city: this.defaultValues.city,
+                region: this.defaultValues.region,
+            };
+
+            if (!showLocationsBlock) return;
+
+            this.initLocationsBlock();
+        }
+    }
+
+    initLocationsBlock = async () => {
+        const { regions, initialWorker: { city, region }} = this.props;
+        const targetRegion = regions.get(region);
+        if (!targetRegion) return;
+        this.formValues.region = targetRegion.name;
+        await this.loadSpecificCities();
+        if (!city) return;
+        const targetCity = this.cities.find(({ id }) => id === city);
+        if (!targetCity) return;
+        this.formValues.city = targetCity.name;
+    }
+
     render() {
         const {
-            initialUser,
+            initialWorker,
             isLoading,
             open,
             onClose,
@@ -271,7 +363,13 @@ class WorkerModal extends Component<IProps> {
                                         onChange={this.changeHandler}
                                         error={this.errors.get('region')}
                                         propName='region'>
-                                            <MenuItem value='' />
+                                            {
+                                                this.regions.map(({ id, name }) => (
+                                                    <MenuItem key={id} value={name}>
+                                                        { name }
+                                                    </MenuItem>
+                                                ))
+                                            }
                                     </FormRow>
                                     <FormRow
                                         required
@@ -281,7 +379,13 @@ class WorkerModal extends Component<IProps> {
                                         onChange={this.changeHandler}
                                         error={this.errors.get('city')}
                                         propName='city'>
-                                            <MenuItem value='' />
+                                            {
+                                                this.cities.map(({ id, name }) => (
+                                                    <MenuItem key={id} value={name}>
+                                                        { name }
+                                                    </MenuItem>
+                                                ))
+                                            }
                                     </FormRow>
                                 </Grid>
                             }
@@ -318,7 +422,7 @@ class WorkerModal extends Component<IProps> {
                         {
                             isLoading
                             ? <LoadingMask size={20} />
-                            : initialUser
+                            : initialWorker
                                 ? 'Зберегти зміни'
                                 : 'Додати користувача'
                         }

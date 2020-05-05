@@ -835,8 +835,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities(oblastName: string) {
-        return this.rootStore.api.getLocations(`api/city?oblast=${oblastName}`);
+    loadSpecificCities({ oblastName, regionName }: {
+        oblastName?: string;
+        regionName?: string;
+    }) {
+        let url: string;
+        if (oblastName) url = `api/city?oblast=${oblastName}`;
+        if (regionName) url = `api/city?region=${regionName}`;
+        return url
+            ? this.rootStore.api.getLocations(url)
+            : null;
     }
 
     @action.bound

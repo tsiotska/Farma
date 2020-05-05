@@ -34,8 +34,11 @@ interface IProps extends WithStyles<typeof styles> {
     initialLpu?: ILPU;
     title: string;
     oblasti?: Map<number, ILocation>;
-    loadSpecificCities?: (oblastName: string) => Promise<ILocation[]>;
     loadTypes?: (targetProp: string) => Promise<string[]>;
+    loadSpecificCities?: (param: {
+        oblastName?: string;
+        regionName?: string;
+    }) => Promise<ILocation[]>;
 }
 
 export interface ILpuModalValues {
@@ -154,7 +157,8 @@ class LpuModal extends Component<IProps> {
     submitHandler = () => this.props.onSubmit(this.formValues);
 
     loadSpecificCities = async (oblastName: string) => {
-        this.cities = await this.props.loadSpecificCities(oblastName);
+        const res = await this.props.loadSpecificCities({ oblastName });
+        if (Array.isArray(res)) this.cities = res;
     }
 
     initFromInitial = async () => {

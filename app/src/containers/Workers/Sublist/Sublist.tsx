@@ -16,6 +16,8 @@ import { IPosition } from '../../../interfaces/IPosition';
 import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 import { ILocation } from '../../../interfaces/ILocation';
 import WorkerListItem from '../../../components/WorkerListItem';
+import { USER_ROLE } from '../../../constants/Roles';
+import { EDIT_WORKER_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     title: {
@@ -42,6 +44,7 @@ interface IProps extends WithStyles<typeof styles> {
     expandedWorker?: IExpandedWorker;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     retryLoadSubworkers?: () => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
@@ -51,6 +54,9 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             cities,
             loadSubworkers: retryLoadSubworkers
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
@@ -58,11 +64,30 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus,
     expandedWorker,
     cities,
+    openModal
 }))
 @observer
 class Sublist extends Component<IProps> {
     get asyncStatus(): IAsyncStatus {
         return this.props.getAsyncStatus('loadSubworkers');
+    }
+
+    editClickHandler = (worker: IWorker) => {
+        const { openModal, positions } = this.props;
+        const allowedPositions: USER_ROLE[] = [
+            USER_ROLE.REGIONAL_MANAGER,
+            USER_ROLE.MEDICAL_AGENT,
+        ];
+        const filteredPositions: IPosition[] = [];
+        positions.forEach(position => {
+            const { id } = position;
+            if (allowedPositions.includes(id)) filteredPositions.push(position);
+        });
+        openModal(EDIT_WORKER_MODAL, {
+            initialWorker: worker,
+            positions: filteredPositions,
+            showLocationsBlock: true
+        });
     }
 
     getList = () => {
@@ -74,11 +99,12 @@ class Sublist extends Component<IProps> {
         ? expandedWorker.subworkers.map(x => (
             <WorkerListItem
                 key={x.id}
+                editClickHandler={this.editClickHandler}
                 position={positions.get(x.position)}
                 worker={x}
                 fired={false}
                 isExpanded={false}
-                location={cities.get(x.city)}
+                userLocation={cities.get(x.city)}
                 classes={{
                     avatar: classes.avatar
                 }}

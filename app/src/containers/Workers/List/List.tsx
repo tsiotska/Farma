@@ -9,6 +9,8 @@ import { IExpandedWorker } from '../../../stores/DepartmentsStore';
 import { computed } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import WorkerListItem from '../../../components/WorkerListItem';
+import { USER_ROLE } from '../../../constants/Roles';
+import { EDIT_WORKER_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -49,6 +51,7 @@ interface IProps extends WithStyles<typeof styles> {
     regions?: Map<number, ILocation>;
     expandedWorker?: IExpandedWorker;
     setExpandedWorker?: (workerId: number | null) => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
@@ -59,12 +62,16 @@ interface IProps extends WithStyles<typeof styles> {
             cities,
             regions
         },
+        uiStore: {
+            openModal
+        }
     }
 }) => ({
     expandedWorker,
     setExpandedWorker,
     cities,
-    regions
+    regions,
+    openModal
 }))
 @observer
 class List extends Component<IProps> {
@@ -92,6 +99,24 @@ class List extends Component<IProps> {
                 ? workerId
                 : null
         );
+    }
+
+    editClickHandler = (worker: IWorker) => {
+        const { openModal, positions } = this.props;
+        const allowedPositions: USER_ROLE[] = [
+            USER_ROLE.REGIONAL_MANAGER,
+            USER_ROLE.MEDICAL_AGENT,
+        ];
+        const filteredPositions: IPosition[] = [];
+        positions.forEach(position => {
+            const { id } = position;
+            if (allowedPositions.includes(id)) filteredPositions.push(position);
+        });
+        openModal(EDIT_WORKER_MODAL, {
+            initialWorker: worker,
+            positions: filteredPositions,
+            showLocationsBlock: true
+        });
     }
 
     render() {
@@ -175,7 +200,8 @@ class List extends Component<IProps> {
                                 ? expandedWorker.id === x.id
                                 : false
                             }
-                            location={this.targetLocations.get(x[this.targetPropName])}
+                            editClickHandler={this.editClickHandler}
+                            userLocation={this.targetLocations.get(x[this.targetPropName])}
                             expandChangeHandler={this.expandChangeHandler(x.id)}
                             position={positions.get(x.position)}
                             children={expandable && <Sublist rmId={x.id} positions={positions} />}

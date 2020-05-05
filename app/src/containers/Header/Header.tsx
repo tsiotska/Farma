@@ -12,6 +12,7 @@ import { computed } from 'mobx';
 import { ArrowBack } from '@material-ui/icons';
 import cx from 'classnames';
 import AddWorkerModal from './AddWorkerModal';
+import EditWorkerModal from './EditWorkerModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -120,6 +121,7 @@ export class Header extends Component<IProps, {}> {
                 </AppBar>
                 <SalaryReviewModal />
                 <AddWorkerModal />
+                <EditWorkerModal />
             </>
         );
     }

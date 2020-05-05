@@ -26,6 +26,10 @@ import { ILocation } from '../../interfaces/ILocation';
 import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
+import { EDIT_WORKER_MODAL } from '../../constants/Modals';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { matchPath } from 'react-router';
+import { ADMIN_ROUTE, USERS_SETTINGS_ROUTE } from '../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -112,9 +116,10 @@ interface IProps extends WithStyles<typeof styles> {
     isExpanded?: boolean;
     expandChangeHandler?: (e: any, expanded: boolean) => void;
     historyPushUser?: (worker: IUserCommonInfo, role: USER_ROLE) => void;
-    location?: ILocation;
+    userLocation?: ILocation;
     position?: IPosition;
     disableClick?: boolean;
+    editClickHandler: (worker: IWorker) => void;
 }
 
 @inject(({
@@ -131,10 +136,10 @@ class WorkerListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
 
     @computed
-    get location(): string {
-        const { location } = this.props;
-        return location
-            ? location.name
+    get userLocation(): string {
+        const { userLocation } = this.props;
+        return userLocation
+            ? userLocation.name
             : null;
     }
 
@@ -179,6 +184,12 @@ class WorkerListItem extends Component<IProps> {
         }
 
         return from;
+    }
+
+    editClickHandler = (e: any) => {
+        e.stopPropagation();
+        const { editClickHandler, worker } = this.props;
+        editClickHandler(worker);
     }
 
     workerClickHandler = (e: any) => {
@@ -272,7 +283,7 @@ class WorkerListItem extends Component<IProps> {
                     </Grid>
                     <Grid xs className={cx(classes.gridItem, classes.locationCell)} alignItems='center' container zeroMinWidth item>
                         <Typography variant='body2'>
-                            { this.location || this.position || '-' }
+                            { this.userLocation || this.position || '-' }
                         </Typography>
                     </Grid>
                     <Grid xs={fired ? 2 : true} className={cx(classes.gridItem, classes.dateCell)} alignItems='center' zeroMinWidth container item>
@@ -315,7 +326,7 @@ class WorkerListItem extends Component<IProps> {
                                         <NotInterested fontSize='small' />
                                     </IconButton>
                                 }
-                                <IconButton className={classes.iconButton}>
+                                <IconButton onClick={this.editClickHandler} className={classes.iconButton}>
                                     <Edit fontSize='small' />
                                 </IconButton>
                             </>

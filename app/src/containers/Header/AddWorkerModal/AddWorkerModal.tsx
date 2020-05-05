@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
 import WorkerModal from '../WorkerModal';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { computed, observable } from 'mobx';

@@ -284,13 +284,9 @@ export class APIRequester {
     }
 
     getLocations(url: string): Promise<ILocation[]> {
-        return this.requestRepeater(
-            this.instance.get(url),
-            locationsNormalizer,
-            this.defaultErrorHandler(),
-            3,
-            1500
-        );
+        return this.instance.get(url)
+            .then(locationsNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 
     getAgents(branchId: number, positionId: number): Promise<IUser[]> {

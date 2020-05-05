@@ -31,7 +31,10 @@ interface IProps extends WithStyles<typeof styles> {
 
     initialPharmacy?: ILPU;
     oblasti?: Map<number, ILocation>;
-    loadSpecificCities?: (oblastName: string) => Promise<ILocation[]>;
+    loadSpecificCities?: (param: {
+        oblastName?: string;
+        regionName?: string;
+    }) => Promise<ILocation[]>;
     loadSpecificLpus?: (cityId: number) =>  Promise<ILPU[]>;
     loadTypes?: (targetProp: 'hcf' | 'pharmacy') => Promise<string[]>;
 }
@@ -170,7 +173,8 @@ class PharmacyModal extends Component<IProps> {
     }
 
     loadSpecificCities = async (oblastName: string) => {
-        this.cities = await this.props.loadSpecificCities(oblastName);
+        const res = await this.props.loadSpecificCities({oblastName});
+        if (Array.isArray(res)) this.cities = res;
     }
 
     loadSpecificLpus = async (cityId: number) => {
