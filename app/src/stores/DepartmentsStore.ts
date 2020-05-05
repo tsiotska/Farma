@@ -405,7 +405,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async addLpu(data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
-        const intFields: Array<keyof ILpuModalValues> = [ 'city' ];
+        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -419,11 +419,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload: any = Object.entries(data)
         .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
             const newPropName = namesMap[propName];
-            const convertedValue = intFields.includes(propName)
-                ? +value
-                : value;
-            return (newPropName && !!convertedValue)
-            ? { ...acc, [newPropName]: convertedValue }
+
+            let actualValue: any = value;
+            if (objectFields.includes(propName)) {
+                actualValue = (value && 'id' in value)
+                    ? value.id
+                    : null;
+            }
+
+            return (newPropName && !!actualValue)
+            ? { ...acc, [newPropName]: actualValue}
             : acc;
         }, {});
 
@@ -447,7 +452,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
-        const intFields: Array<keyof ILpuModalValues> = [ 'city' ];
+        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -461,11 +466,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload: any = Object.entries(data)
         .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
             const newPropName = namesMap[propName];
-            const convertedValue = intFields.includes(propName)
-                ? +value
-                : value;
-            return (newPropName && !!convertedValue)
-            ? { ...acc, [newPropName]: convertedValue }
+
+            let actualValue: any = value;
+            if (objectFields.includes(propName)) {
+                actualValue = (value && 'id' in value)
+                    ? value.id
+                    : null;
+            }
+
+            return (newPropName && !!actualValue)
+            ? { ...acc, [newPropName]: actualValue}
             : acc;
         }, {});
 
@@ -476,7 +486,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (isLpuEdited) {
             Object.entries(data).forEach(([ propName, value ]) => {
-                initialLpu[propName] = value;
+                if (objectFields.includes(propName)) {
+                    const name = (value && typeof value === 'object')
+                        ? value.name
+                        : null;
+                    initialLpu[propName] = name;
+                } else {
+                    initialLpu[propName] = value;
+                }
             });
         }
 

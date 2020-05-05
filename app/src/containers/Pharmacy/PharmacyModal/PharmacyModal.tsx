@@ -6,7 +6,6 @@ import { observable, computed, reaction, when } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import { ILpuModalValues } from '../../Lpu/LpuModal/LpuModal';
 import FormRow from '../../../components/FormRow';
 import { phoneValidator } from '../../../helpers/validators';
 
@@ -94,8 +93,8 @@ class PharmacyModal extends Component<IProps> {
     };
 
     @computed
-    get allProps(): Array<keyof ILpuModalValues> {
-        return [...Object.keys(this.formValues)] as Array<keyof ILpuModalValues>;
+    get allProps(): Array<keyof IPharmacyModalValues> {
+        return [...Object.keys(this.formValues)] as Array<keyof IPharmacyModalValues>;
     }
 
     @computed
@@ -107,8 +106,8 @@ class PharmacyModal extends Component<IProps> {
         }
 
         return this.allProps.some(x => {
-            const { [x as keyof ILpuModalValues]: initialValue } = initialPharmacy;
-            const { [x as keyof ILpuModalValues]: currentValue } = this.formValues;
+            const { [x as keyof IPharmacyModalValues]: initialValue } = initialPharmacy;
+            const { [x as keyof IPharmacyModalValues]: currentValue } = this.formValues;
 
             if (x === 'city') {
                 const cityName = currentValue
