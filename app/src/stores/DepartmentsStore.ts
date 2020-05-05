@@ -447,6 +447,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
+        const intFields: Array<keyof ILpuModalValues> = [ 'city' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'hcf_type',
@@ -458,11 +459,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
+        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
             const newPropName = namesMap[propName];
-
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
+            const convertedValue = intFields.includes(propName)
+                ? +value
+                : value;
+            return (newPropName && !!convertedValue)
+            ? { ...acc, [newPropName]: convertedValue }
             : acc;
         }, {});
 
@@ -507,8 +510,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
+        .reduce((acc, [propName, value ]: [keyof IPharmacyModalValues, any]) => {
             const newPropName = namesMap[propName];
+            if (propName === 'city') {
+                const actualValue = value.id;
+                return { ...acc, city: actualValue };
+            }
             return (newPropName && !!value)
             ? { ...acc, [newPropName]: value }
             : acc;
@@ -550,12 +557,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const newPropName = namesMap[propName];
 
             if (propName === 'city') {
-                const name = value
-                    ? value.name
-                    : '';
+                const id = value
+                    ? value.id
+                    : 0;
 
-                return name
-                    ? { ...acc, [newPropName]: name }
+                return id
+                    ? { ...acc, [newPropName]: id }
                     : acc;
             }
 
