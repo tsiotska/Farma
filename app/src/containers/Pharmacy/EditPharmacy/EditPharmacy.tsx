@@ -16,7 +16,7 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
-    editPharmacy?: (data: any) => boolean;
+    editPharmacy?: (initialPharmacy: ILPU, data: any) => boolean;
     modalPayload?: ILPU;
 }
 
@@ -56,8 +56,8 @@ class EditPharmacy extends Component<IProps> {
     closeHandler = () => this.props.openModal(null);
 
     submitHandler = async (formValues: IPharmacyModalValues) => {
-        const { editPharmacy } = this.props;
-        const lpuCreated = await editPharmacy(formValues);
+        const { editPharmacy, modalPayload } = this.props;
+        const lpuCreated = await editPharmacy(modalPayload, formValues);
         this.openSnackbar = true;
         this.snackbarType = !!lpuCreated
             ? SNACKBAR_TYPE.SUCCESS
@@ -70,7 +70,7 @@ class EditPharmacy extends Component<IProps> {
         return (
             <>
                 <PharmacyModal
-                    open={openedModal === EDIT_PHARMACY_MODAL}
+                    open={openedModal === EDIT_PHARMACY_MODAL && !!modalPayload}
                     isLoading={this.isLoading}
                     title='Редагувати аптеку'
                     onClose={this.closeHandler}
