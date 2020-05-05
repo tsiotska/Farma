@@ -23,6 +23,7 @@ import { ISpecialty } from '../interfaces/ISpecialty';
 import { invert } from 'lodash';
 import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
 import { SORT_ORDER } from './UIStore';
+import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 
 export interface IExpandedWorker {
     id: number;
@@ -225,34 +226,48 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadDoctors() {
-        const { api, userStore: { previewUser } } = this.rootStore;
-
-        if (!this.currentDepartmentId || !previewUser) return;
-
-        const { position, id } = previewUser;
-
-        if (position !== USER_ROLE.MEDICAL_AGENT) return;
-
-        const unconfirmed = await this.dispatchRequest(
-            api.getDoctors(this.currentDepartmentId, id, true),
+    async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
+        const { api, userStore: { previewUser }} = this.rootStore;
+        const condition = this.currentDepartmentId
+            && previewUser
+            && previewUser.id
+            && previewUser.position === USER_ROLE.MEDICAL_AGENT;
+        if (!condition) return;
+        return this.dispatchRequest(
+            api.getDoctors(this.currentDepartmentId, previewUser.id, true),
             'loadUnconfirmedDoctors'
         );
+    }
 
-        if (unconfirmed) {
-            unconfirmed.forEach(x => {
-                x.confirmed = false;
-            });
-            this.doctors.push(...unconfirmed);
-        }
-
-        const res = await this.dispatchRequest(
-            api.getDoctors(this.currentDepartmentId, id),
+    @action.bound
+    async loadConfirmedDoctors(): Promise<IDoctor[]> {
+        const { api, userStore: { previewUser }} = this.rootStore;
+        const condition = this.currentDepartmentId
+            && previewUser
+            && previewUser.id
+            && previewUser.position === USER_ROLE.MEDICAL_AGENT;
+        if (!condition) return;
+        return this.dispatchRequest(
+            api.getDoctors(this.currentDepartmentId, previewUser.id),
             'loadDoctors'
         );
+    }
 
-        if (res) {
-            this.doctors.push(...res);
+    @action.bound
+    async loadDoctors() {
+        const unconfirmedDocs = await this.loadUnconfirmedDoctors();
+
+        if (unconfirmedDocs) {
+            unconfirmedDocs.forEach(x => {
+                x.confirmed = false;
+            });
+            this.doctors.push(...unconfirmedDocs);
+        }
+
+        const confirmedDocs = await this.loadConfirmedDoctors();
+
+        if (confirmedDocs) {
+            this.doctors.push(...confirmedDocs);
         }
     }
 
@@ -1040,6 +1055,29 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }
 
         return !!createdWorker;
+    }
+
+    @action.bound
+    async acceptAgent(doctor: IDoctor) {
+        const { api } = this.rootStore;
+        const status = await api.acceptDoctor(doctor.id);
+
+        if (status === CONFIRM_STATUS.ACCEPTED) {
+            // reload unconfirmed
+            const loadUnconfirmedPromise = this.loadUnconfirmedDoctors();
+            const allConfirmed = this.doctors.filter(({ confirmed }) => confirmed === true);
+            const unconfirmed = await loadUnconfirmedPromise;
+            this.doctors = [
+                ...unconfirmed,
+                ...allConfirmed
+            ];
+        } else if (status === CONFIRM_STATUS.CONFIRMED) {
+            // push doc from unconfirmed to confirmed
+            doctor.confirmed = true;
+        } else {
+            return false;
+        }
+        return true;
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {

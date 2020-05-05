@@ -226,7 +226,7 @@ class WorkerListItem extends Component<IProps> {
                 mobilePhone,
                 workPhone,
                 card,
-                isVacancy
+                isVacancy,
             }
         } = this.props;
 

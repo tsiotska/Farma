@@ -34,6 +34,7 @@ import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer';
+import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 
 export interface ICachedPromise <T> {
     promise: Promise<T>;
@@ -508,5 +509,15 @@ export class APIRequester {
                 : []
             ))
             .catch(this.defaultErrorHandler([]));
+    }
+
+    acceptDoctor(docId: number): Promise<CONFIRM_STATUS> {
+        return this.instance.put(`api/agent/${docId}/accept`)
+            .then(({ status }) => {
+                return status === 200
+                ? CONFIRM_STATUS.ACCEPTED
+                : CONFIRM_STATUS.CONFIRMED;
+            })
+            .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
 }

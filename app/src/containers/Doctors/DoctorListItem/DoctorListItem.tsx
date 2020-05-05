@@ -7,11 +7,13 @@ import {
     IconButton,
     Typography
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
+import { observable } from 'mobx';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -50,7 +52,8 @@ const styles = (theme: any) => createStyles({
         color: 'white',
         borderColor: 'white',
         height: 36,
-        padding: '0 8px'
+        padding: '0 8px',
+        minWidth: 100
     },
     deposit: {
         width: '100%',
@@ -60,11 +63,33 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
+    confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
+    acceptAgent?: (doctor: IDoctor) => boolean;
 }
 
+@inject(({
+    appState: {
+        departmentsStore: {
+            acceptAgent
+        }
+    }
+}) => ({
+    acceptAgent
+}))
 @observer
 class DoctorListItem extends Component<IProps> {
+    @observable isLoadingConfirmation: boolean = false;
+
+    confirmClickHandler =  async () => {
+        const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
+        if (!unconfirmed) return;
+        this.isLoadingConfirmation = true;
+        const isConfirmed = await acceptAgent(doctor);
+        this.isLoadingConfirmation = false;
+        confirmationCallback(isConfirmed);
+    }
+
     render() {
         const {
             unconfirmed,
@@ -117,8 +142,16 @@ class DoctorListItem extends Component<IProps> {
                 <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
                     {
                         unconfirmed
-                        ? <Button className={classes.confirmButton} variant='outlined'>
-                            Підтвердити
+                        ? <Button
+                            disabled={this.isLoadingConfirmation}
+                            onClick={this.confirmClickHandler}
+                            className={classes.confirmButton}
+                            variant='outlined'>
+                                {
+                                    this.isLoadingConfirmation
+                                    ? <LoadingMask size={20} />
+                                    : 'Підтвердити'
+                                }
                           </Button>
                         : <>
                             <Typography className={cx(classes.deposit, classes.text)}>

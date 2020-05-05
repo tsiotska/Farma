@@ -1,13 +1,22 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, LinearProgress, Typography } from '@material-ui/core';
+import {
+    createStyles,
+    withStyles,
+    WithStyles,
+    Grid,
+    LinearProgress,
+    Typography
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable } from 'mobx';
 import Header from './Header';
 import ListHeader from './ListHeader';
 import { IDoctor } from '../../interfaces/IDoctor';
 import DoctorListItem from './DoctorListItem';
 import Pagination from '../../components/Pagination';
+import Snackbar from '../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -54,6 +63,9 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Doctors extends Component<IProps> {
+    @observable isSnackbarOpen: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('loadDoctors').loading;
@@ -74,7 +86,19 @@ class Doctors extends Component<IProps> {
         return doctors.filter((x, i) => (i >= begin && i < begin + itemsPerPage));
     }
 
+    snackbarCloseHandler = () => {
+        this.isSnackbarOpen = false;
+    }
+
+    confirmationCallback = (success: boolean) => {
+        this.snackbarType = success
+        ? SNACKBAR_TYPE.SUCCESS
+        : SNACKBAR_TYPE.ERROR;
+        this.isSnackbarOpen = true;
+    }
+
     componentDidMount() {
+        this.props.clearDoctors();
         this.props.loadDoctors();
     }
 
@@ -109,6 +133,7 @@ class Doctors extends Component<IProps> {
                             key={doc.id}
                             doctor={doc}
                             unconfirmed={doc.confirmed === false}
+                            confirmationCallback={this.confirmationCallback}
                         />
                     ))
                 }
@@ -118,6 +143,16 @@ class Doctors extends Component<IProps> {
                     itemsPerPage={itemsPerPage}
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
+                />
+                <Snackbar
+                    open={this.isSnackbarOpen}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                        ? 'Лікар успішно підтверджений'
+                        : 'Підтвердити лікаря неможливо'
+                    }
                 />
             </Grid>
         );

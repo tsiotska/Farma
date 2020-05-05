@@ -58,6 +58,7 @@ interface IProps extends WithStyles<typeof styles> {
     setBonusesYear?: (value: number, shouldPostData: boolean) => void;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
+    clearDoctors?: () => void;
 }
 
 @inject(({
@@ -75,13 +76,15 @@ interface IProps extends WithStyles<typeof styles> {
         },
         departmentsStore: {
             loadLocationsAgents,
-            loadDoctors
+            loadDoctors,
+            clearDoctors
         },
         uiStore: {
             openModal
         }
     }
 }) => ({
+    clearDoctors,
     loadBonuses,
     bonuses,
     previewBonus,
@@ -198,11 +201,18 @@ class Marks extends Component<IProps> {
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     componentDidUpdate({ role: prevRole }: IProps) {
-        const { role: currentRole, loadDoctors, loadLocationsAgents, loadBonuses } = this.props;
+        const {
+            role: currentRole,
+            loadDoctors,
+            loadLocationsAgents,
+            loadBonuses,
+            clearDoctors
+        } = this.props;
 
         if (prevRole === currentRole) return;
 
         if (currentRole === USER_ROLE.MEDICAL_AGENT) {
+            clearDoctors();
             loadDoctors();
         } else {
             loadLocationsAgents();
@@ -211,9 +221,16 @@ class Marks extends Component<IProps> {
     }
 
     componentDidMount() {
-        const { role, loadBonuses, loadLocationsAgents, loadDoctors } = this.props;
+        const {
+            role,
+            loadBonuses,
+            loadLocationsAgents,
+            loadDoctors,
+            clearDoctors
+        } = this.props;
         loadBonuses();
         if (role === USER_ROLE.MEDICAL_AGENT) {
+            clearDoctors();
             loadDoctors();
         } else {
             loadLocationsAgents();

@@ -1,0 +1,5 @@
+export enum CONFIRM_STATUS {
+    ACCEPTED,
+    CONFIRMED,
+    REJECTED
+}
