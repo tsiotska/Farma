@@ -30,11 +30,11 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     onClose: () => void;
     onSubmit: (value: ILpuModalValues) => void;
+    types: string[];
 
     initialLpu?: ILPU;
     title: string;
     oblasti?: Map<number, ILocation>;
-    loadTypes?: (targetProp: string) => Promise<string[]>;
     loadSpecificCities?: (param: {
         oblastName?: string;
         regionId?: number;
@@ -57,13 +57,11 @@ export interface ILpuModalValues {
         departmentsStore: {
             oblasti,
             loadSpecificCities,
-            loadTypes,
         }
     }
 }) => ({
     oblasti,
     loadSpecificCities,
-    loadTypes,
 }))
 @observer
 class LpuModal extends Component<IProps> {
@@ -76,7 +74,6 @@ class LpuModal extends Component<IProps> {
     };
 
     @observable cities: ILocation[] = [];
-    @observable types: string[] = [];
 
     @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
     @observable formValues: ILpuModalValues = {
@@ -231,10 +228,7 @@ class LpuModal extends Component<IProps> {
     }
 
     async componentDidMount() {
-        const { loadTypes} = this.props;
-
         this.initFromInitial();
-        this.types = await loadTypes('hcf');
     }
 
     render() {
@@ -242,7 +236,8 @@ class LpuModal extends Component<IProps> {
             open,
             onClose,
             title,
-            classes
+            classes,
+            types
         } = this.props;
 
         return (
@@ -323,14 +318,14 @@ class LpuModal extends Component<IProps> {
                         <FormRow
                             select
                             required
-                            disabled={!this.types.length}
+                            disabled={!types.length}
                             label='Тип'
                             values={this.formValues}
                             onChange={this.changeHandler}
                             propName='type'
                             error={this.errors.get('type')}>
                                 {
-                                    this.types.map(name => (
+                                    types.map(name => (
                                         <MenuItem key={name} value={name}>
                                             { name }
                                         </MenuItem>

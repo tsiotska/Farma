@@ -13,6 +13,7 @@ import { ILPU } from '../../../interfaces/ILPU';
 const styles = (theme: any) => createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
+    types: string[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
@@ -66,11 +67,12 @@ class EditPharmacy extends Component<IProps> {
     }
 
     render() {
-        const { openedModal, modalPayload } = this.props;
+        const { openedModal, modalPayload, types } = this.props;
 
         return (
             <>
                 <PharmacyModal
+                    types={types}
                     open={openedModal === EDIT_PHARMACY_MODAL && !!modalPayload}
                     isLoading={this.isLoading}
                     title='Редагувати аптеку'

@@ -303,8 +303,8 @@ class WorkerModal extends Component<IProps> {
             this.formValues.city = this.defaultValues.city;
         }
         const shouldInitLocationsBlock = !!initialWorker
-            && (this.requireRegion === true && !this.formValues.region)
-            || (this.requireCity === true && !this.formValues.city);
+            && ((this.requireRegion === true && !this.formValues.region)
+            || (this.requireCity === true && !this.formValues.city));
         if (shouldInitLocationsBlock) this.initLocationsBlock();
     }
 

@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
@@ -55,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -65,7 +66,8 @@ interface IProps extends WithStyles<typeof styles> {
             sortedLpus: LPUs,
             currentDepartmentId,
             loadUnconfirmedLPUs,
-            unconfirmedLPUs
+            unconfirmedLPUs,
+            loadTypes
         },
         uiStore: {
             openModal,
@@ -84,10 +86,13 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
-    openModal
+    openModal,
+    loadTypes
 }))
 @observer
 class Lpu extends Component<IProps> {
+    @observable types: string[] = [];
+
     @computed
     get isUnconfirmedLPUsLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedLPUs').loading;
@@ -127,8 +132,14 @@ class Lpu extends Component<IProps> {
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
 
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('hcf');
+    }
+
     componentDidMount() {
         this.loadData();
+        this.initializeTypes();
     }
 
     componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
@@ -206,8 +217,8 @@ class Lpu extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddLpu />
-                <EditLpu />
+                <AddLpu types={this.types} />
+                <EditLpu types={this.types} />
             </Grid>
         );
     }

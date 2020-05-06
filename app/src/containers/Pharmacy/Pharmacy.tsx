@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
@@ -55,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     setPharmacyDemand?: (value: boolean) => void;
     openModal?: (modalName: string) => void;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -65,7 +66,8 @@ interface IProps extends WithStyles<typeof styles> {
             sortedPharmacies: pharmacies,
             setPharmacyDemand,
             unconfirmedPharmacies,
-            loadUnconfirmedPharmacies
+            loadUnconfirmedPharmacies,
+            loadTypes
         },
         uiStore: {
             setCurrentPage,
@@ -84,10 +86,13 @@ interface IProps extends WithStyles<typeof styles> {
     setPharmacyDemand,
     unconfirmedPharmacies,
     loadUnconfirmedPharmacies,
-    openModal
+    openModal,
+    loadTypes
 }))
 @observer
 class Pharmacy extends Component<IProps> {
+    @observable types: string[] = [];
+
     @computed
     get isUnconfirmedPharmaciesLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedPharmacies').loading;
@@ -123,9 +128,15 @@ class Pharmacy extends Component<IProps> {
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
 
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('pharmacy');
+    }
+
     componentDidMount() {
         this.props.setPharmacyDemand(true);
         this.props.loadUnconfirmedPharmacies();
+        this.initializeTypes();
     }
 
     componentWillUnmount() {
@@ -201,8 +212,8 @@ class Pharmacy extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddPharmacy />
-                <EditPharmacy />
+                <AddPharmacy types={this.types} />
+                <EditPharmacy types={this.types} />
             </Grid>
         );
     }
