@@ -57,7 +57,7 @@ class ListItem extends Component<IProps> {
         return (
             <WorkerListItem
                 editClickHandler={this.editClickHandler}
-                position={positions.get(worker.id)}
+                position={positions.get(worker.position)}
                 worker={worker}
                 fired={false}
                 isExpanded={false}

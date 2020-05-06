@@ -122,9 +122,9 @@ class WorkerModal extends Component<IProps> {
             workPhone: phoneValidator,
             email: emailValidator,
             position: stringValidator,
-            name: this.minLengthValidator(3),
-            password: this.minLengthValidator(3),
-            card: this.minLengthValidator(16),
+            name: (value: string) => lengthValidator(3, value),
+            password: (value: string) => lengthValidator(3, value),
+            card: (value: string) => value && value.length === 16,
             city: stringValidator,
         };
         const { classes } = props;
@@ -224,8 +224,6 @@ class WorkerModal extends Component<IProps> {
 
         this.cities = await loadSpecificCities({ regionId: region }) || [];
     }
-
-    minLengthValidator = (minLength: number) => (value: string) => lengthValidator(minLength, value);
 
     valueValidator = (propName: keyof IWorkerModalValues, value: string): string | boolean => {
         if (propName === 'region') return !value;

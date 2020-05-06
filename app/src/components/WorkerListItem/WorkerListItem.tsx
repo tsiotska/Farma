@@ -26,6 +26,7 @@ import { ILocation } from '../../interfaces/ILocation';
 import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
+import Config from '../../../Config';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -269,7 +270,7 @@ class WorkerListItem extends Component<IProps> {
                             src={
                                 isVacancy
                                     ? vacancyIcon
-                                    : avatar
+                                    : `${Config.ASSETS_URL}/${avatar}`
                             }
                             loadPlaceholder={<PermIdentity className={classes.placeholderImage} fontSize='small' />}
                         />

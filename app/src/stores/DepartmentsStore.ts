@@ -1061,7 +1061,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (avatar) formData.set('avatar', avatar);
+        if (avatar) formData.set('image', avatar);
         const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
@@ -1102,7 +1102,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (newAvatar) formData.set('avatar', newAvatar);
+        if (newAvatar) formData.set('image', newAvatar);
         let initialValue: any;
         const payload = Object.entries(values).reduce(
             (acc, [key, value]) => {
