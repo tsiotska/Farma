@@ -5,15 +5,18 @@ import {
     Grid,
     Button,
     IconButton,
-    Typography
+    Typography,
+    Popover
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
+import Icon from '../../../components/InfoIcon';
+import InfoWindow from '../../../components/InfoWindow';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -58,6 +61,14 @@ const styles = (theme: any) => createStyles({
     deposit: {
         width: '100%',
         color: '#7B8FFE'
+    },
+    infoIcon: {
+        '&:hover': {
+            cursor: 'pointer'
+        }
+    },
+    paper: {
+        color: 'red'
     }
 });
 
@@ -69,25 +80,44 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            acceptAgent
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     acceptAgent
+                 }
+             }
+         }) => ({
     acceptAgent
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
+    @observable anchorEl: any = false;
 
-    confirmClickHandler =  async () => {
+    confirmClickHandler = async () => {
         const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
         if (!unconfirmed) return;
         this.isLoadingConfirmation = true;
         const isConfirmed = await acceptAgent(doctor);
         this.isLoadingConfirmation = false;
         confirmationCallback(isConfirmed);
+    }
+
+    handleClick = (event: React.FormEvent<EventTarget>): void => {
+        this.anchorEl = this.anchorEl ? null : event.currentTarget;
+    }
+
+    closeInfo = (): void => {
+        this.anchorEl = null;
+    }
+
+    @computed
+    get open() {
+        return Boolean(this.anchorEl);
+    }
+
+    @computed
+    get id() {
+        return this.anchorEl ? 'simple-popper' : undefined;
     }
 
     render() {
@@ -107,63 +137,74 @@ class DoctorListItem extends Component<IProps> {
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                <Grid xs={3} container item>
+                <Grid xs={2} container item>
                     <Typography className={classes.text}>
-                        { LPUName || '-' }
+                        {LPUName || '-'}
                     </Typography>
                 </Grid>
+                <Grid xs={1} container item>
+                    <Icon aria-describedby={this.id} onClick={this.handleClick} className={classes.infoIcon}/>
+                    <Popover onClose={this.closeInfo} id={this.id} open={this.open} anchorEl={this.anchorEl}
+                             anchorOrigin={{
+                                 vertical: 'bottom',
+                                 horizontal: 'left',
+                             }}>
+                        <InfoWindow/>
+                    </Popover>
+                </Grid>
+
                 <Grid xs={3} container item>
                     <Typography className={classes.text}>
-                        { name || '-' }
+                        {name || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
-                        { specialty || '-'}
+                        {specialty || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
-                            ? '-'
-                            : <>
-                                <span className={classes.phone}>{ mobilePhone }</span>
-                                <span className={classes.phone}>{ workPhone }</span>
-                              </>
+                                ? '-'
+                                : <>
+                                    <span className={classes.phone}>{mobilePhone}</span>
+                                    <span className={classes.phone}>{workPhone}</span>
+                                </>
                         }
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
-                        { card || '-'}
+                        {card || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
                     {
                         unconfirmed
-                        ? <Button
-                            disabled={this.isLoadingConfirmation}
-                            onClick={this.confirmClickHandler}
-                            className={classes.confirmButton}
-                            variant='outlined'>
+                            ? <Button
+                                disabled={this.isLoadingConfirmation}
+                                onClick={this.confirmClickHandler}
+                                className={classes.confirmButton}
+                                variant='outlined'>
                                 {
                                     this.isLoadingConfirmation
-                                    ? <LoadingMask size={20} />
-                                    : 'Підтвердити'
+                                        ? <LoadingMask size={20}/>
+                                        : 'Підтвердити'
                                 }
-                          </Button>
-                        : <>
-                            <Typography className={cx(classes.deposit, classes.text)}>
-                                { deposit || 0 }
-                            </Typography>
-                            <IconButton>
-                                <Edit className={classes.editIcon} fontSize='small' />
-                            </IconButton>
-                          </>
+                            </Button>
+                            : <>
+                                <Typography className={cx(classes.deposit, classes.text)}>
+                                    {deposit || 0}
+                                </Typography>
+                                <IconButton>
+                                    <Edit className={classes.editIcon} fontSize='small'/>
+                                </IconButton>
+                            </>
                     }
                     <IconButton>
-                        <Delete className={classes.removeIcon} fontSize='small' />
+                        <Delete className={classes.removeIcon} fontSize='small'/>
                     </IconButton>
                 </Grid>
             </Grid>
