@@ -59,6 +59,7 @@ class EditLpu extends Component<IProps> {
         this.snackbarType = !!lpuEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuEdited) this.closeHandler();
     }
 
     render() {
@@ -82,8 +83,8 @@ class EditLpu extends Component<IProps> {
                 anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
                 message={
                     this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                    ? 'ЛПУ успішно створено'
-                    : 'Неможливо додати ЛПУ'
+                    ? 'ЛПУ успішно змінено'
+                    : 'Неможливо змінити ЛПУ'
                 }
             />
             </>

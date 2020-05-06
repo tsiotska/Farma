@@ -218,8 +218,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    editPharmacy(depId: number, data: any): Promise<boolean> {
-        return this.instance.put(`/api/pharmacy/${depId}`, data)
+    editPharmacy(id: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/pharmacy/${id}`, data)
         .then(() => true)
         .catch(this.defaultErrorHandler(false));
     }
@@ -275,8 +275,8 @@ export class APIRequester {
         .then(({ data: { data } }) => (
             Array.isArray(data)
             ? data.map(
-                (name: string, id: number) => ({
-                    id,
+                (name: string, i: number) => ({
+                    id: i + 1,
                     name
                 }))
             : []
@@ -403,12 +403,31 @@ export class APIRequester {
 
     createWorker(userData: FormData, departmentId?: number): Promise<IWorker> {
         const url = departmentId
-        ? `/api/branch/${departmentId}/worker`
-        : '/api/worker';
+            ? `/api/branch/${departmentId}/worker`
+            : '/api/worker';
 
         return this.instance.post(url, userData)
             .then(workerNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    editWorker(data: FormData, workerId: number, departmentId: number): Promise<{
+        edited: boolean;
+        avatar: string;
+    }> {
+        const url = departmentId
+            ? `/api/branch/${departmentId}/worker/${workerId}`
+            : `/api/worker/${workerId}`;
+
+        return this.instance.put(url, data)
+            .then(({ data: { data: { avatar } } }: any) => ({
+                edited: true,
+                avatar: avatar || null
+            }))
+            .catch(this.defaultErrorHandler({
+                edited: false,
+                avatar: null
+            }));
     }
 
     createFFM(ffmData: FormData, departmentId: number): Promise<IUser> {

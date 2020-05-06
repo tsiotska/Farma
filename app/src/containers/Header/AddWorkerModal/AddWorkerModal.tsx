@@ -10,6 +10,7 @@ import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
 
 interface IProps {
+    showLocationsBlock: boolean;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
@@ -78,6 +79,8 @@ class AddWorkerModal extends Component<IProps> {
     }
 
     render() {
+        const { showLocationsBlock } = this.props;
+
         return (
             <>
                 <WorkerModal
@@ -87,6 +90,7 @@ class AddWorkerModal extends Component<IProps> {
                     onSubmit={this.submitHandler}
                     title='Додати працівника'
                     positions={this.positions}
+                    showLocationsBlock={showLocationsBlock}
                 />
                 <Snackbar
                     open={this.showSnackbar}

@@ -39,7 +39,12 @@ const valueNormalizers: any = {
     fired: (value: string) => new Date(value),
     hired: (value: string) =>  new Date(value),
     created: (value: string) =>  new Date(value),
-    isVacancy: (value: any) => !!value
+    isVacancy: (value: any) => !!value,
+    card: (value: any) => (
+        value
+        ? value.replace(/ /g, '')
+        : null
+    ),
 };
 
 const requiredProps = ['id'];

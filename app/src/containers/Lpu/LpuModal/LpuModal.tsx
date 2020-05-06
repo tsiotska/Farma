@@ -11,7 +11,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import { observable, computed, reaction } from 'mobx';
+import { observable, computed, reaction, toJS } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import FormRow from '../../../components/FormRow';
 import { phoneValidator } from '../../../helpers/validators';
@@ -37,14 +37,15 @@ interface IProps extends WithStyles<typeof styles> {
     loadTypes?: (targetProp: string) => Promise<string[]>;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
 }
 
 export interface ILpuModalValues {
+    [key: string]: string | ILocation;
     name: string;
-    oblast: string;
-    city: string;
+    oblast: ILocation;
+    city: ILocation;
     type: string;
     address: string;
     phone1: string;
@@ -66,6 +67,7 @@ export interface ILpuModalValues {
 }))
 @observer
 class LpuModal extends Component<IProps> {
+    readonly objectFields: Array<keyof ILpuModalValues> = [ 'oblast', 'city' ];
     readonly optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
     readonly errorMessages: {[key: string]: string} = {
         phone1: 'Телефон має склададатись з 10 або 12 цифр',
@@ -73,15 +75,14 @@ class LpuModal extends Component<IProps> {
         default: 'Значення має містити не менше 3 символів'
     };
 
-    reactionDisposer: any;
     @observable cities: ILocation[] = [];
     @observable types: string[] = [];
 
     @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
     @observable formValues: ILpuModalValues = {
         name: '',
-        oblast: '',
-        city: '',
+        oblast: null,
+        city: null,
         type: '',
         address: '',
         phone1: '',
@@ -89,20 +90,20 @@ class LpuModal extends Component<IProps> {
     };
 
     @computed
-    get oblastListItems(): string[] {
+    get oblastListItems(): ILocation[] {
         const { oblasti } = this.props;
         const res: any = [];
 
-        oblasti.forEach(({ name }) => {
-            res.push(name);
+        oblasti.forEach(x => {
+            res.push(x);
         });
 
         return res;
     }
 
     @computed
-    get allProps(): Array<keyof ILpuModalValues> {
-        return [...Object.keys(this.formValues)] as Array<keyof ILpuModalValues>;
+    get allProps(): string[] {
+        return [...Object.keys(this.formValues)];
     }
 
     @computed
@@ -110,12 +111,20 @@ class LpuModal extends Component<IProps> {
         const { initialLpu } = this.props;
 
         if (!initialLpu) {
-            return this.allProps.some(x => !this.formValues[x]);
+            return this.allProps.some(x => !!this.formValues[x]);
         }
 
         return this.allProps.some(x => {
-            const { [x as keyof ILpuModalValues]: initialValue } = initialLpu;
-            const { [x as keyof ILpuModalValues]: currentValue } = this.formValues;
+            const initialValue = initialLpu[x];
+            const currentValue = this.formValues[x];
+
+            if (this.objectFields.includes(x)) {
+                const actualValue = (currentValue && typeof currentValue === 'object')
+                    ? currentValue.name
+                    : null;
+                return initialValue !== actualValue;
+            }
+
             return (initialValue || '') !== currentValue;
         });
     }
@@ -138,6 +147,8 @@ class LpuModal extends Component<IProps> {
             if (!value) return false;
             const isInvalid = !phoneValidator(value);
             return isInvalid && this.errorMessages[propName];
+        } else if (this.objectFields.includes(propName)) {
+            return !value;
         } else {
             const isInvalid = !value || value.length < 3;
             return isInvalid && this.errorMessages.default;
@@ -150,7 +161,19 @@ class LpuModal extends Component<IProps> {
     }
 
     changeHandler = (propName: keyof ILpuModalValues, value: string) => {
-        this.formValues[propName] = value;
+        if (this.objectFields.includes(propName)) {
+            const id = +value;
+            if (propName === 'oblast') {
+                const targetOblast = this.oblastListItems.find(x => x.id === id) || null;
+                this.formValues[propName] = targetOblast;
+                this.formValues.city = null;
+                if (targetOblast) this.loadSpecificCities(targetOblast.name);
+            } else if (propName === 'city') {
+                this.formValues[propName] = this.cities.find(x => x.id === id) || null;
+            }
+        } else {
+            this.formValues[propName] = value;
+        }
         this.validate(propName, value);
     }
 
@@ -178,17 +201,22 @@ class LpuModal extends Component<IProps> {
 
         this.formValues = {
             name: name || '',
-            oblast: oblast || '',
-            city: '',
+            oblast: null,
+            city: null,
             type: type || '',
             address: address || '',
             phone1: phone1 || '',
             phone2: phone2 || '',
         };
 
-        await this.loadSpecificCities(oblast);
+        const targetOblast = this.oblastListItems.find(x => x.name === oblast);
 
-        this.formValues.city = city || '';
+        if (!targetOblast) return;
+
+        this.formValues.oblast = targetOblast;
+        await this.loadSpecificCities(targetOblast.name);
+
+        this.formValues.city = this.cities.find(x => x.name === city) || null;
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -206,21 +234,7 @@ class LpuModal extends Component<IProps> {
         const { loadTypes} = this.props;
 
         this.initFromInitial();
-
-        this.reactionDisposer = reaction(
-            () => this.formValues.oblast,
-            async (oblastName: string) => {
-                this.formValues.city = '';
-                this.cities = [];
-                this.loadSpecificCities(oblastName);
-            }
-        );
-
         this.types = await loadTypes('hcf');
-    }
-
-    componentWillUnmount() {
-        this.reactionDisposer();
     }
 
     render() {
@@ -254,11 +268,16 @@ class LpuModal extends Component<IProps> {
                             values={this.formValues}
                             onChange={this.changeHandler}
                             propName='oblast'
+                            value={
+                                this.formValues.oblast
+                                ? this.formValues.oblast.id
+                                : ''
+                            }
                             required
                             error={this.errors.get('oblast')}>
                                 {
-                                    this.oblastListItems.map(name => (
-                                        <MenuItem key={name} value={name}>
+                                    this.oblastListItems.map(({ name, id }) => (
+                                        <MenuItem key={id} value={id}>
                                             { name }
                                         </MenuItem>
                                     ))
@@ -279,11 +298,16 @@ class LpuModal extends Component<IProps> {
                             label='Місто'
                             values={this.formValues}
                             onChange={this.changeHandler}
+                            value={
+                                this.formValues.city
+                                ? this.formValues.city.id
+                                : ''
+                            }
                             propName='city'
                             error={this.errors.get('city')}>
                                 {
                                     this.cities.map(({ id, name }) => (
-                                        <MenuItem key={id} value={name}>
+                                        <MenuItem key={id} value={id}>
                                             { name }
                                         </MenuItem>
                                     ))
