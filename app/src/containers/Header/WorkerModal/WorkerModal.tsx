@@ -111,7 +111,7 @@ class WorkerModal extends Component<IProps> {
 
     @observable formValues: IWorkerModalValues = {...this.defaultValues};
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
-    @observable image: File = null;
+    @observable image: File | string = null;
     @observable cities: ILocation[] = [];
 
     constructor(props: IProps) {
@@ -256,7 +256,12 @@ class WorkerModal extends Component<IProps> {
     submitHandler = () => {
         const { onSubmit, isLoading } = this.props;
         if (isLoading) return;
-        onSubmit(this.formValues, this.image);
+        onSubmit(
+            this.formValues,
+            typeof this.image === 'string'
+            ? null
+            : this.image
+        );
     }
 
     appendFileHandler = (image: File) => {
@@ -283,6 +288,7 @@ class WorkerModal extends Component<IProps> {
                 card,
                 position,
                 email,
+                avatar
             } = initialWorker;
 
             this.formValues = {
@@ -297,6 +303,8 @@ class WorkerModal extends Component<IProps> {
                 city: this.defaultValues.city,
                 region: this.defaultValues.region,
             };
+
+            if (avatar) this.image = avatar;
 
             if (!showLocationsBlock) return;
 
