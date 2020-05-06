@@ -91,6 +91,7 @@ class WorkerModal extends Component<IProps> {
     readonly intFields: Array<keyof IWorkerModalValues> = [ 'position' ];
     readonly regionRelatedFields: Array<keyof IWorkerModalValues> = ['city', 'region'];
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
+    readonly dropzoneClasses: any;
     readonly errorMessages: { [key: string]: string } = {
         homePhone: 'Телефон має склададатись з 10 або 12 цифр',
         workPhone: 'Телефон має склададатись з 10 або 12 цифр',
@@ -127,6 +128,12 @@ class WorkerModal extends Component<IProps> {
             city: stringValidator,
             region: stringValidator
         };
+        const { classes } = props;
+        this.dropzoneClasses = {
+            container: classes.dropzone,
+            removePhotoButton: classes.dropzoneButton,
+            addPhotoButton: classes.dropzoneButton,
+        };
     }
 
     @computed
@@ -146,11 +153,8 @@ class WorkerModal extends Component<IProps> {
     get valuesChanged(): boolean {
         const { initialWorker } = this.props;
 
-        if (!initialWorker) {
-            return this.allProps.some(x => !!this.formValues[x]);
-        }
-
-        return this.allProps.some(x => {
+        const valuesChanged = initialWorker
+        ? this.allProps.some(x => {
             const initialValue = initialWorker[x];
             const currentValue = this.formValues[x];
 
@@ -159,7 +163,12 @@ class WorkerModal extends Component<IProps> {
             }
 
             return (initialValue || '') !== currentValue;
-        });
+        })
+        : this.allProps.some(x => !!this.formValues[x]);
+
+        const imageChanged = !!this.image && typeof this.image === 'object';
+
+        return valuesChanged || imageChanged;
     }
 
     @computed
@@ -256,6 +265,7 @@ class WorkerModal extends Component<IProps> {
     submitHandler = () => {
         const { onSubmit, isLoading } = this.props;
         if (isLoading) return;
+        console.log('image: ', toJS(this.image));
         onSubmit(
             this.formValues,
             typeof this.image === 'string'
@@ -279,6 +289,7 @@ class WorkerModal extends Component<IProps> {
         const becomeClosed = wasOpen === true && open === false;
         if (becomeClosed) {
             this.formValues = {...this.defaultValues};
+            this.image = null;
         }
         if (becomeOpened && !!initialWorker) {
             const {
@@ -345,11 +356,7 @@ class WorkerModal extends Component<IProps> {
                 maxWidth='md'>
                     <Grid wrap='nowrap' container>
                         <AvatarDropzone
-                            classes={{
-                                container: classes.dropzone,
-                                removePhotoButton: classes.dropzoneButton,
-                                addPhotoButton: classes.dropzoneButton,
-                            }}
+                            classes={this.dropzoneClasses}
                             appendFile={this.appendFileHandler}
                             removeIcon={this.removeFileHandler}
                             file={this.image}

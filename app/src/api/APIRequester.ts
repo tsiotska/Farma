@@ -403,12 +403,31 @@ export class APIRequester {
 
     createWorker(userData: FormData, departmentId?: number): Promise<IWorker> {
         const url = departmentId
-        ? `/api/branch/${departmentId}/worker`
-        : '/api/worker';
+            ? `/api/branch/${departmentId}/worker`
+            : '/api/worker';
 
         return this.instance.post(url, userData)
             .then(workerNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    editWorker(data: FormData, workerId: number, departmentId: number): Promise<{
+        edited: boolean;
+        avatar: string;
+    }> {
+        const url = departmentId
+            ? `/api/branch/${departmentId}/worker/${workerId}`
+            : `/api/worker/${workerId}`;
+
+        return this.instance.put(url, data)
+            .then(({ data: { data: { avatar } } }: any) => ({
+                edited: true,
+                avatar: avatar || null
+            }))
+            .catch(this.defaultErrorHandler({
+                edited: false,
+                avatar: null
+            }));
     }
 
     createFFM(ffmData: FormData, departmentId: number): Promise<IUser> {

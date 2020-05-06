@@ -4,9 +4,11 @@ import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { IWorker } from '../../../interfaces/IWorker';
 import { IPosition } from '../../../interfaces/IPosition';
 import { EDIT_WORKER_MODAL } from '../../../constants/Modals';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable } from 'mobx';
 import WorkerModal from '../WorkerModal';
 import { IWorkerModalValues } from '../WorkerModal/WorkerModal';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import Snackbar from '../../../components/Snackbar';
 
 interface IProps {
     showLocationsBlock: boolean;
@@ -17,6 +19,7 @@ interface IProps {
         initialWorker: IWorker,
         positions: IPosition[],
     };
+    editWorker?: (initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File) => boolean;
 }
 
 @inject(({
@@ -27,17 +30,22 @@ interface IProps {
             openModal
         },
         departmentsStore: {
-            getAsyncStatus
+            getAsyncStatus,
+            editWorker
         }
     }
 }) => ({
     openedModal,
     modalPayload,
     getAsyncStatus,
-    openModal
+    openModal,
+    editWorker
 }))
 @observer
 class EditWorkerModal extends Component<IProps> {
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('editWorker').loading;
@@ -70,23 +78,26 @@ class EditWorkerModal extends Component<IProps> {
             : null;
     }
 
-    // @computed
-    // get showLocationsBlock(): boolean {
-    //     const { modalPayload } = this.props;
-    //     return !!modalPayload && 'showLocationsBlock' in modalPayload
-    //         ? modalPayload.showLocationsBlock
-    //         : false;
-    // }
-
     closeHandler = () => this.props.openModal(null);
 
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
+    }
+
     submitHandler = async (data: IWorkerModalValues, image: File) => {
-        console.log('submit');
+        if (!this.initialWorker) return;
+        const { editWorker } = this.props;
+        console.log('image: ', image);
+        const isEdited = await editWorker(this.initialWorker, data, image);
+        this.snackbarType = isEdited
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
+        if (isEdited) this.closeHandler();
     }
 
     render() {
-        const { modalPayload, showLocationsBlock } = this.props;
-        // console.log(toJS(modalPayload));
+        const { showLocationsBlock } = this.props;
 
         return (
             <>
@@ -99,6 +110,16 @@ class EditWorkerModal extends Component<IProps> {
                     positions={this.positions}
                     initialWorker={this.initialWorker}
                     showLocationsBlock={showLocationsBlock}
+                />
+                <Snackbar
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Дані успішно змінені'
+                            : 'Під час редагування користувача трапилась помилка'
+                    }
+                    open={this.showSnackbar}
+                    type={this.snackbarType}
+                    onClose={this.snackbarCloseHandler}
                 />
             </>
         );

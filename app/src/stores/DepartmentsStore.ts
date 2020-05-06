@@ -1066,11 +1066,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
             if (normalizedPropName === namesMap.card) {
-                const changedValue = [...value].reduce((resultingString, curr, i) => (
-                    (!!i && i % 4 === 0)
-                        ? `${resultingString} ${curr}`
-                        : `${resultingString}${curr}`
-                ), '');
+                const changedValue = this.diluteCardValue(value as string);
                 return { ...acc, [normalizedPropName]: changedValue };
             }
             return { ...acc, [normalizedPropName]: value };
@@ -1087,6 +1083,71 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }
 
         return !!createdWorker;
+    }
+
+    @action.bound
+    async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File) {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            position: 'position',
+            region: 'region',
+            city: 'city',
+            name: 'full_name',
+            email: 'email',
+            password: 'password',
+            workPhone: 'work_phone',
+            homePhone: 'mobile_phone',
+            card: 'bank_card',
+        };
+
+        const formData = new FormData();
+        if (newAvatar) formData.set('avatar', newAvatar);
+        const payload = Object.entries(values).reduce(
+            (acc, [key, value]) => {
+                const initialValue = key === 'position'
+                ? initialWorker[key] || USER_ROLE.UNKNOWN
+                : initialWorker[key] || '';
+
+                const jsonPropName = namesMap[key];
+
+                if (!jsonPropName || initialValue === value) return acc;
+
+                if (jsonPropName === namesMap.card) {
+                    const cardValue = this.diluteCardValue(value as string);
+                    return { ...acc, [jsonPropName]: cardValue };
+                }
+
+                return { ...acc, [jsonPropName]: value };
+            },
+            {}
+        );
+        formData.set('json', JSON.stringify(payload));
+
+        console.log('initial: ', toJS(initialWorker), payload);
+
+        const { edited, avatar } = await this.dispatchRequest(
+            api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
+            'editWorker'
+        );
+
+        if (edited) {
+            console.log('new avatar: ', newAvatar, avatar);
+            if (newAvatar) {
+                initialWorker.avatar = avatar;
+            }
+
+            const invertedNames = invert(namesMap);
+            Object.entries(payload).forEach(([ key, value ]) => {
+                const invertedName = invertedNames[key];
+                const initialValue = initialWorker[invertedName];
+                if (invertedName && initialValue !== value) {
+                    initialWorker[invertedName] = value;
+                }
+            });
+        }
+
+        return edited;
     }
 
     @action.bound
@@ -1137,6 +1198,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             return false;
         }
         return true;
+    }
+
+    private diluteCardValue(value: string) {
+        return [...value].reduce((resultingString, curr, i) => (
+            (!!i && i % 4 === 0)
+                ? `${resultingString} ${curr}`
+                : `${resultingString}${curr}`
+        ), '');
     }
 
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {
