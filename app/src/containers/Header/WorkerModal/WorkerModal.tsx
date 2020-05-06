@@ -88,7 +88,6 @@ export interface IWorkerModalValues {
 }))
 @observer
 class WorkerModal extends Component<IProps> {
-    readonly intFields: Array<keyof IWorkerModalValues> = [ 'position' ];
     readonly regionRelatedFields: Array<keyof IWorkerModalValues> = ['city', 'region'];
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
     readonly dropzoneClasses: any;
@@ -241,7 +240,7 @@ class WorkerModal extends Component<IProps> {
     }
 
     changeHandler = (propName: keyof IWorkerModalValues, value: string) => {
-        if (this.intFields.includes(propName)) {
+        if (propName === 'position') {
             const converted = +value;
             this.formValues[propName] = converted;
         } else if (propName === 'region') {
@@ -277,15 +276,33 @@ class WorkerModal extends Component<IProps> {
 
     componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker, showLocationsBlock, regions } = this.props;
+        const { open, initialWorker } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
+
         if (becomeClosed) {
             this.formValues = {...this.defaultValues};
             this.image = null;
+        } else if (becomeOpened && !!initialWorker) {
+            this.initValuesFromInitialWorker();
         }
-        if (becomeOpened && !!initialWorker) {
-            const {
+
+        if (this.requireRegion === false && !!this.formValues.region) {
+            this.formValues.region = this.defaultValues.region;
+        }
+        if (this.requireCity === false && !!this.formValues.city) {
+            this.formValues.city = this.defaultValues.city;
+        }
+        const shouldInitLocationsBlock = !!initialWorker
+            && (this.requireRegion === true && !this.formValues.region)
+            || (this.requireCity === true && !this.formValues.city);
+        if (shouldInitLocationsBlock) this.initLocationsBlock();
+    }
+
+    initValuesFromInitialWorker = () => {
+        const {
+            showLocationsBlock,
+            initialWorker: {
                 name,
                 workPhone,
                 mobilePhone,
@@ -293,31 +310,30 @@ class WorkerModal extends Component<IProps> {
                 position,
                 email,
                 avatar
-            } = initialWorker;
+        }} = this.props;
 
-            this.formValues = {
-                name: name || this.defaultValues.name,
-                workPhone: workPhone || this.defaultValues.workPhone,
-                homePhone: mobilePhone || this.defaultValues.homePhone,
-                card: card || this.defaultValues.card,
-                position: position || this.defaultValues.position,
-                email: email || this.defaultValues.email,
+        this.formValues = {
+            name: name || this.defaultValues.name,
+            workPhone: workPhone || this.defaultValues.workPhone,
+            homePhone: mobilePhone || this.defaultValues.homePhone,
+            card: card || this.defaultValues.card,
+            position: position || this.defaultValues.position,
+            email: email || this.defaultValues.email,
 
-                password: this.defaultValues.password,
-                city: this.defaultValues.city,
-                region: this.defaultValues.region,
-            };
+            password: this.defaultValues.password,
+            city: this.defaultValues.city,
+            region: this.defaultValues.region,
+        };
 
-            if (avatar) this.image = avatar;
+        if (avatar) this.image = avatar;
 
-            if (!showLocationsBlock) return;
+        if (!showLocationsBlock) return;
 
-            this.initLocationsBlock();
-        }
+        this.initLocationsBlock();
     }
 
     initLocationsBlock = async () => {
-        const { initialWorker: { city, region }} = this.props;
+        const { initialWorker: { city, region } } = this.props;
         this.formValues.region = region || this.defaultValues.region;
         await this.loadSpecificCities();
         if (!city) return;
