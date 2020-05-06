@@ -170,9 +170,11 @@ class Pharmacy extends Component<IProps> {
                     </Button>
                 </Grid>
                 {
-                    this.requestStatus.loading
-                    ? <LinearProgress />
-                    : <HCFList data={this.preparedPharmacies} showHeader />
+                    this.requestStatus.loading && <LinearProgress/>
+                }
+                {
+                    !!this.preparedPharmacies.length &&
+                    <HCFList data={this.preparedPharmacies} showHeader />
                 }
                 {
                     this.requestStatus.error &&

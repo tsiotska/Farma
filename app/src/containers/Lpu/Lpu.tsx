@@ -65,7 +65,7 @@ interface IProps extends WithStyles<typeof styles> {
             sortedLpus: LPUs,
             currentDepartmentId,
             loadUnconfirmedLPUs,
-            unconfirmedLPUs
+            unconfirmedLPUs,
         },
         uiStore: {
             openModal,
@@ -84,7 +84,7 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
-    openModal
+    openModal,
 }))
 @observer
 class Lpu extends Component<IProps> {
@@ -120,9 +120,11 @@ class Lpu extends Component<IProps> {
     retryClickHandler = () => this.props.loadLPUs();
 
     loadData = async () => {
-        const { loadLPUs, loadUnconfirmedLPUs } = this.props;
+        const { loadLPUs, loadUnconfirmedLPUs, LPUs } = this.props;
         await loadUnconfirmedLPUs();
-        await loadLPUs();
+        if (!LPUs) {
+            await loadLPUs();
+        }
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
@@ -133,11 +135,13 @@ class Lpu extends Component<IProps> {
 
     componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
         const { currentDepartmentId: actualId } = this.props;
-        if (prevId !== actualId) this.loadData();
+        if (prevId !== actualId) {
+            this.loadData(); }
     }
 
     componentWillUnmount() {
-        this.props.setCurrentPage(0);
+        const { setCurrentPage } = this.props;
+        setCurrentPage(0);
     }
 
     render() {
@@ -175,9 +179,11 @@ class Lpu extends Component<IProps> {
                     </Button>
                 </Grid>
                 {
-                    this.requestStatus.loading
-                    ? <LinearProgress />
-                    : <HCFList data={this.preparedLPUs} showHeader />
+                    this.requestStatus.loading && <LinearProgress/>
+                }
+                {
+                    !!this.preparedLPUs.length &&
+                    <HCFList data={this.preparedLPUs} showHeader />
                 }
                 {
                     this.requestStatus.error &&

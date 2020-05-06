@@ -84,6 +84,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.expandedWorker = null;
         this.workers = [];
         this.firedWorkers = [];
+        this.LPUs = null;
+        this.pharmacies = null;
     }
 
     @computed
@@ -349,6 +351,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadPharmacies(isNeeded: boolean) {
+        if (!isNeeded) {
+            this.pharmacies = null;
+            return;
+        }
+
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
         let keepDoing: boolean = true;
@@ -356,8 +363,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         while (keepDoing) {
             const url = this.getPharmacyApiUrl(false, page);
-            const shouldAbort = isNeeded === false || url === null;
-            if (shouldAbort) continue;
+
+            if (!url && keepDoing) {
+            continue;
+            }
 
             const part = await this.dispatchRequest(
                 api.getPharmacies(url),
@@ -369,6 +378,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     this.pharmacies = [];
                 }
                 this.pharmacies.push(...part);
+                console.log(toJS(this.pharmacies));
                 page++;
             }
             keepDoing = !!part && part.length === 1000;
@@ -398,13 +408,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (this.currentDepartmentId === null || previewUser === null) return;
         let page = 1;
         let keepDoing: boolean = true;
+        const initialDepartmentId = this.currentDepartmentId;
 
         while (keepDoing) {
-            const url = this.getMedicalDepartmentsApiUrl(this.currentDepartmentId, previewUser, false, page);
+            const url = this.getMedicalDepartmentsApiUrl(
+                this.currentDepartmentId, previewUser, false, page
+            );
+
+            if (!url && keepDoing) {
+                continue;
+            }
+
             const part = await this.dispatchRequest(
                 api.getMedicalDepartments(url),
                 requestName
             );
+
+            if (initialDepartmentId !== this.currentDepartmentId) {
+                break;
+            }
+
             if (part) {
                 if (this.LPUs === null) {
                     this.LPUs = [];
