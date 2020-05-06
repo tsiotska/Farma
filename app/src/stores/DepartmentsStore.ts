@@ -1108,7 +1108,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             (acc, [key, value]) => {
                 if (key === 'position') {
                     initialValue = initialWorker[key] || USER_ROLE.UNKNOWN;
-                } else if (key === 'region') {
+                } else if (key === 'region' || key === 'city') {
                     initialValue = initialWorker[key] || 0;
                 } else {
                     initialValue = initialWorker[key] || '';

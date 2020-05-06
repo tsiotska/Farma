@@ -71,7 +71,7 @@ export interface IWorkerModalValues {
     position: USER_ROLE;
     email: string;
     password: string;
-    city: string;
+    city: number;
     region: number;
 }
 
@@ -105,7 +105,7 @@ class WorkerModal extends Component<IProps> {
         position: USER_ROLE.UNKNOWN,
         email: '',
         password: '',
-        city: '',
+        city: 0,
         region: 0,
     };
 
@@ -124,7 +124,6 @@ class WorkerModal extends Component<IProps> {
             name: (value: string) => lengthValidator(3, value),
             password: (value: string) => lengthValidator(3, value),
             card: (value: string) => value && value.length === 16,
-            city: stringValidator,
         };
         const { classes } = props;
         this.dropzoneClasses = {
@@ -156,10 +155,10 @@ class WorkerModal extends Component<IProps> {
             const initialValue = initialWorker[x];
             const currentValue = this.formValues[x];
 
-            if (x === 'position') {
-                return initialValue !== currentValue;
-            } else if (x === 'region') {
+            if (this.regionRelatedFields.includes(x)) {
                 return (initialValue || 0) !== currentValue;
+            } else if (x === 'position') {
+                return initialValue !== currentValue;
             }
 
             return (initialValue || '') !== currentValue;
@@ -215,6 +214,15 @@ class WorkerModal extends Component<IProps> {
         return position === USER_ROLE.MEDICAL_AGENT || position === USER_ROLE.REGIONAL_MANAGER;
     }
 
+    @computed
+    get cityName(): string {
+        if (!this.requireRegion || !this.formValues.city) return '';
+        const targetCity = this.cities.find(({ id }) => id === this.formValues.city);
+        return targetCity
+            ? targetCity.name
+            : '';
+    }
+
     loadSpecificCities = async () => {
         const { loadSpecificCities } = this.props;
         const { region } = this.formValues;
@@ -225,7 +233,7 @@ class WorkerModal extends Component<IProps> {
     }
 
     valueValidator = (propName: keyof IWorkerModalValues, value: string): string | boolean => {
-        if (propName === 'region') return !value;
+        if (this.regionRelatedFields.includes(propName)) return !value;
 
         const validator = this.validators[propName] || stringValidator;
         const errorMessage = this.errorMessages[propName];
@@ -245,8 +253,10 @@ class WorkerModal extends Component<IProps> {
             this.formValues[propName] = converted;
         } else if (propName === 'region') {
             this.formValues[propName] = +value || 0;
-            this.formValues.city = '';
+            this.formValues.city = this.defaultValues.city;
             this.loadSpecificCities();
+        } else if (propName === 'city') {
+            this.formValues[propName] = +value || 0;
         } else {
             this.formValues[propName] = value;
         }
@@ -257,7 +267,6 @@ class WorkerModal extends Component<IProps> {
     submitHandler = () => {
         const { onSubmit, isLoading } = this.props;
         if (isLoading) return;
-        console.log('image: ', toJS(this.image));
         onSubmit(
             this.formValues,
             typeof this.image === 'string'
@@ -336,22 +345,19 @@ class WorkerModal extends Component<IProps> {
         const { initialWorker: { city, region } } = this.props;
         this.formValues.region = region || this.defaultValues.region;
         await this.loadSpecificCities();
-        if (!city) return;
-        const targetCity = this.cities.find(({ id }) => id === city);
-        if (!targetCity) return;
-        this.formValues.city = targetCity.name;
+        this.formValues.city = city || this.defaultValues.city;
     }
 
     render() {
         const {
-            initialWorker,
-            isLoading,
             open,
-            onClose,
             title,
+            onClose,
             classes,
-            positions,
             regions,
+            isLoading,
+            positions,
+            initialWorker,
             showLocationsBlock
         } = this.props;
 
@@ -464,6 +470,7 @@ class WorkerModal extends Component<IProps> {
                                             select
                                             label='Місто'
                                             values={this.formValues}
+                                            value={this.cityName}
                                             onChange={this.changeHandler}
                                             error={this.errors.get('city')}
                                             propName='city'>

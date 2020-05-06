@@ -193,7 +193,7 @@ class WorkerListItem extends Component<IProps> {
         const {
             historyPushUser,
             disableClick,
-            worker : { id, name, avatar, position, isVacancy }
+            worker : { id, name, avatar, position }
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
@@ -262,9 +262,7 @@ class WorkerListItem extends Component<IProps> {
                             componentProps={{
                                 classes: {
                                     root: classes.avatar,
-                                    img: (isVacancy
-                                    ? classes.image
-                                    : classes.avatar)
+                                    img: cx({[classes.image]: isVacancy})
                                 }
                             }}
                             src={
