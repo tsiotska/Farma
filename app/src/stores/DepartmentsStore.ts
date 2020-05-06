@@ -880,13 +880,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities({ oblastName, regionName }: {
+    loadSpecificCities({ oblastName, regionId }: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) {
         let url: string;
         if (oblastName) url = `api/city?oblast=${oblastName}`;
-        if (regionName) url = `api/city?region=${regionName}`;
+        if (regionId) url = `api/city?region=${regionId}`;
         return url
             ? this.rootStore.api.getLocations(url)
             : null;

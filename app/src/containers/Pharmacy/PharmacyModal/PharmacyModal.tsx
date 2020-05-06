@@ -32,7 +32,7 @@ interface IProps extends WithStyles<typeof styles> {
     oblasti?: Map<number, ILocation>;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
     loadSpecificLpus?: (cityId: number) =>  Promise<ILPU[]>;
     loadTypes?: (targetProp: 'hcf' | 'pharmacy') => Promise<string[]>;

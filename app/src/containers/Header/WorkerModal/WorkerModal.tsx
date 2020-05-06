@@ -57,7 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     initialWorker?: IWorker;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
     regions?: Map<number, ILocation>;
 }
@@ -207,10 +207,20 @@ class WorkerModal extends Component<IProps> {
     }
 
     loadSpecificCities = async () => {
-        const { loadSpecificCities } = this.props;
+        const { loadSpecificCities, regions } = this.props;
         const { region } = this.formValues;
-        const res = await loadSpecificCities({ regionName: region });
-        if (Array.isArray(res)) this.cities = res;
+
+        let regionId: number;
+        for (const [key, value] of regions) {
+            if (value.name === region) {
+                regionId = key;
+                break;
+            }
+        }
+
+        if (!regionId) return;
+
+        this.cities = await loadSpecificCities({ regionId }) || [];
     }
 
     minLengthValidator = (minLength: number) => (value: string) => lengthValidator(minLength, value);

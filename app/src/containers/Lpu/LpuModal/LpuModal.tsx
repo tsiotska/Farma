@@ -37,7 +37,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadTypes?: (targetProp: string) => Promise<string[]>;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
 }
 
