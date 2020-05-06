@@ -87,7 +87,6 @@ class EditWorkerModal extends Component<IProps> {
     submitHandler = async (data: IWorkerModalValues, image: File) => {
         if (!this.initialWorker) return;
         const { editWorker } = this.props;
-        console.log('image: ', image);
         const isEdited = await editWorker(this.initialWorker, data, image);
         this.snackbarType = isEdited
             ? SNACKBAR_TYPE.SUCCESS

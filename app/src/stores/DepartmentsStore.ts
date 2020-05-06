@@ -1103,11 +1103,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const formData = new FormData();
         if (newAvatar) formData.set('avatar', newAvatar);
+        let initialValue: any;
         const payload = Object.entries(values).reduce(
             (acc, [key, value]) => {
-                const initialValue = key === 'position'
-                ? initialWorker[key] || USER_ROLE.UNKNOWN
-                : initialWorker[key] || '';
+                if (key === 'position') {
+                    initialValue = initialWorker[key] || USER_ROLE.UNKNOWN;
+                } else if (key === 'region') {
+                    initialValue = initialWorker[key] || 0;
+                } else {
+                    initialValue = initialWorker[key] || '';
+                }
 
                 const jsonPropName = namesMap[key];
 
@@ -1140,7 +1145,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const invertedNames = invert(namesMap);
             Object.entries(payload).forEach(([ key, value ]) => {
                 const invertedName = invertedNames[key];
-                const initialValue = initialWorker[invertedName];
+                initialValue = initialWorker[invertedName];
                 if (invertedName && initialValue !== value) {
                     initialWorker[invertedName] = value;
                 }

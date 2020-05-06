@@ -72,7 +72,7 @@ export interface IWorkerModalValues {
     email: string;
     password: string;
     city: string;
-    region: string;
+    region: number;
 }
 
 @inject(({
@@ -107,7 +107,7 @@ class WorkerModal extends Component<IProps> {
         email: '',
         password: '',
         city: '',
-        region: '',
+        region: 0,
     };
 
     @observable formValues: IWorkerModalValues = {...this.defaultValues};
@@ -126,7 +126,6 @@ class WorkerModal extends Component<IProps> {
             password: this.minLengthValidator(3),
             card: this.minLengthValidator(16),
             city: stringValidator,
-            region: stringValidator
         };
         const { classes } = props;
         this.dropzoneClasses = {
@@ -160,6 +159,8 @@ class WorkerModal extends Component<IProps> {
 
             if (x === 'position') {
                 return initialValue !== currentValue;
+            } else if (x === 'region') {
+                return (initialValue || 0) !== currentValue;
             }
 
             return (initialValue || '') !== currentValue;
@@ -216,25 +217,19 @@ class WorkerModal extends Component<IProps> {
     }
 
     loadSpecificCities = async () => {
-        const { loadSpecificCities, regions } = this.props;
+        const { loadSpecificCities } = this.props;
         const { region } = this.formValues;
 
-        let regionId: number;
-        for (const [key, value] of regions) {
-            if (value.name === region) {
-                regionId = key;
-                break;
-            }
-        }
+        if (!region) return;
 
-        if (!regionId) return;
-
-        this.cities = await loadSpecificCities({ regionId }) || [];
+        this.cities = await loadSpecificCities({ regionId: region }) || [];
     }
 
     minLengthValidator = (minLength: number) => (value: string) => lengthValidator(minLength, value);
 
     valueValidator = (propName: keyof IWorkerModalValues, value: string): string | boolean => {
+        if (propName === 'region') return !value;
+
         const validator = this.validators[propName] || stringValidator;
         const errorMessage = this.errorMessages[propName];
 
@@ -252,7 +247,7 @@ class WorkerModal extends Component<IProps> {
             const converted = +value;
             this.formValues[propName] = converted;
         } else if (propName === 'region') {
-            this.formValues[propName] = value;
+            this.formValues[propName] = +value || 0;
             this.formValues.city = '';
             this.loadSpecificCities();
         } else {
@@ -324,10 +319,8 @@ class WorkerModal extends Component<IProps> {
     }
 
     initLocationsBlock = async () => {
-        const { regions, initialWorker: { city, region }} = this.props;
-        const targetRegion = regions.get(region);
-        if (!targetRegion) return;
-        this.formValues.region = targetRegion.name;
+        const { initialWorker: { city, region }} = this.props;
+        this.formValues.region = region || this.defaultValues.region;
         await this.loadSpecificCities();
         if (!city) return;
         const targetCity = this.cities.find(({ id }) => id === city);
@@ -344,6 +337,7 @@ class WorkerModal extends Component<IProps> {
             title,
             classes,
             positions,
+            regions,
             showLocationsBlock
         } = this.props;
 
@@ -433,8 +427,8 @@ class WorkerModal extends Component<IProps> {
                                             label='Регіон'
                                             values={this.formValues}
                                             value={
-                                                this.regions.length
-                                                ? this.formValues.region
+                                                this.regions.length && regions.has(this.formValues.region)
+                                                ? regions.get(this.formValues.region).id
                                                 : ''
                                             }
                                             onChange={this.changeHandler}
@@ -442,7 +436,7 @@ class WorkerModal extends Component<IProps> {
                                             propName='region'>
                                                 {
                                                     this.regions.map(({ id, name }) => (
-                                                        <MenuItem key={id} value={name}>
+                                                        <MenuItem key={id} value={id}>
                                                             { name }
                                                         </MenuItem>
                                                     ))
