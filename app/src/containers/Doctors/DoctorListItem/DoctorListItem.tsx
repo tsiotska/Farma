@@ -43,6 +43,7 @@ const styles = (theme: any) => createStyles({
             : theme.palette.primary.gray.light
     },
     text: {
+        textTransform: 'capitalize',
         color: ({ unconfirmed }: any) => unconfirmed
             ? 'white'
             : theme.palette.primary.gray.main,
@@ -108,22 +109,22 @@ class DoctorListItem extends Component<IProps> {
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid xs={3} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
                     </Typography>
                 </Grid>
                 <Grid xs={3} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { name || '-' }
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { specialty || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={cx(classes.phoneContainer, classes.text)}>
+                    <Typography variant='body2' className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
                             ? '-'
@@ -135,7 +136,7 @@ class DoctorListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { card || '-'}
                     </Typography>
                 </Grid>
@@ -154,7 +155,7 @@ class DoctorListItem extends Component<IProps> {
                                 }
                           </Button>
                         : <>
-                            <Typography className={cx(classes.deposit, classes.text)}>
+                            <Typography variant='body2' className={cx(classes.deposit, classes.text)}>
                                 { deposit || 0 }
                             </Typography>
                             <IconButton>

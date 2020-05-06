@@ -954,7 +954,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
 
         if (res) {
-            const mapped: Array<[number, IUser]> = res.map(x => ([ x.id, x ]));
+            const mapped = res.map((x): [number, IUser] => ([ x.id, x ]));
             this.locationsAgents = new Map(mapped);
         }
 
