@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Tabs, Tab, IconButton } from '@material-ui/core';
+import { createStyles, WithStyles, Grid, Tabs, Tab, IconButton, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IDepartment } from '../../interfaces/IDepartment';
@@ -14,6 +14,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { LOCATION_TITLE } from './List/List';
 import ExcelIcon from '../../components/ExcelIcon';
+import { ADD_WORKER_MODAL } from '../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -28,7 +29,7 @@ const styles = (theme: any) => createStyles({
     tab: {
         fontSize: theme.typography.pxToRem(20),
         textTransform: 'capitalize',
-        minHeight: 0,
+        minHeight: 38,
         padding: '0 10px'
     },
     excelButton: {
@@ -36,6 +37,16 @@ const styles = (theme: any) => createStyles({
         borderRadius: 2,
         marginLeft: 'auto',
         marginRight: 6
+    },
+    addWorkerButton: {
+        marginLeft: 'auto',
+        color: theme.palette.primary.green.main,
+        border: '1px solid',
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        textTransform: 'capitalize',
+        fontSize: theme.typography.pxToRem(15),
+        padding: '5px 12px'
     }
 });
 
@@ -51,6 +62,7 @@ interface IProps extends WithStyles<typeof styles> {
     firedWorkers?: IWorker[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     role?: USER_ROLE;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 type TabValue = 'all' | 'fired';
@@ -70,6 +82,9 @@ type TabValue = 'all' | 'fired';
         },
         userStore: {
             role
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
@@ -82,6 +97,7 @@ type TabValue = 'all' | 'fired';
     firedWorkers,
     getAsyncStatus,
     resetWorkers,
+    openModal,
     role
 }))
 @withRouter
@@ -91,6 +107,20 @@ class Workers extends Component<IProps> {
 
     get isFFM(): boolean {
         return this.props.role === USER_ROLE.FIELD_FORCE_MANAGER;
+    }
+
+    addWorkerClickHandler = () => {
+        const { role, openModal, positions } = this.props;
+        const allowedPositions = role === USER_ROLE.FIELD_FORCE_MANAGER
+            ? [ USER_ROLE.REGIONAL_MANAGER, USER_ROLE.MEDICAL_AGENT ]
+            : [ USER_ROLE.MEDICAL_AGENT ];
+        const filteredPositions: IPosition[] = [];
+        positions.forEach(position => {
+            if (allowedPositions.includes(position.id)) {
+                filteredPositions.push(position);
+            }
+        });
+        openModal(ADD_WORKER_MODAL, filteredPositions);
     }
 
     loadExcel = () => this.props.loadWorkersExcel();
@@ -155,16 +185,24 @@ class Workers extends Component<IProps> {
 
         return (
             <Grid className={classes.root} direction='column' container>
-                <Tabs
-                    classes={{
-                        root: classes.tabs,
-                        indicator: classes.indicator
-                    }}
-                    onChange={this.tabChangeHandler}
-                    value={this.tab}>
-                    <Tab className={classes.tab} value='all' label='Працівники' />
-                    <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
-                </Tabs>
+                <Grid wrap='nowrap' container alignItems='center'>
+                    <Tabs
+                        classes={{
+                            root: classes.tabs,
+                            indicator: classes.indicator
+                        }}
+                        onChange={this.tabChangeHandler}
+                        value={this.tab}>
+                        <Tab className={classes.tab} value='all' label='Працівники' />
+                        <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
+                    </Tabs>
+                    {
+                        this.tab === 'all' &&
+                        <Button onClick={this.addWorkerClickHandler} className={classes.addWorkerButton}>
+                            Додати Працівника
+                        </Button>
+                    }
+                </Grid>
                 <List
                     locationTitle={
                         role === USER_ROLE.FIELD_FORCE_MANAGER

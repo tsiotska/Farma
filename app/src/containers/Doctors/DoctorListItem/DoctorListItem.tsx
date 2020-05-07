@@ -14,6 +14,7 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
 import { observable } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
+import { EDIT_DOC_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -43,6 +44,7 @@ const styles = (theme: any) => createStyles({
             : theme.palette.primary.gray.light
     },
     text: {
+        textTransform: 'capitalize',
         color: ({ unconfirmed }: any) => unconfirmed
             ? 'white'
             : theme.palette.primary.gray.main,
@@ -66,16 +68,21 @@ interface IProps extends WithStyles<typeof styles> {
     confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
     acceptAgent?: (doctor: IDoctor) => boolean;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             acceptAgent
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
-    acceptAgent
+    acceptAgent,
+    openModal
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
@@ -88,6 +95,11 @@ class DoctorListItem extends Component<IProps> {
         const isConfirmed = await acceptAgent(doctor);
         this.isLoadingConfirmation = false;
         confirmationCallback(isConfirmed);
+    }
+
+    editClickHandler = () => {
+        const { doctor, openModal } = this.props;
+        openModal(EDIT_DOC_MODAL, doctor);
     }
 
     render() {
@@ -108,22 +120,22 @@ class DoctorListItem extends Component<IProps> {
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid xs={3} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
                     </Typography>
                 </Grid>
                 <Grid xs={3} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { name || '-' }
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { specialty || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={cx(classes.phoneContainer, classes.text)}>
+                    <Typography variant='body2' className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
                             ? '-'
@@ -135,7 +147,7 @@ class DoctorListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
-                    <Typography className={classes.text}>
+                    <Typography variant='body2' className={classes.text}>
                         { card || '-'}
                     </Typography>
                 </Grid>
@@ -154,10 +166,10 @@ class DoctorListItem extends Component<IProps> {
                                 }
                           </Button>
                         : <>
-                            <Typography className={cx(classes.deposit, classes.text)}>
+                            <Typography variant='body2' className={cx(classes.deposit, classes.text)}>
                                 { deposit || 0 }
                             </Typography>
-                            <IconButton>
+                            <IconButton onClick={this.editClickHandler}>
                                 <Edit className={classes.editIcon} fontSize='small' />
                             </IconButton>
                           </>

@@ -55,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     setPharmacyDemand?: (value: boolean) => void;
     openModal?: (modalName: string) => void;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -65,7 +66,8 @@ interface IProps extends WithStyles<typeof styles> {
             sortedPharmacies: pharmacies,
             setPharmacyDemand,
             unconfirmedPharmacies,
-            loadUnconfirmedPharmacies
+            loadUnconfirmedPharmacies,
+            loadTypes
         },
         uiStore: {
             setCurrentPage,
@@ -84,10 +86,12 @@ interface IProps extends WithStyles<typeof styles> {
     setPharmacyDemand,
     unconfirmedPharmacies,
     loadUnconfirmedPharmacies,
-    openModal
+    openModal,
+    loadTypes
 }))
 @observer
 class Pharmacy extends Component<IProps> {
+    @observable types: string[] = [];
     autorunDisposer: any;
     reactionDisposer: any;
 
@@ -139,6 +143,11 @@ class Pharmacy extends Component<IProps> {
             : [];
     }
 
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('pharmacy');
+    }
+
     componentDidMount() {
         this.autorunDisposer = autorun(this.autorunCallback);
         this.reactionDisposer = reaction(
@@ -154,6 +163,7 @@ class Pharmacy extends Component<IProps> {
 
         this.props.setPharmacyDemand(true);
         this.props.loadUnconfirmedPharmacies();
+        this.initializeTypes();
     }
 
     componentWillUnmount() {
@@ -233,8 +243,8 @@ class Pharmacy extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddPharmacy />
-                <EditPharmacy />
+                <AddPharmacy types={this.types} />
+                <EditPharmacy types={this.types} />
             </Grid>
         );
     }

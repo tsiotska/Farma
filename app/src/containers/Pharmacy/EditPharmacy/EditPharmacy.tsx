@@ -13,10 +13,11 @@ import { ILPU } from '../../../interfaces/ILPU';
 const styles = (theme: any) => createStyles({});
 
 interface IProps extends WithStyles<typeof styles> {
+    types: string[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
-    editPharmacy?: (data: any) => boolean;
+    editPharmacy?: (initialPharmacy: ILPU, data: any) => boolean;
     modalPayload?: ILPU;
 }
 
@@ -56,21 +57,23 @@ class EditPharmacy extends Component<IProps> {
     closeHandler = () => this.props.openModal(null);
 
     submitHandler = async (formValues: IPharmacyModalValues) => {
-        const { editPharmacy } = this.props;
-        const lpuCreated = await editPharmacy(formValues);
+        const { editPharmacy, modalPayload } = this.props;
+        const pharmacyEdited = await editPharmacy(modalPayload, formValues);
         this.openSnackbar = true;
-        this.snackbarType = !!lpuCreated
+        this.snackbarType = !!pharmacyEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (pharmacyEdited) this.closeHandler();
     }
 
     render() {
-        const { openedModal, modalPayload } = this.props;
+        const { openedModal, modalPayload, types } = this.props;
 
         return (
             <>
                 <PharmacyModal
-                    open={openedModal === EDIT_PHARMACY_MODAL}
+                    types={types}
+                    open={openedModal === EDIT_PHARMACY_MODAL && !!modalPayload}
                     isLoading={this.isLoading}
                     title='Редагувати аптеку'
                     onClose={this.closeHandler}

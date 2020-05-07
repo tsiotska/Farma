@@ -54,6 +54,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -64,6 +65,7 @@ interface IProps extends WithStyles<typeof styles> {
             sortedLpus: LPUs,
             loadUnconfirmedLPUs,
             unconfirmedLPUs,
+            loadTypes,
         },
         uiStore: {
             openModal,
@@ -82,6 +84,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
     openModal,
+    loadTypes
 }))
 @observer
 class Lpu extends Component<IProps> {
@@ -89,6 +92,7 @@ class Lpu extends Component<IProps> {
     reactionDisposer: any;
 
     @observable preparedLPUs: ILPU[] = [];
+    @observable types: string[] = [];
 
     @computed
     get isUnconfirmedLPUsLoading(): boolean {
@@ -140,6 +144,11 @@ class Lpu extends Component<IProps> {
             : [];
     }
 
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('hcf');
+    }
+
     componentDidMount() {
         this.autorunDisposer = autorun(this.autorunCallback);
         this.reactionDisposer = reaction(
@@ -154,6 +163,7 @@ class Lpu extends Component<IProps> {
         );
 
         this.loadData();
+        this.initializeTypes();
     }
 
     componentWillUnmount() {
@@ -229,8 +239,8 @@ class Lpu extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddLpu />
-                <EditLpu />
+                <AddLpu types={this.types} />
+                <EditLpu types={this.types} />
             </Grid>
         );
     }

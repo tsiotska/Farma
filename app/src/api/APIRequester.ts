@@ -28,7 +28,7 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
-import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
+import { doctorsNormalizer, doctorNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
@@ -206,10 +206,10 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    editPharmacy(depId: number, data: any): Promise<boolean> {
-        return this.instance.put(`/api/pharmacy/${depId}`, data)
-            .then(() => true)
-            .catch(this.defaultErrorHandler(false));
+    editPharmacy(id: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/pharmacy/${id}`, data)
+        .then(() => true)
+        .catch(this.defaultErrorHandler(false));
     }
 
     deleteLpu(id: number): Promise<boolean> {
@@ -260,16 +260,16 @@ export class APIRequester {
 
     getOblasti(): Promise<ILocation[]> {
         return this.instance.get('/api/oblast')
-            .then(({ data: { data } }) => (
-                Array.isArray(data)
-                    ? data.map(
-                    (name: string, id: number) => ({
-                        id,
-                        name
-                    }))
-                    : []
-            ))
-            .catch(this.defaultErrorHandler([]));
+        .then(({ data: { data } }) => (
+            Array.isArray(data)
+            ? data.map(
+                (name: string, i: number) => ({
+                    id: i + 1,
+                    name
+                }))
+            : []
+        ))
+        .catch(this.defaultErrorHandler([]));
     }
 
     getLocations(url: string): Promise<ILocation[]> {
@@ -383,6 +383,18 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(null));
     }
 
+    editDoc(depId: number, mpId: number, docId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/branch/${depId}/mp/${mpId}/agent/${docId}`, data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    createDoc(depId: number, mpId: number, data: any): Promise<IDoctor> {
+        return this.instance.post(`/api/branch/${depId}/mp/${mpId}/agent`, data)
+            .then(doctorNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
     createDepartment(departmentData: FormData): Promise<IDepartment> {
         return this.instance.post('/api/branch', departmentData)
             .then(branchNormalizer)
@@ -397,6 +409,25 @@ export class APIRequester {
         return this.instance.post(url, userData)
             .then(workerNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    editWorker(data: FormData, workerId: number, departmentId: number): Promise<{
+        edited: boolean;
+        avatar: string;
+    }> {
+        const url = departmentId
+            ? `/api/branch/${departmentId}/worker/${workerId}`
+            : `/api/worker/${workerId}`;
+
+        return this.instance.put(url, data)
+            .then(({ data: { data: { avatar } } }: any) => ({
+                edited: true,
+                avatar: avatar || null
+            }))
+            .catch(this.defaultErrorHandler({
+                edited: false,
+                avatar: null
+            }));
     }
 
     createFFM(ffmData: FormData, departmentId: number): Promise<IUser> {
@@ -507,5 +538,17 @@ export class APIRequester {
                     : CONFIRM_STATUS.CONFIRMED;
             })
             .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
+    }
+
+    getDocsPositions(): Promise<string[]> {
+        return this.instance.get('/api/agent/position')
+            .then(({ data: { data } }) => {
+                const isArray = Array.isArray(data);
+                const isValid = data.every((x: string) => typeof x === 'string');
+                return (isArray && isValid)
+                    ? data
+                    : [];
+            })
+            .catch(this.defaultErrorHandler([]));
     }
 }

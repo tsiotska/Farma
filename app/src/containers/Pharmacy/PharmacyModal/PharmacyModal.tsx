@@ -6,7 +6,6 @@ import { observable, computed, reaction, when } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
-import { ILpuModalValues } from '../../Lpu/LpuModal/LpuModal';
 import FormRow from '../../../components/FormRow';
 import { phoneValidator } from '../../../helpers/validators';
 
@@ -28,15 +27,15 @@ interface IProps extends WithStyles<typeof styles> {
     title: string;
     onClose: () => void;
     onSubmit: (values: IPharmacyModalValues) => void;
+    types: string[];
 
     initialPharmacy?: ILPU;
     oblasti?: Map<number, ILocation>;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
     loadSpecificLpus?: (cityId: number) =>  Promise<ILPU[]>;
-    loadTypes?: (targetProp: 'hcf' | 'pharmacy') => Promise<string[]>;
 }
 
 export interface IPharmacyModalValues {
@@ -56,14 +55,12 @@ export interface IPharmacyModalValues {
             oblasti,
             loadSpecificCities,
             loadSpecificLpus,
-            loadTypes,
         }
     }
 }) => ({
     oblasti,
     loadSpecificCities,
     loadSpecificLpus,
-    loadTypes,
 }))
 @observer
 class PharmacyModal extends Component<IProps> {
@@ -71,7 +68,6 @@ class PharmacyModal extends Component<IProps> {
     cityReactionDisposer: any;
 
     @observable cities: ILocation[] = [];
-    @observable types: string[] = [];
     @observable lpus: ILPU[] = [];
 
     @observable errors: Map<keyof IPharmacyModalValues, boolean | string> = new Map();
@@ -94,8 +90,8 @@ class PharmacyModal extends Component<IProps> {
     };
 
     @computed
-    get allProps(): Array<keyof ILpuModalValues> {
-        return [...Object.keys(this.formValues)] as Array<keyof ILpuModalValues>;
+    get allProps(): Array<keyof IPharmacyModalValues> {
+        return [...Object.keys(this.formValues)] as Array<keyof IPharmacyModalValues>;
     }
 
     @computed
@@ -103,12 +99,12 @@ class PharmacyModal extends Component<IProps> {
         const { initialPharmacy } = this.props;
 
         if (!initialPharmacy) {
-            return this.allProps.some(x => !this.formValues[x]);
+            return this.allProps.some(x => !!this.formValues[x]);
         }
 
         return this.allProps.some(x => {
-            const { [x as keyof ILpuModalValues]: initialValue } = initialPharmacy;
-            const { [x as keyof ILpuModalValues]: currentValue } = this.formValues;
+            const { [x as keyof IPharmacyModalValues]: initialValue } = initialPharmacy;
+            const { [x as keyof IPharmacyModalValues]: currentValue } = this.formValues;
 
             if (x === 'city') {
                 const cityName = currentValue
@@ -223,8 +219,6 @@ class PharmacyModal extends Component<IProps> {
     }
 
     async componentDidMount() {
-        const { loadTypes } = this.props;
-
         this.oblastReactionDisposer = reaction(
             () => this.formValues.oblast,
             async (oblastName: string) => {
@@ -243,8 +237,6 @@ class PharmacyModal extends Component<IProps> {
                 }
             }
         );
-
-        this.types = await loadTypes('pharmacy');
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -267,7 +259,8 @@ class PharmacyModal extends Component<IProps> {
             onClose,
             title,
             classes,
-            oblasti
+            oblasti,
+            types
         } = this.props;
 
         return (
@@ -372,11 +365,11 @@ class PharmacyModal extends Component<IProps> {
                             values={this.formValues}
                             onChange={this.changeHandler}
                             propName='type'
-                            disabled={!this.types.length}
+                            disabled={!types.length}
                             required
                             error={this.errors.get('type')}>
                                 {
-                                    this.types.map(x => (
+                                    types.map(x => (
                                         <MenuItem className={classes.menuItem} key={x} value={x}>
                                             { x }
                                         </MenuItem>

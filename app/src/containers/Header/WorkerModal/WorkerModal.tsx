@@ -57,7 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     initialWorker?: IWorker;
     loadSpecificCities?: (param: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) => Promise<ILocation[]>;
     regions?: Map<number, ILocation>;
 }
@@ -71,8 +71,8 @@ export interface IWorkerModalValues {
     position: USER_ROLE;
     email: string;
     password: string;
-    city: string;
-    region: string;
+    city: number;
+    region: number;
 }
 
 @inject(({
@@ -88,15 +88,15 @@ export interface IWorkerModalValues {
 }))
 @observer
 class WorkerModal extends Component<IProps> {
-    readonly intFields: Array<keyof IWorkerModalValues> = [ 'position' ];
-    readonly optionalValues: Array<keyof IWorkerModalValues> = ['homePhone', 'workPhone'];
     readonly regionRelatedFields: Array<keyof IWorkerModalValues> = ['city', 'region'];
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
+    readonly dropzoneClasses: any;
     readonly errorMessages: { [key: string]: string } = {
         homePhone: 'Телефон має склададатись з 10 або 12 цифр',
         workPhone: 'Телефон має склададатись з 10 або 12 цифр',
         name: 'Значення має містити не менше 3 символів',
         password: 'Значення має містити не менше 3 символів',
+        card: 'Значення має складатись з 16 символів'
     };
     readonly defaultValues: IWorkerModalValues = {
         name: '',
@@ -106,13 +106,13 @@ class WorkerModal extends Component<IProps> {
         position: USER_ROLE.UNKNOWN,
         email: '',
         password: '',
-        city: '',
-        region: '',
+        city: 0,
+        region: 0,
     };
 
     @observable formValues: IWorkerModalValues = {...this.defaultValues};
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
-    @observable image: File = null;
+    @observable image: File | string = null;
     @observable cities: ILocation[] = [];
 
     constructor(props: IProps) {
@@ -122,37 +122,72 @@ class WorkerModal extends Component<IProps> {
             workPhone: phoneValidator,
             email: emailValidator,
             position: stringValidator,
-            name: this.minLengthValidator(3),
-            password: this.minLengthValidator(3),
-            card: this.minLengthValidator(16),
-            city: stringValidator,
-            region: stringValidator
+            name: (value: string) => lengthValidator(3, value),
+            password: (value: string) => lengthValidator(3, value),
+            card: (value: string) => value && value.length === 16,
+        };
+        const { classes } = props;
+        this.dropzoneClasses = {
+            container: classes.dropzone,
+            removePhotoButton: classes.dropzoneButton,
+            addPhotoButton: classes.dropzoneButton,
         };
     }
 
     @computed
+    get allProps(): string[] {
+        return [...Object.keys(this.defaultValues)];
+    }
+
+    @computed
+    get optionalValues(): Array<keyof IWorkerModalValues> {
+        const { open, initialWorker } = this.props;
+        const defaultValues: Array<keyof IWorkerModalValues> = ['homePhone', 'workPhone'];
+        if (open && initialWorker) return [...defaultValues, 'password' ];
+        return defaultValues;
+    }
+
+    @computed
     get valuesChanged(): boolean {
-        return true;
+        const { initialWorker } = this.props;
+
+        const valuesChanged = initialWorker
+        ? this.allProps.some(x => {
+            const initialValue = initialWorker[x];
+            const currentValue = this.formValues[x];
+
+            if (this.regionRelatedFields.includes(x)) {
+                return (initialValue || 0) !== currentValue;
+            } else if (x === 'position') {
+                return initialValue !== currentValue;
+            }
+
+            return (initialValue || '') !== currentValue;
+        })
+        : this.allProps.some(x => !!this.formValues[x]);
+
+        const imageChanged = !!this.image && typeof this.image === 'object';
+
+        return valuesChanged || imageChanged;
     }
 
     @computed
     get allowSubmit(): boolean {
-        const { showLocationsBlock } = this.props;
-        return [...Object.keys(this.defaultValues)].reduce(
+        return this.allProps.reduce(
             (allow: boolean, propName: keyof IWorkerModalValues) => {
-                if (!showLocationsBlock && this.regionRelatedFields.includes(propName)) {
-                    return allow && true;
-                }
+                const shouldSkip = (propName === 'city' && this.requireCity === false)
+                    || (propName === 'region' && this.requireRegion === false);
+                if (shouldSkip) return allow;
 
                 const isOptional = this.optionalValues.includes(propName);
-                const isValid = this.errors.get(propName) === false;
+                const isValid = !this.errors.get(propName);
                 const valueExist = !!this.formValues[propName];
                 const flag = valueExist
                     ? isValid
                     : isOptional;
 
                 return allow && flag;
-        }, true);
+        }, this.valuesChanged);
     }
 
     @computed
@@ -168,16 +203,39 @@ class WorkerModal extends Component<IProps> {
         return res;
     }
 
+    @computed
+    get requireCity(): boolean {
+        const { position } = this.formValues;
+        return position === USER_ROLE.MEDICAL_AGENT;
+    }
+
+    @computed
+    get requireRegion(): boolean {
+        const { position } = this.formValues;
+        return position === USER_ROLE.MEDICAL_AGENT || position === USER_ROLE.REGIONAL_MANAGER;
+    }
+
+    @computed
+    get cityName(): string {
+        if (!this.requireRegion || !this.formValues.city) return '';
+        const targetCity = this.cities.find(({ id }) => id === this.formValues.city);
+        return targetCity
+            ? targetCity.name
+            : '';
+    }
+
     loadSpecificCities = async () => {
         const { loadSpecificCities } = this.props;
         const { region } = this.formValues;
-        const res = await loadSpecificCities({ regionName: region });
-        if (Array.isArray(res)) this.cities = res;
+
+        if (!region) return;
+
+        this.cities = await loadSpecificCities({ regionId: region }) || [];
     }
 
-    minLengthValidator = (minLength: number) => (value: string) => lengthValidator(minLength, value);
-
     valueValidator = (propName: keyof IWorkerModalValues, value: string): string | boolean => {
+        if (this.regionRelatedFields.includes(propName)) return !value;
+
         const validator = this.validators[propName] || stringValidator;
         const errorMessage = this.errorMessages[propName];
 
@@ -191,13 +249,15 @@ class WorkerModal extends Component<IProps> {
     }
 
     changeHandler = (propName: keyof IWorkerModalValues, value: string) => {
-        if (this.intFields.includes(propName)) {
+        if (propName === 'position') {
             const converted = +value;
             this.formValues[propName] = converted;
         } else if (propName === 'region') {
-            this.formValues[propName] = value;
-            this.formValues.city = '';
+            this.formValues[propName] = +value || 0;
+            this.formValues.city = this.defaultValues.city;
             this.loadSpecificCities();
+        } else if (propName === 'city') {
+            this.formValues[propName] = +value || 0;
         } else {
             this.formValues[propName] = value;
         }
@@ -208,7 +268,12 @@ class WorkerModal extends Component<IProps> {
     submitHandler = () => {
         const { onSubmit, isLoading } = this.props;
         if (isLoading) return;
-        onSubmit(this.formValues, this.image);
+        onSubmit(
+            this.formValues,
+            typeof this.image === 'string'
+            ? null
+            : this.image
+        );
     }
 
     appendFileHandler = (image: File) => {
@@ -221,60 +286,79 @@ class WorkerModal extends Component<IProps> {
 
     componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker, showLocationsBlock, regions } = this.props;
+        const { open, initialWorker } = this.props;
         const becomeOpened = wasOpen === false && open === true;
-        if (becomeOpened && !!initialWorker) {
-            const {
+        const becomeClosed = wasOpen === true && open === false;
+
+        if (becomeClosed) {
+            this.formValues = {...this.defaultValues};
+            this.image = null;
+        } else if (becomeOpened && !!initialWorker) {
+            this.initValuesFromInitialWorker();
+        }
+
+        if (this.requireRegion === false && !!this.formValues.region) {
+            this.formValues.region = this.defaultValues.region;
+        }
+        if (this.requireCity === false && !!this.formValues.city) {
+            this.formValues.city = this.defaultValues.city;
+        }
+        const shouldInitLocationsBlock = !!initialWorker
+            && ((this.requireRegion === true && !this.formValues.region)
+            || (this.requireCity === true && !this.formValues.city));
+        if (shouldInitLocationsBlock) this.initLocationsBlock();
+    }
+
+    initValuesFromInitialWorker = () => {
+        const {
+            showLocationsBlock,
+            initialWorker: {
                 name,
                 workPhone,
                 mobilePhone,
                 card,
                 position,
                 email,
-                city,
-                region,
-            } = initialWorker;
+                avatar
+        }} = this.props;
 
-            this.formValues = {
-                name: name || this.defaultValues.name,
-                workPhone: workPhone || this.defaultValues.workPhone,
-                homePhone: mobilePhone || this.defaultValues.homePhone,
-                card: card || this.defaultValues.card,
-                position: position || this.defaultValues.position,
-                email: email || this.defaultValues.email,
+        this.formValues = {
+            name: name || this.defaultValues.name,
+            workPhone: workPhone || this.defaultValues.workPhone,
+            homePhone: mobilePhone || this.defaultValues.homePhone,
+            card: card || this.defaultValues.card,
+            position: position || this.defaultValues.position,
+            email: email || this.defaultValues.email,
 
-                password: this.defaultValues.password,
-                city: this.defaultValues.city,
-                region: this.defaultValues.region,
-            };
+            password: this.defaultValues.password,
+            city: this.defaultValues.city,
+            region: this.defaultValues.region,
+        };
 
-            if (!showLocationsBlock) return;
+        if (avatar) this.image = avatar;
 
-            this.initLocationsBlock();
-        }
+        if (!showLocationsBlock) return;
+
+        this.initLocationsBlock();
     }
 
     initLocationsBlock = async () => {
-        const { regions, initialWorker: { city, region }} = this.props;
-        const targetRegion = regions.get(region);
-        if (!targetRegion) return;
-        this.formValues.region = targetRegion.name;
+        const { initialWorker: { city, region } } = this.props;
+        this.formValues.region = region || this.defaultValues.region;
         await this.loadSpecificCities();
-        if (!city) return;
-        const targetCity = this.cities.find(({ id }) => id === city);
-        if (!targetCity) return;
-        this.formValues.city = targetCity.name;
+        this.formValues.city = city || this.defaultValues.city;
     }
 
     render() {
         const {
-            initialWorker,
-            isLoading,
             open,
-            onClose,
             title,
+            onClose,
             classes,
+            regions,
+            isLoading,
             positions,
+            initialWorker,
             showLocationsBlock
         } = this.props;
 
@@ -287,11 +371,7 @@ class WorkerModal extends Component<IProps> {
                 maxWidth='md'>
                     <Grid wrap='nowrap' container>
                         <AvatarDropzone
-                            classes={{
-                                container: classes.dropzone,
-                                removePhotoButton: classes.dropzoneButton,
-                                addPhotoButton: classes.dropzoneButton,
-                            }}
+                            classes={this.dropzoneClasses}
                             appendFile={this.appendFileHandler}
                             removeIcon={this.removeFileHandler}
                             file={this.image}
@@ -333,6 +413,11 @@ class WorkerModal extends Component<IProps> {
                                     select
                                     label='Посада'
                                     values={this.formValues}
+                                    value={
+                                        positions.length
+                                        ? this.formValues.position
+                                        : USER_ROLE.UNKNOWN
+                                    }
                                     onChange={this.changeHandler}
                                     error={this.errors.get('position')}
                                     propName='position'>
@@ -355,38 +440,50 @@ class WorkerModal extends Component<IProps> {
                                     <Typography className={classes.subheader}>
                                         Територія
                                     </Typography>
-                                    <FormRow
-                                        required
-                                        select
-                                        label='Регіон'
-                                        values={this.formValues}
-                                        onChange={this.changeHandler}
-                                        error={this.errors.get('region')}
-                                        propName='region'>
-                                            {
-                                                this.regions.map(({ id, name }) => (
-                                                    <MenuItem key={id} value={name}>
-                                                        { name }
-                                                    </MenuItem>
-                                                ))
+                                    {
+                                        this.requireRegion &&
+                                        <FormRow
+                                            required
+                                            select
+                                            label='Регіон'
+                                            values={this.formValues}
+                                            value={
+                                                this.regions.length && regions.has(this.formValues.region)
+                                                ? regions.get(this.formValues.region).id
+                                                : ''
                                             }
-                                    </FormRow>
-                                    <FormRow
-                                        required
-                                        select
-                                        label='Місто'
-                                        values={this.formValues}
-                                        onChange={this.changeHandler}
-                                        error={this.errors.get('city')}
-                                        propName='city'>
-                                            {
-                                                this.cities.map(({ id, name }) => (
-                                                    <MenuItem key={id} value={name}>
-                                                        { name }
-                                                    </MenuItem>
-                                                ))
-                                            }
-                                    </FormRow>
+                                            onChange={this.changeHandler}
+                                            error={this.errors.get('region')}
+                                            propName='region'>
+                                                {
+                                                    this.regions.map(({ id, name }) => (
+                                                        <MenuItem key={id} value={id}>
+                                                            { name }
+                                                        </MenuItem>
+                                                    ))
+                                                }
+                                        </FormRow>
+                                    }
+                                    {
+                                        this.requireCity &&
+                                        <FormRow
+                                            required
+                                            select
+                                            label='Місто'
+                                            values={this.formValues}
+                                            value={this.cityName}
+                                            onChange={this.changeHandler}
+                                            error={this.errors.get('city')}
+                                            propName='city'>
+                                                {
+                                                    this.cities.map(({ id, name }) => (
+                                                        <MenuItem key={id} value={name}>
+                                                            { name }
+                                                        </MenuItem>
+                                                    ))
+                                                }
+                                        </FormRow>
+                                    }
                                 </Grid>
                             }
                             <Grid justify='space-between' container>
@@ -402,7 +499,7 @@ class WorkerModal extends Component<IProps> {
                                     error={this.errors.get('email')}
                                 />
                                 <FormRow
-                                    required
+                                    required={this.optionalValues.includes('password') === false}
                                     label='Пароль'
                                     values={this.formValues}
                                     onChange={this.changeHandler}

@@ -81,7 +81,6 @@ class UserSettings extends Component<IProps> {
                             key={worker.id}
                             worker={worker}
                             positions={positions}
-                            // position={positions.get(worker.position)}
                         />
                     ))
                 }
