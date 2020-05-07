@@ -6,7 +6,7 @@ import { ISpecialty } from '../../../interfaces/ISpecialty';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
 import FormRow from '../../../components/FormRow';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import { lengthValidator, onlyNumbersValidator, Validator } from '../../../helpers/validators';
 import LoadingMask from '../../../components/LoadingMask';
 import { IDoctor } from '../../../interfaces/IDoctor';
@@ -50,7 +50,7 @@ export interface IDoctorModalValues {
     lpu: ILPU;
     specialty: ISpecialty;
     position: string;
-    homePhone: string;
+    mobilePhone: string;
     workPhone: string;
     card: string;
 }
@@ -75,20 +75,20 @@ export interface IDoctorModalValues {
 @observer
 class DoctorModal extends Component<IProps> {
     readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
-    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'homePhone', 'workPhone', 'position' ];
+    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'mobilePhone', 'workPhone', 'position' ];
     readonly allFields: Array<keyof IDoctorModalValues>;
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {
         name: 'Значення має містити не менше 3 символів',
         card: 'Значення має складатись з 16 цифр',
-        homePhone: 'Телефон має склададатись з 10 або 12 цифр',
+        mobilePhone: 'Телефон має склададатись з 10 або 12 цифр',
         workPhone: 'Телефон має склададатись з 10 або 12 цифр',
     };
     readonly initialFormValues: IDoctorModalValues = {
         name: '',
         lpu: null,
         specialty: null,
-        homePhone: '',
+        mobilePhone: '',
         workPhone: '',
         card: '',
         position: ''
@@ -111,7 +111,7 @@ class DoctorModal extends Component<IProps> {
             name: (value: string) => lengthValidator(3, value),
             lpu: objectValidator,
             specialty: objectValidator,
-            homePhone: phoneValidator,
+            mobilePhone: phoneValidator,
             workPhone: phoneValidator,
             card: cardValidator,
             position: objectValidator
@@ -133,7 +133,7 @@ class DoctorModal extends Component<IProps> {
                 const lpuId = currentValue
                     ? (currentValue as ILPU).id
                     : null;
-                return (initialValue || null) !== lpuId;
+                return initialDoc.LPUId !== lpuId;
             } else if (x === 'specialty') {
                 const specialtyName = currentValue
                     ? (currentValue as ISpecialty).name
@@ -148,11 +148,7 @@ class DoctorModal extends Component<IProps> {
     get allowSubmit(): boolean {
         const requiredProps = this.allFields.filter(x => this.optionalFields.includes(x) === false);
         const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
-        const allPropsIsValid = this.allFields.every(x => (
-            this.optionalFields.includes(x)
-                ? !this.errors.get(x)
-                : this.errors.get(x) === false
-        ));
+        const allPropsIsValid = this.allFields.every(x => !this.errors.get(x));
         return hasRequiredProps && allPropsIsValid && this.valuesChanged;
     }
 
@@ -215,7 +211,7 @@ class DoctorModal extends Component<IProps> {
             name: name || this.initialFormValues.name,
             lpu: this.initialFormValues.lpu,
             specialty: this.initialFormValues.specialty,
-            homePhone: mobilePhone || this.initialFormValues.homePhone,
+            mobilePhone: mobilePhone || this.initialFormValues.mobilePhone,
             workPhone: workPhone || this.initialFormValues.workPhone,
             card: card || this.initialFormValues.card,
             position: position || this.initialFormValues.position,
@@ -279,8 +275,8 @@ class DoctorModal extends Component<IProps> {
                     label='Телефон 1'
                     values={this.formValues}
                     onChange={this.changeHandler}
-                    error={this.errors.get('homePhone')}
-                    propName='homePhone'
+                    error={this.errors.get('mobilePhone')}
+                    propName='mobilePhone'
                 />
                 <FormRow
                     select

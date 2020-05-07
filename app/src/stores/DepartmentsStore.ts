@@ -1051,9 +1051,86 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async editDoc(initialDoc: IDoctor, formValues: IDoctorModalValues): Promise<boolean> {
-        console.log('hi: ', toJS(formValues));
-        return true;
+    async editDoc(initialDoc: IDoctor, formValues: IDoctorModalValues) {
+        const { api, userStore: { previewUser }} = this.rootStore;
+        const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? previewUser.id
+            : null;
+        if (!mpId) return false;
+        const namesMap: Record<keyof IDoctorModalValues, string> = {
+            name: 'full_name',
+            lpu: 'hcf',
+            specialty: 'speciality',
+            workPhone: 'work_phone',
+            mobilePhone: 'mobile_phone',
+            card: 'bank_card',
+            position: 'position'
+        };
+        let actualValue: any;
+        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+            const initialValue = initialDoc[key];
+            const propName = namesMap[key];
+
+            if (propName === namesMap.card) {
+                return value === initialValue
+                    ? acc
+                    : { ...acc, [propName]: this.diluteCardValue(value as string) };
+            } else if (propName === namesMap.specialty) {
+                actualValue = value
+                    ? (value as ISpecialty).name
+                    : null;
+            } else if (propName === namesMap.lpu) {
+                actualValue = value
+                    ? (value as ILPU).id
+                    : null;
+                const initLpu = initialDoc.LPUId;
+                return actualValue === initLpu
+                    ? acc
+                    : { ...acc, [propName]: (actualValue || '')};
+            } else {
+                actualValue = value;
+            }
+
+            return propName && actualValue !== (initialValue || '')
+                ? { ...acc, [propName]: (actualValue || '') }
+                : acc;
+        }, {});
+        console.log('payload: ', toJS(initialDoc), payload);
+        const isEdited = await this.dispatchRequest(
+            api.editDoc(
+                this.currentDepartmentId,
+                mpId,
+                initialDoc.id,
+                payload
+            ),
+            'editDoc'
+        );
+
+        if (isEdited) {
+            console.log('edited!');
+            const inverted = invert(namesMap);
+            [...Object.keys(payload)].forEach((key) => {
+                const propName = inverted[key];
+                const value = payload[key];
+                if (key === namesMap.lpu) {
+                    const lpu = formValues.lpu;
+                    const lpuId = lpu
+                        ? lpu.id
+                        : null;
+                    const lpuName = lpu
+                        ? lpu.name
+                        : null;
+                    initialDoc.LPUId = lpuId;
+                    initialDoc.LPUName = lpuName;
+                } else {
+                    console.log(propName, value);
+                    initialDoc[propName] = value;
+                }
+
+            });
+        }
+
+        return isEdited;
     }
 
     @action.bound
@@ -1070,7 +1147,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             lpu: 'hcf',
             specialty: 'speciality',
             workPhone: 'work_phone',
-            homePhone: 'mobile_phone',
+            mobilePhone: 'mobile_phone',
             card: 'bank_card',
             position: 'position'
         };

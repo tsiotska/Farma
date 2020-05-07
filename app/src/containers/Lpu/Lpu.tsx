@@ -67,7 +67,7 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentId,
             loadUnconfirmedLPUs,
             unconfirmedLPUs,
-            loadTypes
+            loadTypes,
         },
         uiStore: {
             openModal,

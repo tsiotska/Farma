@@ -395,6 +395,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(null));
     }
 
+    editDoc(depId: number, mpId: number, docId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/branch/${depId}/mp/${mpId}/agent/${docId}`, data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
     createDoc(depId: number, mpId: number, data: any): Promise<IDoctor> {
         return this.instance.post(`/api/branch/${depId}/mp/${mpId}/agent`, data)
             .then(doctorNormalizer)

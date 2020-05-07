@@ -36,7 +36,8 @@ export const doctorValuesMap: IValuesMap = {
 };
 
 const valueNormalizers = {
-    name: (value: string) => value ? value.toLowerCase() : null
+    name: (value: string) => value ? value.toLowerCase() : null,
+    card: (value: string) => value ? value.replace(/ /g, '') : null
 };
 
 export const doctorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(
