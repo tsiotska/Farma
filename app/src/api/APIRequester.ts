@@ -545,4 +545,16 @@ export class APIRequester {
         })
         .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
+
+    getDocsPositions(): Promise<string[]> {
+        return this.instance.get('/api/agent/position')
+            .then(({ data: { data } }) => {
+                const isArray = Array.isArray(data);
+                const isValid = data.every((x: string) => typeof x === 'string');
+                return (isArray && isValid)
+                    ? data
+                    : [];
+            })
+            .catch(this.defaultErrorHandler([]));
+    }
 }

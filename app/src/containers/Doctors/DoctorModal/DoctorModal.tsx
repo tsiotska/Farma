@@ -24,6 +24,9 @@ const styles = (theme: any) => createStyles({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between'
+    },
+    lastFormRow: {
+        paddingRight: '52%'
     }
 });
 
@@ -38,6 +41,7 @@ interface IProps extends WithStyles<typeof styles> {
     LPUs?: ILPU[];
     loadLPUs?: () => void;
     initialDoc?: IDoctor;
+    getDocsPositions?: () => Promise<string[]>;
 }
 
 export interface IDoctorModalValues {
@@ -45,6 +49,7 @@ export interface IDoctorModalValues {
     name: string;
     lpu: ILPU;
     specialty: ISpecialty;
+    position: string;
     homePhone: string;
     workPhone: string;
     card: string;
@@ -57,6 +62,7 @@ export interface IDoctorModalValues {
             loadSpecialties,
             LPUs,
             loadLPUs,
+            getDocsPositions
         }
     }
 }) => ({
@@ -64,11 +70,12 @@ export interface IDoctorModalValues {
     loadSpecialties,
     LPUs,
     loadLPUs,
+    getDocsPositions
 }))
 @observer
 class DoctorModal extends Component<IProps> {
     readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
-    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'homePhone', 'workPhone' ];
+    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'homePhone', 'workPhone', 'position' ];
     readonly allFields: Array<keyof IDoctorModalValues>;
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {
@@ -84,9 +91,12 @@ class DoctorModal extends Component<IProps> {
         homePhone: '',
         workPhone: '',
         card: '',
+        position: ''
     };
     @observable formValues: IDoctorModalValues = { ...this.initialFormValues };
     @observable errors: Map<keyof IDoctorModalValues, boolean | string> = new Map();
+
+    @observable docsPositions: string[] = [];
 
     constructor(props: IProps) {
         super(props);
@@ -104,6 +114,7 @@ class DoctorModal extends Component<IProps> {
             homePhone: phoneValidator,
             workPhone: phoneValidator,
             card: cardValidator,
+            position: objectValidator
         };
         this.allFields = [...Object.keys(this.initialFormValues)];
     }
@@ -172,6 +183,11 @@ class DoctorModal extends Component<IProps> {
             loadSpecialties();
             loadLPUs();
         }
+    }
+
+    async componentDidMount() {
+        const { getDocsPositions } = this.props;
+        this.docsPositions = await getDocsPositions();
     }
 
     render() {
@@ -270,6 +286,23 @@ class DoctorModal extends Component<IProps> {
                     propName='card'
                     required
                 />
+                <FormRow
+                    select
+                    label='Посада'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    classes={{root: classes.lastFormRow}}
+                    error={this.errors.get('position')}
+                    propName='position'
+                    fullWidth>
+                        {
+                            this.docsPositions.map(x => (
+                                <MenuItem key={x} value={x}>
+                                    { x }
+                                </MenuItem>
+                            ))
+                        }
+                </FormRow>
                 <Button
                     onClick={this.submitHandler}
                     disabled={isLoading || this.allowSubmit === false}

@@ -1046,6 +1046,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    getDocsPositions(): Promise<string[]> {
+        return this.rootStore.api.getDocsPositions();
+    }
+
+    @action.bound
     async createDoc(formValues: IDoctorModalValues) {
         const { api, userStore: { previewUser } } = this.rootStore;
         const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
@@ -1061,6 +1066,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             workPhone: 'work_phone',
             homePhone: 'mobile_phone',
             card: 'bank_card',
+            position: 'position'
         };
 
         const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
