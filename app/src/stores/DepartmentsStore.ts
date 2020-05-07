@@ -1112,7 +1112,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async acceptPharmacy(pharmacy: ILPU) {
         const { api } = this.rootStore;
-        const status = await api.accept(pharmacy.id, 'hcf'); // Change type
+        const status = await api.accept(pharmacy.id, 'pharmacy'); // Change type
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
             // reload unconfirmed

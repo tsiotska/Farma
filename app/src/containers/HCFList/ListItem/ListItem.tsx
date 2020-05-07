@@ -81,43 +81,24 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    type?: string;
     pharmacy: ILPU;
-    unconfirmed: boolean;
+    unconfirmed?: boolean;
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
     deleteClickHandler?: (lpu: ILPU) => void;
-    confirmationCallback?: (success: boolean) => void;
-    acceptLpu?: (lpu: ILPU) => boolean;
-    acceptPharmacy?: (lpu: ILPU) => boolean;
+    acceptHandler?: (pharmacy: ILPU) => void;
 }
 
-@inject(({
-             appState: {
-                 departmentsStore: {
-                     acceptLpu
-                 }
-             }
-         }) => ({
-    acceptLpu
-}))
 @observer
 class ListItem extends Component<IProps> {
 
     @observable isLoadingConfirmation: boolean = false;
 
     confirmClickHandler = async () => {
-        const { type, acceptLpu, acceptPharmacy, pharmacy, unconfirmed, confirmationCallback } = this.props;
-        if (!unconfirmed) return;
+        const { acceptHandler, pharmacy } = this.props;
         this.isLoadingConfirmation = true;
-        let isConfirmed;
-        if (type === PERMISSIONS.CONFIRM_LPU) {
-            isConfirmed = await acceptLpu(pharmacy);
-        } else if (type === PERMISSIONS.CONFIRM_PHARMACY) {
-            isConfirmed = await acceptPharmacy(pharmacy);
-        }
+        await acceptHandler(pharmacy);
         this.isLoadingConfirmation = false;
-        confirmationCallback(isConfirmed);
     }
 
     get regionName(): string {

@@ -11,14 +11,13 @@ import { EDIT_LPU_MODAL, EDIT_PHARMACY_MODAL } from '../../../constants/Modals';
 const styles = createStyles({});
 
 interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<any>> {
-    type?: string;
     data: ILPU[];
-    unconfirmed: boolean;
     regions?: Map<number, ILocation>;
     openModal?: (modalName: string, payload: any) => void;
     deleteLpu?: (lpu: ILPU) => void;
     deletePharmacy?: (lpu: ILPU) => void;
-    confirmationCallback?: (success: boolean) => void;
+    acceptHandler?: (pharmacy: ILPU) => void;
+    unconfirmed?: boolean;
 }
 
 @inject(({
@@ -61,8 +60,7 @@ class PharmaciesList extends Component<IProps> {
             data,
             unconfirmed,
             regions,
-            confirmationCallback,
-            type
+            acceptHandler
         } = this.props;
 
         return (
@@ -71,14 +69,13 @@ class PharmaciesList extends Component<IProps> {
                     {
                         data.map(pharmacy => (
                             <ListItem
-                                type={type}
                                 key={pharmacy.id}
                                 pharmacy={pharmacy}
-                                unconfirmed={unconfirmed}
                                 region={regions.get(pharmacy.region)}
                                 editClickHandler={this.editClickHandler}
                                 deleteClickHandler={this.deleteClickHandler}
-                                confirmationCallback={confirmationCallback}
+                                acceptHandler={acceptHandler}
+                                unconfirmed={unconfirmed}
                             />
                         ))
                     }

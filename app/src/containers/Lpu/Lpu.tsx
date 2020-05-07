@@ -19,7 +19,6 @@ import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
-import { PERMISSIONS } from '../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -58,6 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
+    acceptLpu?: (lpu: ILPU) => boolean;
 }
 
 @inject(({
@@ -68,7 +68,8 @@ interface IProps extends WithStyles<typeof styles> {
                      sortedLpus: LPUs,
                      currentDepartmentId,
                      loadUnconfirmedLPUs,
-                     unconfirmedLPUs
+                     unconfirmedLPUs,
+                     acceptLpu
                  },
                  uiStore: {
                      openModal,
@@ -87,7 +88,8 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
-    openModal
+    openModal,
+    acceptLpu
 }))
 @observer
 class Lpu extends Component<IProps> {
@@ -135,11 +137,12 @@ class Lpu extends Component<IProps> {
         this.isSnackbarOpen = false;
     }
 
-    confirmationCallback = (success: boolean): void => {
-        this.snackbarType = success
+    acceptLpuHandler = async (lpu: ILPU) => {
+       const success = await this.props.acceptLpu(lpu);
+       this.snackbarType = success
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-        this.isSnackbarOpen = true;
+       this.isSnackbarOpen = true;
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
@@ -175,7 +178,7 @@ class Lpu extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
-                        <HCFList data={unconfirmedLPUs} unconfirmed/>
+                        <HCFList acceptHandler={this.acceptLpuHandler} data={unconfirmedLPUs} unconfirmed/>
                     </Grid>
                 }
                 {this.isUnconfirmedLPUsLoading && <LinearProgress/>}
@@ -194,9 +197,7 @@ class Lpu extends Component<IProps> {
                 {
                     this.requestStatus.loading
                         ? <LinearProgress/>
-                        : <HCFList type={PERMISSIONS.CONFIRM_LPU}
-                                   confirmationCallback={this.confirmationCallback}
-                                   data={this.preparedLPUs} showHeader/>
+                        : <HCFList data={this.preparedLPUs} showHeader/>
                 }
                 {
                     this.requestStatus.error &&
@@ -231,8 +232,8 @@ class Lpu extends Component<IProps> {
                     type={this.snackbarType}
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                            ? 'Лікар успішно підтверджений'
-                            : 'Підтвердити лікаря неможливо'
+                            ? 'ЛПУ успішно підтверджений'
+                            : 'Підтвердити ЛПУ неможливо'
                     }
                 />
                 <AddLpu/>
