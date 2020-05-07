@@ -13,10 +13,12 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed } from 'mobx';
+import { computed, observable, autorun, toJS, reaction } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
+import debounce from 'lodash/debounce';
+import { throttle, defer } from 'lodash';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -88,6 +90,11 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Pharmacy extends Component<IProps> {
+    autorunDisposer: any;
+    reactionDisposer: any;
+
+    @observable preparedPharmacies: ILPU[] = [];
+
     @computed
     get isUnconfirmedPharmaciesLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedPharmacies').loading;
@@ -108,22 +115,45 @@ class Pharmacy extends Component<IProps> {
             && (!pharmacies || !pharmacies.length);
     }
 
-    @computed
-    get preparedPharmacies(): ILPU[] {
-        const { pharmacies, itemsPerPage, currentPage } = this.props;
-        const begin = itemsPerPage * currentPage;
-        return Array.isArray(pharmacies)
-        ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-        : [];
-    }
-
     retryClickHandler = () => {
         this.props.loadPharmacies(true);
     }
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
 
+    autorunCallback = () => {
+        const { pharmacies, itemsPerPage, currentPage } = this.props;
+
+        const begin = itemsPerPage * currentPage;
+
+        if (this.requestStatus.loading) {
+            const itemOnBegin = pharmacies
+                ? pharmacies[begin]
+                : null;
+            const displayingActualData = this.preparedPharmacies.length === itemsPerPage
+                && this.preparedPharmacies[0] === itemOnBegin;
+            const pharmacyIsEmpty = pharmacies === null || pharmacies.length === 0;
+            if (pharmacyIsEmpty || displayingActualData) return;
+        }
+
+        this.preparedPharmacies = pharmacies
+            ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
+    }
+
     componentDidMount() {
+        this.autorunDisposer = autorun(this.autorunCallback);
+        this.reactionDisposer = reaction(
+            () => this.requestStatus.loading,
+            (isLoading) => {
+                this.autorunDisposer();
+                const delay = isLoading
+                    ? 300
+                    : 0;
+                this.autorunDisposer = autorun(this.autorunCallback, { delay });
+            }
+        );
+
         this.props.setPharmacyDemand(true);
         this.props.loadUnconfirmedPharmacies();
     }
@@ -131,6 +161,8 @@ class Pharmacy extends Component<IProps> {
     componentWillUnmount() {
         this.props.setPharmacyDemand(false);
         this.props.setCurrentPage(0);
+        this.reactionDisposer();
+        this.autorunDisposer();
     }
 
     render() {
@@ -170,11 +202,11 @@ class Pharmacy extends Component<IProps> {
                     </Button>
                 </Grid>
                 {
-                    this.requestStatus.loading && <LinearProgress/>
-                }
-                {
                     !!this.preparedPharmacies.length &&
                     <HCFList data={this.preparedPharmacies} showHeader />
+                }
+                {
+                    this.requestStatus.loading && <LinearProgress />
                 }
                 {
                     this.requestStatus.error &&

@@ -351,7 +351,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadPharmacies(isNeeded: boolean) {
-        if (!isNeeded) {
+        const initialUrl = this.getPharmacyApiUrl();
+
+        if (!isNeeded || !initialUrl) {
             this.pharmacies = null;
             return;
         }
@@ -361,28 +363,27 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let keepDoing: boolean = true;
         let page: number = 1;
 
+        this.setLoading(requestName);
         while (keepDoing) {
-            const url = this.getPharmacyApiUrl(false, page);
+            const url = `${initialUrl}?page=${page}&count=${this.lpuCount}`;
+            const part = await api.getPharmacies(url);
 
-            if (!url && keepDoing) {
-            continue;
+            if (this.getPharmacyApiUrl() !== initialUrl || this.pharmacyDemand === false) {
+                this.pharmacies = null;
+                break;
             }
-
-            const part = await this.dispatchRequest(
-                api.getPharmacies(url),
-                requestName
-            );
 
             if (part) {
                 if (!this.pharmacies) {
                     this.pharmacies = [];
                 }
                 this.pharmacies.push(...part);
-                console.log(toJS(this.pharmacies));
                 page++;
             }
+
             keepDoing = !!part && part.length === 1000;
         }
+        this.setSuccess(requestName);
     }
 
     @action.bound
@@ -410,21 +411,18 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let keepDoing: boolean = true;
         const initialDepartmentId = this.currentDepartmentId;
 
+        this.setLoading(requestName);
         while (keepDoing) {
             const url = this.getMedicalDepartmentsApiUrl(
-                this.currentDepartmentId, previewUser, false, page
+                this.currentDepartmentId,
+                previewUser,
+                false,
+                page
             );
 
-            if (!url && keepDoing) {
-                continue;
-            }
-
-            const part = await this.dispatchRequest(
-                api.getMedicalDepartments(url),
-                requestName
-            );
-
-            if (initialDepartmentId !== this.currentDepartmentId) {
+            if (!url) break;
+            const part = await api.getMedicalDepartments(url);
+            if (this.currentDepartmentId !== initialDepartmentId) {
                 break;
             }
 
@@ -435,8 +433,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 this.LPUs.push(...part);
                 page++;
             }
+
             keepDoing = !!part && part.length === 1000;
         }
+        this.setSuccess(requestName);
     }
 
     @action.bound
@@ -1149,23 +1149,28 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     private getMedicalDepartmentsApiUrl(departmentId: number, user: IUser, unconfirmed: boolean = false, page?: number): string {
         const { position, id } = user;
-        const urlParam = unconfirmed
-            ? '?unconfirmed=1'
-            : `?page=${page}&count=${this.lpuCount}`;
+
+        const params: string[] = [];
+        if (unconfirmed) params.push('unconfirmed=1');
+        if (page) params.push(`page=${page}`);
+
+        const query = params.length
+            ? `?${params.join('&')}`
+            : '';
 
         switch (position) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
-                return `/api/branch/${departmentId}/ffm/hcf${urlParam}`;
+                return `/api/branch/${departmentId}/ffm/hcf${query}`;
             case USER_ROLE.REGIONAL_MANAGER:
-                return `/api/branch/${departmentId}/rm/${id}/hcf${urlParam}`;
+                return `/api/branch/${departmentId}/rm/${id}/hcf${query}`;
             case USER_ROLE.MEDICAL_AGENT:
-                return `/api/branch/${departmentId}/mp/${id}/hcf${urlParam}`;
+                return `/api/branch/${departmentId}/mp/${id}/hcf${query}`;
             default:
                 return null;
         }
     }
 
-    private getPharmacyApiUrl(unconfirmed: boolean = false, page?: number): string {
+    private getPharmacyApiUrl(unconfirmed: boolean = false): string {
         const { userStore: { role, previewUser } } = this.rootStore;
 
         const userId = previewUser
@@ -1174,14 +1179,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (!this.currentDepartmentId || !userId) return null;
 
-        const queryParams: string[] = [];
-        if (unconfirmed) {
-            queryParams.push('unconfirmed=1');
-        }
-        if (page) {
-            queryParams.push(`page=${page}&count=${this.lpuCount}`);
-        }
-        const queryParam = queryParams.length ? `?${queryParams.join('&')}` : '';
+        const queryParam = unconfirmed
+            ? `?unconfirmed=1`
+            : '';
 
         switch (role) {
             case USER_ROLE.FIELD_FORCE_MANAGER:

@@ -178,12 +178,17 @@ class Lpu extends Component<IProps> {
                         Додати ЛПУ
                     </Button>
                 </Grid>
-                {
-                    this.requestStatus.loading && <LinearProgress/>
-                }
+                {/* {
+                    !!this.preparedLPUs.length
+                        ? <HCFList data={this.preparedLPUs} showHeader />
+                        : <LinearProgress />
+                } */}
                 {
                     !!this.preparedLPUs.length &&
                     <HCFList data={this.preparedLPUs} showHeader />
+                }
+                {
+                    this.requestStatus.loading && <LinearProgress/>
                 }
                 {
                     this.requestStatus.error &&
