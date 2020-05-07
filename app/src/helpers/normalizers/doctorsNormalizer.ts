@@ -1,4 +1,4 @@
-import { IValuesMap, objectArrayNormalizer } from './normalizer';
+import { IValuesMap, objectArrayNormalizer, defaultObjectNormalizer } from './normalizer';
 import { IDoctor } from './../../interfaces/IDoctor';
 
 export const defaultDoctor: IDoctor = {
@@ -35,14 +35,23 @@ export const doctorValuesMap: IValuesMap = {
     deposit: 'deposit'
 };
 
+const valueNormalizers = {
+    name: (value: string) => value ? value.toLowerCase() : null
+};
+
 export const doctorsNormalizer = ({ data: { data }}: any): IDoctor[] => objectArrayNormalizer(
     data,
     defaultDoctor,
     doctorValuesMap,
     {
         requiredProps: [ 'id' ],
-        valueNormalizers: {
-            name: (value: string) => value ? value.toLowerCase() : null
-        }
+        valueNormalizers
     }
+);
+
+export const doctorNormalizer = ({ data: { data }}: any): IDoctor => defaultObjectNormalizer(
+    data,
+    defaultDoctor,
+    doctorValuesMap,
+    valueNormalizers
 );

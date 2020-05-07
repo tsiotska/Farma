@@ -28,7 +28,7 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
-import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
+import { doctorsNormalizer, doctorNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
@@ -393,6 +393,12 @@ export class APIRequester {
         return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
             .then(doctorsNormalizer)
             .catch(this.defaultErrorHandler(null));
+    }
+
+    createDoc(depId: number, mpId: number, data: any): Promise<IDoctor> {
+        return this.instance.post(`/api/branch/${depId}/mp/${mpId}/agent`, data)
+            .then(doctorNormalizer)
+            .catch(this.defaultErrorHandler());
     }
 
     createDepartment(departmentData: FormData): Promise<IDepartment> {

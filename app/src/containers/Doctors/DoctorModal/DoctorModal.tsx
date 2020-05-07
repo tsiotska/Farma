@@ -6,8 +6,10 @@ import { ISpecialty } from '../../../interfaces/ISpecialty';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
 import FormRow from '../../../components/FormRow';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import { lengthValidator, onlyNumbersValidator, Validator } from '../../../helpers/validators';
+import LoadingMask from '../../../components/LoadingMask';
+import { IDoctor } from '../../../interfaces/IDoctor';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -35,6 +37,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadSpecialties?: () => void;
     LPUs?: ILPU[];
     loadLPUs?: () => void;
+    initialDoc?: IDoctor;
 }
 
 export interface IDoctorModalValues {
@@ -66,6 +69,7 @@ export interface IDoctorModalValues {
 class DoctorModal extends Component<IProps> {
     readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
     readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'homePhone', 'workPhone' ];
+    readonly allFields: Array<keyof IDoctorModalValues>;
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {
         name: 'Значення має містити не менше 3 символів',
@@ -101,6 +105,28 @@ class DoctorModal extends Component<IProps> {
             workPhone: phoneValidator,
             card: cardValidator,
         };
+        this.allFields = [...Object.keys(this.initialFormValues)];
+    }
+
+    @computed
+    get valuesChanged(): boolean {
+        const { initialDoc } = this.props;
+        if (!initialDoc) {
+            return this.allFields.some(x => this.formValues[x] !== this.initialFormValues[x]);
+        }
+        return true;
+    }
+
+    @computed
+    get allowSubmit(): boolean {
+        const requiredProps = this.allFields.filter(x => this.optionalFields.includes(x) === false);
+        const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
+        const allPropsIsValid = this.allFields.every(x => (
+            this.optionalFields.includes(x)
+                ? !this.errors.get(x)
+                : this.errors.get(x) === false
+        ));
+        return hasRequiredProps && allPropsIsValid && this.valuesChanged;
     }
 
     validate = (propName: keyof IDoctorModalValues, value: string) => {
@@ -153,7 +179,8 @@ class DoctorModal extends Component<IProps> {
             onClose,
             title,
             specialties,
-            LPUs
+            LPUs,
+            isLoading
         } = this.props;
 
         return (
@@ -241,8 +268,16 @@ class DoctorModal extends Component<IProps> {
                     propName='card'
                     required
                 />
-                <Button className={classes.submitButton} variant='contained' color='primary'>
-                    Додати лікаря
+                <Button
+                    disabled={isLoading || this.allowSubmit === false}
+                    className={classes.submitButton}
+                    variant='contained'
+                    color='primary'>
+                        {
+                            isLoading
+                            ? <LoadingMask size={20} />
+                            : 'Додати лікаря'
+                        }
                 </Button>
             </Dialog>
         );

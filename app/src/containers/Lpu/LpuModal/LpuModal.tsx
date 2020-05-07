@@ -129,7 +129,7 @@ class LpuModal extends Component<IProps> {
     @computed
     get allowSubmit(): boolean {
         const requiredProps = this.allProps
-        .filter((x) => (this.optionalFields as string[]).includes(x) === false);
+            .filter((x) => (this.optionalFields as string[]).includes(x) === false);
         const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
         const isAllPropsValid = this.allProps.every(x => !(this.errors as Map<string, any>).get(x));
         return hasRequiredProps && isAllPropsValid && this.valuesChanged;

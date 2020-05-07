@@ -1,3 +1,4 @@
+import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
 import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
 import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
 import { ADD_PHARMACY_MODAL } from './../constants/Modals';
@@ -1042,6 +1043,33 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         // if (callback) callback();
 
         return initialReport;
+    }
+
+    @action.bound
+    async createDoc(formValues: IDoctorModalValues) {
+        const { api, userStore: { previewUser } } = this.rootStore;
+        const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? previewUser.id
+            : null;
+        if (!mpId) return false;
+        const createdDoc = await this.dispatchRequest(
+            api.createDoc(this.currentDepartmentId, mpId, formValues),
+            'createDoc'
+        );
+
+        if (createdDoc) {
+            this.doctors.push(createdDoc);
+            this.doctors.sort((a, b) => {
+                const aIsConfirmed = !!a.confirmed;
+                const bIsConfirmed = !!b.confirmed;
+                if (aIsConfirmed && bIsConfirmed) return 0;
+                return aIsConfirmed
+                    ? -1
+                    : 1;
+            });
+        }
+
+        return !!createdDoc;
     }
 
     @action.bound
