@@ -1051,6 +1051,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async editDoc(initialDoc: IDoctor, formValues: IDoctorModalValues): Promise<boolean> {
+        console.log('hi: ', toJS(formValues));
+        return true;
+    }
+
+    @action.bound
     async createDoc(formValues: IDoctorModalValues) {
         const { api, userStore: { previewUser } } = this.rootStore;
         const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)

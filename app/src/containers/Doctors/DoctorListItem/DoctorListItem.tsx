@@ -14,6 +14,7 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
 import { observable } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
+import { EDIT_DOC_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -67,16 +68,21 @@ interface IProps extends WithStyles<typeof styles> {
     confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
     acceptAgent?: (doctor: IDoctor) => boolean;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             acceptAgent
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
-    acceptAgent
+    acceptAgent,
+    openModal
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
@@ -89,6 +95,11 @@ class DoctorListItem extends Component<IProps> {
         const isConfirmed = await acceptAgent(doctor);
         this.isLoadingConfirmation = false;
         confirmationCallback(isConfirmed);
+    }
+
+    editClickHandler = () => {
+        const { doctor, openModal } = this.props;
+        openModal(EDIT_DOC_MODAL, doctor);
     }
 
     render() {
@@ -158,7 +169,7 @@ class DoctorListItem extends Component<IProps> {
                             <Typography variant='body2' className={cx(classes.deposit, classes.text)}>
                                 { deposit || 0 }
                             </Typography>
-                            <IconButton>
+                            <IconButton onClick={this.editClickHandler}>
                                 <Edit className={classes.editIcon} fontSize='small' />
                             </IconButton>
                           </>

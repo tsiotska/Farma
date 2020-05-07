@@ -37,9 +37,9 @@ interface IProps extends WithStyles<typeof styles> {
     onSubmit: (values: IDoctorModalValues) => void;
     title: string;
     specialties?: ISpecialty[];
-    loadSpecialties?: () => void;
+    loadSpecialties?: () => Promise<void>;
     LPUs?: ILPU[];
-    loadLPUs?: () => void;
+    loadLPUs?: () => Promise<void>;
     initialDoc?: IDoctor;
     getDocsPositions?: () => Promise<string[]>;
 }
@@ -125,7 +125,23 @@ class DoctorModal extends Component<IProps> {
         if (!initialDoc) {
             return this.allFields.some(x => this.formValues[x] !== this.initialFormValues[x]);
         }
-        return true;
+        return this.allFields.some(x => {
+            const initialValue = initialDoc[x];
+            const currentValue = this.formValues[x];
+
+            if (x === 'lpu') {
+                const lpuId = currentValue
+                    ? (currentValue as ILPU).id
+                    : null;
+                return (initialValue || null) !== lpuId;
+            } else if (x === 'specialty') {
+                const specialtyName = currentValue
+                    ? (currentValue as ISpecialty).name
+                    : null;
+                return (initialValue || null) !== specialtyName;
+            }
+            return (initialValue || '') !== currentValue;
+        });
     }
 
     @computed
@@ -176,12 +192,51 @@ class DoctorModal extends Component<IProps> {
 
     componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, loadSpecialties, loadLPUs } = this.props;
+        const { open, loadSpecialties, loadLPUs, initialDoc } = this.props;
 
         const becomeOpen = wasOpen === false && open === true;
-        if (becomeOpen) {
-            loadSpecialties();
-            loadLPUs();
+        if (!becomeOpen) return;
+        const specialtyPromise = loadSpecialties();
+        const lpusPromise = loadLPUs();
+
+        if (!initialDoc) return;
+
+        const {
+            name,
+            LPUId,
+            specialty,
+            position,
+            mobilePhone,
+            workPhone,
+            card,
+        } = initialDoc;
+
+        this.formValues = {
+            name: name || this.initialFormValues.name,
+            lpu: this.initialFormValues.lpu,
+            specialty: this.initialFormValues.specialty,
+            homePhone: mobilePhone || this.initialFormValues.homePhone,
+            workPhone: workPhone || this.initialFormValues.workPhone,
+            card: card || this.initialFormValues.card,
+            position: position || this.initialFormValues.position,
+        };
+
+        if (LPUId) {
+            lpusPromise.then(() => {
+                const targetLpu = this.props.LPUs
+                    ? this.props.LPUs.find(x => x.id === LPUId)
+                    : null;
+                this.formValues.lpu = targetLpu;
+            });
+        }
+
+        if (specialty) {
+            specialtyPromise.then(() => {
+                const targetSpecialty = this.props.specialties
+                    ? this.props.specialties.find(x => x.name === specialty)
+                    : null;
+                this.formValues.specialty = targetSpecialty;
+            });
         }
     }
 
