@@ -14,6 +14,8 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
 import { observable } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
+import EditDepositModal from '../EditDepositModal';
+import { ADD_MEDICINE_MODAL, EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -57,7 +59,10 @@ const styles = (theme: any) => createStyles({
     },
     deposit: {
         width: '100%',
-        color: '#7B8FFE'
+        color: '#647CFE',
+        '&:hover': {
+            cursor: 'pointer'
+        }
     }
 });
 
@@ -66,28 +71,37 @@ interface IProps extends WithStyles<typeof styles> {
     confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
     acceptAgent?: (doctor: IDoctor) => boolean;
+    openModal?: (modalName: string) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            acceptAgent
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openModal,
+                 },
+                 departmentsStore: {
+                     acceptAgent
+                 }
+             }
+         }) => ({
+    openModal,
     acceptAgent
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
 
-    confirmClickHandler =  async () => {
+    confirmClickHandler = async () => {
         const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
         if (!unconfirmed) return;
         this.isLoadingConfirmation = true;
         const isConfirmed = await acceptAgent(doctor);
         this.isLoadingConfirmation = false;
         confirmationCallback(isConfirmed);
+    }
+
+    depositModalHandler = () => {
+        this.props.openModal(EDIT_DEPOSIT_MODAL);
     }
 
     render() {
@@ -109,62 +123,65 @@ class DoctorListItem extends Component<IProps> {
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid xs={3} container item>
                     <Typography className={classes.text}>
-                        { LPUName || '-' }
+                        {LPUName || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={3} container item>
                     <Typography className={classes.text}>
-                        { name || '-' }
+                        {name || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
-                        { specialty || '-'}
+                        {specialty || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
-                            ? '-'
-                            : <>
-                                <span className={classes.phone}>{ mobilePhone }</span>
-                                <span className={classes.phone}>{ workPhone }</span>
-                              </>
+                                ? '-'
+                                : <>
+                                    <span className={classes.phone}>{mobilePhone}</span>
+                                    <span className={classes.phone}>{workPhone}</span>
+                                </>
                         }
                     </Typography>
                 </Grid>
                 <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
-                        { card || '-'}
+                        {card || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
                     {
                         unconfirmed
-                        ? <Button
-                            disabled={this.isLoadingConfirmation}
-                            onClick={this.confirmClickHandler}
-                            className={classes.confirmButton}
-                            variant='outlined'>
+                            ? <Button
+                                disabled={this.isLoadingConfirmation}
+                                onClick={this.confirmClickHandler}
+                                className={classes.confirmButton}
+                                variant='outlined'>
                                 {
                                     this.isLoadingConfirmation
-                                    ? <LoadingMask size={20} />
-                                    : 'Підтвердити'
+                                        ? <LoadingMask size={20}/>
+                                        : 'Підтвердити'
                                 }
-                          </Button>
-                        : <>
-                            <Typography className={cx(classes.deposit, classes.text)}>
-                                { deposit || 0 }
-                            </Typography>
-                            <IconButton>
-                                <Edit className={classes.editIcon} fontSize='small' />
-                            </IconButton>
-                          </>
+                            </Button>
+                            : <>
+                                <Typography onClick={this.depositModalHandler}
+                                            className={cx(classes.deposit, classes.text)}>
+                                    {deposit || 0}
+                                </Typography>
+                                <IconButton>
+                                    <Edit className={classes.editIcon} fontSize='small'/>
+                                </IconButton>
+                            </>
                     }
                     <IconButton>
-                        <Delete className={classes.removeIcon} fontSize='small' />
+                        <Delete className={classes.removeIcon} fontSize='small'/>
                     </IconButton>
+
+                    <EditDepositModal/>
                 </Grid>
             </Grid>
         );
