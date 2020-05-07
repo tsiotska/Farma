@@ -366,36 +366,35 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.setLoading(requestName);
         while (keepDoing) {
             const url = `${initialUrl}?page=${page}&count=${this.lpuCount}`;
-            const part = await api.getPharmacies(url);
+            const pharmacies = await api.getPharmacies(url);
 
             if (this.getPharmacyApiUrl() !== initialUrl || this.pharmacyDemand === false) {
                 this.pharmacies = null;
                 break;
             }
 
-            if (part) {
-                if (!this.pharmacies) {
-                    this.pharmacies = [];
+            if (pharmacies) {
+                if (this.pharmacies === null) {
+                    this.pharmacies = pharmacies;
+                } else {
+                    this.pharmacies.push(...pharmacies);
                 }
-                this.pharmacies.push(...part);
                 page++;
             }
 
-            keepDoing = !!part && part.length === 1000;
+            keepDoing = !!pharmacies && pharmacies.length === 1000;
         }
         this.setSuccess(requestName);
     }
 
     @action.bound
     async loadUnconfirmedLPUs() {
-        const requestName = 'loadUnconfirmedLPUs';
-        const { api, userStore: { previewUser } } = this.rootStore;
-
-        if (this.currentDepartmentId === null || previewUser === null) return;
-        const url = this.getMedicalDepartmentsApiUrl(this.currentDepartmentId, previewUser, true);
+        const { api } = this.rootStore;
+        const url = this.getMedicalDepartmentsApiUrl(true);
+        if (!url) return;
         const res = await this.dispatchRequest(
             api.getMedicalDepartments(url),
-            requestName
+            'loadUnconfirmedLPUs'
         );
 
         if (res) this.unconfirmedLPUs = res;
@@ -404,33 +403,30 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLPUs() {
         const requestName = 'loadLPUs';
-        const { api, userStore: { previewUser } } = this.rootStore;
+        const { api } = this.rootStore;
+        const initialUrl = this.getMedicalDepartmentsApiUrl();
 
-        if (this.currentDepartmentId === null || previewUser === null) return;
+        if (!initialUrl) return;
+
         let page = 1;
         let keepDoing: boolean = true;
-        const initialDepartmentId = this.currentDepartmentId;
 
         this.setLoading(requestName);
         while (keepDoing) {
-            const url = this.getMedicalDepartmentsApiUrl(
-                this.currentDepartmentId,
-                previewUser,
-                false,
-                page
-            );
-
-            if (!url) break;
+            const url = `${initialUrl}?page=${page}`;
             const part = await api.getMedicalDepartments(url);
-            if (this.currentDepartmentId !== initialDepartmentId) {
+
+            if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
+                this.LPUs = null;
                 break;
             }
 
             if (part) {
                 if (this.LPUs === null) {
-                    this.LPUs = [];
+                    this.LPUs = part;
+                } else {
+                    this.LPUs.push(...part);
                 }
-                this.LPUs.push(...part);
                 page++;
             }
 
@@ -1147,24 +1143,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return true;
     }
 
-    private getMedicalDepartmentsApiUrl(departmentId: number, user: IUser, unconfirmed: boolean = false, page?: number): string {
-        const { position, id } = user;
+    private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
+        const { userStore: { previewUser }} = this.rootStore;
+        if (!previewUser || !this.currentDepartmentId) return null;
+        const { position, id } = previewUser;
 
-        const params: string[] = [];
-        if (unconfirmed) params.push('unconfirmed=1');
-        if (page) params.push(`page=${page}`);
-
-        const query = params.length
-            ? `?${params.join('&')}`
+        const query = unconfirmed
+            ? '?unconfirmed=1'
             : '';
 
         switch (position) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
-                return `/api/branch/${departmentId}/ffm/hcf${query}`;
+                return `/api/branch/${this.currentDepartmentId}/ffm/hcf${query}`;
             case USER_ROLE.REGIONAL_MANAGER:
-                return `/api/branch/${departmentId}/rm/${id}/hcf${query}`;
+                return `/api/branch/${this.currentDepartmentId}/rm/${id}/hcf${query}`;
             case USER_ROLE.MEDICAL_AGENT:
-                return `/api/branch/${departmentId}/mp/${id}/hcf${query}`;
+                return `/api/branch/${this.currentDepartmentId}/mp/${id}/hcf${query}`;
             default:
                 return null;
         }

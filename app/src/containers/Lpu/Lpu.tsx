@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable, autorun, reaction } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
@@ -48,7 +48,6 @@ interface IProps extends WithStyles<typeof styles> {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
     unconfirmedLPUs?: ILPU[];
-    currentDepartmentId?: number;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
@@ -63,7 +62,6 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             sortedLpus: LPUs,
-            currentDepartmentId,
             loadUnconfirmedLPUs,
             unconfirmedLPUs,
         },
@@ -81,13 +79,17 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage,
     currentPage,
     itemsPerPage,
-    currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
     openModal,
 }))
 @observer
 class Lpu extends Component<IProps> {
+    autorunDisposer: any;
+    reactionDisposer: any;
+
+    @observable preparedLPUs: ILPU[] = [];
+
     @computed
     get isUnconfirmedLPUsLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedLPUs').loading;
@@ -108,40 +110,57 @@ class Lpu extends Component<IProps> {
             && (!LPUs || !LPUs.length);
     }
 
-    @computed
-    get preparedLPUs(): ILPU[] {
-        const { LPUs, itemsPerPage, currentPage } = this.props;
-        const begin = itemsPerPage * currentPage;
-        return Array.isArray(LPUs)
-        ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-        : [];
-    }
-
     retryClickHandler = () => this.props.loadLPUs();
 
     loadData = async () => {
-        const { loadLPUs, loadUnconfirmedLPUs, LPUs } = this.props;
+        const { loadLPUs, loadUnconfirmedLPUs } = this.props;
         await loadUnconfirmedLPUs();
-        if (!LPUs) {
-            await loadLPUs();
-        }
+        await loadLPUs();
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
 
-    componentDidMount() {
-        this.loadData();
+    autorunCallback = () => {
+        const { LPUs, itemsPerPage, currentPage } = this.props;
+
+        const begin = itemsPerPage * currentPage;
+
+        if (this.requestStatus.loading) {
+            const itemOnBegin = LPUs
+                ? LPUs[begin]
+                : null;
+            const displayingActualData = this.preparedLPUs.length === itemsPerPage
+                && this.preparedLPUs[0] === itemOnBegin;
+            const LPUsIsEmpty = LPUs === null || LPUs.length === 0;
+            if (LPUsIsEmpty || displayingActualData) return;
+        }
+
+        this.preparedLPUs = LPUs
+            ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
     }
 
-    componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
-        const { currentDepartmentId: actualId } = this.props;
-        if (prevId !== actualId) {
-            this.loadData(); }
+    componentDidMount() {
+        this.autorunDisposer = autorun(this.autorunCallback);
+        this.reactionDisposer = reaction(
+            () => this.requestStatus.loading,
+            (isLoading) => {
+                this.autorunDisposer();
+                const delay = isLoading
+                    ? 300
+                    : 0;
+                this.autorunDisposer = autorun(this.autorunCallback, { delay });
+            }
+        );
+
+        this.loadData();
     }
 
     componentWillUnmount() {
         const { setCurrentPage } = this.props;
         setCurrentPage(0);
+        this.reactionDisposer();
+        this.autorunDisposer();
     }
 
     render() {
@@ -178,18 +197,11 @@ class Lpu extends Component<IProps> {
                         Додати ЛПУ
                     </Button>
                 </Grid>
-                {/* {
-                    !!this.preparedLPUs.length
-                        ? <HCFList data={this.preparedLPUs} showHeader />
-                        : <LinearProgress />
-                } */}
                 {
                     !!this.preparedLPUs.length &&
                     <HCFList data={this.preparedLPUs} showHeader />
                 }
-                {
-                    this.requestStatus.loading && <LinearProgress/>
-                }
+                { this.requestStatus.loading && <LinearProgress/> }
                 {
                     this.requestStatus.error &&
                     <>

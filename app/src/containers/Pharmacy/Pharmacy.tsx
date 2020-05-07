@@ -17,8 +17,6 @@ import { computed, observable, autorun, toJS, reaction } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
-import debounce from 'lodash/debounce';
-import { throttle, defer } from 'lodash';
 
 const styles = (theme: any) => createStyles({
     root: {
