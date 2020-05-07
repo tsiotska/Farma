@@ -8,13 +8,17 @@ import {
     IconButton,
     Button
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { ILPU } from '../../../interfaces/ILPU';
 import cx from 'classnames';
 import { Edit, Delete } from '@material-ui/icons';
 import { gridStyles } from '../gridStyles';
 import { ILocation } from '../../../interfaces/ILocation';
 import CommitBadge from '../../../components/CommitBadge';
+import LoadingMask from '../../Doctors/DoctorListItem/DoctorListItem';
+import { observable, toJS } from 'mobx';
+import { IDoctor } from '../../../interfaces/IDoctor';
+import { PERMISSIONS } from '../../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -77,15 +81,45 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    type?: string;
     pharmacy: ILPU;
     unconfirmed: boolean;
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
     deleteClickHandler?: (lpu: ILPU) => void;
+    confirmationCallback?: (success: boolean) => void;
+    acceptLpu?: (lpu: ILPU) => boolean;
+    acceptPharmacy?: (lpu: ILPU) => boolean;
 }
 
+@inject(({
+             appState: {
+                 departmentsStore: {
+                     acceptLpu
+                 }
+             }
+         }) => ({
+    acceptLpu
+}))
 @observer
 class ListItem extends Component<IProps> {
+
+    @observable isLoadingConfirmation: boolean = false;
+
+    confirmClickHandler = async () => {
+        const { type, acceptLpu, acceptPharmacy, pharmacy, unconfirmed, confirmationCallback } = this.props;
+        if (!unconfirmed) return;
+        this.isLoadingConfirmation = true;
+        let isConfirmed;
+        if (type === PERMISSIONS.CONFIRM_LPU) {
+            isConfirmed = await acceptLpu(pharmacy);
+        } else if (type === PERMISSIONS.CONFIRM_PHARMACY) {
+            isConfirmed = await acceptPharmacy(pharmacy);
+        }
+        this.isLoadingConfirmation = false;
+        confirmationCallback(isConfirmed);
+    }
+
     get regionName(): string {
         const { region } = this.props;
         return region
@@ -101,6 +135,11 @@ class ListItem extends Component<IProps> {
     deleteClickHandler = () => {
         const { deleteClickHandler, pharmacy } = this.props;
         if (deleteClickHandler) deleteClickHandler(pharmacy);
+    }
+
+    componentDidMount(): void {
+        console.log('this.props.pharmacy');
+        console.log(toJS(this.props.pharmacy));
     }
 
     render() {
@@ -128,32 +167,32 @@ class ListItem extends Component<IProps> {
                     {
                         unconfirmed &&
                         <>
-                            <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm} />
-                            <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm} />
+                            <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm}/>
+                            <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm}/>
                         </>
                     }
                     <Typography className={classes.text} variant='body2'>
-                        { name }
+                        {name}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { this.regionName }
+                        {this.regionName}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.oblast)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { oblast }
+                        {oblast}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { city }
+                        {city}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { address }
+                        {address}
                     </Typography>
                 </Grid>
                 <Grid
@@ -164,20 +203,28 @@ class ListItem extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span className={classes.phoneText}>{ phone1 }</span>
-                        <span className={classes.phoneText}>{ phone2 }</span>
+                        <span className={classes.phoneText}>{phone1}</span>
+                        <span className={classes.phoneText}>{phone2}</span>
                     </Typography>
                     {
                         unconfirmed
-                        ? <Button variant='outlined' className={classes.confirmButton}>
-                            Підтвердити
-                          </Button>
-                        : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
-                            <Edit className={classes.icon} />
-                          </IconButton>
+                            ? <Button
+                                disabled={this.isLoadingConfirmation}
+                                onClick={this.confirmClickHandler}
+                                className={classes.confirmButton}
+                                variant='outlined'>
+                                {
+                                    this.isLoadingConfirmation
+                                        ? <LoadingMask size={20}/>
+                                        : 'Підтвердити'
+                                }
+                            </Button>
+                            : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
+                                <Edit className={classes.icon}/>
+                            </IconButton>
                     }
                     <IconButton onClick={this.deleteClickHandler} className={classes.iconButton}>
-                        <Delete className={classes.icon} />
+                        <Delete className={classes.icon}/>
                     </IconButton>
                 </Grid>
             </Grid>
