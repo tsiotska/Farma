@@ -161,6 +161,8 @@ class DoctorModal extends Component<IProps> {
         this.validate(propName, value);
     }
 
+    submitHandler = () => this.props.onSubmit(this.formValues);
+
     componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
         const { open, loadSpecialties, loadLPUs } = this.props;
@@ -269,6 +271,7 @@ class DoctorModal extends Component<IProps> {
                     required
                 />
                 <Button
+                    onClick={this.submitHandler}
                     disabled={isLoading || this.allowSubmit === false}
                     className={classes.submitButton}
                     variant='contained'

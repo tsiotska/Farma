@@ -1051,9 +1051,34 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
             ? previewUser.id
             : null;
+
         if (!mpId) return false;
+
+        const namesMap: Record<keyof IDoctorModalValues, string> = {
+            name: 'full_name',
+            lpu: 'hcf',
+            specialty: 'speciality',
+            workPhone: 'work_phone',
+            homePhone: 'mobile_phone',
+            card: 'bank_card',
+        };
+
+        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+            const propName = namesMap[key];
+            if (!propName || !value) return acc;
+            if (propName === namesMap.card) {
+                const preparedValue = this.diluteCardValue(value as string);
+                return { ...acc, [propName]: preparedValue };
+            } else if (propName === namesMap.specialty) {
+                return { ...acc, [propName]: (value as ISpecialty).name };
+            } else if (propName === namesMap.lpu) {
+                return { ...acc, [propName]: (value as ILPU).id };
+            }
+            return { ...acc, [propName]: value };
+        }, {});
+
         const createdDoc = await this.dispatchRequest(
-            api.createDoc(this.currentDepartmentId, mpId, formValues),
+            api.createDoc(this.currentDepartmentId, mpId, payload),
             'createDoc'
         );
 
