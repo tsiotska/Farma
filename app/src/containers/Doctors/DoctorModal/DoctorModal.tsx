@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, WithStyles, Button, MenuItem } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ISpecialty } from '../../../interfaces/ISpecialty';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
 import FormRow from '../../../components/FormRow';
 import { observable } from 'mobx';
+import { lengthValidator, onlyNumbersValidator, Validator } from '../../../helpers/validators';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -17,6 +18,10 @@ const styles = (theme: any) => createStyles({
     },
     menuItem: {
         minHeight: 36
+    },
+    container: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
 
@@ -25,8 +30,11 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     onClose: () => void;
     onSubmit: (values: IDoctorModalValues) => void;
-    lpus: ILPU[];
     title: string;
+    specialties?: ISpecialty[];
+    loadSpecialties?: () => void;
+    LPUs?: ILPU[];
+    loadLPUs?: () => void;
 }
 
 export interface IDoctorModalValues {
@@ -39,12 +47,32 @@ export interface IDoctorModalValues {
     card: string;
 }
 
-// @inject(() => ({
-//     specialties
-// }))
+@inject(({
+    appState: {
+        departmentsStore: {
+            specialties,
+            loadSpecialties,
+            LPUs,
+            loadLPUs,
+        }
+    }
+}) => ({
+    specialties,
+    loadSpecialties,
+    LPUs,
+    loadLPUs,
+}))
 @observer
 class DoctorModal extends Component<IProps> {
     readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
+    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'homePhone', 'workPhone' ];
+    readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
+    readonly errorMessages: { [key: string]: string } = {
+        name: 'Значення має містити не менше 3 символів',
+        card: 'Значення має складатись з 16 цифр',
+        homePhone: 'Телефон має склададатись з 10 або 12 цифр',
+        workPhone: 'Телефон має склададатись з 10 або 12 цифр',
+    };
     readonly initialFormValues: IDoctorModalValues = {
         name: '',
         lpu: null,
@@ -54,12 +82,67 @@ class DoctorModal extends Component<IProps> {
         card: '',
     };
     @observable formValues: IDoctorModalValues = { ...this.initialFormValues };
+    @observable errors: Map<keyof IDoctorModalValues, boolean | string> = new Map();
+
+    constructor(props: IProps) {
+        super(props);
+        const phoneValidator = (value: string) => !!value
+            && onlyNumbersValidator(value)
+            && (value.length === 10 || value.length === 12);
+        const cardValidator = (value: string) => !!value
+            && value.length === 16
+            && onlyNumbersValidator(value);
+        const objectValidator = (value: any) => !!value;
+        this.validators = {
+            name: (value: string) => lengthValidator(3, value),
+            lpu: objectValidator,
+            specialty: objectValidator,
+            homePhone: phoneValidator,
+            workPhone: phoneValidator,
+            card: cardValidator,
+        };
+    }
+
+    validate = (propName: keyof IDoctorModalValues, value: string) => {
+        const validator = this.validators[propName];
+        const isOptional = this.optionalFields.includes(propName);
+        const errorMessage = this.errorMessages[propName];
+        const isValid = isOptional
+            ? !value || validator(value)
+            : !!value && validator(value);
+        this.errors.set(
+            propName,
+            isValid
+                ? false
+                : errorMessage || true
+        );
+    }
 
     changeHandler = (propName: keyof IDoctorModalValues, value: string) => {
+        const { LPUs, specialties } = this.props;
         if (this.objectFields.includes(propName)) {
-            this.formValues[propName] = value;
+            const id = +value;
+            const source = (
+                propName === 'lpu'
+                    ? LPUs
+                    : specialties
+                ) || [];
+            const targetItem = source.find(x => x.id === id);
+            this.formValues[propName] = targetItem || null;
         } else {
             this.formValues[propName] = value;
+        }
+        this.validate(propName, value);
+    }
+
+    componentDidUpdate(prevProps: IProps) {
+        const { open: wasOpen } = prevProps;
+        const { open, loadSpecialties, loadLPUs } = this.props;
+
+        const becomeOpen = wasOpen === false && open === true;
+        if (becomeOpen) {
+            loadSpecialties();
+            loadLPUs();
         }
     }
 
@@ -68,23 +151,99 @@ class DoctorModal extends Component<IProps> {
             classes,
             open,
             onClose,
-            title
+            title,
+            specialties,
+            LPUs
         } = this.props;
+
         return (
             <Dialog
-            classes={{ title: classes.header }}
-            open={open}
-            onClose={onClose}
-            title={title}
-            fullWidth
-            maxWidth='sm'>
+                classes={{
+                    title: classes.header,
+                    content: classes.container
+                }}
+                open={open}
+                onClose={onClose}
+                title={title}
+                fullWidth
+                maxWidth='sm'>
                 <FormRow
                     label='ПІБ'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     propName='name'
+                    error={this.errors.get('name')}
                     required
                 />
+                <FormRow
+                    label='Телефон 1'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    error={this.errors.get('homePhone')}
+                    propName='homePhone'
+                />
+                <FormRow
+                    select
+                    label='ЛПУ/Аптека'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    error={this.errors.get('lpu')}
+                    propName='lpu'
+                    disabled={!LPUs || !LPUs.length}
+                    value={
+                        this.formValues.lpu
+                        ? this.formValues.lpu.id
+                        : ''
+                    }
+                    required>
+                        {
+                            !!LPUs && LPUs.map(({ id, name }) => (
+                                <MenuItem key={id} value={id}>
+                                    { name }
+                                </MenuItem>
+                            ))
+                        }
+                </FormRow>
+                <FormRow
+                    label='Телефон 2'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    error={this.errors.get('workPhone')}
+                    propName='workPhone'
+                />
+                <FormRow
+                    select
+                    label='Спеціальність'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    error={this.errors.get('specialty')}
+                    propName='specialty'
+                    disabled={!specialties || !specialties.length}
+                    value={
+                        this.formValues.specialty
+                        ? this.formValues.specialty.id
+                        : ''
+                    }
+                    required>
+                        {
+                            !!specialties && specialties.map(({ id, name }) => (
+                                <MenuItem key={id} value={id}>
+                                    { name }
+                                </MenuItem>
+                            ))
+                        }
+                </FormRow>
+                <FormRow
+                    label='Банківська картка'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    error={this.errors.get('card')}
+                    propName='card'
+                    required
+                />
+                <Button className={classes.submitButton} variant='contained' color='primary'>
+                    Додати лікаря
+                </Button>
             </Dialog>
         );
     }

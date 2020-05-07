@@ -96,6 +96,7 @@ class WorkerModal extends Component<IProps> {
         workPhone: 'Телефон має склададатись з 10 або 12 цифр',
         name: 'Значення має містити не менше 3 символів',
         password: 'Значення має містити не менше 3 символів',
+        card: 'Значення має складатись з 16 символів'
     };
     readonly defaultValues: IWorkerModalValues = {
         name: '',

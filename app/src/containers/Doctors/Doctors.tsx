@@ -17,6 +17,7 @@ import DoctorListItem from './DoctorListItem';
 import Pagination from '../../components/Pagination';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import CreateDoctorModal from './CreateDoctorModal';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -154,6 +155,7 @@ class Doctors extends Component<IProps> {
                         : 'Підтвердити лікаря неможливо'
                     }
                 />
+                <CreateDoctorModal />
             </Grid>
         );
     }
