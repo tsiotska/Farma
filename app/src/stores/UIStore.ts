@@ -20,15 +20,31 @@ export interface IFilterBy {
     value: string;
 }
 
+export interface IDeletePopoverSettings {
+    anchorEl: Element;
+    callback: (confirm: boolean) => void;
+}
+
 export class UIStore implements IUIStore {
     @observable salesHeaderHeight: number;
     @observable openedModal: string;
     @observable modalPayload: any;
     @observable itemsPerPage: Readonly<number> = 50;
     @observable currentPage: number = 0;
+    @observable delPopoverSettings: IDeletePopoverSettings = {
+        anchorEl: null,
+        callback: null
+    };
 
     @observable LpuSortSettings: ISortBy = null;
     @observable LpuFilterSettings: IFilterBy = null;
+
+    @action.bound
+    openDelPopper(settings: IDeletePopoverSettings) {
+        this.delPopoverSettings = settings === null
+            ? { anchorEl: null, callback: null }
+            : { ...settings };
+    }
 
     @action.bound
     setSalesHeaderHeight(value: number) {

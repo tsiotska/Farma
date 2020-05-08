@@ -27,6 +27,7 @@ import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtil
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
 import Config from '../../../Config';
+import { IDeletePopoverSettings } from '../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -108,6 +109,8 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     worker: IWorker;
     fired: boolean;
+    editClickHandler: (worker: IWorker) => void;
+
     expandable?: boolean;
     children?: any;
     isExpanded?: boolean;
@@ -116,17 +119,21 @@ interface IProps extends WithStyles<typeof styles> {
     userLocation?: ILocation;
     position?: IPosition;
     disableClick?: boolean;
-    editClickHandler: (worker: IWorker) => void;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
 }
 
 @inject(({
     appState: {
         userStore: {
             historyPushUser
+        },
+        uiStore: {
+            openDelPopper
         }
     }
 }) => ({
-    historyPushUser
+    historyPushUser,
+    openDelPopper
 }))
 @observer
 class WorkerListItem extends Component<IProps> {
@@ -181,6 +188,18 @@ class WorkerListItem extends Component<IProps> {
         }
 
         return from;
+    }
+
+    delClickCallback = (confirmed: boolean) => {
+        console.log('confirmed: ', confirmed);
+        this.props.openDelPopper(null);
+    }
+
+    removeClickHandler = ({ currentTarget }: any) => {
+        this.props.openDelPopper({
+            anchorEl: currentTarget,
+            callback: this.delClickCallback
+        });
     }
 
     editClickHandler = (e: any) => {
@@ -317,7 +336,7 @@ class WorkerListItem extends Component<IProps> {
                             <>
                                 {
                                     isVacancy === false &&
-                                    <IconButton className={classes.iconButton}>
+                                    <IconButton onClick={this.removeClickHandler} className={classes.iconButton}>
                                         <NotInterested fontSize='small' />
                                     </IconButton>
                                 }

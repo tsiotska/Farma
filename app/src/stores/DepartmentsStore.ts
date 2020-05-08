@@ -1390,6 +1390,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return true;
     }
 
+    @action.bound
+    removeWorker(worker: IWorker) {
+        console.log('remove worker');
+    }
+
     private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
         const { userStore: { previewUser }} = this.rootStore;
         if (!previewUser || !this.currentDepartmentId) return null;

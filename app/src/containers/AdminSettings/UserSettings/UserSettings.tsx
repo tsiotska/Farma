@@ -13,6 +13,7 @@ import ListItem from './ListItem';
 import { IPosition } from '../../../interfaces/IPosition';
 import { ADD_WORKER_MODAL } from '../../../constants/Modals';
 import { USER_ROLE } from '../../../constants/Roles';
+import DeletePopover from '../../../components/DeletePopover';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -90,6 +91,7 @@ class UserSettings extends Component<IProps> {
                     variant='outlined'>
                     Додати користувача
                 </Button>
+                <DeletePopover />
             </Grid>
         );
     }
