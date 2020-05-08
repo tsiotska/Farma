@@ -66,6 +66,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable workers: IWorker[] = []; // agents store
     @observable expandedWorker: IExpandedWorker = null;  // agents store
     @observable firedWorkers: IWorker[] = []; // agents store
+
     @observable doctors: IDoctor[] = []; // docs store
 
     constructor(rootStore: IRootStore) {
@@ -227,6 +228,23 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
+        return Promise.resolve([{
+            id: 1,
+            name: 'test',
+            LPUId: 2,
+            LPUName: 'test',
+            FFMCommit: true,
+            RMCommit: false,
+            specialty: 'test',
+            position: 'test',
+            workPhone: 'test',
+            mobilePhone: 'test',
+            card: 'test',
+            created: null,
+            confirmed: false,
+            deposit: 5
+        }]);
+
         const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
@@ -1059,6 +1077,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return !!createdWorker;
     }
 
+// fix it
     @action.bound
     async acceptAgent(doctor: IDoctor) {
         const { api } = this.rootStore;
