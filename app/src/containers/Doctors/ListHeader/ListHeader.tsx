@@ -9,7 +9,7 @@ const styles = (theme: any) => createStyles({
         minWidth: 120
     },
     accessContainer: {
-        width: 100
+        minWidth: 100
     },
     root: {
         marginTop: 16,
@@ -75,17 +75,20 @@ class ListHeader extends Component<IProps> {
                         № карти
                     </Typography>
                 </Grid>
-                {
-                    !unconfirmed &&
-                    <Grid xs={3} alignItems='center' container item>
-                        <Typography variant='body2' color='textSecondary'>
-                            Депозит
-                        </Typography>
-                        <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
-                            <ExcelIcon/>
-                        </IconButton>
-                    </Grid>
-                }
+
+                <Grid xs={3} alignItems='center' container item>
+                    {
+                        !unconfirmed &&
+                        <>
+                            <Typography variant='body2' color='textSecondary'>
+                                Депозит
+                            </Typography>
+                            <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
+                                <ExcelIcon/>
+                            </IconButton>
+                        </>
+                    }
+                </Grid>
             </Grid>
         );
     }

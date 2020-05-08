@@ -6,7 +6,13 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import DoctorListItem from '../../Doctors/DoctorListItem';
 import ListHeader from '../../Doctors/ListHeader';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    title: {
+        fontSize: 16,
+        fontWeight: 600,
+        color: '#868698'
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     unconfirmedDoctors?: IDoctor[];
@@ -17,11 +23,11 @@ interface IProps extends WithStyles<typeof styles> {
 class UnconfirmedDoctorsList extends Component<IProps> {
 
     render() {
-        const {unconfirmedDoctors, confirmationCallback} = this.props;
+        const {classes, unconfirmedDoctors, confirmationCallback} = this.props;
 
         return (
-           <Grid>
-               <Typography> Додані лікарі </Typography>
+           <Grid container>
+               <Typography className={classes.title}> Додані лікарі </Typography>
                <ListHeader unconfirmed/>
                {unconfirmedDoctors.map((doc) => (
                <DoctorListItem

@@ -35,6 +35,11 @@ const styles = (theme: any) => createStyles({
         display: 'flex',
         flexWrap: 'nowrap'
     },
+    badge: {
+        '&:not(:first-child)': {
+            marginLeft: 10
+        }
+    },
     phone: {},
     phoneContainer: {
         display: 'flex',
@@ -121,8 +126,8 @@ class DoctorListItem extends Component<IProps> {
                 {
                     unconfirmed &&
                     <Grid className={classes.badgesContainer}>
-                        <CommitBadge title='ФФМ' committed={FFMCommit}/>
-                        <CommitBadge title='РМ' committed={RMCommit}/>
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                     </Grid>
                 }
                 <Grid xs={3} container item>
