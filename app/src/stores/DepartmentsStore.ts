@@ -352,17 +352,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadPharmacies(isNeeded: boolean) {
-        const initialUrl = this.getPharmacyApiUrl();
-
-        if (!isNeeded || !initialUrl) {
-            this.pharmacies = null;
-            return;
-        }
-
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
         let keepDoing: boolean = true;
         let page: number = 1;
+        this.pharmacies = null;
+        const initialUrl = this.getPharmacyApiUrl();
+
+        if (!isNeeded || !initialUrl) return;
 
         this.setLoading(requestName);
         while (keepDoing) {
@@ -405,18 +402,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async loadLPUs() {
         const requestName = 'loadLPUs';
         const { api } = this.rootStore;
+        this.LPUs = null;
+        let page = 1;
+        let keepDoing: boolean = true;
         const initialUrl = this.getMedicalDepartmentsApiUrl();
 
         if (!initialUrl) return;
 
-        let page = 1;
-        let keepDoing: boolean = true;
-
+        console.log('start loading lpu');
         this.setLoading(requestName);
         while (keepDoing) {
             const url = `${initialUrl}?page=${page}`;
             const part = await api.getMedicalDepartments(url);
-
+            console.log('lpu part is loaded');
             if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
                 this.LPUs = null;
                 break;
@@ -434,6 +432,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             keepDoing = !!part && part.length === 1000;
         }
         this.setSuccess(requestName);
+        console.log('finish lpu loading');
     }
 
     @action.bound
@@ -1273,7 +1272,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             email: 'email',
             password: 'password',
             workPhone: 'work_phone',
-            homePhone: 'mobile_phone',
+            mobilePhone: 'mobile_phone',
             card: 'bank_card',
         };
 
@@ -1292,6 +1291,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
                 const jsonPropName = namesMap[key];
 
+                console.log(
+                    jsonPropName,
+                    initialValue,
+                    value,
+                    initialValue === value
+                );
                 if (!jsonPropName || initialValue === value) return acc;
 
                 if (jsonPropName === namesMap.card) {
@@ -1303,17 +1308,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             },
             {}
         );
-        formData.set('json', JSON.stringify(payload));
 
         console.log('initial: ', toJS(initialWorker), payload);
-
         const { edited, avatar } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
             'editWorker'
         );
 
         if (edited) {
-            console.log('new avatar: ', newAvatar, avatar);
             if (newAvatar) {
                 initialWorker.avatar = avatar;
             }

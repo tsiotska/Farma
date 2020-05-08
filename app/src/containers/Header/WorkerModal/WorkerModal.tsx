@@ -66,7 +66,7 @@ export interface IWorkerModalValues {
     [key: string]: string | number;
     name: string;
     workPhone: string;
-    homePhone: string;
+    mobilePhone: string;
     card: string;
     position: USER_ROLE;
     email: string;
@@ -92,7 +92,7 @@ class WorkerModal extends Component<IProps> {
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
     readonly dropzoneClasses: any;
     readonly errorMessages: { [key: string]: string } = {
-        homePhone: 'Телефон має склададатись з 10 або 12 цифр',
+        mobilePhone: 'Телефон має склададатись з 10 або 12 цифр',
         workPhone: 'Телефон має склададатись з 10 або 12 цифр',
         name: 'Значення має містити не менше 3 символів',
         password: 'Значення має містити не менше 3 символів',
@@ -101,7 +101,7 @@ class WorkerModal extends Component<IProps> {
     readonly defaultValues: IWorkerModalValues = {
         name: '',
         workPhone: '',
-        homePhone: '',
+        mobilePhone: '',
         card: '',
         position: USER_ROLE.UNKNOWN,
         email: '',
@@ -118,7 +118,7 @@ class WorkerModal extends Component<IProps> {
     constructor(props: IProps) {
         super(props);
         this.validators = {
-            homePhone: phoneValidator,
+            mobilePhone: phoneValidator,
             workPhone: phoneValidator,
             email: emailValidator,
             position: stringValidator,
@@ -142,7 +142,7 @@ class WorkerModal extends Component<IProps> {
     @computed
     get optionalValues(): Array<keyof IWorkerModalValues> {
         const { open, initialWorker } = this.props;
-        const defaultValues: Array<keyof IWorkerModalValues> = ['homePhone', 'workPhone'];
+        const defaultValues: Array<keyof IWorkerModalValues> = ['mobilePhone', 'workPhone'];
         if (open && initialWorker) return [...defaultValues, 'password' ];
         return defaultValues;
     }
@@ -215,21 +215,11 @@ class WorkerModal extends Component<IProps> {
         return position === USER_ROLE.MEDICAL_AGENT || position === USER_ROLE.REGIONAL_MANAGER;
     }
 
-    @computed
-    get cityName(): string {
-        if (!this.requireRegion || !this.formValues.city) return '';
-        const targetCity = this.cities.find(({ id }) => id === this.formValues.city);
-        return targetCity
-            ? targetCity.name
-            : '';
-    }
-
     loadSpecificCities = async () => {
         const { loadSpecificCities } = this.props;
         const { region } = this.formValues;
 
         if (!region) return;
-
         this.cities = await loadSpecificCities({ regionId: region }) || [];
     }
 
@@ -248,10 +238,24 @@ class WorkerModal extends Component<IProps> {
             : (errorMessage || true);
     }
 
+    positionChangeCallback = async () => {
+        const { initialWorker } = this.props;
+        if (!initialWorker) return;
+        const { initialWorker: { city, region } } = this.props;
+        if (this.requireRegion === true && !this.formValues.region) {
+            this.formValues.region = region || this.defaultValues.region;
+            await this.loadSpecificCities();
+        }
+        if (this.requireCity === true && !this.formValues.city) {
+            this.formValues.city = city || this.defaultValues.city;
+        }
+    }
+
     changeHandler = (propName: keyof IWorkerModalValues, value: string) => {
         if (propName === 'position') {
             const converted = +value;
             this.formValues[propName] = converted;
+            this.positionChangeCallback();
         } else if (propName === 'region') {
             this.formValues[propName] = +value || 0;
             this.formValues.city = this.defaultValues.city;
@@ -263,6 +267,7 @@ class WorkerModal extends Component<IProps> {
         }
         const hasError = this.valueValidator(propName, value);
         this.errors.set(propName, hasError);
+        console.log(toJS(this.formValues));
     }
 
     submitHandler = () => {
@@ -303,10 +308,6 @@ class WorkerModal extends Component<IProps> {
         if (this.requireCity === false && !!this.formValues.city) {
             this.formValues.city = this.defaultValues.city;
         }
-        const shouldInitLocationsBlock = !!initialWorker
-            && ((this.requireRegion === true && !this.formValues.region)
-            || (this.requireCity === true && !this.formValues.city));
-        if (shouldInitLocationsBlock) this.initLocationsBlock();
     }
 
     initValuesFromInitialWorker = () => {
@@ -325,7 +326,7 @@ class WorkerModal extends Component<IProps> {
         this.formValues = {
             name: name || this.defaultValues.name,
             workPhone: workPhone || this.defaultValues.workPhone,
-            homePhone: mobilePhone || this.defaultValues.homePhone,
+            mobilePhone: mobilePhone || this.defaultValues.mobilePhone,
             card: card || this.defaultValues.card,
             position: position || this.defaultValues.position,
             email: email || this.defaultValues.email,
@@ -405,8 +406,8 @@ class WorkerModal extends Component<IProps> {
                                     label='Домашній телефон'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
-                                    propName='homePhone'
-                                    error={this.errors.get('homePhone')}
+                                    propName='mobilePhone'
+                                    error={this.errors.get('mobilePhone')}
                                 />
                                 <FormRow
                                     required
@@ -471,13 +472,14 @@ class WorkerModal extends Component<IProps> {
                                             select
                                             label='Місто'
                                             values={this.formValues}
-                                            value={this.cityName}
                                             onChange={this.changeHandler}
                                             error={this.errors.get('city')}
+                                            disabled={this.cities.length === 0}
                                             propName='city'>
+                                                <MenuItem value={this.defaultValues.city} className={classes.menuItem} />
                                                 {
                                                     this.cities.map(({ id, name }) => (
-                                                        <MenuItem key={id} value={name}>
+                                                        <MenuItem key={id} value={id}>
                                                             { name }
                                                         </MenuItem>
                                                     ))
