@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
 import { workersNormalizer, workerNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
@@ -346,10 +347,10 @@ export class APIRequester {
     }
 
     updateCommonSettings({ kpi, payments }: ISalarySettings) {
-        const data: any = {
-            default_amount_kpi: kpi,
-            payments
-        };
+        const data: any = {};
+        if (kpi) data.default_amount_kpi = kpi;
+        if (payments) data.payments = payments;
+        if (isEqual(data, {})) return Promise.resolve(false);
         return this.instance.put('/api/settings', data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
