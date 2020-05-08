@@ -552,4 +552,14 @@ export class APIRequester {
             })
             .catch(this.defaultErrorHandler([]));
     }
+
+    deleteWorker(depId: number, role: USER_ROLE, workerId: number): Promise<boolean> {
+        let roleParam: string;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) roleParam = 'ffm';
+        if (role === USER_ROLE.REGIONAL_MANAGER) roleParam = 'rm';
+        if (!roleParam) return Promise.resolve(false);
+        return this.instance.delete(`​/api​/branch​/${depId}​/${roleParam​}​/worker​/${workerId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }
