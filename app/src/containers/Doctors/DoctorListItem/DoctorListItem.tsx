@@ -31,7 +31,9 @@ const styles = (theme: any) => createStyles({
         minWidth: 120
     },
     badgesContainer: {
-        width: 100
+        minWidth: 100,
+        display: 'flex',
+        flexWrap: 'nowrap'
     },
     phone: {},
     phoneContainer: {
@@ -118,7 +120,7 @@ class DoctorListItem extends Component<IProps> {
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 {
                     unconfirmed &&
-                    <Grid container alignItems='center' className={classes.badgesContainer}>
+                    <Grid className={classes.badgesContainer}>
                         <CommitBadge title='ФФМ' committed={FFMCommit}/>
                         <CommitBadge title='РМ' committed={RMCommit}/>
                     </Grid>
@@ -128,17 +130,17 @@ class DoctorListItem extends Component<IProps> {
                         {LPUName || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={2} container item>
+                <Grid xs={3} container item>
                     <Typography className={classes.text}>
                         {name || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
                         {specialty || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
@@ -150,13 +152,13 @@ class DoctorListItem extends Component<IProps> {
                         }
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography className={classes.text}>
                         {card || '-'}
                     </Typography>
                 </Grid>
 
-                <Grid xs={2} alignItems='center' justify='flex-end' wrap='nowrap' container item>
+                <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
                     {
                         unconfirmed
                             ? <Button

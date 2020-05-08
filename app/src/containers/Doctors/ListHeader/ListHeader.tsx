@@ -8,6 +8,9 @@ const styles = (theme: any) => createStyles({
     column: {
         minWidth: 120
     },
+    accessContainer: {
+        width: 100
+    },
     root: {
         marginTop: 16,
         paddingLeft: 5,
@@ -41,7 +44,7 @@ class ListHeader extends Component<IProps> {
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
                 {
                     unconfirmed &&
-                    <Grid xs={2} item>
+                    <Grid className={classes.accessContainer}>
                         <Typography variant='body2' color='textSecondary'>
                             Підтверджено
                         </Typography>
@@ -52,29 +55,29 @@ class ListHeader extends Component<IProps> {
                         ЛПУ
                     </Typography>
                 </Grid>
-                <Grid xs={2} container item>
+                <Grid xs={3} container item>
                     <Typography variant='body2' color='textSecondary'>
                         ПІБ лікаря
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs={1} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Спецільність
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs={1} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Телефон
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs={unconfirmed ? 3 : 1} container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         № карти
                     </Typography>
                 </Grid>
                 {
                     !unconfirmed &&
-                    <Grid xs={2} alignItems='center' container item>
+                    <Grid xs={3} alignItems='center' container item>
                         <Typography variant='body2' color='textSecondary'>
                             Депозит
                         </Typography>
