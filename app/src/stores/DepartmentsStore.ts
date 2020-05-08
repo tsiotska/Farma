@@ -1261,7 +1261,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File) {
+    async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File | string) {
         const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
@@ -1277,7 +1277,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (newAvatar) formData.set('image', newAvatar);
+
+        const initialAvatar = initialWorker.avatar;
+
+        if (initialAvatar !== newAvatar) {
+            const isAvatarRemoved = typeof initialAvatar === 'string' && newAvatar === null;
+            formData.set('image', isAvatarRemoved ? 'none' : newAvatar);
+        }
+
         let initialValue: any;
         const payload = Object.entries(values).reduce(
             (acc, [key, value]) => {

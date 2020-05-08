@@ -48,7 +48,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     open: boolean;
-    onSubmit: (data: IWorkerModalValues, image: File) => void;
+    onSubmit: (data: IWorkerModalValues, image: File | string) => void;
     onClose: () => void;
     isLoading: boolean;
     title: string;
@@ -166,7 +166,9 @@ class WorkerModal extends Component<IProps> {
         })
         : this.allProps.some(x => !!this.formValues[x]);
 
-        const imageChanged = !!this.image && typeof this.image === 'object';
+        const imageChanged = initialWorker
+            ? this.image !== initialWorker.avatar
+            : !!this.image;
 
         return valuesChanged || imageChanged;
     }
@@ -182,11 +184,12 @@ class WorkerModal extends Component<IProps> {
                 const isOptional = this.optionalValues.includes(propName);
                 const isValid = !this.errors.get(propName);
                 const valueExist = !!this.formValues[propName];
-                const flag = valueExist
+
+                const isOk = valueExist
                     ? isValid
                     : isOptional;
 
-                return allow && flag;
+                return allow && isOk;
         }, this.valuesChanged);
     }
 
@@ -275,9 +278,10 @@ class WorkerModal extends Component<IProps> {
         if (isLoading) return;
         onSubmit(
             this.formValues,
-            typeof this.image === 'string'
-            ? null
-            : this.image
+            this.image
+            // typeof this.image === 'string'
+            // ? null
+            // : this.image
         );
     }
 

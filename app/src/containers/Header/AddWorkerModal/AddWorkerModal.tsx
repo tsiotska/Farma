@@ -69,9 +69,14 @@ class AddWorkerModal extends Component<IProps> {
         this.showSnackbar = false;
     }
 
-    submitHandler = async (data: IWorkerModalValues, image: File) => {
+    submitHandler = async (data: IWorkerModalValues, image: File | string) => {
         const { createWorker } = this.props;
-        const workerCreated = await createWorker(data, image);
+        const workerCreated = await createWorker(
+            data,
+            typeof image === 'string'
+                ? null
+                : image
+        );
         this.showSnackbar = true;
         this.snackbarType = workerCreated
             ? SNACKBAR_TYPE.SUCCESS

@@ -19,7 +19,7 @@ interface IProps {
         initialWorker: IWorker,
         positions: IPosition[],
     };
-    editWorker?: (initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File) => boolean;
+    editWorker?: (initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File | string) => boolean;
 }
 
 @inject(({
