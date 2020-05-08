@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/styles';
 import { NotInterested, Edit } from '@material-ui/icons';
 import { isValid, lightFormat } from 'date-fns';
 import vacancyIcon from '../../../assets/icons/vacancyIcon.png';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { IPosition } from '../../interfaces/IPosition';
 import { IWorker } from '../../interfaces/IWorker';
 import { IUserCommonInfo } from '../../interfaces/IUser';
@@ -28,6 +28,8 @@ import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
 import Config from '../../../Config';
 import { IDeletePopoverSettings } from '../../stores/UIStore';
+import Snackbar from '../Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -111,6 +113,7 @@ interface IProps extends WithStyles<typeof styles> {
     fired: boolean;
     editClickHandler: (worker: IWorker) => void;
 
+    deleteHandler?: (removed: boolean) => void;
     expandable?: boolean;
     children?: any;
     isExpanded?: boolean;
@@ -120,6 +123,7 @@ interface IProps extends WithStyles<typeof styles> {
     position?: IPosition;
     disableClick?: boolean;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    removeWorker?: (worker: IWorker) => boolean;
 }
 
 @inject(({
@@ -129,11 +133,15 @@ interface IProps extends WithStyles<typeof styles> {
         },
         uiStore: {
             openDelPopper
+        },
+        departmentsStore: {
+            removeWorker
         }
     }
 }) => ({
     historyPushUser,
-    openDelPopper
+    openDelPopper,
+    removeWorker
 }))
 @observer
 class WorkerListItem extends Component<IProps> {
@@ -190,12 +198,17 @@ class WorkerListItem extends Component<IProps> {
         return from;
     }
 
-    delClickCallback = (confirmed: boolean) => {
-        console.log('confirmed: ', confirmed);
-        this.props.openDelPopper(null);
+    delClickCallback = async (confirmed: boolean) => {
+        const { worker, openDelPopper, removeWorker, deleteHandler } = this.props;
+        openDelPopper(null);
+        if (!confirmed) return;
+        const workerRemoved = await removeWorker(worker);
+        deleteHandler(workerRemoved);
     }
 
-    removeClickHandler = ({ currentTarget }: any) => {
+    removeClickHandler = (e: any) => {
+        e.stopPropagation();
+        const { currentTarget } = e;
         this.props.openDelPopper({
             anchorEl: currentTarget,
             callback: this.delClickCallback

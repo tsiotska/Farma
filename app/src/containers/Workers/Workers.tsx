@@ -15,6 +15,9 @@ import { USER_ROLE } from '../../constants/Roles';
 import { LOCATION_TITLE } from './List/List';
 import ExcelIcon from '../../components/ExcelIcon';
 import { ADD_WORKER_MODAL } from '../../constants/Modals';
+import DeletePopover from '../../components/DeletePopover';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import Snackbar from '../../components/Snackbar';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -103,6 +106,8 @@ type TabValue = 'all' | 'fired';
 @withRouter
 @observer
 class Workers extends Component<IProps> {
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable tab: TabValue = 'all';
 
     get isFFM(): boolean {
@@ -148,6 +153,17 @@ class Workers extends Component<IProps> {
         });
 
         this.loadData();
+    }
+
+    deleteHandler = (workerRemoved: boolean) => {
+        this.snackbarType = workerRemoved
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
+    }
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -198,29 +214,43 @@ class Workers extends Component<IProps> {
                     </Tabs>
                     {
                         this.tab === 'all' &&
-                        <Button onClick={this.addWorkerClickHandler} className={classes.addWorkerButton}>
+                        <Button
+                            onClick={this.addWorkerClickHandler}
+                            className={classes.addWorkerButton}>
                             Додати Працівника
                         </Button>
                     }
                 </Grid>
                 <List
+                    positions={positions}
+                    fired={this.tab === 'fired'}
+                    expandable={this.isFFM && this.tab === 'all'}
+                    onDelete={this.deleteHandler}
                     locationTitle={
                         role === USER_ROLE.FIELD_FORCE_MANAGER
-                        ? LOCATION_TITLE.REGION
-                        : LOCATION_TITLE.CITY
+                            ? LOCATION_TITLE.REGION
+                            : LOCATION_TITLE.CITY
                     }
-                    positions={positions}
                     workers={
                         this.tab === 'fired'
                             ? firedWorkers
                             : workers
                     }
-                    fired={this.tab === 'fired'}
-                    expandable={this.isFFM && this.tab === 'all'}
                     headerAppend={
                         <IconButton className={classes.excelButton} onClick={this.loadExcel}>
                             <ExcelIcon size={24} />
                         </IconButton>
+                    }
+                />
+                <DeletePopover />
+                <Snackbar
+                    open={this.showSnackbar}
+                    type={this.snackbarType}
+                    onClose={this.snackbarCloseHandler}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Працівника видалено'
+                            : 'Видалити працівника невдалося'
                     }
                 />
             </Grid>

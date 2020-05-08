@@ -46,6 +46,7 @@ interface IProps extends WithStyles<typeof styles> {
     expandable: boolean;
     headerAppend?: any;
     locationTitle?: LOCATION_TITLE;
+    onDelete: (removed: boolean) => void;
 
     cities?: Map<number, ILocation>;
     regions?: Map<number, ILocation>;
@@ -127,7 +128,8 @@ class List extends Component<IProps> {
             expandable,
             expandedWorker,
             headerAppend,
-            locationTitle
+            locationTitle,
+            onDelete
         } = this.props;
 
         return (
@@ -199,11 +201,19 @@ class List extends Component<IProps> {
                                 ? expandedWorker.id === x.id
                                 : false
                             }
+                            deleteHandler={onDelete}
                             editClickHandler={this.editClickHandler}
                             userLocation={this.targetLocations.get(x[this.targetPropName])}
                             expandChangeHandler={this.expandChangeHandler(x.id)}
                             position={positions.get(x.position)}
-                            children={expandable && <Sublist rmId={x.id} positions={positions} />}
+                            children={
+                                expandable &&
+                                <Sublist
+                                    rmId={x.id}
+                                    onDelete={onDelete}
+                                    positions={positions}
+                                />
+                            }
                         />
                     ))
                 }

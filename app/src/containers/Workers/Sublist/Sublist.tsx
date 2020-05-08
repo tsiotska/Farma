@@ -39,6 +39,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     rmId: number;
     positions: Map<number, IPosition>;
+    onDelete: (removed: boolean) => void;
 
     cities?: Map<number, ILocation>;
     expandedWorker?: IExpandedWorker;
@@ -90,7 +91,7 @@ class Sublist extends Component<IProps> {
     }
 
     getList = () => {
-        const { expandedWorker, positions, classes, cities } = this.props;
+        const { expandedWorker, positions, classes, cities, onDelete } = this.props;
 
         if (expandedWorker === null || expandedWorker.subworkers === null) return;
 
@@ -98,11 +99,12 @@ class Sublist extends Component<IProps> {
         ? expandedWorker.subworkers.map(x => (
             <WorkerListItem
                 key={x.id}
-                editClickHandler={this.editClickHandler}
-                position={positions.get(x.position)}
                 worker={x}
                 fired={false}
                 isExpanded={false}
+                deleteHandler={onDelete}
+                editClickHandler={this.editClickHandler}
+                position={positions.get(x.position)}
                 userLocation={cities.get(x.city)}
                 classes={{
                     avatar: classes.avatar

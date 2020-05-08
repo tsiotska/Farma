@@ -1391,8 +1391,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    removeWorker(worker: IWorker) {
+    async removeWorker(worker: IWorker): Promise<boolean> {
         console.log('remove worker');
+        const { api, userStore: { role } } = this.rootStore;
+        if (!this.currentDepartmentId) return false;
+        const workerRemoved = await api.deleteWorker(this.currentDepartmentId, role, worker.id);
+        if (workerRemoved) {
+            const workerId = this.workers
+                ? this.workers.indexOf(worker)
+                : -1;
+            const subworkerId = this.expandedWorker
+                ? this.expandedWorker.subworkers.indexOf(worker)
+                : -1;
+            if (workerId !== -1) {
+                this.workers.splice(workerId, 1);
+            }
+            if (subworkerId !== -1) {
+                this.expandedWorker.subworkers.splice(subworkerId, 1);
+            }
+        }
+        return workerRemoved;
     }
 
     private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
