@@ -12,9 +12,6 @@ import cx from 'classNames';
 const styles = (theme: any) => createStyles({
         root: {
             minWidth: 600,
-            [theme.breakpoints.up('sm')]: {
-                width: 'fit-content',
-            },
         },
         head: {
             [theme.breakpoints.up('sm')]: {
@@ -25,9 +22,7 @@ const styles = (theme: any) => createStyles({
             color: '#1ba61f',
             fontSize: 22
         },
-
         FIO: {},
-
         body: {
             flexWrap: 'nowrap',
             maxHeight: 300,
@@ -36,23 +31,18 @@ const styles = (theme: any) => createStyles({
             borderTop: '1px solid #a8a8a8',
             borderBottom: '1px solid #a8a8a8'
         },
-
         field: {
             marginTop: theme.spacing(2)
         },
-
         label: {
             marginBottom: theme.spacing(1)
         },
-
         minusValue: {
             color: '#a60825'
         },
-
         plusValue: {
             color: '#1ba61f'
         },
-
         footer: {
             justifyContent: 'space-between',
             alignItems:
