@@ -525,34 +525,11 @@ export class APIRequester {
             })
             .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
-// add normalize
-    getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
-        return Promise.resolve(
-            [{
-                deposit: 150,
-                message: 'Виплата',
-                datetime: '2020-05-09 12:35:40'
-            },
-                {
-                    deposit: -100,
-                    message: 'Списання',
-                    datetime: '2020-05-09 12:35:40'
-                },
-                {
-                    deposit: 50,
-                    message: 'Виплата',
-                    datetime: '2020-05-09 12:35:40'
-                }]
-        ).then((data) => {
-            console.log('data');
-            console.log(data);
-            return data;
-        })
-            .catch(this.defaultErrorHandler());
-       // Production
-       /* return this.instance.get(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`)
+
+   getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
+        return this.instance.get(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`)
             .then(depositNormalizer)
-            .catch(this.defaultErrorHandler());*/
+            .catch(this.defaultErrorHandler());
     }
 
     postDeposit(departmentId: number, previewUserId: number, doctorId: number, payload: IDepositFormValue): Promise<boolean> {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { computed, observable, toJS } from 'mobx';
 import Dialog from '../../../components/Dialog';
-import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
+import { EDIT_DEPOSIT_MODAL, EDIT_WORKER_MODAL } from '../../../constants/Modals';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import FormContent from './FormContent';
@@ -10,6 +10,7 @@ import { IDeposit } from '../../../interfaces/IDeposit';
 import { createStyles, Grid, WithStyles } from '@material-ui/core';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Snackbar from '../../../components/Snackbar';
+import { IDoctor } from '../../../interfaces/IDoctor';
 
 export interface IDepositFormValue {
     deposit: string;
@@ -29,6 +30,7 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadDepositHistory?: () => any;
     insertDeposit?: (data: IDepositFormValue) => any;
+    modalPayload?: IDoctor;
 }
 
 @inject(({
@@ -36,6 +38,7 @@ interface IProps extends WithStyles<typeof styles> {
                  uiStore: {
                      openedModal,
                      openModal,
+                     modalPayload
                  },
                  departmentsStore: {
                      getAsyncStatus
@@ -50,8 +53,10 @@ interface IProps extends WithStyles<typeof styles> {
     openModal,
     getAsyncStatus,
     loadDepositHistory,
-    insertDeposit
+    insertDeposit,
+    modalPayload
 }))
+
 @observer
 class EditDepositModal extends Component<IProps> {
     @observable isSnackbarOpen: boolean = false;
@@ -67,10 +72,21 @@ class EditDepositModal extends Component<IProps> {
         }
     }
 
+    componentWillUnmount(): void {
+        this.deposits = null;
+    }
+
     @computed
     get isLoading(): boolean {
         //  return this.props.getAsyncStatus('insertDeposit').loading;
         return false;
+    }
+
+    @computed
+    get isOpen(): boolean {
+        const { openedModal, modalPayload } = this.props;
+        if (!modalPayload) return false; // unnecessery (doesnt close window)
+        return openedModal === EDIT_DEPOSIT_MODAL;
     }
 
     closeHandler = () => this.props.openModal(null);
@@ -95,7 +111,7 @@ class EditDepositModal extends Component<IProps> {
             <>
                 <Dialog
                     classes={{ content: classes.content }}
-                    open={openedModal === EDIT_DEPOSIT_MODAL}
+                    open={this.isOpen}
                     onClose={this.closeHandler}
                     maxWidth='md'>
                     <FormContent

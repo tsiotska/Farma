@@ -29,8 +29,8 @@ export const lpuValuesMap: IValuesMap = {
     oblast: 'oblast',
     phone1: 'phone1',
     phone2: 'phone2',
-    ffm_confirmed: 'ffmConfirm',
-    rm_confirmed: 'rmConfirm',
+    ffm_confirmed: 'FFMCommit',
+    rm_confirmed: 'FFMCommit',
     confirmed: 'confirmed',
     hcf: 'lpu',
     hcf_name: 'lpuName'

@@ -94,11 +94,6 @@ class FormContent extends Component<IProps> {
         super(props);
     }
 
-    componentDidUpdate(): void {
-        console.log('modalPayload');
-        console.log(toJS(this.props.modalPayload));
-    }
-
     @computed
     get isSubmitAllowed(): boolean {
         return true;
@@ -114,31 +109,32 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading, deposits, modalPayload } = this.props;
-
+        const { classes, isLoading, deposits, modalPayload: doctor } = this.props;
         return (
             <>
-                <Grid direction='column' className={classes.head} container item>
-                    <Grid item>
-                        <Typography className={classes.count}>
-                            9 679
-                        </Typography>
+                { !!doctor &&
+                    <Grid direction='column' className={classes.head} container item>
+                        <Grid item>
+                            <Typography className={classes.count}>
+                                {doctor.deposit || 0}
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography className={classes.FIO}>
+                                {doctor.name}
+                            </Typography>
+                        </Grid>
                     </Grid>
-                    <Grid item>
-                        <Typography className={classes.FIO}>
-                            {modalPayload.name}
-                        </Typography>
-                    </Grid>
-                </Grid>
+                }
                 <Grid direction='column' className={classes.body} container item>
                     {
                         !!deposits ? deposits.map((elem: any, i: number) => (
 
                                 <Grid key={i} direction='row' className={classes.field} container item>
-                                    <Grid xs={3} item>
-                                        <Typography color='textSecondary'>{elem.datetime}</Typography>
+                                    <Grid xs={4} item>
+                                        <Typography color='textSecondary'>{elem.date}</Typography>
                                     </Grid>
-                                    <Grid xs={3} item>
+                                    <Grid xs={2} item>
                                         <Typography>{elem.deposit}</Typography>
                                     </Grid>
                                     <Grid xs={6} item>
