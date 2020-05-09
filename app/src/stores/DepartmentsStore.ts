@@ -348,6 +348,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedPharmacies() {
+        Promise.resolve([{
+            id: 1,
+            name: 'pharmacy',
+            type: 'pharmacy',
+            region: 123,
+            oblast: 'pharmacy',
+            city: 'pharmacy',
+            address: 'pharmacy',
+            phone1: '1123213',
+            phone2: '1234321',
+            FFMCommit: true,
+            RMCommit: false,
+            confirmed: false,
+            lpu: 213,
+            lpuName: 'pharmacy'
+        }]).then((res) => this.unconfirmedPharmacies = res)
+            .catch((err) => console.log(err));
+        return;
+        // Production
+        /*
         const requestName = 'loadUnconfirmedPharmacies';
         const { api } = this.rootStore;
         const url = this.getPharmacyApiUrl(true);
@@ -362,7 +382,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res && url === this.getPharmacyApiUrl(true)) {
             this.unconfirmedPharmacies = res;
-        }
+        }*/
     }
 
     @action.bound
@@ -391,6 +411,24 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedLPUs() {
+        this.unconfirmedLPUs = [{
+            id: 1,
+            name: 'name',
+            type: 'lpu',
+            region: 123,
+            oblast: 'awdawd',
+            city: 'awdawd',
+            address: 'awda',
+            phone1: '1123213',
+            phone2: '1234321',
+            FFMCommit: true,
+            RMCommit: false,
+            confirmed: false,
+            lpu: 213,
+            lpuName: 'lpuname'
+        }];
+        return;
+
         const requestName = 'loadUnconfirmedLPUs';
         const { api, userStore: { previewUser } } = this.rootStore;
 
@@ -1077,7 +1115,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return !!createdWorker;
     }
 
-// fix it
     @action.bound
     async acceptAgent(doctor: IDoctor) {
         const { api } = this.rootStore;
@@ -1103,6 +1140,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptLpu(lpu: ILPU) {
+        console.log('accepting lpu!');
+        console.log(toJS(lpu));
+
         const { api } = this.rootStore;
         const status = await api.accept(lpu.id, 'hcf');
 
@@ -1130,12 +1170,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptPharmacy(pharmacy: ILPU) {
+        console.log('accepting pharmacy!');
+        console.log(toJS(pharmacy));
         const { api } = this.rootStore;
-        const status = await api.accept(pharmacy.id, 'pharmacy'); // Change type
+        const status = await api.accept(pharmacy.id, 'pharmacy');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
+            console.log('Accepted!');
             // reload unconfirmed
-            await this.loadUnconfirmedLPUs();
+            // await this.loadUnconfirmedPharmacies();
         } else if (status === CONFIRM_STATUS.CONFIRMED) {
             // push doc from unconfirmed to confirmed
             const indexOfLpu = this.unconfirmedPharmacies

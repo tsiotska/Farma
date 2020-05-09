@@ -77,9 +77,8 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
-    confirmationCallback?: (success: boolean) => void;
     unconfirmed?: boolean;
-    acceptAgent?: (doctor: IDoctor) => boolean;
+    confirmHandler?: (doc: IDoctor) => void;
 }
 
 @inject(({
@@ -96,12 +95,11 @@ class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
 
     confirmClickHandler = async () => {
-        const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
-        if (!unconfirmed) return;
+        const { confirmHandler, doctor } = this.props;
+        if (!confirmHandler) return;
         this.isLoadingConfirmation = true;
-        const isConfirmed = await acceptAgent(doctor);
+        await confirmHandler(doctor);
         this.isLoadingConfirmation = false;
-        confirmationCallback(isConfirmed);
     }
 
     render() {

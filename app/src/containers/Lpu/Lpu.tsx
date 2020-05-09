@@ -138,11 +138,11 @@ class Lpu extends Component<IProps> {
     }
 
     acceptLpuHandler = async (lpu: ILPU) => {
-       const success = await this.props.acceptLpu(lpu);
-       this.snackbarType = success
+        const isConfirmed = await this.props.acceptLpu(lpu);
+        this.snackbarType = isConfirmed
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-       this.isSnackbarOpen = true;
+        this.isSnackbarOpen = true;
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);

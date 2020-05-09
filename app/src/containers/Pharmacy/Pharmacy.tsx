@@ -134,8 +134,8 @@ class Pharmacy extends Component<IProps> {
     }
 
     acceptPharmacyHandler = async (pharmacy: ILPU) => {
-        const success = await this.props.acceptPharmacy(pharmacy);
-        this.snackbarType = success
+        const isAccepted = await this.props.acceptPharmacy(pharmacy);
+        this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;

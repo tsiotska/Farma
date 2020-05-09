@@ -26,6 +26,8 @@ const styles = (theme: any) => createStyles({
         marginBottom: 1,
         minHeight: 48,
         padding: '5px 0',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
             : theme.palette.primary.white,
@@ -94,10 +96,10 @@ class ListItem extends Component<IProps> {
 
     @observable isLoadingConfirmation: boolean = false;
 
-    confirmClickHandler = async () => {
+    confirmClickHandler = () => {
         const { acceptHandler, pharmacy } = this.props;
         this.isLoadingConfirmation = true;
-        await acceptHandler(pharmacy);
+        acceptHandler(pharmacy);
         this.isLoadingConfirmation = false;
     }
 
@@ -118,11 +120,6 @@ class ListItem extends Component<IProps> {
         if (deleteClickHandler) deleteClickHandler(pharmacy);
     }
 
-    componentDidMount(): void {
-        console.log('this.props.pharmacy');
-        console.log(toJS(this.props.pharmacy));
-    }
-
     render() {
         const {
             classes,
@@ -137,8 +134,8 @@ class ListItem extends Component<IProps> {
                 address,
                 phone1,
                 phone2,
-                ffmConfirm,
-                rmConfirm
+                FFMCommit,
+                RMCommit
             }
         } = this.props;
 
@@ -148,8 +145,8 @@ class ListItem extends Component<IProps> {
                     {
                         unconfirmed &&
                         <>
-                            <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm}/>
-                            <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm}/>
+                            <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                            <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                         </>
                     }
                     <Typography className={classes.text} variant='body2'>
