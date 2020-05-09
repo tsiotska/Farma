@@ -55,6 +55,9 @@ export class APIRequester {
         this.instance = axios.create({
             baseURL: Config.API_URL.trim(),
             withCredentials: true,
+            // paramsSerializer: (params) => {
+
+            // }
         });
 
         // request logger
@@ -394,6 +397,12 @@ export class APIRequester {
         return this.instance.post(`/api/branch/${depId}/mp/${mpId}/agent`, data)
             .then(doctorNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    deleteDoc(depId: number, mpId: number, docId: number): Promise<boolean> {
+        return this.instance.delete(`api/branch/${depId}/mp/${mpId}/agent/${docId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
     }
 
     createDepartment(departmentData: FormData): Promise<IDepartment> {

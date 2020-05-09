@@ -15,6 +15,7 @@ import cx from 'classnames';
 import { observable } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
 import { EDIT_DOC_MODAL } from '../../../constants/Modals';
+import { IDeletePopoverSettings } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -66,9 +67,11 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
     confirmationCallback: (success: boolean) => void;
+    deleteHandler: (doc: IDoctor) => (confirm: boolean) => void;
     unconfirmed?: boolean;
     acceptAgent?: (doctor: IDoctor) => boolean;
     openModal?: (modalName: string, payload: any) => void;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
 }
 
 @inject(({
@@ -77,10 +80,12 @@ interface IProps extends WithStyles<typeof styles> {
             acceptAgent
         },
         uiStore: {
-            openModal
+            openModal,
+            openDelPopper
         }
     }
 }) => ({
+    openDelPopper,
     acceptAgent,
     openModal
 }))
@@ -100,6 +105,14 @@ class DoctorListItem extends Component<IProps> {
     editClickHandler = () => {
         const { doctor, openModal } = this.props;
         openModal(EDIT_DOC_MODAL, doctor);
+    }
+
+    deleteClickHandler = ({ currentTarget }: any) => {
+        const { openDelPopper, deleteHandler, doctor } = this.props;
+        openDelPopper({
+            anchorEl: currentTarget,
+            callback: deleteHandler(doctor)
+        });
     }
 
     render() {
@@ -174,8 +187,11 @@ class DoctorListItem extends Component<IProps> {
                             </IconButton>
                           </>
                     }
-                    <IconButton>
-                        <Delete className={classes.removeIcon} fontSize='small' />
+                    <IconButton onClick={this.deleteClickHandler}>
+                        <Delete
+                            className={classes.removeIcon}
+                            fontSize='small'
+                        />
                     </IconButton>
                 </Grid>
             </Grid>

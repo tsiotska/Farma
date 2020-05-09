@@ -1,3 +1,6 @@
+import invert from 'lodash/invert';
+import flattenDeep from 'lodash/flattenDeep';
+
 import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
 import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
 import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
@@ -16,12 +19,10 @@ import { IWorker } from '../interfaces/IWorker';
 import { USER_ROLE } from '../constants/Roles';
 import { ILocation } from '../interfaces/ILocation';
 import { IUser } from '../interfaces/IUser';
-import flattenDeep from 'lodash/flattenDeep';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IDoctor } from '../interfaces/IDoctor';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
-import { invert } from 'lodash';
 import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
 import { SORT_ORDER } from './UIStore';
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
@@ -1354,6 +1355,33 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }
 
         return edited;
+    }
+
+    @action.bound
+    async removeDoctor(doc: IDoctor) {
+        const { api, userStore: { previewUser: { id } } } = this.rootStore;
+
+        const depId = this.currentDepartmentId;
+        const mpId = id;
+        const docId = doc.id;
+
+        const docRemoved = await this.dispatchRequest(
+            api.deleteDoc(
+                depId,
+                mpId,
+                docId
+            ),
+            'deleteDoc'
+        );
+
+        if (docRemoved) {
+            const docInd = this.doctors.indexOf(doc);
+            if (docInd !== -1) {
+                this.doctors.splice(docInd, 1);
+            }
+        }
+
+        return docRemoved;
     }
 
     @action.bound

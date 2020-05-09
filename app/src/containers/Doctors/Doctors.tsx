@@ -19,6 +19,8 @@ import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 import CreateDoctorModal from './CreateDoctorModal';
 import EditDoctorModal from './EditDoctorModal.tsx';
+import DeletePopover from '../../components/DeletePopover';
+import { IDeletePopoverSettings } from '../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,6 +39,8 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
     itemsPerPage?: number;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    removeDoctor?: (doc: IDoctor) => boolean;
 }
 
 @inject(({
@@ -45,28 +49,32 @@ interface IProps extends WithStyles<typeof styles> {
             loadDoctors,
             getAsyncStatus,
             clearDoctors,
-            doctors
+            doctors,
+            removeDoctor
         },
         uiStore: {
             setCurrentPage,
             currentPage,
-            itemsPerPage
+            itemsPerPage,
+            openDelPopper
         }
     }
 }) => ({
+    removeDoctor,
     loadDoctors,
     getAsyncStatus,
     clearDoctors,
     doctors,
     setCurrentPage,
     currentPage,
-    itemsPerPage
-
+    itemsPerPage,
+    openDelPopper
 }))
 @observer
 class Doctors extends Component<IProps> {
     @observable isSnackbarOpen: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable snackbarMessage: string = '';
 
     @computed
     get isLoading(): boolean {
@@ -88,14 +96,31 @@ class Doctors extends Component<IProps> {
         return doctors.filter((x, i) => (i >= begin && i < begin + itemsPerPage));
     }
 
+    deleteHandler = (doc: IDoctor) => async (confirmed: boolean) => {
+        const { openDelPopper, removeDoctor } = this.props;
+        openDelPopper(null);
+        if (!confirmed) return;
+        const docRemoved = await removeDoctor(doc);
+        this.snackbarType = docRemoved
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = docRemoved
+            ? 'Лікар успішно видалений'
+            : 'Під час видалення лікаря трапилась помилка';
+        this.isSnackbarOpen = true;
+    }
+
     snackbarCloseHandler = () => {
         this.isSnackbarOpen = false;
     }
 
-    confirmationCallback = (success: boolean) => {
+    confirmationCallback =  (success: boolean) => {
         this.snackbarType = success
-        ? SNACKBAR_TYPE.SUCCESS
-        : SNACKBAR_TYPE.ERROR;
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = success
+            ? 'Лікар успішно підтверджений'
+            : 'Підтвердити лікаря неможливо';
         this.isSnackbarOpen = true;
     }
 
@@ -135,6 +160,7 @@ class Doctors extends Component<IProps> {
                             key={doc.id}
                             doctor={doc}
                             unconfirmed={doc.confirmed === false}
+                            deleteHandler={this.deleteHandler}
                             confirmationCallback={this.confirmationCallback}
                         />
                     ))
@@ -150,14 +176,20 @@ class Doctors extends Component<IProps> {
                     open={this.isSnackbarOpen}
                     onClose={this.snackbarCloseHandler}
                     type={this.snackbarType}
-                    message={
-                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                        ? 'Лікар успішно підтверджений'
-                        : 'Підтвердити лікаря неможливо'
-                    }
+                    message={this.snackbarMessage}
                 />
                 <CreateDoctorModal />
                 <EditDoctorModal />
+                <DeletePopover
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
             </Grid>
         );
     }
