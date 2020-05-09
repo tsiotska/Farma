@@ -1116,6 +1116,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
+        const { api } = this.rootStore;
+        return CONFIRM_STATUS.REJECTED !== await api.accept(doctor.id, 'agent');
+    }
+
+    @action.bound
     async acceptAgent(doctor: IDoctor) {
         const { api } = this.rootStore;
         const status = await api.accept(doctor.id, 'agent');
@@ -1140,9 +1146,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptLpu(lpu: ILPU) {
-        console.log('accepting lpu!');
-        console.log(toJS(lpu));
-
         const { api } = this.rootStore;
         const status = await api.accept(lpu.id, 'hcf');
 
@@ -1170,14 +1173,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async acceptPharmacy(pharmacy: ILPU) {
-        console.log('accepting pharmacy!');
-        console.log(toJS(pharmacy));
         const { api } = this.rootStore;
         const status = await api.accept(pharmacy.id, 'pharmacy');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
-            console.log('Accepted!');
-            // reload unconfirmed
             // await this.loadUnconfirmedPharmacies();
         } else if (status === CONFIRM_STATUS.CONFIRMED) {
             // push doc from unconfirmed to confirmed

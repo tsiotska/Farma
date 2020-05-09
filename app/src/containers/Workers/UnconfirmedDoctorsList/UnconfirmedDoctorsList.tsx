@@ -16,14 +16,14 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     unconfirmedDoctors?: IDoctor[];
-    confirmationCallback?: (success: boolean) => void;
+    confirmHandler?: (doc: IDoctor) => void;
 }
 
 @observer
 class UnconfirmedDoctorsList extends Component<IProps> {
 
     render() {
-        const {classes, unconfirmedDoctors, confirmationCallback} = this.props;
+        const {classes, unconfirmedDoctors, confirmHandler} = this.props;
 
         return (
            <Grid container>
@@ -34,7 +34,7 @@ class UnconfirmedDoctorsList extends Component<IProps> {
                    key={doc.id}
                    doctor={doc}
                    unconfirmed
-                   confirmationCallback={confirmationCallback}
+                   confirmHandler={confirmHandler}
                />
                ))}
                </Grid>

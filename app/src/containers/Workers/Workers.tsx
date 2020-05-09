@@ -55,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     role?: USER_ROLE;
     loadUnconfirmedDoctors: () => IDoctor[];
+    pureAgentConfirm?: (doctor: IDoctor) => boolean;
 }
 
 type TabValue = 'all' | 'fired';
@@ -71,7 +72,8 @@ type TabValue = 'all' | 'fired';
                      getAsyncStatus,
                      loadWorkersExcel,
                      resetWorkers,
-                     loadUnconfirmedDoctors
+                     loadUnconfirmedDoctors,
+                     pureAgentConfirm
                  },
                  userStore: {
                      role
@@ -88,7 +90,8 @@ type TabValue = 'all' | 'fired';
     getAsyncStatus,
     resetWorkers,
     role,
-    loadUnconfirmedDoctors
+    loadUnconfirmedDoctors,
+    pureAgentConfirm
 }))
 @withRouter
 @observer
@@ -130,11 +133,16 @@ class Workers extends Component<IProps> {
         this.loadData();
     }
 
-    confirmationCallback = (success: boolean) => {
-        this.snackbarType = success
+    confirmHandler = async (doc: IDoctor) => {
+        const { pureAgentConfirm, loadUnconfirmedDoctors } = this.props;
+        const isConfirmed = await pureAgentConfirm(doc);
+        this.snackbarType = isConfirmed
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;
+        if (isConfirmed) {
+            this.unconfirmedDoctors = await loadUnconfirmedDoctors();
+        }
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -174,7 +182,7 @@ class Workers extends Component<IProps> {
             <Grid className={classes.root} direction='column' container>
                 {(this.unconfirmedDoctors && this.unconfirmedDoctors.length > 0) &&
                 <UnconfirmedDoctorsList unconfirmedDoctors={this.unconfirmedDoctors}
-                                        confirmationCallback={this.confirmationCallback}
+                                        confirmHandler={this.confirmHandler}
                 />
                 }
                 <Tabs

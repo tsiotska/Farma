@@ -133,12 +133,13 @@ class Pharmacy extends Component<IProps> {
         this.isSnackbarOpen = false;
     }
 
-    acceptPharmacyHandler = async (pharmacy: ILPU) => {
+    confirmPharmacyHandler = async (pharmacy: ILPU) => {
         const isAccepted = await this.props.acceptPharmacy(pharmacy);
         this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;
+        return isAccepted;
     }
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
@@ -171,7 +172,7 @@ class Pharmacy extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані аптеки
                         </Typography>
-                        <HCFList acceptHandler={this.acceptPharmacyHandler} data={unconfirmedPharmacies} unconfirmed/>
+                        <HCFList confirmHandler={this.confirmPharmacyHandler} data={unconfirmedPharmacies} unconfirmed/>
                     </Grid>
                 }
                 {

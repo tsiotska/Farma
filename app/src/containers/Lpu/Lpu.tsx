@@ -137,9 +137,9 @@ class Lpu extends Component<IProps> {
         this.isSnackbarOpen = false;
     }
 
-    acceptLpuHandler = async (lpu: ILPU) => {
-        const isConfirmed = await this.props.acceptLpu(lpu);
-        this.snackbarType = isConfirmed
+    confirmLpuHandler = async (lpu: ILPU) => {
+        const isAccepted = await this.props.acceptLpu(lpu);
+        this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;
@@ -178,7 +178,7 @@ class Lpu extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
-                        <HCFList acceptHandler={this.acceptLpuHandler} data={unconfirmedLPUs} unconfirmed/>
+                        <HCFList confirmHandler={this.confirmLpuHandler} data={unconfirmedLPUs} unconfirmed/>
                     </Grid>
                 }
                 {this.isUnconfirmedLPUsLoading && <LinearProgress/>}

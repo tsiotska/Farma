@@ -16,7 +16,7 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     openModal?: (modalName: string, payload: any) => void;
     deleteLpu?: (lpu: ILPU) => void;
     deletePharmacy?: (lpu: ILPU) => void;
-    acceptHandler?: (pharmacy: ILPU) => void;
+    confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
 }
 
@@ -60,7 +60,7 @@ class PharmaciesList extends Component<IProps> {
             data,
             unconfirmed,
             regions,
-            acceptHandler
+            confirmHandler
         } = this.props;
 
         return (
@@ -74,7 +74,7 @@ class PharmaciesList extends Component<IProps> {
                                 region={regions.get(pharmacy.region)}
                                 editClickHandler={this.editClickHandler}
                                 deleteClickHandler={this.deleteClickHandler}
-                                acceptHandler={acceptHandler}
+                                confirmHandler={confirmHandler}
                                 unconfirmed={unconfirmed}
                             />
                         ))

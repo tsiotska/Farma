@@ -95,8 +95,8 @@ class Doctors extends Component<IProps> {
 
     confirmHandler = async (doc: IDoctor) => {
         const { acceptAgent } = this.props;
-        const isConfirmed = acceptAgent(doc);
-        this.snackbarType = isConfirmed
+        const isAccepted = await acceptAgent(doc);
+        this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;

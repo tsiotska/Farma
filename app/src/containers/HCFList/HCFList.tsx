@@ -16,19 +16,18 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     data?: ILPU[];
     showHeader?: boolean;
-    acceptHandler?: (pharmacy: ILPU) => void;
+    confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
 }
 
 @observer
 class HCFList extends Component<IProps> {
     render() {
-        const { classes, data, showHeader, unconfirmed, acceptHandler } = this.props;
-
+        const { classes, data, showHeader, unconfirmed, confirmHandler } = this.props;
         return (
             <Grid direction='column' className={classes.root} container>
                 {showHeader && <Header/>}
-                <PharmaciesList acceptHandler={acceptHandler} unconfirmed={unconfirmed} data={data}/>
+                <PharmaciesList confirmHandler={confirmHandler} unconfirmed={unconfirmed} data={data}/>
             </Grid>
         );
     }

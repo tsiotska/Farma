@@ -15,10 +15,8 @@ import { Edit, Delete } from '@material-ui/icons';
 import { gridStyles } from '../gridStyles';
 import { ILocation } from '../../../interfaces/ILocation';
 import CommitBadge from '../../../components/CommitBadge';
-import LoadingMask from '../../Doctors/DoctorListItem/DoctorListItem';
+import LoadingMask from '../../../components/LoadingMask';
 import { observable, toJS } from 'mobx';
-import { IDoctor } from '../../../interfaces/IDoctor';
-import { PERMISSIONS } from '../../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -88,7 +86,7 @@ interface IProps extends WithStyles<typeof styles> {
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
     deleteClickHandler?: (lpu: ILPU) => void;
-    acceptHandler?: (pharmacy: ILPU) => void;
+    confirmHandler?: (pharmacy: ILPU) => void;
 }
 
 @observer
@@ -96,10 +94,10 @@ class ListItem extends Component<IProps> {
 
     @observable isLoadingConfirmation: boolean = false;
 
-    confirmClickHandler = () => {
-        const { acceptHandler, pharmacy } = this.props;
+    confirmClickHandler = async () => {
+        const { confirmHandler, pharmacy } = this.props;
         this.isLoadingConfirmation = true;
-        acceptHandler(pharmacy);
+        await confirmHandler(pharmacy);
         this.isLoadingConfirmation = false;
     }
 
