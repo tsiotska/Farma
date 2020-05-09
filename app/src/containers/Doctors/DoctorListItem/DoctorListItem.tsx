@@ -12,7 +12,7 @@ import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
 import EditDepositModal from '../EditDepositModal';
 import { ADD_MEDICINE_MODAL, EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
@@ -71,7 +71,7 @@ interface IProps extends WithStyles<typeof styles> {
     confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
     acceptAgent?: (doctor: IDoctor) => boolean;
-    openModal?: (modalName: string) => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
@@ -101,7 +101,10 @@ class DoctorListItem extends Component<IProps> {
     }
 
     depositModalHandler = () => {
-        this.props.openModal(EDIT_DEPOSIT_MODAL);
+        const { openModal, doctor} = this.props;
+        console.log('doctor');
+        console.log(toJS(doctor));
+        openModal(EDIT_DEPOSIT_MODAL, doctor);
     }
 
     render() {
@@ -180,8 +183,6 @@ class DoctorListItem extends Component<IProps> {
                     <IconButton>
                         <Delete className={classes.removeIcon} fontSize='small'/>
                     </IconButton>
-
-                    <EditDepositModal/>
                 </Grid>
             </Grid>
         );
