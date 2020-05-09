@@ -7,8 +7,7 @@ import Header from './Header';
 import { ILPU } from '../../interfaces/ILPU';
 
 const styles = (theme: any) => createStyles({
-    root: {
-    },
+    root: {},
     pagination: {
         margin: '16px 0 60px auto'
     }
@@ -17,18 +16,18 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     data?: ILPU[];
     showHeader?: boolean;
+    confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
 }
 
 @observer
 class HCFList extends Component<IProps> {
     render() {
-        const { classes, data, showHeader, unconfirmed } = this.props;
-
+        const { classes, data, showHeader, unconfirmed, confirmHandler } = this.props;
         return (
             <Grid direction='column' className={classes.root} container>
-                { showHeader && <Header />}
-                <PharmaciesList data={data} unconfirmed={unconfirmed} />
+                {showHeader && <Header/>}
+                <PharmaciesList confirmHandler={confirmHandler} unconfirmed={unconfirmed} data={data}/>
             </Grid>
         );
     }

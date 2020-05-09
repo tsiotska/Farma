@@ -14,9 +14,8 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
 import { observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
-import EditDepositModal from '../EditDepositModal';
-import { ADD_MEDICINE_MODAL, EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
-
+import CommitBadge from '../../../components/CommitBadge';
+import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
 const styles = (theme: any) => createStyles({
     root: {
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
@@ -30,6 +29,16 @@ const styles = (theme: any) => createStyles({
     },
     column: {
         minWidth: 120
+    },
+    badgesContainer: {
+        minWidth: 100,
+        display: 'flex',
+        flexWrap: 'nowrap'
+    },
+    badge: {
+        '&:not(:first-child)': {
+            marginLeft: 10
+        }
     },
     phone: {},
     phoneContainer: {
@@ -68,9 +77,8 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
-    confirmationCallback: (success: boolean) => void;
     unconfirmed?: boolean;
-    acceptAgent?: (doctor: IDoctor) => boolean;
+    confirmHandler?: (doc: IDoctor) => void;
     openModal?: (modalName: string, payload: any) => void;
 }
 
@@ -79,29 +87,24 @@ interface IProps extends WithStyles<typeof styles> {
                  uiStore: {
                      openModal,
                  },
-                 departmentsStore: {
-                     acceptAgent
-                 }
              }
          }) => ({
-    openModal,
-    acceptAgent
+    openModal
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
 
     confirmClickHandler = async () => {
-        const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
-        if (!unconfirmed) return;
+        const { confirmHandler, doctor } = this.props;
+        if (!confirmHandler) return;
         this.isLoadingConfirmation = true;
-        const isConfirmed = await acceptAgent(doctor);
+        await confirmHandler(doctor);
         this.isLoadingConfirmation = false;
-        confirmationCallback(isConfirmed);
     }
 
     depositModalHandler = () => {
-        const { openModal, doctor} = this.props;
+        const { openModal, doctor } = this.props;
         console.log('doctor');
         console.log(toJS(doctor));
         openModal(EDIT_DEPOSIT_MODAL, doctor);
@@ -112,6 +115,8 @@ class DoctorListItem extends Component<IProps> {
             unconfirmed,
             classes,
             doctor: {
+                FFMCommit,
+                RMCommit,
                 LPUName,
                 name,
                 specialty,
@@ -124,6 +129,13 @@ class DoctorListItem extends Component<IProps> {
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
+                {
+                    unconfirmed &&
+                    <Grid className={classes.badgesContainer}>
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
+                    </Grid>
+                }
                 <Grid xs={3} container item>
                     <Typography className={classes.text}>
                         {LPUName || '-'}
@@ -156,6 +168,7 @@ class DoctorListItem extends Component<IProps> {
                         {card || '-'}
                     </Typography>
                 </Grid>
+
                 <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
                     {
                         unconfirmed
@@ -171,8 +184,10 @@ class DoctorListItem extends Component<IProps> {
                                 }
                             </Button>
                             : <>
+
                                 <Typography onClick={this.depositModalHandler}
                                             className={cx(classes.deposit, classes.text)}>
+
                                     {deposit || 0}
                                 </Typography>
                                 <IconButton>
@@ -180,10 +195,12 @@ class DoctorListItem extends Component<IProps> {
                                 </IconButton>
                             </>
                     }
+
                     <IconButton>
                         <Delete className={classes.removeIcon} fontSize='small'/>
                     </IconButton>
                 </Grid>
+
             </Grid>
         );
     }

@@ -13,10 +13,12 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed, toJS } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
+import Snackbar from '../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -55,26 +57,28 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
+    acceptLpu?: (lpu: ILPU) => boolean;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            getAsyncStatus,
-            loadLPUs,
-            sortedLpus: LPUs,
-            currentDepartmentId,
-            loadUnconfirmedLPUs,
-            unconfirmedLPUs
-        },
-        uiStore: {
-            openModal,
-            setCurrentPage,
-            currentPage,
-            itemsPerPage
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     getAsyncStatus,
+                     loadLPUs,
+                     sortedLpus: LPUs,
+                     currentDepartmentId,
+                     loadUnconfirmedLPUs,
+                     unconfirmedLPUs,
+                     acceptLpu
+                 },
+                 uiStore: {
+                     openModal,
+                     setCurrentPage,
+                     currentPage,
+                     itemsPerPage
+                 }
+             }
+         }) => ({
     getAsyncStatus,
     loadLPUs,
     LPUs,
@@ -84,10 +88,14 @@ interface IProps extends WithStyles<typeof styles> {
     currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
-    openModal
+    openModal,
+    acceptLpu
 }))
 @observer
 class Lpu extends Component<IProps> {
+    @observable isSnackbarOpen: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
     @computed
     get isUnconfirmedLPUsLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedLPUs').loading;
@@ -113,8 +121,8 @@ class Lpu extends Component<IProps> {
         const { LPUs, itemsPerPage, currentPage } = this.props;
         const begin = itemsPerPage * currentPage;
         return Array.isArray(LPUs)
-        ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-        : [];
+            ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
     }
 
     retryClickHandler = () => this.props.loadLPUs();
@@ -123,6 +131,18 @@ class Lpu extends Component<IProps> {
         const { loadLPUs, loadUnconfirmedLPUs } = this.props;
         await loadUnconfirmedLPUs();
         await loadLPUs();
+    }
+
+    snackbarCloseHandler = () => {
+        this.isSnackbarOpen = false;
+    }
+
+    confirmLpuHandler = async (lpu: ILPU) => {
+        const isAccepted = await this.props.acceptLpu(lpu);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.isSnackbarOpen = true;
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
@@ -154,14 +174,14 @@ class Lpu extends Component<IProps> {
             <Grid direction='column' className={classes.root} container>
                 {
                     (Array.isArray(unconfirmedLPUs) && unconfirmedLPUs.length !== 0) &&
-                      <Grid className={classes.unconfirmedList} direction='column' container>
+                    <Grid className={classes.unconfirmedList} direction='column' container>
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
-                        <HCFList data={unconfirmedLPUs} unconfirmed />
-                      </Grid>
+                        <HCFList confirmHandler={this.confirmLpuHandler} data={unconfirmedLPUs} unconfirmed/>
+                    </Grid>
                 }
-                { this.isUnconfirmedLPUsLoading && <LinearProgress /> }
+                {this.isUnconfirmedLPUsLoading && <LinearProgress/>}
                 <Grid
                     className={classes.header}
                     justify='space-between'
@@ -176,8 +196,8 @@ class Lpu extends Component<IProps> {
                 </Grid>
                 {
                     this.requestStatus.loading
-                    ? <LinearProgress />
-                    : <HCFList data={this.preparedLPUs} showHeader />
+                        ? <LinearProgress/>
+                        : <HCFList data={this.preparedLPUs} showHeader/>
                 }
                 {
                     this.requestStatus.error &&
@@ -206,8 +226,18 @@ class Lpu extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddLpu />
-                <EditLpu />
+                <Snackbar
+                    open={this.isSnackbarOpen}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'ЛПУ успішно підтверджений'
+                            : 'Підтвердити ЛПУ неможливо'
+                    }
+                />
+                <AddLpu/>
+                <EditLpu/>
             </Grid>
         );
     }

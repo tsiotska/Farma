@@ -66,6 +66,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable workers: IWorker[] = []; // agents store
     @observable expandedWorker: IExpandedWorker = null;  // agents store
     @observable firedWorkers: IWorker[] = []; // agents store
+
     @observable doctors: IDoctor[] = []; // docs store
 
     constructor(rootStore: IRootStore) {
@@ -77,8 +78,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     private departmentChangeHandler = (newDepartment: IDepartment) => {
         const departmentId = newDepartment
-        ? newDepartment.id
-        : null;
+            ? newDepartment.id
+            : null;
         const storedMeds = this.meds.get(departmentId) || [];
         if (!storedMeds.length) this.loadMeds(departmentId);
         this.expandedWorker = null;
@@ -88,7 +89,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const { uiStore: { LpuSortSettings }} = this.rootStore;
+        const { uiStore: { LpuSortSettings } } = this.rootStore;
         if (!LpuSortSettings || !this.LPUs) return this.LPUs;
 
         const { order, propName } = LpuSortSettings;
@@ -98,7 +99,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 // @ts-ignore
                 ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
                 // @ts-ignore
-                 : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
             return this.LPUs.sort(callback);
         } else {
             return this.LPUs;
@@ -107,7 +108,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const { uiStore: { LpuSortSettings }} = this.rootStore;
+        const { uiStore: { LpuSortSettings } } = this.rootStore;
         if (!LpuSortSettings || !this.pharmacies) return this.pharmacies;
 
         const { order, propName } = LpuSortSettings;
@@ -117,7 +118,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 // @ts-ignore
                 ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
                 // @ts-ignore
-                 : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
             return this.pharmacies.sort(callback);
         } else {
             return this.pharmacies;
@@ -127,8 +128,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @computed
     get currentDepartmentId(): number {
         return this.currentDepartment
-        ? this.currentDepartment.id
-        : null;
+            ? this.currentDepartment.id
+            : null;
     }
 
     @computed
@@ -227,7 +228,24 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
-        const { api, userStore: { previewUser }} = this.rootStore;
+        return Promise.resolve([{
+            id: 1,
+            name: 'test',
+            LPUId: 2,
+            LPUName: 'test',
+            FFMCommit: true,
+            RMCommit: false,
+            specialty: 'test',
+            position: 'test',
+            workPhone: 'test',
+            mobilePhone: 'test',
+            card: 'test',
+            created: null,
+            confirmed: false,
+            deposit: 5
+        }]);
+
+        const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
             && previewUser.id
@@ -241,7 +259,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadConfirmedDoctors(): Promise<IDoctor[]> {
-        const { api, userStore: { previewUser }} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
             && previewUser.id
@@ -330,6 +348,26 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedPharmacies() {
+        Promise.resolve([{
+            id: 1,
+            name: 'pharmacy',
+            type: 'pharmacy',
+            region: 123,
+            oblast: 'pharmacy',
+            city: 'pharmacy',
+            address: 'pharmacy',
+            phone1: '1123213',
+            phone2: '1234321',
+            FFMCommit: true,
+            RMCommit: false,
+            confirmed: false,
+            lpu: 213,
+            lpuName: 'pharmacy'
+        }]).then((res) => this.unconfirmedPharmacies = res)
+            .catch((err) => console.log(err));
+        return;
+        // Production
+        /*
         const requestName = 'loadUnconfirmedPharmacies';
         const { api } = this.rootStore;
         const url = this.getPharmacyApiUrl(true);
@@ -344,7 +382,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res && url === this.getPharmacyApiUrl(true)) {
             this.unconfirmedPharmacies = res;
-        }
+        }*/
     }
 
     @action.bound
@@ -373,6 +411,24 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedLPUs() {
+        this.unconfirmedLPUs = [{
+            id: 1,
+            name: 'name',
+            type: 'lpu',
+            region: 123,
+            oblast: 'awdawd',
+            city: 'awdawd',
+            address: 'awda',
+            phone1: '1123213',
+            phone2: '1234321',
+            FFMCommit: true,
+            RMCommit: false,
+            confirmed: false,
+            lpu: 213,
+            lpuName: 'lpuname'
+        }];
+        return;
+
         const requestName = 'loadUnconfirmedLPUs';
         const { api, userStore: { previewUser } } = this.rootStore;
 
@@ -416,14 +472,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
-            const newPropName = namesMap[propName];
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
-            : acc;
-        }, {});
+            .reduce((acc, [propName, value]) => {
+                const newPropName = namesMap[propName];
+                return (newPropName && !!value)
+                    ? { ...acc, [newPropName]: value }
+                    : acc;
+            }, {});
 
-        const newLpu  = await this.dispatchRequest(
+        const newLpu = await this.dispatchRequest(
             api.addLpu(payload),
             'addLpu'
         );
@@ -454,21 +510,21 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
-            const newPropName = namesMap[propName];
+            .reduce((acc, [propName, value]) => {
+                const newPropName = namesMap[propName];
 
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
-            : acc;
-        }, {});
+                return (newPropName && !!value)
+                    ? { ...acc, [newPropName]: value }
+                    : acc;
+            }, {});
 
-        const isLpuEdited  = await this.dispatchRequest(
+        const isLpuEdited = await this.dispatchRequest(
             api.editLpu(initialLpu.id, payload),
             'editLpu'
         );
 
         if (isLpuEdited) {
-            Object.entries(data).forEach(([ propName, value ]) => {
+            Object.entries(data).forEach(([propName, value]) => {
                 initialLpu[propName] = value;
             });
         }
@@ -503,12 +559,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
-            const newPropName = namesMap[propName];
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
-            : acc;
-        }, {});
+            .reduce((acc, [propName, value]) => {
+                const newPropName = namesMap[propName];
+                return (newPropName && !!value)
+                    ? { ...acc, [newPropName]: value }
+                    : acc;
+            }, {});
 
         const newPharmacy = await this.dispatchRequest(
             api.addPharmacy(payload),
@@ -542,23 +598,23 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]) => {
-            const newPropName = namesMap[propName];
+            .reduce((acc, [propName, value]) => {
+                const newPropName = namesMap[propName];
 
-            if (propName === 'city') {
-                const name = value
-                    ? value.name
-                    : '';
+                if (propName === 'city') {
+                    const name = value
+                        ? value.name
+                        : '';
 
-                return name
-                    ? { ...acc, [newPropName]: name }
+                    return name
+                        ? { ...acc, [newPropName]: name }
+                        : acc;
+                }
+
+                return (newPropName && !!value)
+                    ? { ...acc, [newPropName]: value }
                     : acc;
-            }
-
-            return (newPropName && !!value)
-                ? { ...acc, [newPropName]: value }
-                : acc;
-        }, {});
+            }, {});
 
         const isPharmacyEdited = await this.dispatchRequest(
             api.editPharmacy(this.currentDepartmentId, payload),
@@ -567,7 +623,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (isPharmacyEdited) {
             const invertedNames = invert(namesMap);
-            Object.entries(payload).forEach(([ key, value ]) => {
+            Object.entries(payload).forEach(([key, value]) => {
                 const propName = invertedNames[key];
                 const valueChanged = initialPharmacy[propName] !== value;
                 if (propName && valueChanged) {
@@ -691,16 +747,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         const preparedData: any = Object.entries(data).reduce(
-            (total, [ key, value ]) => {
+            (total, [key, value]) => {
                 const newKey = namesMap[key];
 
                 const converted = intValues.includes(key)
-                ? +value
-                : value;
+                    ? +value
+                    : value;
 
                 return (!!newKey && !!converted)
-                ? { ...total, [newKey]: converted }
-                : total;
+                    ? { ...total, [newKey]: converted }
+                    : total;
             },
             {}
         );
@@ -739,18 +795,18 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         const preparedData: any = Object.entries(data).reduce(
-            (total, [ key, value ]) => {
+            (total, [key, value]) => {
                 const newKey = namesMap[key];
 
                 const converted = intValues.includes(key)
-                ? +value
-                : value;
+                    ? +value
+                    : value;
 
                 const isChanged = medicine[key] !== converted;
 
                 return (!!newKey && !!converted && isChanged)
-                ? { ...total, [newKey]: converted }
-                : total;
+                    ? { ...total, [newKey]: converted }
+                    : total;
             },
             {}
         );
@@ -774,7 +830,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (isUpdated) {
             const invertedMap = invert(namesMap);
-            Object.entries(preparedData).forEach(([ propName, value ]) => {
+            Object.entries(preparedData).forEach(([propName, value]) => {
                 const restoredPropName = invertedMap[propName];
                 if (restoredPropName) {
                     medicine[restoredPropName] = value;
@@ -790,12 +846,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
         const depId = this.currentDepartmentId;
         if (!depId) return false;
-        const removed =  await api.deleteDrug(depId, medId);
+        const removed = await api.deleteDrug(depId, medId);
         if (removed) {
             const depMeds = this.meds.get(depId);
             const med = depMeds
-            ? null
-            : depMeds.find(({ id }) => id === medId);
+                ? null
+                : depMeds.find(({ id }) => id === medId);
 
             if (med) med.deleted = true;
         }
@@ -878,8 +934,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
             data
-            ? data.map((x): [number, ILocation] => ([ x.id, x ]))
-            : [];
+                ? data.map((x): [number, ILocation] => ([x.id, x]))
+                : [];
 
         const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
         const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
@@ -924,13 +980,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
 
         if (res) {
-            const mapped = res.map((x): [number, IUser] => ([ x.id, x ]));
+            const mapped = res.map((x): [number, IUser] => ([x.id, x]));
             this.locationsAgents = new Map(mapped);
         }
 
         const callback = res
-        ? this.setSuccess
-        : this.setError;
+            ? this.setSuccess
+            : this.setError;
 
         callback(requestName);
     }
@@ -941,22 +997,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         const workerId = this.expandedWorker
-        ? this.expandedWorker.id
-        : null;
+            ? this.expandedWorker.id
+            : null;
 
         if (this.currentDepartmentId === null || workerId === null) return;
         this.setLoading(requestName, this.currentDepartmentId);
         const res = await api.getWorkers(`/api/branch/${this.currentDepartmentId}/rm/${workerId}/worker`);
 
         const isRelevant = this.getRequestParams(requestName) === this.currentDepartmentId
-        && workerId === (this.expandedWorker && this.expandedWorker.id);
+            && workerId === (this.expandedWorker && this.expandedWorker.id);
         if (!isRelevant) return;
 
         this.expandedWorker.subworkers = res;
 
         const callback = res
-        ? this.setSuccess
-        : this.setError;
+            ? this.setSuccess
+            : this.setError;
 
         callback(requestName);
     }
@@ -969,7 +1025,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (!permissionsMap.size) return false;
 
         const data = [...permissionsMap.entries()]
-            .map(([ id, permissions ]) => ({ permissions, id }));
+            .map(([id, permissions]) => ({ permissions, id }));
 
         const res = await this.dispatchRequest(
             api.updatePermissions(data),
@@ -1032,7 +1088,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const formData = new FormData();
         if (avatar) formData.set('avatar', avatar);
-        const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
+        const payload = Object.entries(values).reduce((acc, [prop, value]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
             if (normalizedPropName === namesMap.card) {
@@ -1057,6 +1113,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         }
 
         return !!createdWorker;
+    }
+
+    @action.bound
+    async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
+        const { api } = this.rootStore;
+        return CONFIRM_STATUS.REJECTED !== await api.accept(doctor.id, 'agent');
     }
 
     @action.bound
@@ -1109,24 +1171,54 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return true;
     }
 
+    @action.bound
+    async acceptPharmacy(pharmacy: ILPU) {
+        const { api } = this.rootStore;
+        const status = await api.accept(pharmacy.id, 'pharmacy');
+
+        if (status === CONFIRM_STATUS.ACCEPTED) {
+            await this.loadUnconfirmedPharmacies();
+        } else if (status === CONFIRM_STATUS.CONFIRMED) {
+            // push doc from unconfirmed to confirmed
+            const indexOfLpu = this.unconfirmedPharmacies
+                ? this.unconfirmedPharmacies.indexOf(pharmacy)
+                : -1;
+
+            if (indexOfLpu !== -1) {
+                this.unconfirmedPharmacies.splice(indexOfLpu, 1);
+            }
+
+            pharmacy.confirmed = true;
+            if (this.pharmacies) this.pharmacies.push(pharmacy);
+            else this.pharmacies = [pharmacy];
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {
-        const { userStore: { role, previewUser }} = this.rootStore;
+        const { userStore: { role, previewUser } } = this.rootStore;
 
         const userId = previewUser
-        ? previewUser.id
-        : null;
+            ? previewUser.id
+            : null;
 
         if (this.currentDepartmentId === null || userId === null) return null;
 
         const queryParam = unconfirmed
-        ? '?unconfirmed=1'
-        : '';
+            ? '?unconfirmed=1'
+            : '';
 
         switch (role) {
-            case USER_ROLE.FIELD_FORCE_MANAGER: return `/api/branch/${this.currentDepartmentId}/ffm/pharmacy${queryParam}`;
-            case USER_ROLE.REGIONAL_MANAGER: return `/api/branch/${this.currentDepartmentId}/rm/${userId}/pharmacy${queryParam}`;
-            case USER_ROLE.MEDICAL_AGENT: return `/api/branch/${this.currentDepartmentId}/mp/${userId}/pharmacy${queryParam}`;
-            default: return null;
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `/api/branch/${this.currentDepartmentId}/ffm/pharmacy${queryParam}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `/api/branch/${this.currentDepartmentId}/rm/${userId}/pharmacy${queryParam}`;
+            case USER_ROLE.MEDICAL_AGENT:
+                return `/api/branch/${this.currentDepartmentId}/mp/${userId}/pharmacy${queryParam}`;
+            default:
+                return null;
         }
     }
 
@@ -1148,11 +1240,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             : '';
 
         switch (role) {
-            case USER_ROLE.ADMIN: return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
-            case USER_ROLE.FIELD_FORCE_MANAGER: return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
-            case USER_ROLE.REGIONAL_MANAGER: return `api/branch/${this.currentDepartmentId}/rm/${userId}/worker${queryParam}`;
-            case USER_ROLE.MEDICAL_AGENT: return `api/branch/${this.currentDepartmentId}/mp/${userId}/worker${queryParam}`;
-            default: return null;
+            case USER_ROLE.ADMIN:
+                return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `api/branch/${this.currentDepartmentId}/ffm/worker${queryParam}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `api/branch/${this.currentDepartmentId}/rm/${userId}/worker${queryParam}`;
+            case USER_ROLE.MEDICAL_AGENT:
+                return `api/branch/${this.currentDepartmentId}/mp/${userId}/worker${queryParam}`;
+            default:
+                return null;
         }
     }
 }

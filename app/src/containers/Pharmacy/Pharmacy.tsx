@@ -13,10 +13,12 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
+import Snackbar from '../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -55,26 +57,28 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     setPharmacyDemand?: (value: boolean) => void;
     openModal?: (modalName: string) => void;
+    acceptPharmacy?: (lpu: ILPU) => boolean;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            getAsyncStatus,
-            loadPharmacies,
-            sortedPharmacies: pharmacies,
-            setPharmacyDemand,
-            unconfirmedPharmacies,
-            loadUnconfirmedPharmacies
-        },
-        uiStore: {
-            setCurrentPage,
-            currentPage,
-            itemsPerPage,
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     getAsyncStatus,
+                     loadPharmacies,
+                     sortedPharmacies: pharmacies,
+                     setPharmacyDemand,
+                     unconfirmedPharmacies,
+                     loadUnconfirmedPharmacies,
+                     acceptPharmacy
+                 },
+                 uiStore: {
+                     setCurrentPage,
+                     currentPage,
+                     itemsPerPage,
+                     openModal
+                 }
+             }
+         }) => ({
     getAsyncStatus,
     loadPharmacies,
     pharmacies,
@@ -84,10 +88,14 @@ interface IProps extends WithStyles<typeof styles> {
     setPharmacyDemand,
     unconfirmedPharmacies,
     loadUnconfirmedPharmacies,
-    openModal
+    openModal,
+    acceptPharmacy
 }))
 @observer
 class Pharmacy extends Component<IProps> {
+    @observable isSnackbarOpen: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
     @computed
     get isUnconfirmedPharmaciesLoading(): boolean {
         return this.props.getAsyncStatus('loadUnconfirmedPharmacies').loading;
@@ -113,12 +121,25 @@ class Pharmacy extends Component<IProps> {
         const { pharmacies, itemsPerPage, currentPage } = this.props;
         const begin = itemsPerPage * currentPage;
         return Array.isArray(pharmacies)
-        ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-        : [];
+            ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
     }
 
     retryClickHandler = () => {
         this.props.loadPharmacies(true);
+    }
+
+    snackbarCloseHandler = () => {
+        this.isSnackbarOpen = false;
+    }
+
+    confirmPharmacyHandler = async (pharmacy: ILPU) => {
+        const isAccepted = await this.props.acceptPharmacy(pharmacy);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.isSnackbarOpen = true;
+        return isAccepted;
     }
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
@@ -151,11 +172,11 @@ class Pharmacy extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані аптеки
                         </Typography>
-                        <HCFList data={unconfirmedPharmacies} unconfirmed/>
+                        <HCFList confirmHandler={this.confirmPharmacyHandler} data={unconfirmedPharmacies} unconfirmed/>
                     </Grid>
                 }
                 {
-                    this.isUnconfirmedPharmaciesLoading && <LinearProgress />
+                    this.isUnconfirmedPharmaciesLoading && <LinearProgress/>
                 }
                 <Grid
                     className={classes.header}
@@ -171,8 +192,8 @@ class Pharmacy extends Component<IProps> {
                 </Grid>
                 {
                     this.requestStatus.loading
-                    ? <LinearProgress />
-                    : <HCFList data={this.preparedPharmacies} showHeader />
+                        ? <LinearProgress/>
+                        : <HCFList data={this.preparedPharmacies} showHeader/>
                 }
                 {
                     this.requestStatus.error &&
@@ -201,8 +222,18 @@ class Pharmacy extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
-                <AddPharmacy />
-                <EditPharmacy />
+                <Snackbar
+                    open={this.isSnackbarOpen}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Аптека успішно підтверджена'
+                            : 'Підтвердити аптеку неможливо'
+                    }
+                />
+                <AddPharmacy/>
+                <EditPharmacy/>
             </Grid>
         );
     }

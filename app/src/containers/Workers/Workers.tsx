@@ -14,6 +14,9 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { LOCATION_TITLE } from './List/List';
 import ExcelIcon from '../../components/ExcelIcon';
+import { IDoctor } from '../../interfaces/IDoctor';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import UnconfirmedDoctorsList from './UnconfirmedDoctorsList/UnconfirmedDoctorsList';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -51,28 +54,32 @@ interface IProps extends WithStyles<typeof styles> {
     firedWorkers?: IWorker[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     role?: USER_ROLE;
+    loadUnconfirmedDoctors: () => IDoctor[];
+    pureAgentConfirm?: (doctor: IDoctor) => boolean;
 }
 
 type TabValue = 'all' | 'fired';
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartment,
-            loadWorkers,
-            loadFiredWorkers,
-            positions,
-            workers,
-            firedWorkers,
-            getAsyncStatus,
-            loadWorkersExcel,
-            resetWorkers
-        },
-        userStore: {
-            role
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartment,
+                     loadWorkers,
+                     loadFiredWorkers,
+                     positions,
+                     workers,
+                     firedWorkers,
+                     getAsyncStatus,
+                     loadWorkersExcel,
+                     resetWorkers,
+                     loadUnconfirmedDoctors,
+                     pureAgentConfirm
+                 },
+                 userStore: {
+                     role
+                 }
+             }
+         }) => ({
     currentDepartment,
     loadWorkers,
     loadFiredWorkers,
@@ -82,12 +89,17 @@ type TabValue = 'all' | 'fired';
     firedWorkers,
     getAsyncStatus,
     resetWorkers,
-    role
+    role,
+    loadUnconfirmedDoctors,
+    pureAgentConfirm
 }))
 @withRouter
 @observer
 class Workers extends Component<IProps> {
     @observable tab: TabValue = 'all';
+    @observable unconfirmedDoctors: IDoctor[] = null;
+    @observable isSnackbarOpen: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
 
     get isFFM(): boolean {
         return this.props.role === USER_ROLE.FIELD_FORCE_MANAGER;
@@ -95,12 +107,13 @@ class Workers extends Component<IProps> {
 
     loadExcel = () => this.props.loadWorkersExcel();
 
-    loadData = () => {
-        const { loadWorkers, loadFiredWorkers } = this.props;
+    loadData = async () => {
+        const { loadWorkers, loadFiredWorkers, loadUnconfirmedDoctors } = this.props;
         const action = this.tab === 'all'
             ? loadWorkers
             : loadFiredWorkers;
         action();
+        this.unconfirmedDoctors = await loadUnconfirmedDoctors();
     }
 
     tabChangeHandler = (event: any, value: TabValue) => {
@@ -118,6 +131,18 @@ class Workers extends Component<IProps> {
         });
 
         this.loadData();
+    }
+
+    confirmHandler = async (doc: IDoctor) => {
+        const { pureAgentConfirm, loadUnconfirmedDoctors } = this.props;
+        const isConfirmed = await pureAgentConfirm(doc);
+        this.snackbarType = isConfirmed
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.isSnackbarOpen = true;
+        if (isConfirmed) {
+            this.unconfirmedDoctors = await loadUnconfirmedDoctors();
+        }
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -155,6 +180,11 @@ class Workers extends Component<IProps> {
 
         return (
             <Grid className={classes.root} direction='column' container>
+                {(this.unconfirmedDoctors && this.unconfirmedDoctors.length > 0) &&
+                <UnconfirmedDoctorsList unconfirmedDoctors={this.unconfirmedDoctors}
+                                        confirmHandler={this.confirmHandler}
+                />
+                }
                 <Tabs
                     classes={{
                         root: classes.tabs,
@@ -162,14 +192,14 @@ class Workers extends Component<IProps> {
                     }}
                     onChange={this.tabChangeHandler}
                     value={this.tab}>
-                    <Tab className={classes.tab} value='all' label='Працівники' />
-                    <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
+                    <Tab className={classes.tab} value='all' label='Працівники'/>
+                    <Tab className={classes.tab} value='fired' label='Звільнені працівники'/>
                 </Tabs>
                 <List
                     locationTitle={
                         role === USER_ROLE.FIELD_FORCE_MANAGER
-                        ? LOCATION_TITLE.REGION
-                        : LOCATION_TITLE.CITY
+                            ? LOCATION_TITLE.REGION
+                            : LOCATION_TITLE.CITY
                     }
                     positions={positions}
                     workers={
@@ -181,7 +211,7 @@ class Workers extends Component<IProps> {
                     expandable={this.isFFM && this.tab === 'all'}
                     headerAppend={
                         <IconButton className={classes.excelButton} onClick={this.loadExcel}>
-                            <ExcelIcon size={24} />
+                            <ExcelIcon size={24}/>
                         </IconButton>
                     }
                 />

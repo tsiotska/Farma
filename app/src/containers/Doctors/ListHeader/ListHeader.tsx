@@ -8,6 +8,9 @@ const styles = (theme: any) => createStyles({
     column: {
         minWidth: 120
     },
+    accessContainer: {
+        minWidth: 100
+    },
     root: {
         marginTop: 16,
         paddingLeft: 5,
@@ -20,24 +23,33 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     loadDocsExcel?: () => void;
+    unconfirmed?: boolean;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            loadDocsExcel
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     loadDocsExcel
+                 }
+             }
+         }) => ({
     loadDocsExcel
 }))
 @observer
 class ListHeader extends Component<IProps> {
     render() {
-        const { classes, loadDocsExcel } = this.props;
+        const { classes, loadDocsExcel, unconfirmed } = this.props;
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
+                {
+                    unconfirmed &&
+                    <Grid className={classes.accessContainer}>
+                        <Typography variant='body2' color='textSecondary'>
+                            Підтверджено
+                        </Typography>
+                    </Grid>
+                }
                 <Grid xs={3} container item>
                     <Typography variant='body2' color='textSecondary'>
                         ЛПУ
@@ -48,28 +60,34 @@ class ListHeader extends Component<IProps> {
                         ПІБ лікаря
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Спецільність
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Телефон
                     </Typography>
                 </Grid>
-                <Grid className={classes.column} xs container item>
+                <Grid xs className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         № карти
                     </Typography>
                 </Grid>
+
                 <Grid xs={3} alignItems='center' container item>
-                    <Typography variant='body2' color='textSecondary'>
-                        Депозит
-                    </Typography>
-                    <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
-                        <ExcelIcon />
-                    </IconButton>
+                    {
+                        !unconfirmed &&
+                        <>
+                            <Typography variant='body2' color='textSecondary'>
+                                Депозит
+                            </Typography>
+                            <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
+                                <ExcelIcon/>
+                            </IconButton>
+                        </>
+                    }
                 </Grid>
             </Grid>
         );

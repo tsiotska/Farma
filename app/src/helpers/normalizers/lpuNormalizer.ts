@@ -11,8 +11,8 @@ export const defaultLPU: ILPU = {
     address: null,
     phone1: null,
     phone2: null,
-    ffmConfirm: null,
-    rmConfirm: null,
+    FFMCommit: null,
+    RMCommit: null,
     confirmed: true,
     lpuName: null,
     lpu: null
@@ -30,7 +30,7 @@ export const lpuValuesMap: IValuesMap = {
     phone1: 'phone1',
     phone2: 'phone2',
     ffm_confirmed: 'FFMCommit',
-    rm_confirmed: 'FFMCommit',
+    rm_confirmed: 'RMCommit',
     confirmed: 'confirmed',
     hcf: 'lpu',
     hcf_name: 'lpuName'

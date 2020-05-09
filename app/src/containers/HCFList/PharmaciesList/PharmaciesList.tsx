@@ -12,25 +12,26 @@ const styles = createStyles({});
 
 interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<any>> {
     data: ILPU[];
-    unconfirmed: boolean;
     regions?: Map<number, ILocation>;
     openModal?: (modalName: string, payload: any) => void;
     deleteLpu?: (lpu: ILPU) => void;
     deletePharmacy?: (lpu: ILPU) => void;
+    confirmHandler?: (pharmacy: ILPU) => void;
+    unconfirmed?: boolean;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            regions,
-            deleteLpu,
-            deletePharmacy
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     regions,
+                     deleteLpu,
+                     deletePharmacy
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     regions,
     openModal,
     deleteLpu,
@@ -40,7 +41,7 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
 @observer
 class PharmaciesList extends Component<IProps> {
     editClickHandler = (lpu: ILPU) => {
-        const { openModal, history: { location: { pathname }}} = this.props;
+        const { openModal, history: { location: { pathname } } } = this.props;
         let targetModal: string;
         if (!!matchPath(pathname, LPU_ROUTE)) targetModal = EDIT_LPU_MODAL;
         if (!!matchPath(pathname, PHARMACY_ROUTE)) targetModal = EDIT_PHARMACY_MODAL;
@@ -48,7 +49,7 @@ class PharmaciesList extends Component<IProps> {
     }
 
     deleteClickHandler = (lpu: ILPU) => {
-        const { deleteLpu, deletePharmacy, history: { location: { pathname }} } = this.props;
+        const { deleteLpu, deletePharmacy, history: { location: { pathname } } } = this.props;
         if (!!matchPath(pathname, LPU_ROUTE)) deleteLpu(lpu);
         if (!!matchPath(pathname, PHARMACY_ROUTE)) deletePharmacy(lpu);
     }
@@ -59,6 +60,7 @@ class PharmaciesList extends Component<IProps> {
             data,
             unconfirmed,
             regions,
+            confirmHandler
         } = this.props;
 
         return (
@@ -69,10 +71,11 @@ class PharmaciesList extends Component<IProps> {
                             <ListItem
                                 key={pharmacy.id}
                                 pharmacy={pharmacy}
-                                unconfirmed={unconfirmed}
                                 region={regions.get(pharmacy.region)}
                                 editClickHandler={this.editClickHandler}
                                 deleteClickHandler={this.deleteClickHandler}
+                                confirmHandler={confirmHandler}
+                                unconfirmed={unconfirmed}
                             />
                         ))
                     }

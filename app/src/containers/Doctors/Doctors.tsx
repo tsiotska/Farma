@@ -36,6 +36,7 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
     itemsPerPage?: number;
+    acceptAgent?: (doc: IDoctor) => boolean;
 }
 
 @inject(({
@@ -44,7 +45,8 @@ interface IProps extends WithStyles<typeof styles> {
             loadDoctors,
             getAsyncStatus,
             clearDoctors,
-            doctors
+            doctors,
+            acceptAgent
         },
         uiStore: {
             setCurrentPage,
@@ -53,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
+    acceptAgent,
     loadDoctors,
     getAsyncStatus,
     clearDoctors,
@@ -91,10 +94,12 @@ class Doctors extends Component<IProps> {
         this.isSnackbarOpen = false;
     }
 
-    confirmationCallback = (success: boolean) => {
-        this.snackbarType = success
-        ? SNACKBAR_TYPE.SUCCESS
-        : SNACKBAR_TYPE.ERROR;
+    confirmHandler = async (doc: IDoctor) => {
+        const { acceptAgent } = this.props;
+        const isAccepted = await acceptAgent(doc);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
         this.isSnackbarOpen = true;
     }
 
@@ -134,7 +139,7 @@ class Doctors extends Component<IProps> {
                             key={doc.id}
                             doctor={doc}
                             unconfirmed={doc.confirmed === false}
-                            confirmationCallback={this.confirmationCallback}
+                            confirmHandler={this.confirmHandler}
                         />
                     ))
                 }
