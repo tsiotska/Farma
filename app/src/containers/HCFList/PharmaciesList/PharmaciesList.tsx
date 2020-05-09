@@ -7,6 +7,7 @@ import { ILocation } from '../../../interfaces/ILocation';
 import { withRouter, RouteComponentProps, matchPath } from 'react-router-dom';
 import { PHARMACY_ROUTE, LPU_ROUTE } from '../../../constants/Router';
 import { EDIT_LPU_MODAL, EDIT_PHARMACY_MODAL } from '../../../constants/Modals';
+import { IDeletePopoverSettings } from '../../../stores/UIStore';
 
 const styles = createStyles({});
 
@@ -15,8 +16,10 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     unconfirmed: boolean;
     regions?: Map<number, ILocation>;
     openModal?: (modalName: string, payload: any) => void;
-    deleteLpu?: (lpu: ILPU) => void;
-    deletePharmacy?: (lpu: ILPU) => void;
+    deleteLpu?: (lpu: ILPU, unconfirmed: boolean) => boolean;
+    deletePharmacy?: (lpu: ILPU, unconfirmed: boolean) => boolean;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    onDelete?: (isRemoved: boolean) => void;
 }
 
 @inject(({
@@ -27,14 +30,16 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
             deletePharmacy
         },
         uiStore: {
-            openModal
+            openModal,
+            openDelPopper
         }
     }
 }) => ({
     regions,
     openModal,
     deleteLpu,
-    deletePharmacy
+    deletePharmacy,
+    openDelPopper
 }))
 @withRouter
 @observer
@@ -47,13 +52,28 @@ class PharmaciesList extends Component<IProps> {
         if (targetModal) openModal(targetModal, lpu);
     }
 
-    deleteClickHandler = (lpu: ILPU) => {
-        const { deleteLpu, deletePharmacy, history: { location: { pathname }} } = this.props;
-        if (!!matchPath(pathname, LPU_ROUTE)) deleteLpu(lpu);
-        if (!!matchPath(pathname, PHARMACY_ROUTE)) deletePharmacy(lpu);
+    delCallback = (lpu: ILPU) => async (confirmed: boolean) => {
+        const {
+            openDelPopper,
+            deleteLpu,
+            deletePharmacy,
+            onDelete,
+            unconfirmed,
+            history: { location: { pathname }}
+        } = this.props;
+        openDelPopper(null);
+        let lpuDeleted: boolean = false;
+        if (!confirmed) return;
+        if (!!matchPath(pathname, LPU_ROUTE)) lpuDeleted = await deleteLpu(lpu, unconfirmed);
+        if (!!matchPath(pathname, PHARMACY_ROUTE)) lpuDeleted = await deletePharmacy(lpu, unconfirmed);
+        if (onDelete) onDelete(lpuDeleted);
     }
 
-    // TODO: pagination, sort, search
+    deleteClickHandler = (lpu: ILPU, anchorEl: Element) => this.props.openDelPopper({
+            anchorEl,
+            callback: this.delCallback(lpu)
+        })
+
     render() {
         const {
             data,

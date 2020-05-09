@@ -537,14 +537,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async deleteLpu(lpu: ILPU) {
+    async deleteLpu(lpu: ILPU, unconfirmed: boolean) {
         const { api } = this.rootStore;
+
         const isDeleted = await api.deleteLpu(lpu.id);
 
         if (isDeleted) {
-            const index = this.LPUs.indexOf(lpu);
-            if (index !== -1) this.LPUs.splice(index, 1);
+            const source = unconfirmed
+                ? this.unconfirmedLPUs
+                : this.LPUs;
+            const index = source.indexOf(lpu);
+            if (index !== -1) {
+                source.splice(index, 1);
+            }
         }
+
+        return isDeleted;
     }
 
     @action.bound
@@ -644,14 +652,21 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async deletePharmacy(lpu: ILPU) {
+    async deletePharmacy(lpu: ILPU, unconfirmed: boolean) {
         const { api } = this.rootStore;
         const isDeleted = await api.deleteLpu(lpu.id);
 
         if (isDeleted) {
-            const index = this.pharmacies.indexOf(lpu);
-            if (index !== -1) this.pharmacies.splice(index, 1);
+            const source = unconfirmed
+                ? this.unconfirmedPharmacies
+                : this.pharmacies;
+            const index = source.indexOf(lpu);
+            if (index !== -1) {
+                source.splice(index, 1);
+            }
         }
+
+        return isDeleted;
     }
 
     @action.bound

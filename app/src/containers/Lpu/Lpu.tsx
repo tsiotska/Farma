@@ -17,6 +17,9 @@ import { computed, toJS, observable, autorun, reaction } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
+import DeletePopover from '../../components/DeletePopover';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import Snackbar from '../../components/Snackbar';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -91,6 +94,8 @@ class Lpu extends Component<IProps> {
     autorunDisposer: any;
     reactionDisposer: any;
 
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable preparedLPUs: ILPU[] = [];
     @observable types: string[] = [];
 
@@ -112,6 +117,17 @@ class Lpu extends Component<IProps> {
             && error === false
             && success === false
             && (!LPUs || !LPUs.length);
+    }
+
+    deleteCallback = (isDeleted: boolean) => {
+        this.snackbarType = isDeleted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
+    }
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
     }
 
     retryClickHandler = () => this.props.loadLPUs();
@@ -191,7 +207,10 @@ class Lpu extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
-                        <HCFList data={unconfirmedLPUs} unconfirmed />
+                        <HCFList
+                            onDelete={this.deleteCallback}
+                            data={unconfirmedLPUs}
+                            unconfirmed />
                       </Grid>
                 }
                 { this.isUnconfirmedLPUsLoading && <LinearProgress /> }
@@ -209,7 +228,11 @@ class Lpu extends Component<IProps> {
                 </Grid>
                 {
                     !!this.preparedLPUs.length &&
-                    <HCFList data={this.preparedLPUs} showHeader />
+                    <HCFList
+                        data={this.preparedLPUs}
+                        onDelete={this.deleteCallback}
+                        showHeader
+                    />
                 }
                 { this.requestStatus.loading && <LinearProgress/> }
                 {
@@ -241,6 +264,26 @@ class Lpu extends Component<IProps> {
                 />
                 <AddLpu types={this.types} />
                 <EditLpu types={this.types} />
+                <DeletePopover
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
+                <Snackbar
+                    open={this.showSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'ЛПУ успішно видалено'
+                            : 'Неможливо видалити ЛПУ'
+                    }
+                />
             </Grid>
         );
     }

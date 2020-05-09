@@ -18,17 +18,27 @@ interface IProps extends WithStyles<typeof styles> {
     data?: ILPU[];
     showHeader?: boolean;
     unconfirmed?: boolean;
+    onDelete?: (deleted: boolean) => void;
 }
 
 @observer
 class HCFList extends Component<IProps> {
     render() {
-        const { classes, data, showHeader, unconfirmed } = this.props;
+        const {
+            classes,
+            data,
+            showHeader,
+            unconfirmed,
+            onDelete
+        } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
                 { showHeader && <Header />}
-                <PharmaciesList data={data} unconfirmed={unconfirmed} />
+                <PharmaciesList
+                    onDelete={onDelete}
+                    data={data}
+                    unconfirmed={unconfirmed} />
             </Grid>
         );
     }

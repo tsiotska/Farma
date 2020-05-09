@@ -17,6 +17,9 @@ import { computed, observable, autorun, toJS, reaction } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
+import DeletePopover from '../../components/DeletePopover';
+import Snackbar from '../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -91,10 +94,12 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class Pharmacy extends Component<IProps> {
-    @observable types: string[] = [];
     autorunDisposer: any;
     reactionDisposer: any;
 
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable types: string[] = [];
     @observable preparedPharmacies: ILPU[] = [];
 
     @computed
@@ -115,6 +120,17 @@ class Pharmacy extends Component<IProps> {
             && error === false
             && success === false
             && (!pharmacies || !pharmacies.length);
+    }
+
+    deleteCallback = (isDeleted: boolean) => {
+        this.snackbarType = isDeleted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
+    }
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
     }
 
     retryClickHandler = () => {
@@ -191,7 +207,11 @@ class Pharmacy extends Component<IProps> {
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані аптеки
                         </Typography>
-                        <HCFList data={unconfirmedPharmacies} unconfirmed/>
+                        <HCFList
+                            onDelete={this.deleteCallback}
+                            data={unconfirmedPharmacies}
+                            unconfirmed
+                        />
                     </Grid>
                 }
                 {
@@ -211,7 +231,11 @@ class Pharmacy extends Component<IProps> {
                 </Grid>
                 {
                     !!this.preparedPharmacies.length &&
-                    <HCFList data={this.preparedPharmacies} showHeader />
+                    <HCFList
+                        data={this.preparedPharmacies}
+                        onDelete={this.deleteCallback}
+                        showHeader
+                    />
                 }
                 {
                     this.requestStatus.loading && <LinearProgress />
@@ -245,6 +269,26 @@ class Pharmacy extends Component<IProps> {
                 />
                 <AddPharmacy types={this.types} />
                 <EditPharmacy types={this.types} />
+                <DeletePopover
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
+                <Snackbar
+                    open={this.showSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'ЛПУ успішно видалено'
+                            : 'Неможливо видалити ЛПУ'
+                    }
+                />
             </Grid>
         );
     }

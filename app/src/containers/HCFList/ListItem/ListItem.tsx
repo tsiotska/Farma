@@ -81,7 +81,7 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmed: boolean;
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
-    deleteClickHandler?: (lpu: ILPU) => void;
+    deleteClickHandler?: (lpu: ILPU, anchorEl: Element) => void;
 }
 
 @observer
@@ -98,9 +98,9 @@ class ListItem extends Component<IProps> {
         if (editClickHandler) editClickHandler(pharmacy);
     }
 
-    deleteClickHandler = () => {
+    deleteClickHandler = ({ currentTarget }: any) => {
         const { deleteClickHandler, pharmacy } = this.props;
-        if (deleteClickHandler) deleteClickHandler(pharmacy);
+        if (deleteClickHandler) deleteClickHandler(pharmacy, currentTarget);
     }
 
     render() {
