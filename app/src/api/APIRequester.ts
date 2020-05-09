@@ -512,7 +512,6 @@ export class APIRequester {
     }
 
     accept(id: number, objectType: 'agent' | 'hcf' | 'pharmacy'): Promise<CONFIRM_STATUS> {
-        return Promise.resolve(CONFIRM_STATUS.ACCEPTED);
         return this.instance.put(`api/${objectType}/${id}/accept`)
             .then(({ status }) => {
                 return status === 200

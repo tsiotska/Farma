@@ -1177,7 +1177,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const status = await api.accept(pharmacy.id, 'pharmacy');
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
-            // await this.loadUnconfirmedPharmacies();
+            await this.loadUnconfirmedPharmacies();
         } else if (status === CONFIRM_STATUS.CONFIRMED) {
             // push doc from unconfirmed to confirmed
             const indexOfLpu = this.unconfirmedPharmacies

@@ -96,6 +96,7 @@ class ListItem extends Component<IProps> {
 
     confirmClickHandler = async () => {
         const { confirmHandler, pharmacy } = this.props;
+        if (!confirmHandler) return;
         this.isLoadingConfirmation = true;
         await confirmHandler(pharmacy);
         this.isLoadingConfirmation = false;
