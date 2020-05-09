@@ -865,7 +865,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async removeMeds(medId: number) {
+    async removeMeds(medId: number): Promise<boolean> {
         const { api } = this.rootStore;
         const depId = this.currentDepartmentId;
         if (!depId) return false;
@@ -878,6 +878,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
             if (med) med.deleted = true;
         }
+        return removed;
     }
 
     @action.bound

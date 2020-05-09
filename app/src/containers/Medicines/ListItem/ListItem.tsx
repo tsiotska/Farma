@@ -17,6 +17,7 @@ import Config from '../../../../Config';
 import RestoreButton from '../RestoreButton';
 import cx from 'classnames';
 import { MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
+import { IDeletePopoverSettings } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     wrapper: {
@@ -87,28 +88,31 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     medicine: IMedicine;
     allowEdit: boolean;
-    removeMeds?: (id: number) => void;
     openModal?: (modalName: string, payload: any) => void;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    deleteHandler?: (medId: number) => (confirmed: boolean) => void;
 }
 
 @inject(({
     appState: {
-        departmentsStore: {
-            removeMeds
-        },
+
         uiStore: {
-            openModal
+            openModal,
+            openDelPopper
         }
     }
 }) => ({
-    removeMeds,
-    openModal
+    openModal,
+    openDelPopper
 }))
 @observer
 class ListItem extends Component<IProps> {
-    removeClickHandler = () => {
-        const { removeMeds, medicine: { id } } = this.props;
-        removeMeds(id);
+    removeClickHandler = ({ currentTarget }: any) => {
+        const { openDelPopper, deleteHandler, medicine: { id } } = this.props;
+        openDelPopper({
+            anchorEl: currentTarget,
+            callback: deleteHandler(id)
+        });
     }
 
     editClickHandler = () => {

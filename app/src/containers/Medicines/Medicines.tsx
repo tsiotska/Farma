@@ -4,7 +4,8 @@ import {
     WithStyles,
     Grid,
     Typography,
-    Button
+    Button,
+    Snackbar
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -18,6 +19,7 @@ import { ADD_MEDICINE_MODAL } from '../../constants/Modals';
 import AddMedsModal from './AddMedsModal';
 import { computed } from 'mobx';
 import EditMedsModal from './EditMedsModal';
+import DeletePopover from '../../components/DeletePopover';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -104,6 +106,22 @@ class Medicines extends Component<IProps> {
                 }
                 <EditMedsModal />
                 <AddMedsModal />
+                <DeletePopover
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
+                {/* <Snackbar
+                    open={this.sho}
+                    type={}
+                    message={}
+                    onClose={}
+                /> */}
             </Grid>
         );
     }
