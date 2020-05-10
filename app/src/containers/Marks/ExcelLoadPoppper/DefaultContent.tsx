@@ -81,7 +81,20 @@ class DefaultContent extends Component<IProps> {
 
     submitHandler = () => {
         const { loadBonusesExcel, from, to } = this.props;
-        loadBonusesExcel(this.activeMode, from, to);
+
+        const dateFrom = new Date(
+            from.getFullYear(),
+            from.getMonth(),
+            1
+        );
+
+        const dateTo = new Date(
+            to.getFullYear(),
+            to.getMonth() + 1,
+            1
+        );
+
+        loadBonusesExcel(this.activeMode, dateFrom, dateTo);
     }
 
     render() {

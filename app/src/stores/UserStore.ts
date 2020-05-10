@@ -112,7 +112,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const monthFrom = dateFrom.getMonth() + 1;
         const monthTo = dateTo.getMonth() + 1;
 
-        const dateFromString = format(dateTo, `yyyy-'${monthFrom}'-dd`);
+        const dateFromString = format(dateFrom, `yyyy-'${monthFrom}'-dd`);
         const dateToString = format(dateTo, `yyyy-'${monthTo}'-dd`);
 
         const url = urls[this.role]
