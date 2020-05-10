@@ -28,6 +28,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;
     items: ISearchResult[];
+    loadMoreHandler: () => void;
 }
 
 @observer
@@ -60,7 +61,7 @@ class SearchList extends Component<IProps> {
     }
 
     render() {
-        const { items, anchor, classes } = this.props;
+        const { items, anchor, classes, loadMoreHandler } = this.props;
 
         return (
             <Popper
@@ -88,8 +89,8 @@ class SearchList extends Component<IProps> {
                             </Typography>
                         }
                         {
-                            this.shouldDisplayData && items.length === this.maxCount &&
-                            <Button className={classes.loadButton} variant='contained' color='primary'>
+                            this.shouldDisplayData && items.length % this.maxCount === 0 &&
+                            <Button onClick={loadMoreHandler} className={classes.loadButton} variant='contained' color='primary'>
                                 Завантажити ще лікарів...
                             </Button>
                         }

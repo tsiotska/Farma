@@ -93,7 +93,7 @@ class Search extends Component<IProps> {
     searchClickHandler = async () => {
         const { loadSearchQuery } = this.props;
         this.isProcessing = true;
-        const res =  await loadSearchQuery(this.query, this.page);
+        const res = await loadSearchQuery(this.query, this.page);
         runInAction(() => {
             this.searchResult = res;
             this.isProcessing = false;
@@ -110,6 +110,19 @@ class Search extends Component<IProps> {
         this.query = '';
         this.status = INPUT_STATE.CLEAR;
         this.searchResult = null;
+    }
+
+    loadMoreHandler = async () => {
+        const { loadSearchQuery } = this.props;
+        this.page = this.page + 1;
+        this.isProcessing = true;
+        const res = await loadSearchQuery(this.query, this.page);
+        runInAction(() => {
+            this.searchResult = !!this.searchResult
+                ? [ ...this.searchResult, ...res ]
+                : res;
+            this.isProcessing = false;
+        });
     }
 
     enterPressHandler = ({ keyCode }: any) => {
@@ -180,6 +193,7 @@ class Search extends Component<IProps> {
                     <SearchList
                         anchor={this.inputRef.current}
                         items={this.suggestItems}
+                        loadMoreHandler={this.loadMoreHandler}
                     />
                 }
             </>
