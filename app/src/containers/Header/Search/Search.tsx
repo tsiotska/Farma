@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, toJS, action, runInAction } from 'mobx';
 import { ISearchResult } from '../../../interfaces/ISearchResult';
+import SearchList from '../SearchList';
 
 const styles = (theme: any) => createStyles({
     input: {
@@ -39,11 +40,26 @@ enum INPUT_STATE {
 }))
 @observer
 class Search extends Component<IProps> {
+    readonly mockItems: ISearchResult[] = [
+        {
+            address: 'просп. Перемоги (30-річчя Перемоги), 2',
+            city: 'г. Кривой Рог',
+            ffm: 2,
+            id: 8587,
+            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
+            mp: 184,
+            mpName: 'Вакансия Кривой Рог (Шумакова) ',
+            name: '. Вікторія Олексіївна',
+            rm: 17,
+        }
+    ];
     @observable query: string = '';
     @observable isProcessing: boolean = false;
-    @observable searchResult: ISearchResult[] = null;
+    @observable searchResult: ISearchResult[] = [...this.mockItems];
+    // @observable searchResult: ISearchResult[] = null;
     @observable status: INPUT_STATE = INPUT_STATE.CLEAR;
     @observable page: number = 1;
+    @observable inputRef = React.createRef<HTMLElement>();
 
     searchClickHandler = async () => {
         const { loadSearchQuery } = this.props;
@@ -64,36 +80,48 @@ class Search extends Component<IProps> {
     clearSearch = () => {
         this.query = '';
         this.status = INPUT_STATE.CLEAR;
+        this.searchResult = null;
     }
 
     render() {
         const { classes } = this.props;
+        // console.log(this.inputRef, this.inputRef.current);
         console.log(toJS(this.isProcessing), toJS(this.searchResult));
         return (
-            <Input
-                className={classes.input}
-                value={this.query}
-                onChange={this.changeHandler}
-                startAdornment={
-                    <IconButton
-                        disabled={this.isProcessing}
-                        onClick={this.searchClickHandler}
-                        className={classes.iconButton}>
-                        <SearchIcon fontSize='small' />
-                    </IconButton>
-                }
-                endAdornment={
-                    <Fade in={!!this.query}>
+            <>
+                <Input
+                    ref={this.inputRef}
+                    className={classes.input}
+                    value={this.query}
+                    onChange={this.changeHandler}
+                    startAdornment={
                         <IconButton
                             disabled={this.isProcessing}
-                            onClick={this.clearSearch}
+                            onClick={this.searchClickHandler}
                             className={classes.iconButton}>
-                            <Clear fontSize='small' />
+                            <SearchIcon fontSize='small' />
                         </IconButton>
-                    </Fade>
+                    }
+                    endAdornment={
+                        <Fade in={!!this.query}>
+                            <IconButton
+                                disabled={this.isProcessing}
+                                onClick={this.clearSearch}
+                                className={classes.iconButton}>
+                                <Clear fontSize='small' />
+                            </IconButton>
+                        </Fade>
+                    }
+                    disableUnderline
+                />
+                {
+                    !!this.inputRef && !!this.inputRef.current &&
+                    <SearchList
+                        anchor={this.inputRef.current}
+                        items={this.searchResult}
+                    />
                 }
-                disableUnderline
-            />
+            </>
         );
     }
 }
