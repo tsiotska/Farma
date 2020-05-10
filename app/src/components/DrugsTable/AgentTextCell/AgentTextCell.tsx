@@ -20,6 +20,14 @@ const styles = createStyles({
     checkbox: {
         padding: 0,
         marginRight: 5
+    },
+    text: {
+        display: 'flex',
+        alignItems: 'center'
+    },
+    image: {
+        marginRight: 8,
+        borderRadius: 2
     }
 });
 
@@ -87,10 +95,13 @@ class AgentTextCell extends Component<IProps> {
                     />
                 }
                 label={
-                    <Typography onClick={this.onClick} variant='body2'>
+                    <Typography onClick={this.onClick} className={classes.text} variant='body2'>
                         {
                             this.avatar &&
-                            <ImageLoader src={`${Config.ASSETS_URL}/${this.avatar}`} />
+                            <ImageLoader
+                                src={`${Config.ASSETS_URL}/${this.avatar}`}
+                                className={classes.image}
+                            />
                         }
                         { this.name }
                     </Typography>

@@ -10,6 +10,7 @@ import { ADD_PHARMACY_MODAL } from '../../../constants/Modals';
 import Snackbar from '../../../components/Snackbar';
 
 interface IProps {
+    types: string[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
@@ -56,14 +57,16 @@ class AddPharmacy extends Component<IProps> {
         this.snackbarType = !!lpuCreated
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuCreated) this.closeHandler();
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { openedModal, types } = this.props;
 
         return (
             <>
                 <PharmacyModal
+                    types={types}
                     open={openedModal === ADD_PHARMACY_MODAL}
                     isLoading={this.isLoading}
                     title='Створити аптеку'

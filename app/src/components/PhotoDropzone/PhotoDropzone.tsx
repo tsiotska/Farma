@@ -39,13 +39,12 @@ export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children 
     );
 
     const onDrop = useCallback((files: File[]) => {
-        if (files.length) {
+        if (files.length === 1 && files[0].size <= 2000000) {
             appendFile(files[0]);
             setHoverStatus(false);
         }
     }, [appendFile, setHoverStatus]);
 
-    // TODO: play with maxSize property(2MB is max)
     const {
         getRootProps,
         getInputProps,

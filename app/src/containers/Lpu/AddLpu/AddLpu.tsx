@@ -12,7 +12,8 @@ interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
-    addLpu?: (data: ILpuModalValues) => Promise<boolean> ;
+    addLpu?: (data: ILpuModalValues) => Promise<boolean>;
+    types: string[];
 }
 
 @inject(({
@@ -55,14 +56,16 @@ class AddLpu extends Component<IProps> {
         this.snackbarType = !!lpuCreated
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuCreated) this.closeHandler();
     }
 
     render() {
-        const { openedModal } = this.props;
+        const { openedModal, types } = this.props;
 
         return (
             <>
             <LpuModal
+                types={types}
                 open={openedModal === ADD_LPU_MODAL}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}

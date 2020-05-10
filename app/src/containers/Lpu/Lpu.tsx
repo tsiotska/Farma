@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed, observable, toJS } from 'mobx';
+import { computed, toJS, observable, autorun, reaction } from 'mobx';
 import { ADD_LPU_MODAL } from '../../constants/Modals';
 import AddLpu from './AddLpu';
 import EditLpu from './EditLpu';
@@ -50,7 +50,6 @@ interface IProps extends WithStyles<typeof styles> {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
     unconfirmedLPUs?: ILPU[];
-    currentDepartmentId?: number;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     setCurrentPage?: (page: number) => void;
     currentPage?: number;
@@ -58,6 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
     acceptLpu?: (lpu: ILPU) => boolean;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -66,10 +66,10 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             sortedLpus: LPUs,
-            currentDepartmentId,
             loadUnconfirmedLPUs,
             unconfirmedLPUs,
-            acceptLpu
+            acceptLpu,
+            loadTypes,
         },
         uiStore: {
             openModal,
@@ -85,14 +85,19 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage,
     currentPage,
     itemsPerPage,
-    currentDepartmentId,
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
     openModal,
-    acceptLpu
+    acceptLpu,
+    loadTypes
 }))
 @observer
 class Lpu extends Component<IProps> {
+    autorunDisposer: any;
+    reactionDisposer: any;
+
+    @observable preparedLPUs: ILPU[] = [];
+    @observable types: string[] = [];
     @observable isSnackbarOpen: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
 
@@ -114,15 +119,6 @@ class Lpu extends Component<IProps> {
             && error === false
             && success === false
             && (!LPUs || !LPUs.length);
-    }
-
-    @computed
-    get preparedLPUs(): ILPU[] {
-        const { LPUs, itemsPerPage, currentPage } = this.props;
-        const begin = itemsPerPage * currentPage;
-        return Array.isArray(LPUs)
-            ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-            : [];
     }
 
     retryClickHandler = () => this.props.loadLPUs();
@@ -147,17 +143,53 @@ class Lpu extends Component<IProps> {
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
 
-    componentDidMount() {
-        this.loadData();
+    autorunCallback = () => {
+        const { LPUs, itemsPerPage, currentPage } = this.props;
+
+        const begin = itemsPerPage * currentPage;
+
+        if (this.requestStatus.loading) {
+            const itemOnBegin = LPUs
+                ? LPUs[begin]
+                : null;
+            const displayingActualData = this.preparedLPUs.length === itemsPerPage
+                && this.preparedLPUs[0] === itemOnBegin;
+            const LPUsIsEmpty = LPUs === null || LPUs.length === 0;
+            if (LPUsIsEmpty || displayingActualData) return;
+        }
+
+        this.preparedLPUs = LPUs
+            ? LPUs.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
     }
 
-    componentDidUpdate({ currentDepartmentId: prevId }: IProps) {
-        const { currentDepartmentId: actualId } = this.props;
-        if (prevId !== actualId) this.loadData();
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('hcf');
+    }
+
+    componentDidMount() {
+        this.autorunDisposer = autorun(this.autorunCallback);
+        this.reactionDisposer = reaction(
+            () => this.requestStatus.loading,
+            (isLoading) => {
+                this.autorunDisposer();
+                const delay = isLoading
+                    ? 300
+                    : 0;
+                this.autorunDisposer = autorun(this.autorunCallback, { delay });
+            }
+        );
+
+        this.loadData();
+        this.initializeTypes();
     }
 
     componentWillUnmount() {
-        this.props.setCurrentPage(0);
+        const { setCurrentPage } = this.props;
+        setCurrentPage(0);
+        this.reactionDisposer();
+        this.autorunDisposer();
     }
 
     render() {
@@ -195,10 +227,10 @@ class Lpu extends Component<IProps> {
                     </Button>
                 </Grid>
                 {
-                    this.requestStatus.loading
-                        ? <LinearProgress/>
-                        : <HCFList data={this.preparedLPUs} showHeader/>
+                    !!this.preparedLPUs.length &&
+                    <HCFList data={this.preparedLPUs} showHeader />
                 }
+                { this.requestStatus.loading && <LinearProgress/> }
                 {
                     this.requestStatus.error &&
                     <>
@@ -236,8 +268,8 @@ class Lpu extends Component<IProps> {
                             : 'Підтвердити ЛПУ неможливо'
                     }
                 />
-                <AddLpu/>
-                <EditLpu/>
+                <AddLpu types={this.types} />
+                <EditLpu types={this.types} />
             </Grid>
         );
     }

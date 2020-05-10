@@ -69,7 +69,7 @@ class DateSelectPopper extends Component<IProps> {
                     }
                     <span>
                         {year}
-                        DateSelect   </span>
+                    </span>
                 </Button>
                 <Popover
                     anchorOrigin={{

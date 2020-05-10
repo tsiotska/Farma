@@ -1,10 +1,11 @@
+import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
 import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
 import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
 import { ADD_PHARMACY_MODAL } from './../constants/Modals';
 import { IValuesMap } from './../helpers/normalizers/normalizer';
 import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
 import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
-import { ILPU } from './../interfaces/ILPU';
+import { ILPU } from '../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
@@ -37,6 +38,7 @@ export interface ICreateDepartmentReport {
 
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
+    readonly lpuCount: number = 1000;
 
     // util data
     @observable meds: Map<number, IMedicine[]> = new Map(); // meds store
@@ -53,7 +55,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable unconfirmedPharmacies: ILPU[] = null; // agents store
     @observable pharmacies: ILPU[] = null; // agents store
     @observable pharmacyDemand: boolean = false; // agents store
-    @observable loadedPharmacyUrl: string = null; // agents store
 
     @observable locationsAgents: Map<number, IUser> = new Map(); // agents store
 
@@ -85,6 +86,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.expandedWorker = null;
         this.workers = [];
         this.firedWorkers = [];
+        this.LPUs = null;
+        this.pharmacies = null;
     }
 
     @computed
@@ -335,7 +338,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
         const url = this.getPharmacyApiUrl(true);
 
-        if (url === null || url === this.loadedPharmacyUrl) return;
+        if (!url) return;
 
         this.unconfirmedPharmacies = null;
         const res = await this.dispatchRequest(
@@ -343,7 +346,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             requestName
         );
 
-        if (res && url === this.getPharmacyApiUrl(true)) {
+        if (res) {
             this.unconfirmedPharmacies = res;
         }
     }
@@ -352,36 +355,45 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async loadPharmacies(isNeeded: boolean) {
         const requestName = 'loadPharmacies';
         const { api } = this.rootStore;
-        const url = this.getPharmacyApiUrl();
-
-        const shouldAbort = isNeeded === false ||
-            url === null ||
-            url === this.loadedPharmacyUrl;
-
-        if (shouldAbort) return;
-
+        let keepDoing: boolean = true;
+        let page: number = 1;
         this.pharmacies = null;
-        const res = await this.dispatchRequest(
-            api.getPharmacies(url),
-            requestName
-        );
+        const initialUrl = this.getPharmacyApiUrl();
 
-        if (res && url === this.getPharmacyApiUrl()) {
-            this.loadedPharmacyUrl = url;
-            this.pharmacies = res;
+        if (!isNeeded || !initialUrl) return;
+
+        this.setLoading(requestName);
+        while (keepDoing) {
+            const url = `${initialUrl}?page=${page}&count=${this.lpuCount}`;
+            const pharmacies = await api.getPharmacies(url);
+
+            if (this.getPharmacyApiUrl() !== initialUrl || this.pharmacyDemand === false) {
+                this.pharmacies = null;
+                break;
+            }
+
+            if (pharmacies) {
+                if (this.pharmacies === null) {
+                    this.pharmacies = pharmacies;
+                } else {
+                    this.pharmacies.push(...pharmacies);
+                }
+                page++;
+            }
+
+            keepDoing = !!pharmacies && pharmacies.length === 1000;
         }
+        this.setSuccess(requestName);
     }
 
     @action.bound
     async loadUnconfirmedLPUs() {
-        const requestName = 'loadUnconfirmedLPUs';
-        const { api, userStore: { previewUser } } = this.rootStore;
-
-        if (this.currentDepartmentId === null || previewUser === null) return;
-
+        const { api } = this.rootStore;
+        const url = this.getMedicalDepartmentsApiUrl(true);
+        if (!url) return;
         const res = await this.dispatchRequest(
-            api.getMedicalDepartments(this.currentDepartmentId, previewUser, true),
-            requestName
+            api.getMedicalDepartments(url),
+            'loadUnconfirmedLPUs'
         );
 
         if (res) this.unconfirmedLPUs = res;
@@ -390,22 +402,45 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async loadLPUs() {
         const requestName = 'loadLPUs';
-        const { api, userStore: { previewUser } } = this.rootStore;
+        const { api } = this.rootStore;
+        this.LPUs = null;
+        let page = 1;
+        let keepDoing: boolean = true;
+        const initialUrl = this.getMedicalDepartmentsApiUrl();
 
-        if (this.currentDepartmentId === null || previewUser === null) return;
+        if (!initialUrl) return;
 
-        const res = await this.dispatchRequest(
-            api.getMedicalDepartments(this.currentDepartmentId, previewUser),
-            requestName
-        );
+        console.log('start loading lpu');
+        this.setLoading(requestName);
+        while (keepDoing) {
+            const url = `${initialUrl}?page=${page}`;
+            const part = await api.getMedicalDepartments(url);
+            console.log('lpu part is loaded');
+            if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
+                this.LPUs = null;
+                break;
+            }
 
-        if (res) this.LPUs = res;
+            if (part) {
+                if (this.LPUs === null) {
+                    this.LPUs = part;
+                } else {
+                    this.LPUs.push(...part);
+                }
+                page++;
+            }
+
+            keepDoing = !!part && part.length === 1000;
+        }
+        this.setSuccess(requestName);
+        console.log('finish lpu loading');
     }
 
     @action.bound
     async addLpu(data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
+        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -417,12 +452,20 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-            .reduce((acc, [propName, value]) => {
-                const newPropName = namesMap[propName];
-                return (newPropName && !!value)
-                    ? { ...acc, [newPropName]: value }
-                    : acc;
-            }, {});
+        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
+            const newPropName = namesMap[propName];
+
+            let actualValue: any = value;
+            if (objectFields.includes(propName)) {
+                actualValue = (value && 'id' in value)
+                    ? value.id
+                    : null;
+            }
+
+            return (newPropName && !!actualValue)
+            ? { ...acc, [newPropName]: actualValue}
+            : acc;
+        }, {});
 
         const newLpu = await this.dispatchRequest(
             api.addLpu(payload),
@@ -444,9 +487,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
+        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
         const namesMap: IValuesMap = {
             name: 'name',
-            type: 'hcf_type',
+            type: 'org_type',
             oblast: 'oblast',
             city: 'city',
             address: 'address',
@@ -455,13 +499,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-            .reduce((acc, [propName, value]) => {
-                const newPropName = namesMap[propName];
+        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
+            const newPropName = namesMap[propName];
 
-                return (newPropName && !!value)
-                    ? { ...acc, [newPropName]: value }
-                    : acc;
-            }, {});
+            let actualValue: any = value;
+            if (objectFields.includes(propName)) {
+                actualValue = (value && typeof value === 'object')
+                    ? propName === 'city'
+                        ? value.id
+                        : value.name
+                    : null;
+            }
+
+            return (newPropName && !!actualValue)
+            ? { ...acc, [newPropName]: actualValue}
+            : acc;
+        }, {});
 
         const isLpuEdited = await this.dispatchRequest(
             api.editLpu(initialLpu.id, payload),
@@ -469,8 +522,15 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (isLpuEdited) {
-            Object.entries(data).forEach(([propName, value]) => {
-                initialLpu[propName] = value;
+            Object.entries(data).forEach(([ propName, value ]) => {
+                if (objectFields.includes(propName)) {
+                    const actualValue = (value && typeof value === 'object')
+                        ? value.name
+                        : null;
+                    initialLpu[propName] = actualValue;
+                } else {
+                    initialLpu[propName] = value;
+                }
             });
         }
 
@@ -504,12 +564,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-            .reduce((acc, [propName, value]) => {
-                const newPropName = namesMap[propName];
-                return (newPropName && !!value)
-                    ? { ...acc, [newPropName]: value }
-                    : acc;
-            }, {});
+        .reduce((acc, [propName, value ]: [keyof IPharmacyModalValues, any]) => {
+            const newPropName = namesMap[propName];
+            if (propName === 'city') {
+                const actualValue = value.id;
+                return { ...acc, city: actualValue };
+            }
+            return (newPropName && !!value)
+            ? { ...acc, [newPropName]: value }
+            : acc;
+        }, {});
 
         const newPharmacy = await this.dispatchRequest(
             api.addPharmacy(payload),
@@ -547,12 +611,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 const newPropName = namesMap[propName];
 
                 if (propName === 'city') {
-                    const name = value
-                        ? value.name
-                        : '';
+                    const id = value
+                        ? value.id
+                        : 0;
 
-                    return name
-                        ? { ...acc, [newPropName]: name }
+                    return id
+                        ? { ...acc, [newPropName]: id }
                         : acc;
                 }
 
@@ -562,17 +626,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             }, {});
 
         const isPharmacyEdited = await this.dispatchRequest(
-            api.editPharmacy(this.currentDepartmentId, payload),
+            api.editPharmacy(initialPharmacy.id, payload),
             'editPharmacy'
         );
 
         if (isPharmacyEdited) {
-            const invertedNames = invert(namesMap);
-            Object.entries(payload).forEach(([key, value]) => {
-                const propName = invertedNames[key];
-                const valueChanged = initialPharmacy[propName] !== value;
-                if (propName && valueChanged) {
-                    initialPharmacy[propName] = value;
+            Object.entries(data).forEach(([ key, value ]) => {
+                if (key === 'city') {
+                    const cityName = value.name;
+                    initialPharmacy[key] = cityName;
+                } else {
+                    initialPharmacy[key] = value;
                 }
             });
         }
@@ -851,13 +915,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities({ oblastName, regionName }: {
+    loadSpecificCities({ oblastName, regionId }: {
         oblastName?: string;
-        regionName?: string;
+        regionId?: number;
     }) {
         let url: string;
         if (oblastName) url = `api/city?oblast=${oblastName}`;
-        if (regionName) url = `api/city?region=${regionName}`;
+        if (regionId) url = `api/city?region=${regionId}`;
         return url
             ? this.rootStore.api.getLocations(url)
             : null;
@@ -1016,6 +1080,147 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    getDocsPositions(): Promise<string[]> {
+        return this.rootStore.api.getDocsPositions();
+    }
+
+    @action.bound
+    async editDoc(initialDoc: IDoctor, formValues: IDoctorModalValues) {
+        const { api, userStore: { previewUser }} = this.rootStore;
+        const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? previewUser.id
+            : null;
+        if (!mpId) return false;
+        const namesMap: Record<keyof IDoctorModalValues, string> = {
+            name: 'full_name',
+            lpu: 'hcf',
+            specialty: 'speciality',
+            workPhone: 'work_phone',
+            mobilePhone: 'mobile_phone',
+            card: 'bank_card',
+            position: 'position'
+        };
+        let actualValue: any;
+        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+            const initialValue = initialDoc[key];
+            const propName = namesMap[key];
+
+            if (propName === namesMap.card) {
+                return value === initialValue
+                    ? acc
+                    : { ...acc, [propName]: this.diluteCardValue(value as string) };
+            } else if (propName === namesMap.specialty) {
+                actualValue = value
+                    ? (value as ISpecialty).name
+                    : null;
+            } else if (propName === namesMap.lpu) {
+                actualValue = value
+                    ? (value as ILPU).id
+                    : null;
+                const initLpu = initialDoc.LPUId;
+                return actualValue === initLpu
+                    ? acc
+                    : { ...acc, [propName]: (actualValue || '')};
+            } else {
+                actualValue = value;
+            }
+
+            return propName && actualValue !== (initialValue || '')
+                ? { ...acc, [propName]: (actualValue || '') }
+                : acc;
+        }, {});
+        console.log('payload: ', toJS(initialDoc), payload);
+        const isEdited = await this.dispatchRequest(
+            api.editDoc(
+                this.currentDepartmentId,
+                mpId,
+                initialDoc.id,
+                payload
+            ),
+            'editDoc'
+        );
+
+        if (isEdited) {
+            console.log('edited!');
+            const inverted = invert(namesMap);
+            [...Object.keys(payload)].forEach((key) => {
+                const propName = inverted[key];
+                const value = payload[key];
+                if (key === namesMap.lpu) {
+                    const lpu = formValues.lpu;
+                    const lpuId = lpu
+                        ? lpu.id
+                        : null;
+                    const lpuName = lpu
+                        ? lpu.name
+                        : null;
+                    initialDoc.LPUId = lpuId;
+                    initialDoc.LPUName = lpuName;
+                } else {
+                    console.log(propName, value);
+                    initialDoc[propName] = value;
+                }
+
+            });
+        }
+
+        return isEdited;
+    }
+
+    @action.bound
+    async createDoc(formValues: IDoctorModalValues) {
+        const { api, userStore: { previewUser } } = this.rootStore;
+        const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? previewUser.id
+            : null;
+
+        if (!mpId) return false;
+
+        const namesMap: Record<keyof IDoctorModalValues, string> = {
+            name: 'full_name',
+            lpu: 'hcf',
+            specialty: 'speciality',
+            workPhone: 'work_phone',
+            mobilePhone: 'mobile_phone',
+            card: 'bank_card',
+            position: 'position'
+        };
+
+        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+            const propName = namesMap[key];
+            if (!propName || !value) return acc;
+            if (propName === namesMap.card) {
+                const preparedValue = this.diluteCardValue(value as string);
+                return { ...acc, [propName]: preparedValue };
+            } else if (propName === namesMap.specialty) {
+                return { ...acc, [propName]: (value as ISpecialty).name };
+            } else if (propName === namesMap.lpu) {
+                return { ...acc, [propName]: (value as ILPU).id };
+            }
+            return { ...acc, [propName]: value };
+        }, {});
+
+        const createdDoc = await this.dispatchRequest(
+            api.createDoc(this.currentDepartmentId, mpId, payload),
+            'createDoc'
+        );
+
+        if (createdDoc) {
+            this.doctors.push(createdDoc);
+            this.doctors.sort((a, b) => {
+                const aIsConfirmed = !!a.confirmed;
+                const bIsConfirmed = !!b.confirmed;
+                if (aIsConfirmed && bIsConfirmed) return 0;
+                return aIsConfirmed
+                    ? -1
+                    : 1;
+            });
+        }
+
+        return !!createdDoc;
+    }
+
+    @action.bound
     async createWorker(values: IWorkerModalValues, avatar: File, departmentId?: number): Promise<boolean> {
         const { api } = this.rootStore;
 
@@ -1032,16 +1237,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (avatar) formData.set('avatar', avatar);
-        const payload = Object.entries(values).reduce((acc, [prop, value]) => {
+        if (avatar) formData.set('image', avatar);
+        const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
             if (normalizedPropName === namesMap.card) {
-                const changedValue = [...value].reduce((resultingString, curr, i) => (
-                    (!!i && i % 4 === 0)
-                        ? `${resultingString} ${curr}`
-                        : `${resultingString}${curr}`
-                ), '');
+                const changedValue = this.diluteCardValue(value as string);
                 return { ...acc, [normalizedPropName]: changedValue };
             }
             return { ...acc, [normalizedPropName]: value };
@@ -1064,6 +1265,86 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
         const { api } = this.rootStore;
         return CONFIRM_STATUS.REJECTED !== await api.accept(doctor.id, 'agent');
+    }
+
+    @action.bound
+    async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File | string) {
+        const { api } = this.rootStore;
+
+        const namesMap: IValuesMap = {
+            position: 'position',
+            region: 'region',
+            city: 'city',
+            name: 'full_name',
+            email: 'email',
+            password: 'password',
+            workPhone: 'work_phone',
+            mobilePhone: 'mobile_phone',
+            card: 'bank_card',
+        };
+
+        const formData = new FormData();
+
+        const initialAvatar = initialWorker.avatar;
+
+        if (initialAvatar !== newAvatar) {
+            const isAvatarRemoved = typeof initialAvatar === 'string' && newAvatar === null;
+            formData.set('image', isAvatarRemoved ? 'none' : newAvatar);
+        }
+
+        let initialValue: any;
+        const payload = Object.entries(values).reduce(
+            (acc, [key, value]) => {
+                if (key === 'position') {
+                    initialValue = initialWorker[key] || USER_ROLE.UNKNOWN;
+                } else if (key === 'region' || key === 'city') {
+                    initialValue = initialWorker[key] || 0;
+                } else {
+                    initialValue = initialWorker[key] || '';
+                }
+
+                const jsonPropName = namesMap[key];
+
+                console.log(
+                    jsonPropName,
+                    initialValue,
+                    value,
+                    initialValue === value
+                );
+                if (!jsonPropName || initialValue === value) return acc;
+
+                if (jsonPropName === namesMap.card) {
+                    const cardValue = this.diluteCardValue(value as string);
+                    return { ...acc, [jsonPropName]: cardValue };
+                }
+
+                return { ...acc, [jsonPropName]: value };
+            },
+            {}
+        );
+
+        console.log('initial: ', toJS(initialWorker), payload);
+        const { edited, avatar } = await this.dispatchRequest(
+            api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
+            'editWorker'
+        );
+
+        if (edited) {
+            if (newAvatar) {
+                initialWorker.avatar = avatar;
+            }
+
+            const invertedNames = invert(namesMap);
+            Object.entries(payload).forEach(([ key, value ]) => {
+                const invertedName = invertedNames[key];
+                initialValue = initialWorker[invertedName];
+                if (invertedName && initialValue !== value) {
+                    initialWorker[invertedName] = value;
+                }
+            });
+        }
+
+        return edited;
     }
 
     @action.bound
@@ -1142,6 +1423,36 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return true;
     }
 
+    @action.bound
+    private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
+        const { userStore: { previewUser }} = this.rootStore;
+        if (!previewUser || !this.currentDepartmentId) return null;
+        const { position, id } = previewUser;
+
+        const query = unconfirmed
+            ? '?unconfirmed=1'
+            : '';
+
+        switch (position) {
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return `/api/branch/${this.currentDepartmentId}/ffm/hcf${query}`;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return `/api/branch/${this.currentDepartmentId}/rm/${id}/hcf${query}`;
+            case USER_ROLE.MEDICAL_AGENT:
+                return `/api/branch/${this.currentDepartmentId}/mp/${id}/hcf${query}`;
+            default:
+                return null;
+        }
+    }
+
+    private diluteCardValue(value: string) {
+        return [...value].reduce((resultingString, curr, i) => (
+            (!!i && i % 4 === 0)
+                ? `${resultingString} ${curr}`
+                : `${resultingString}${curr}`
+        ), '');
+    }
+
     private getPharmacyApiUrl(unconfirmed: boolean = false): string {
         const { userStore: { role, previewUser } } = this.rootStore;
 
@@ -1149,10 +1460,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? previewUser.id
             : null;
 
-        if (this.currentDepartmentId === null || userId === null) return null;
+        if (!this.currentDepartmentId || !userId) return null;
 
         const queryParam = unconfirmed
-            ? '?unconfirmed=1'
+            ? `?unconfirmed=1`
             : '';
 
         switch (role) {

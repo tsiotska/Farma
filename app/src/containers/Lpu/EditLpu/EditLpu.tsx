@@ -10,6 +10,7 @@ import { ILpuModalValues } from '../LpuModal/LpuModal';
 import { ILPU } from '../../../interfaces/ILPU';
 
 interface IProps {
+    types: string[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
     openedModal?: string;
@@ -59,14 +60,16 @@ class EditLpu extends Component<IProps> {
         this.snackbarType = !!lpuEdited
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (lpuEdited) this.closeHandler();
     }
 
     render() {
-        const { openedModal, modalPayload } = this.props;
+        const { openedModal, modalPayload, types } = this.props;
 
         return (
             <>
             <LpuModal
+                types={types}
                 open={openedModal === EDIT_LPU_MODAL}
                 isLoading={this.isLoading}
                 onClose={this.closeHandler}
@@ -82,8 +85,8 @@ class EditLpu extends Component<IProps> {
                 anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
                 message={
                     this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                    ? 'ЛПУ успішно створено'
-                    : 'Неможливо додати ЛПУ'
+                    ? 'ЛПУ успішно змінено'
+                    : 'Неможливо змінити ЛПУ'
                 }
             />
             </>
