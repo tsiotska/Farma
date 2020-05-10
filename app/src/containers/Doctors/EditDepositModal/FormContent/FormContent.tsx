@@ -11,6 +11,8 @@ import FormRow from '../../../../components/FormRow';
 import { IDepositFormValue } from '../EditDepositModal';
 import { IDeposit } from '../../../../interfaces/IDeposit';
 import { IDoctor } from '../../../../interfaces/IDoctor';
+import { numberValidator, moneyValidator } from '../../../../helpers/validators';
+import { USER_ROLE } from '../../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     head: {
@@ -66,9 +68,21 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     deposits: IDeposit[];
     doctor: IDoctor;
+    role?: USER_ROLE;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            role
+        }
+    }
+}) => ({
+    role
+}))
+@observer
 class FormContent extends Component<IProps> {
+    readonly allowedRoles: USER_ROLE[] = [USER_ROLE.ADMIN, USER_ROLE.FIELD_FORCE_MANAGER];
     readonly initialValue: IDepositFormValue = {
         deposit: '',
         message: '',
@@ -80,18 +94,27 @@ class FormContent extends Component<IProps> {
         message: false
     };
 
-    constructor(props: IProps) {
-        super(props);
-    }
-
     @computed
     get isSubmitAllowed(): boolean {
         return true;
     }
 
+    validate = (propName: keyof IDepositFormValue, value: string) => {
+        if (propName === 'deposit') {
+            const isValid = !!value
+                && numberValidator(value)
+                && moneyValidator(value);
+            this.fieldsErrorStatuses[propName] = !isValid;
+        } else {
+            const trimmed = value.replace(/ /g, '');
+            const isValid = !!trimmed && trimmed.length;
+            this.fieldsErrorStatuses[propName] = !isValid;
+        }
+    }
+
     onChangeHandler = (propName: keyof IDepositFormValue, value: string) => {
         this.formValues[propName] = value;
-        // this.validate(propName, value);
+        this.validate(propName, value);
     }
 
     submitHandler = () => {
@@ -99,10 +122,11 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading, deposits, doctor } = this.props;
+        const { classes, isLoading, deposits, doctor, role } = this.props;
         return (
             <>
-                { !!doctor &&
+                {
+                    !!doctor &&
                     <Grid direction='column' className={classes.head} container item>
                         <Grid item>
                             <Typography className={classes.count}>
@@ -137,45 +161,47 @@ class FormContent extends Component<IProps> {
                             </Grid>
                     }
                 </Grid>
-                <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
+                {
+                    this.allowedRoles.includes(role) &&
+                    <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
+                        <Grid xs container item>
+                            <FormRow
+                                label='Сумма'
+                                values={this.formValues}
+                                propName='sum'
+                                onChange={this.onChangeHandler}
+                                error={this.fieldsErrorStatuses.deposit}
+                                fullWidth
+                            />
+                        </Grid>
 
-                    <Grid xs container item>
-                        <FormRow
-                            label='Сумма'
-                            values={this.formValues}
-                            propName='sum'
-                            onChange={this.onChangeHandler}
-                            error={this.fieldsErrorStatuses.deposit}
-                            fullWidth
-                        />
-                    </Grid>
+                        <Grid xs={8} container item>
+                            <FormRow
+                                label='Причина'
+                                values={this.formValues}
+                                propName='reason'
+                                onChange={this.onChangeHandler}
+                                error={this.fieldsErrorStatuses.message}
+                                fullWidth
+                            />
+                        </Grid>
 
-                    <Grid xs={8} container item>
-                        <FormRow
-                            label='Причина'
-                            values={this.formValues}
-                            propName='reason'
-                            onChange={this.onChangeHandler}
-                            error={this.fieldsErrorStatuses.message}
-                            fullWidth
-                        />
+                        <Grid alignItems='center' justify='center' xs container item>
+                            <Button
+                                disabled={!this.isSubmitAllowed || isLoading}
+                                className={classes.submitButton}
+                                variant='contained'
+                                color='primary'
+                                onClick={this.submitHandler}>
+                                {
+                                    isLoading
+                                        ? <LoadingMask size={20}/>
+                                        : 'Змінити'
+                                }
+                            </Button>
+                        </Grid>
                     </Grid>
-
-                    <Grid alignItems='center' justify='center' xs container item>
-                        <Button
-                            disabled={!this.isSubmitAllowed || isLoading}
-                            className={classes.submitButton}
-                            variant='contained'
-                            color='primary'
-                            onClick={this.submitHandler}>
-                            {
-                                isLoading
-                                    ? <LoadingMask size={20}/>
-                                    : 'Змінити'
-                            }
-                        </Button>
-                    </Grid>
-                </Grid>
+                }
             </>
         );
     }

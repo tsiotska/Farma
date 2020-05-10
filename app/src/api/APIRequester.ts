@@ -532,8 +532,8 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    postDeposit(departmentId: number, previewUserId: number, doctorId: number, payload: IDepositFormValue): Promise<boolean> {
-        return this.instance.post(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`, payload)
+    postDeposit(departmentId: number, mpId: number, doctorId: number, payload: any): Promise<boolean> {
+        return this.instance.post(`/api/branch/${departmentId}/mp/${mpId}/agent/${doctorId}/deposit`, payload)
             .then(({ status }) => {
                 return status === 200;
             })

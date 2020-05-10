@@ -694,26 +694,26 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    insertDeposit(data: IDepositFormValue): Promise<boolean> {
-        const requestName = 'insertDeposit';
-        const {
-            api,
-            departmentsStore: {
-                currentDepartment
-            },
-            uiStore: {
-                modalPayload: doctor
-            }
-        } = this.rootStore;
+    insertDeposit(docId: number, { deposit, message }: IDepositFormValue): Promise<boolean> {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        const mpId = (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? this.previewUser.id
+            : null;
+
+        const preparedData = {
+            message,
+            deposit: +deposit
+        };
 
         return this.dispatchRequest(
             api.postDeposit(
-                currentDepartment.id,
-                this.previewUser.id,
-                doctor.id,
-                data
+                currentDepartmentId,
+                mpId,
+                docId,
+                preparedData
             ),
-            requestName
+            'insertDeposit'
         );
     }
 }

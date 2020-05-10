@@ -29,7 +29,7 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadDepositHistory?: () => any;
-    insertDeposit?: (data: IDepositFormValue) => any;
+    insertDeposit?: (docId: number, data: IDepositFormValue) => any;
     modalPayload?: IDoctor;
 }
 
@@ -63,29 +63,15 @@ class EditDepositModal extends Component<IProps> {
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable deposits: IDeposit[];
 
-    async componentDidUpdate(prevProps: IProps) {
-        const { openedModal: prevModal } = prevProps;
-        const { loadDepositHistory, openedModal } = this.props;
-        const becomeOpened = prevModal !== EDIT_DEPOSIT_MODAL && openedModal === EDIT_DEPOSIT_MODAL;
-        if (becomeOpened) {
-            this.deposits = await loadDepositHistory();
-        }
-    }
-
-    componentWillUnmount(): void {
-        this.deposits = null;
-    }
-
     @computed
     get isLoading(): boolean {
-        //  return this.props.getAsyncStatus('insertDeposit').loading;
-        return false;
+         return this.props.getAsyncStatus('insertDeposit').loading;
     }
 
     @computed
     get isOpen(): boolean {
         const { openedModal, modalPayload } = this.props;
-        if (!modalPayload) return false; // unnecessery (doesnt close window)
+        if (!modalPayload) return false;
         return openedModal === EDIT_DEPOSIT_MODAL;
     }
 
@@ -96,12 +82,28 @@ class EditDepositModal extends Component<IProps> {
     }
 
     submitHandler = async (data: IDepositFormValue) => {
-        const { insertDeposit } = this.props;
-        const isInserted = await insertDeposit(data);
+        const { insertDeposit, modalPayload: { id } } = this.props;
+        const isInserted = await insertDeposit(id, data);
         this.isSnackbarOpen = true;
         this.snackbarType = isInserted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+    }
+
+    async componentDidUpdate(prevProps: IProps) {
+        const { openedModal: prevModal } = prevProps;
+        const { loadDepositHistory, openedModal } = this.props;
+        const becomeOpened = prevModal !== EDIT_DEPOSIT_MODAL && openedModal === EDIT_DEPOSIT_MODAL;
+        const becomeClosed = prevModal === EDIT_DEPOSIT_MODAL && openedModal !== EDIT_DEPOSIT_MODAL;
+        if (becomeOpened) {
+            this.deposits = await loadDepositHistory();
+        } else if (becomeClosed) {
+            this.deposits = null;
+        }
+    }
+
+    componentWillUnmount() {
+        this.deposits = null;
     }
 
     render() {
