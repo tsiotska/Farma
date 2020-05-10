@@ -1342,7 +1342,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             },
             {}
         );
-
+        formData.append('json', JSON.stringify(payload));
         const { edited, avatar } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
             'editWorker'
