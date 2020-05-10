@@ -36,6 +36,8 @@ import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer';
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
+import { ISearchResult } from '../interfaces/ISearchResult';
+import { searchNormalizer } from '../helpers/normalizers/searchNormalizer';
 
 export interface ICachedPromise<T> {
     promise: Promise<T>;
@@ -570,5 +572,11 @@ export class APIRequester {
         return this.instance.delete(`​/api​/branch​/${depId}​/${roleParam​}​/worker​/${workerId}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
+    }
+
+    querySearch(query: string, page: number): Promise<ISearchResult[]> {
+        return this.instance.get(`api/agent/search?query=${encodeURIComponent(query)}&page=${page}`)
+            .then(searchNormalizer)
+            .catch(this.defaultErrorHandler(null));
     }
 }

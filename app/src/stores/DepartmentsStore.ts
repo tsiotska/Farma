@@ -153,6 +153,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadSearchQuery(query: string, page: number) {
+        return this.rootStore.api.querySearch(query, page);
+    }
+
+    @action.bound
     async loadSpecialties() {
         const { api } = this.rootStore;
 
