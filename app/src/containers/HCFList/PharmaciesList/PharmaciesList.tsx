@@ -21,17 +21,17 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     regions,
-                     deleteLpu,
-                     deletePharmacy
-                 },
-                 uiStore: {
-                     openModal
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            regions,
+            deleteLpu,
+            deletePharmacy
+        },
+        uiStore: {
+            openModal
+        }
+    }
+}) => ({
     regions,
     openModal,
     deleteLpu,

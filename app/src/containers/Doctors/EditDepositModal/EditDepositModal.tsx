@@ -34,21 +34,21 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 uiStore: {
-                     openedModal,
-                     openModal,
-                     modalPayload
-                 },
-                 departmentsStore: {
-                     getAsyncStatus
-                 },
-                 userStore: {
-                     loadDepositHistory,
-                     insertDeposit
-                 }
-             }
-         }) => ({
+    appState: {
+        uiStore: {
+            openedModal,
+            openModal,
+            modalPayload
+        },
+        departmentsStore: {
+            getAsyncStatus
+        },
+        userStore: {
+            loadDepositHistory,
+            insertDeposit
+        }
+    }
+}) => ({
     openedModal,
     openModal,
     getAsyncStatus,

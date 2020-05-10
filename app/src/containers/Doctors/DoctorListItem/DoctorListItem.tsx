@@ -98,12 +98,12 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 uiStore: {
-                     openModal,
-                 },
-             }
-         }) => ({
+    appState: {
+        uiStore: {
+            openModal,
+        },
+    }
+}) => ({
     openModal
 }))
 @observer

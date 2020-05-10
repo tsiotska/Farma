@@ -61,24 +61,24 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     getAsyncStatus,
-                     loadLPUs,
-                     sortedLpus: LPUs,
-                     currentDepartmentId,
-                     loadUnconfirmedLPUs,
-                     unconfirmedLPUs,
-                     acceptLpu
-                 },
-                 uiStore: {
-                     openModal,
-                     setCurrentPage,
-                     currentPage,
-                     itemsPerPage
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            getAsyncStatus,
+            loadLPUs,
+            sortedLpus: LPUs,
+            currentDepartmentId,
+            loadUnconfirmedLPUs,
+            unconfirmedLPUs,
+            acceptLpu
+        },
+        uiStore: {
+            openModal,
+            setCurrentPage,
+            currentPage,
+            itemsPerPage
+        }
+    }
+}) => ({
     getAsyncStatus,
     loadLPUs,
     LPUs,
