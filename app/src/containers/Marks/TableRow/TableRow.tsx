@@ -17,6 +17,7 @@ import HoverableCell from '../HoverableCell';
 
 const styles = (theme: any) => createStyles({
     root: {
+        textTransform: 'capitalize'
     },
     doubleWidthColumn: {
         width: 290

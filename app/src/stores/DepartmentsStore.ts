@@ -1456,10 +1456,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 ? this.expandedWorker.subworkers.indexOf(worker)
                 : -1;
             if (workerId !== -1) {
-                this.workers.splice(workerId, 1);
+                await this.loadWorkers();
+                // this.workers.splice(workerId, 1);
             }
             if (subworkerId !== -1) {
-                this.expandedWorker.subworkers.splice(subworkerId, 1);
+                this.loadSubworkers();
+                // this.expandedWorker.subworkers.splice(subworkerId, 1);
             }
         }
         return workerRemoved;

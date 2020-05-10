@@ -17,7 +17,14 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import { USER_ROLE } from '../../../constants/Roles';
 import TotalRow from '../TotalRow';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    fixedTable: {
+        position: 'fixed',
+        tableLayout: 'fixed',
+        padding: '0 20px',
+        bottom: 0,
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     agents: IAgentInfo[];
@@ -87,8 +94,16 @@ class Table extends Component<IProps> {
         );
     }
 
+    @computed
+    get fixedTableStyles(): any {
+        return {
+            width: this.tableWidth,
+            left: this.leftOffset,
+        };
+    }
+
     render() {
-        const { agents, showLpu } = this.props;
+        const { agents, showLpu, classes } = this.props;
 
         const lastIndex = agents.length - 1;
 
@@ -105,24 +120,6 @@ class Table extends Component<IProps> {
                                     <TableRow
                                         key={x.id}
                                         agent={x}
-                                        itemRef={
-                                            (el: any) => {
-                                                if (!el || i !== lastIndex) return;
-                                                const lastItemRect = el.getBoundingClientRect();
-                                                this.tableWidth = lastItemRect.width + 40;
-                                                this.leftOffset = lastItemRect.left - 20;
-
-                                                this.totalRowPosition = window.innerHeight < document.body.offsetHeight
-                                                ? 'fixed'
-                                                : 'initial';
-                                                // const lastItemBottom = lastItemRect.bottom;
-                                                // console.log(lastItemBottom, window.innerHeight, document.body.offsetHeight)
-                                                // const availableHeight = window.innerHeight - lastItemBottom;
-                                                // this.totalRowPosition = availableHeight > this.totalRowHeight
-                                                //     ? 'initial'
-                                                //     : 'fixed';
-                                            }
-                                        }
                                         showLpu={showLpu}
                                         tooltips={this.tooltips}
                                         lpuName={
@@ -134,6 +131,18 @@ class Table extends Component<IProps> {
                                             agent
                                             ? agent.name
                                             : null
+                                        }
+                                        itemRef={
+                                            (el: any) => {
+                                                if (!el || i !== lastIndex) return;
+                                                const lastItemRect = el.getBoundingClientRect();
+                                                this.tableWidth = lastItemRect.width + 40;
+                                                this.leftOffset = lastItemRect.left - 20;
+
+                                                this.totalRowPosition = window.innerHeight < document.body.offsetHeight
+                                                ? 'fixed'
+                                                : 'initial';
+                                            }
                                         }
                                     />
                                 );
@@ -154,14 +163,8 @@ class Table extends Component<IProps> {
                 (this.showTotalRow && this.totalRowPosition === 'fixed') &&
                 <TableContainer
                     component={Paper}
-                    style={{
-                        width: this.tableWidth,
-                        left: this.leftOffset,
-                        position: 'fixed',
-                        tableLayout: 'fixed',
-                        padding: '0 20px',
-                        bottom: 0,
-                    }}>
+                    className={classes.fixedTable}
+                    style={this.fixedTableStyles}>
                     <MuiTable padding='none'>
                         <TableBody>
                             <TotalRow
