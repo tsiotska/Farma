@@ -13,7 +13,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import HCFList from '../HCFList';
 import Pagination from '../../components/Pagination';
 import { ILPU } from '../../interfaces/ILPU';
-import { computed, observable } from 'mobx';
+import { computed, observable, autorun, toJS, reaction } from 'mobx';
 import { ADD_PHARMACY_MODAL } from '../../constants/Modals';
 import AddPharmacy from './AddPharmacy';
 import EditPharmacy from './EditPharmacy';
@@ -58,6 +58,7 @@ interface IProps extends WithStyles<typeof styles> {
     setPharmacyDemand?: (value: boolean) => void;
     openModal?: (modalName: string) => void;
     acceptPharmacy?: (lpu: ILPU) => boolean;
+    loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
 @inject(({
@@ -69,7 +70,8 @@ interface IProps extends WithStyles<typeof styles> {
             setPharmacyDemand,
             unconfirmedPharmacies,
             loadUnconfirmedPharmacies,
-            acceptPharmacy
+            acceptPharmacy,
+            loadTypes
         },
         uiStore: {
             setCurrentPage,
@@ -89,12 +91,18 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmedPharmacies,
     loadUnconfirmedPharmacies,
     openModal,
-    acceptPharmacy
+    acceptPharmacy,
+    loadTypes
 }))
 @observer
 class Pharmacy extends Component<IProps> {
     @observable isSnackbarOpen: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable types: string[] = [];
+    @observable preparedPharmacies: ILPU[] = [];
+
+    autorunDisposer: any;
+    reactionDisposer: any;
 
     @computed
     get isUnconfirmedPharmaciesLoading(): boolean {
@@ -116,15 +124,6 @@ class Pharmacy extends Component<IProps> {
             && (!pharmacies || !pharmacies.length);
     }
 
-    @computed
-    get preparedPharmacies(): ILPU[] {
-        const { pharmacies, itemsPerPage, currentPage } = this.props;
-        const begin = itemsPerPage * currentPage;
-        return Array.isArray(pharmacies)
-            ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
-            : [];
-    }
-
     retryClickHandler = () => {
         this.props.loadPharmacies(true);
     }
@@ -144,14 +143,54 @@ class Pharmacy extends Component<IProps> {
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
 
+    autorunCallback = () => {
+        const { pharmacies, itemsPerPage, currentPage } = this.props;
+
+        const begin = itemsPerPage * currentPage;
+
+        if (this.requestStatus.loading) {
+            const itemOnBegin = pharmacies
+                ? pharmacies[begin]
+                : null;
+            const displayingActualData = this.preparedPharmacies.length === itemsPerPage
+                && this.preparedPharmacies[0] === itemOnBegin;
+            const pharmacyIsEmpty = pharmacies === null || pharmacies.length === 0;
+            if (pharmacyIsEmpty || displayingActualData) return;
+        }
+
+        this.preparedPharmacies = pharmacies
+            ? pharmacies.filter((x, i) => (i >= begin && i < begin + itemsPerPage))
+            : [];
+    }
+
+    initializeTypes = async () => {
+        const { loadTypes } = this.props;
+        this.types = await loadTypes('pharmacy');
+    }
+
     componentDidMount() {
+        this.autorunDisposer = autorun(this.autorunCallback);
+        this.reactionDisposer = reaction(
+            () => this.requestStatus.loading,
+            (isLoading) => {
+                this.autorunDisposer();
+                const delay = isLoading
+                    ? 300
+                    : 0;
+                this.autorunDisposer = autorun(this.autorunCallback, { delay });
+            }
+        );
+
         this.props.setPharmacyDemand(true);
         this.props.loadUnconfirmedPharmacies();
+        this.initializeTypes();
     }
 
     componentWillUnmount() {
         this.props.setPharmacyDemand(false);
         this.props.setCurrentPage(0);
+        this.reactionDisposer();
+        this.autorunDisposer();
     }
 
     render() {
@@ -191,9 +230,11 @@ class Pharmacy extends Component<IProps> {
                     </Button>
                 </Grid>
                 {
-                    this.requestStatus.loading
-                        ? <LinearProgress/>
-                        : <HCFList data={this.preparedPharmacies} showHeader/>
+                    !!this.preparedPharmacies.length &&
+                    <HCFList data={this.preparedPharmacies} showHeader />
+                }
+                {
+                    this.requestStatus.loading && <LinearProgress />
                 }
                 {
                     this.requestStatus.error &&
@@ -232,8 +273,8 @@ class Pharmacy extends Component<IProps> {
                             : 'Підтвердити аптеку неможливо'
                     }
                 />
-                <AddPharmacy/>
-                <EditPharmacy/>
+                <AddPharmacy types={this.types} />
+                <EditPharmacy types={this.types} />
             </Grid>
         );
     }

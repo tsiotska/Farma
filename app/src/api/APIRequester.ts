@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
 import { workersNormalizer, workerNormalizer } from './../helpers/workersNormalizer';
 import { IUserCredentials } from './../interfaces/IUser';
@@ -31,7 +32,7 @@ import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
-import { doctorsNormalizer } from '../helpers/normalizers/doctorsNormalizer';
+import { doctorsNormalizer, doctorNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormalizer';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
@@ -186,20 +187,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler([]));
     }
 
-    getMedicalDepartments(departmentId: number, user: IUser, unconfirmed: boolean = false): Promise<ILPU[]> {
-        const { position, id } = user;
-
-        const urlParam = unconfirmed
-            ? '?unconfirmed=1'
-            : '';
-
-        let url: string;
-        if (position === USER_ROLE.FIELD_FORCE_MANAGER) url = `/api/branch/${departmentId}/ffm/hcf${urlParam}`;
-        else if (position === USER_ROLE.REGIONAL_MANAGER) url = `/api/branch/${departmentId}/rm/${id}/hcf${urlParam}`;
-        else if (position === USER_ROLE.MEDICAL_AGENT) url = `/api/branch/${departmentId}/mp/${id}/hcf${urlParam}`;
-
-        if (!url) return;
-
+    getMedicalDepartments(url: string): Promise<ILPU[]> {
         return this.instance.get(url)
             .then(lpuNormalizer)
             .catch(this.defaultErrorHandler());
@@ -277,16 +265,16 @@ export class APIRequester {
 
     getOblasti(): Promise<ILocation[]> {
         return this.instance.get('/api/oblast')
-            .then(({ data: { data } }) => (
-                Array.isArray(data)
-                    ? data.map(
-                    (name: string, id: number) => ({
-                        id,
-                        name
-                    }))
-                    : []
-            ))
-            .catch(this.defaultErrorHandler([]));
+        .then(({ data: { data } }) => (
+            Array.isArray(data)
+            ? data.map(
+                (name: string, i: number) => ({
+                    id: i + 1,
+                    name
+                }))
+            : []
+        ))
+        .catch(this.defaultErrorHandler([]));
     }
 
     getLocations(url: string): Promise<ILocation[]> {
@@ -363,10 +351,10 @@ export class APIRequester {
     }
 
     updateCommonSettings({ kpi, payments }: ISalarySettings) {
-        const data: any = {
-            default_amount_kpi: kpi,
-            payments
-        };
+        const data: any = {};
+        if (kpi) data.default_amount_kpi = kpi;
+        if (payments) data.payments = payments;
+        if (isEqual(data, {})) return Promise.resolve(false);
         return this.instance.put('/api/settings', data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
@@ -400,6 +388,18 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(null));
     }
 
+    editDoc(depId: number, mpId: number, docId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/branch/${depId}/mp/${mpId}/agent/${docId}`, data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    createDoc(depId: number, mpId: number, data: any): Promise<IDoctor> {
+        return this.instance.post(`/api/branch/${depId}/mp/${mpId}/agent`, data)
+            .then(doctorNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
     createDepartment(departmentData: FormData): Promise<IDepartment> {
         return this.instance.post('/api/branch', departmentData)
             .then(branchNormalizer)
@@ -414,6 +414,25 @@ export class APIRequester {
         return this.instance.post(url, userData)
             .then(workerNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    editWorker(data: FormData, workerId: number, departmentId: number): Promise<{
+        edited: boolean;
+        avatar: string;
+    }> {
+        const url = departmentId
+            ? `/api/branch/${departmentId}/worker/${workerId}`
+            : `/api/worker/${workerId}`;
+
+        return this.instance.put(url, data)
+            .then(({ data: { data: { avatar } } }: any) => ({
+                edited: true,
+                avatar: avatar || null
+            }))
+            .catch(this.defaultErrorHandler({
+                edited: false,
+                avatar: null
+            }));
     }
 
     createFFM(ffmData: FormData, departmentId: number): Promise<IUser> {
@@ -538,5 +557,17 @@ export class APIRequester {
                 return status === 200;
             })
             .catch(this.defaultErrorHandler());
+    }
+
+    getDocsPositions(): Promise<string[]> {
+        return this.instance.get('/api/agent/position')
+            .then(({ data: { data } }) => {
+                const isArray = Array.isArray(data);
+                const isValid = data.every((x: string) => typeof x === 'string');
+                return (isArray && isValid)
+                    ? data
+                    : [];
+            })
+            .catch(this.defaultErrorHandler([]));
     }
 }

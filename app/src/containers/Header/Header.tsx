@@ -75,7 +75,8 @@ export class Header extends Component<IProps, {}> {
     }
 
     @computed
-    get showBackButton(): boolean {
+    get isSettingsRoute(): boolean {
+        // get showBackButton(): boolean {
         const { history: { location: { pathname }}} = this.props;
         return SETTINGS_ROUTES.some(route => !!matchPath(pathname, route));
     }
@@ -105,7 +106,7 @@ export class Header extends Component<IProps, {}> {
                     className={classes.root}>
                     <Typography className={classes.title} variant='h5'>
                         {
-                            this.showBackButton &&
+                            this.isSettingsRoute &&
                             <IconButton onClick={this.backClickHandler} className={cx(classes.backButton, classes.settingsButton)}>
                                 <ArrowBack width={22} height={22} />
                             </IconButton>
@@ -120,8 +121,8 @@ export class Header extends Component<IProps, {}> {
                     }
                 </AppBar>
                 <SalaryReviewModal />
-                <AddWorkerModal />
-                <EditWorkerModal />
+                <AddWorkerModal showLocationsBlock={!this.isSettingsRoute} />
+                <EditWorkerModal  showLocationsBlock={!this.isSettingsRoute} />
             </>
         );
     }

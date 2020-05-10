@@ -16,6 +16,8 @@ import { observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
 import CommitBadge from '../../../components/CommitBadge';
 import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
+import { EDIT_DOC_MODAL } from '../../../constants/Modals';
+
 const styles = (theme: any) => createStyles({
     root: {
         marginBottom: 1,
@@ -72,6 +74,12 @@ const styles = (theme: any) => createStyles({
         justifyContent: 'center',
         overflow: 'hidden',
         textOverflow: 'ellipsis'
+
+        // textTransform: 'capitalize',
+        // color: ({ unconfirmed }: any) => unconfirmed
+        //     ? 'white'
+        //     : theme.palette.primary.gray.main,
+        // paddingRight: 5
     },
     confirmButton: {
         color: 'white',
@@ -123,6 +131,11 @@ class DoctorListItem extends Component<IProps> {
         openModal(EDIT_DEPOSIT_MODAL, doctor);
     }
 
+    editClickHandler = () => {
+        const { doctor, openModal } = this.props;
+        openModal(EDIT_DOC_MODAL, doctor);
+    }
+
     render() {
         const {
             unconfirmed,
@@ -167,6 +180,33 @@ class DoctorListItem extends Component<IProps> {
                 </Grid>
                 <Grid xs={1} className={classes.column} container item>
                     <Typography className={cx(classes.phoneContainer, classes.text)}>
+            {/*
+            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
+                {
+                    unconfirmed &&
+                    <Grid className={classes.badgesContainer}>
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
+                    </Grid>
+                }
+                <Grid xs={3} container item>
+                    <Typography variant='body2' className={classes.text}>
+                        { LPUName || '-' }
+                    </Typography>
+                </Grid>
+                <Grid xs={3} container item>
+                    <Typography variant='body2' className={classes.text}>
+                        { name || '-' }
+                    </Typography>
+                </Grid>
+                <Grid xs className={classes.column} container item>
+                    <Typography variant='body2' className={classes.text}>
+                        { specialty || '-'}
+                    </Typography>
+                </Grid>
+                <Grid xs className={classes.column} container item>
+                    <Typography variant='body2' className={cx(classes.phoneContainer, classes.text)}>
+            */}
                         {
                             !mobilePhone && !workPhone
                                 ? '-'
@@ -177,9 +217,9 @@ class DoctorListItem extends Component<IProps> {
                         }
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
-                    <Typography className={classes.text}>
-                        {card || '-'}
+                <Grid xs className={classes.column} container item>
+                    <Typography variant='body2' className={classes.text}>
+                        { card || '-'}
                     </Typography>
                 </Grid>
 
@@ -197,17 +237,17 @@ class DoctorListItem extends Component<IProps> {
                                         : 'Підтвердити'
                                 }
                             </Button>
-                            : <>
-
-                                <Typography onClick={this.depositModalHandler}
-                                            className={cx(classes.deposit, classes.text)}>
-
-                                    {deposit || 0}
-                                </Typography>
-                                <IconButton>
-                                    <Edit className={classes.editIcon} fontSize='small'/>
-                                </IconButton>
-                            </>
+                        : <>
+                            <Typography
+                                variant='body2'
+                                onClick={this.depositModalHandler}
+                                className={cx(classes.deposit, classes.text)}>
+                                { deposit || 0 }
+                            </Typography>
+                            <IconButton onClick={this.editClickHandler}>
+                                <Edit className={classes.editIcon} fontSize='small' />
+                            </IconButton>
+                          </>
                     }
 
                     <IconButton>

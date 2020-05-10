@@ -150,7 +150,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const isCreated = await api.updateBonusesData(
             currentDepartmentId,
             userId,
-            year + 1,
+            year,
             month + 1,
             {}
         );

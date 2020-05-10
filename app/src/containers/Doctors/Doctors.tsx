@@ -18,6 +18,8 @@ import Pagination from '../../components/Pagination';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 import EditDepositModal from './EditDepositModal';
+import CreateDoctorModal from './CreateDoctorModal';
+import EditDoctorModal from './EditDoctorModal.tsx';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -161,6 +163,8 @@ class Doctors extends Component<IProps> {
                     }
                 />
                 <EditDepositModal/>
+                <CreateDoctorModal />
+                <EditDoctorModal />
             </Grid>
         );
     }

@@ -15,6 +15,7 @@ import LoadingMask from '../../../components/LoadingMask';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import FormRow from '../../../components/FormRow';
+import isEqual from 'lodash/isEqual';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -76,7 +77,7 @@ export interface IFormValues {
 }))
 @observer
 class FormContent extends Component<IProps> {
-    readonly initialValue: IFormValues = {
+    @observable initialValue: IFormValues = {
         name: '',
         releaseForm: '',
         dosage: '',
@@ -98,6 +99,13 @@ class FormContent extends Component<IProps> {
         barcode: false,
         department: false
     };
+
+    @computed
+    get isValuesChanged(): boolean {
+        const { file } = this.props;
+        const isImageChanged = !!file && typeof file === 'object';
+        return !isEqual(this.formValues, this.initialValue) || isImageChanged;
+    }
 
     lengthValidator: Validator;
     barcodeLengthValidator: Validator;
@@ -144,7 +152,7 @@ class FormContent extends Component<IProps> {
         const allValuesExist = Object.keys(this.fieldsErrorStatuses).length === Object.keys(this.formValues).length;
         const allValuesValid = Object.values(this.fieldsErrorStatuses).every(x => x === false);
         const imageAdded = !!this.props.file;
-        return allValuesExist && allValuesValid && imageAdded;
+        return allValuesExist && allValuesValid && imageAdded && this.isValuesChanged;
     }
 
     @computed
@@ -153,14 +161,6 @@ class FormContent extends Component<IProps> {
             key: id,
             value: name
         }));
-    }
-
-    @computed
-    get defaultDepartmentName(): string {
-        const { currentDepartment } = this.props;
-        return currentDepartment
-        ? currentDepartment.name
-        : '';
     }
 
     validate = (propName: keyof IFormValues, value: string) => {
@@ -205,8 +205,8 @@ class FormContent extends Component<IProps> {
         const { currentDepartment } = this.props;
 
         const department = currentDepartment
-        ? currentDepartment.name
-        : '';
+            ? currentDepartment.name
+            : '';
 
         if (defaultMedicine) {
             const {
@@ -217,9 +217,10 @@ class FormContent extends Component<IProps> {
                 barcode,
                 mark,
                 price,
+                image
             } = defaultMedicine;
 
-            this.formValues = {
+            this.initialValue = {
                 name: name || '',
                 releaseForm: releaseForm || '',
                 manufacturer: manufacturer || '',
@@ -230,11 +231,16 @@ class FormContent extends Component<IProps> {
                 department
             };
 
+        } else {
+            this.initialValue = { ...this.initialValue, department };
+        }
+
+        this.formValues = { ...this.initialValue };
+        if (defaultMedicine) {
             Object.entries(this.formValues)
                 .forEach(([ propName, value ]: [keyof IFormValues, string]) => this.validate(propName, value));
-        } else {
-            this.formValues = { ...this.initialValue, department };
         }
+
     }
 
     submitHandler = () => {
