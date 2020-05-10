@@ -1316,7 +1316,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (initialAvatar !== newAvatar) {
             const isAvatarRemoved = typeof initialAvatar === 'string' && newAvatar === null;
-            formData.set('image', isAvatarRemoved ? 'none' : newAvatar);
+            formData.set('image', isAvatarRemoved ? '' : newAvatar);
         }
 
         let initialValue: any;
