@@ -190,17 +190,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const marks = agents.reduce((acc, curr) => {
             const { marks: agentMarks, id: agent } = curr;
             const preparedMarks = [...agentMarks.values()].map(({
-                                                                    deposit,
-                                                                    drugId,
-                                                                    mark,
-                                                                    payments
-                                                                }) => ({
-                agent,
-                drug: drugId,
-                payments: payments,
-                deposit: deposit,
-                drug_mark: mark,
-            }));
+                    deposit,
+                    drugId,
+                    mark,
+                    payments
+                }) => ({
+                    agent,
+                    drug: drugId,
+                    payments: payments,
+                    deposit: deposit,
+                    drug_mark: mark,
+                })
+            );
             return [...acc, ...preparedMarks];
         }, []);
 
