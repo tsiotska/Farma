@@ -38,6 +38,7 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     getUser?: (userId: number) => IUser;
     historyReplace?: (users: IUser[]) => void;
     setCurrentDepartment?: (depId: number) => void;
+    setPreviewDoctor?: (docId: number) => void;
 }
 
 @inject(({
@@ -49,13 +50,15 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
         },
         departmentsStore: {
             setCurrentDepartment,
+            setPreviewDoctor
         }
     }
 }) => ({
     getUser,
     historyReplace,
     setCurrentDepartment,
-    user
+    user,
+    setPreviewDoctor
 }))
 @withRouter
 @observer
@@ -89,14 +92,15 @@ class SearchList extends Component<IProps> {
         e.nativeEvent.stopImmediatePropagation();
     }
 
-    itemClickHandler = async ({ ffm, rm, mp }: ISearchResult) => {
+    itemClickHandler = async ({ id, ffm, rm, mp }: ISearchResult) => {
         const {
             getUser,
             history,
             historyReplace,
             setCurrentDepartment,
             hideList,
-            user
+            user,
+            setPreviewDoctor
         } = this.props;
         this.isLoading = true;
 
@@ -128,7 +132,7 @@ class SearchList extends Component<IProps> {
             ? filtered
             : [ user, ...filtered ];
         historyReplace(newUserHistory);
-
+        setPreviewDoctor(id);
         history.push(DOCTORS_ROUTE.replace(':departmentId', `${targetDep}`));
         hideList();
     }

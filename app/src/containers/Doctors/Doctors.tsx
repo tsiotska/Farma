@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed, toJS, observable, reaction } from 'mobx';
+import { computed, toJS, observable, reaction, when } from 'mobx';
 import Header from './Header';
 import ListHeader from './ListHeader';
 import { IDoctor } from '../../interfaces/IDoctor';
@@ -35,7 +35,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     doctors?: IDoctor[];
-    loadDoctors?: () => void;
+    loadDoctors?: () => Promise<void>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
     clearDoctors?: () => void;
     setCurrentPage?: (page: number) => void;
@@ -43,7 +43,9 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeDoctor?: (doc: IDoctor) => boolean;
-    previewUser: IUser;
+    previewUser?: IUser;
+    previewDoctorId?: number;
+    setPreviewDoctor?: (id: number) => void;
 }
 
 @inject(({
@@ -53,7 +55,9 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             clearDoctors,
             doctors,
-            removeDoctor
+            removeDoctor,
+            previewDoctorId,
+            setPreviewDoctor
         },
         uiStore: {
             setCurrentPage,
@@ -75,15 +79,19 @@ interface IProps extends WithStyles<typeof styles> {
     currentPage,
     itemsPerPage,
     openDelPopper,
-    previewUser
+    previewUser,
+    previewDoctorId,
+    setPreviewDoctor
 }))
 @observer
 class Doctors extends Component<IProps> {
     reactionDisposer: any;
+    pageReactionDisposer: any;
 
     @observable isSnackbarOpen: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable snackbarMessage: string = '';
+    @observable target: number = null;
 
     @computed
     get isLoading(): boolean {
@@ -105,6 +113,14 @@ class Doctors extends Component<IProps> {
         return doctors.filter((x, i) => (i >= begin && i < begin + itemsPerPage));
     }
 
+    @computed
+    get previewDocInd(): number {
+        const { doctors, previewDoctorId } = this.props;
+        if (previewDoctorId === null) return -1;
+        return doctors
+            ? doctors.findIndex(({ id }) => id === previewDoctorId)
+            : -1;
+    }
     deleteHandler = (doc: IDoctor) => async (confirmed: boolean) => {
         const { openDelPopper, removeDoctor } = this.props;
         openDelPopper(null);
@@ -133,13 +149,40 @@ class Doctors extends Component<IProps> {
         this.isSnackbarOpen = true;
     }
 
+    clearTarget = () => {
+        this.target = null;
+    }
+
+    removeHighlight = () => {
+        this.props.setPreviewDoctor(null);
+    }
+
     componentDidMount() {
+        const {
+            itemsPerPage,
+            setCurrentPage,
+            clearDoctors,
+            loadDoctors,
+            setPreviewDoctor
+        } = this.props;
+
+        this.pageReactionDisposer = reaction(
+            () => this.previewDocInd,
+            (docId: number) => {
+                if (docId === -1) return;
+                const targetPage = Math.floor(docId / itemsPerPage);
+                setCurrentPage(targetPage);
+                this.target = this.props.previewDoctorId;
+            }
+        );
+
         this.reactionDisposer = reaction(
             () => this.props.previewUser,
-            (user: IUser) => {
-                const { clearDoctors, loadDoctors } = this.props;
+            async (user: IUser) => {
                 const shouldReloadData = !!user && user.position === USER_ROLE.MEDICAL_AGENT;
+
                 if (shouldReloadData) {
+                    setCurrentPage(0);
                     clearDoctors();
                     loadDoctors();
                 }
@@ -149,6 +192,7 @@ class Doctors extends Component<IProps> {
     }
 
     componentWillUnmount() {
+        if (this.pageReactionDisposer) this.pageReactionDisposer();
         if (this.reactionDisposer) this.reactionDisposer();
         this.props.clearDoctors();
         this.props.setCurrentPage(0);
@@ -160,7 +204,8 @@ class Doctors extends Component<IProps> {
             doctors,
             currentPage,
             setCurrentPage,
-            itemsPerPage
+            itemsPerPage,
+            previewDoctorId
         } = this.props;
 
         return (
@@ -179,9 +224,21 @@ class Doctors extends Component<IProps> {
                         <DoctorListItem
                             key={doc.id}
                             doctor={doc}
+                            highlight={doc.id === previewDoctorId}
+                            removeHighlighting={this.removeHighlight}
                             unconfirmed={doc.confirmed === false}
                             deleteHandler={this.deleteHandler}
                             confirmationCallback={this.confirmationCallback}
+                            rootRef={(el: any) => {
+                                try {
+                                    if (doc.id === this.target) {
+                                        el.scrollIntoView();
+                                        this.clearTarget();
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            }}
                         />
                     ))
                 }

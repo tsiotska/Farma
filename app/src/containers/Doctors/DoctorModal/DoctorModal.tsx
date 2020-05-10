@@ -251,7 +251,7 @@ class DoctorModal extends Component<IProps> {
             LPUs,
             isLoading
         } = this.props;
-        console.log('lpus: ', toJS(LPUs));
+
         return (
             <Dialog
                 classes={{

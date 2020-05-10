@@ -270,7 +270,6 @@ class WorkerModal extends Component<IProps> {
         }
         const hasError = this.valueValidator(propName, value);
         this.errors.set(propName, hasError);
-        console.log(toJS(this.formValues));
     }
 
     submitHandler = () => {

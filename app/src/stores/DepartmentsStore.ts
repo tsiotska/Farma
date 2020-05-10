@@ -68,6 +68,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable expandedWorker: IExpandedWorker = null;  // agents store
     @observable firedWorkers: IWorker[] = []; // agents store
     @observable doctors: IDoctor[] = []; // docs store
+    @observable previewDoctorId: number = null;
 
     constructor(rootStore: IRootStore) {
         super();
@@ -150,6 +151,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
         this.clearSalaries();
+    }
+
+    @action.bound
+    setPreviewDoctor(docId: number) {
+        this.previewDoctorId = docId;
     }
 
     @action.bound

@@ -10,9 +10,9 @@ import {
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
-import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
 import { observable } from 'mobx';
+import { IDoctor } from '../../../interfaces/IDoctor';
 import LoadingMask from '../../../components/LoadingMask';
 import { EDIT_DOC_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
@@ -26,7 +26,7 @@ const styles = (theme: any) => createStyles({
         padding: '5px 0 5px 5px',
         '& > .MuiGrid-container': {
             overflowX: 'hidden'
-        }
+        },
     },
     column: {
         minWidth: 120
@@ -49,7 +49,11 @@ const styles = (theme: any) => createStyles({
         color: ({ unconfirmed }: any) => unconfirmed
             ? 'white'
             : theme.palette.primary.gray.main,
-        paddingRight: 5
+        paddingRight: 5,
+        '&.highlight': {
+            textDecoration: 'underline',
+            fontWeight: 'bolder'
+        }
     },
     confirmButton: {
         color: 'white',
@@ -72,6 +76,9 @@ interface IProps extends WithStyles<typeof styles> {
     acceptAgent?: (doctor: IDoctor) => boolean;
     openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    rootRef?: any;
+    highlight?: boolean;
+    removeHighlighting?: () => void;
 }
 
 @inject(({
@@ -92,6 +99,7 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
+    timeout: any;
 
     confirmClickHandler =  async () => {
         const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
@@ -115,10 +123,23 @@ class DoctorListItem extends Component<IProps> {
         });
     }
 
+    componentDidMount() {
+        const { highlight, removeHighlighting } = this.props;
+        if (highlight) {
+            this.timeout = setTimeout(removeHighlighting, 2000);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.timeout) window.clearTimeout(this.timeout);
+    }
+
     render() {
         const {
             unconfirmed,
             classes,
+            rootRef,
+            highlight,
             doctor: {
                 LPUName,
                 name,
@@ -131,14 +152,14 @@ class DoctorListItem extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
+            <Grid ref={rootRef} className={classes.root} alignItems='center' wrap='nowrap' container>
                 <Grid xs={3} container item>
                     <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
                     </Typography>
                 </Grid>
                 <Grid xs={3} container item>
-                    <Typography variant='body2' className={classes.text}>
+                    <Typography variant='body2' className={cx(classes.text, { highlight: !!highlight })}>
                         { name || '-' }
                     </Typography>
                 </Grid>
