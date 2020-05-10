@@ -12,24 +12,47 @@ import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
+import CommitBadge from '../../../components/CommitBadge';
+import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
 import { EDIT_DOC_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
+        marginBottom: 1,
+        minHeight: 48,
+        padding: '5px 0 5px 8px',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
-            : 'white',
-        marginBottom: 1,
-        padding: '5px 0 5px 5px',
-        '& > .MuiGrid-container': {
-            overflowX: 'hidden'
+            : theme.palette.primary.white,
+        color: ({ unconfirmed }: any) => unconfirmed
+            ? theme.palette.primary.white
+            : theme.palette.primary.gray.main,
+        '&:first-of-type': {
+            borderTopLeftRadius: 2,
+            borderTopRightRadius: 2,
+        },
+        '&:last-of-type': {
+            borderBottomLeftRadius: 2,
+            borderBottomRightRadius: 2,
         }
     },
     column: {
         minWidth: 120
+    },
+    badgesContainer: {
+        minWidth: 100,
+        display: 'flex',
+        flexWrap: 'nowrap'
+    },
+    badge: {
+        '&:not(:first-child)': {
+            marginLeft: 10
+        }
     },
     phone: {},
     phoneContainer: {
@@ -45,40 +68,49 @@ const styles = (theme: any) => createStyles({
             : theme.palette.primary.gray.light
     },
     text: {
-        textTransform: 'capitalize',
-        color: ({ unconfirmed }: any) => unconfirmed
-            ? 'white'
-            : theme.palette.primary.gray.main,
-        paddingRight: 5
+        lineHeight: 1.5,
+        marginRight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+
+        // textTransform: 'capitalize',
+        // color: ({ unconfirmed }: any) => unconfirmed
+        //     ? 'white'
+        //     : theme.palette.primary.gray.main,
+        // paddingRight: 5
     },
     confirmButton: {
         color: 'white',
         borderColor: 'white',
         height: 36,
         padding: '0 8px',
+        marginLeft: 'auto',
         minWidth: 100
     },
     deposit: {
         width: '100%',
-        color: '#7B8FFE'
+        color: '#647CFE',
+        '&:hover': {
+            cursor: 'pointer'
+        }
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
-    confirmationCallback: (success: boolean) => void;
     deleteHandler: (doc: IDoctor) => (confirm: boolean) => void;
     unconfirmed?: boolean;
-    acceptAgent?: (doctor: IDoctor) => boolean;
+    showBadges?: boolean;
+    confirmHandler?: (doc: IDoctor) => void;
     openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
 }
 
 @inject(({
     appState: {
-        departmentsStore: {
-            acceptAgent
-        },
         uiStore: {
             openModal,
             openDelPopper
@@ -86,20 +118,23 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     openDelPopper,
-    acceptAgent,
     openModal
 }))
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
 
-    confirmClickHandler =  async () => {
-        const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
-        if (!unconfirmed) return;
+    confirmClickHandler = async () => {
+        const { confirmHandler, doctor } = this.props;
+        if (!confirmHandler) return;
         this.isLoadingConfirmation = true;
-        const isConfirmed = await acceptAgent(doctor);
+        await confirmHandler(doctor);
         this.isLoadingConfirmation = false;
-        confirmationCallback(isConfirmed);
+    }
+
+    depositModalHandler = () => {
+        const { openModal, doctor } = this.props;
+        openModal(EDIT_DEPOSIT_MODAL, doctor);
     }
 
     editClickHandler = () => {
@@ -118,8 +153,11 @@ class DoctorListItem extends Component<IProps> {
     render() {
         const {
             unconfirmed,
+            showBadges,
             classes,
             doctor: {
+                FFMCommit,
+                RMCommit,
                 LPUName,
                 name,
                 specialty,
@@ -132,54 +170,65 @@ class DoctorListItem extends Component<IProps> {
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                <Grid xs={3} container item>
+                 {
+                    unconfirmed && showBadges &&
+                    <Grid className={classes.badgesContainer}>
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
+                    </Grid>
+                }
+                <Grid xs container item>
                     <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
                     </Typography>
                 </Grid>
-                <Grid xs={3} container item>
+                <Grid xs container item>
                     <Typography variant='body2' className={classes.text}>
                         { name || '-' }
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' className={classes.text}>
                         { specialty || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
-                            ? '-'
-                            : <>
-                                <span className={classes.phone}>{ mobilePhone }</span>
-                                <span className={classes.phone}>{ workPhone }</span>
-                              </>
+                                ? '-'
+                                : <>
+                                    <span className={classes.phone}>{mobilePhone}</span>
+                                    <span className={classes.phone}>{workPhone}</span>
+                                </>
                         }
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' className={classes.text}>
                         { card || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
+
+                <Grid xs={3} alignItems='center' wrap='nowrap' container item>
                     {
                         unconfirmed
-                        ? <Button
-                            disabled={this.isLoadingConfirmation}
-                            onClick={this.confirmClickHandler}
-                            className={classes.confirmButton}
-                            variant='outlined'>
+                            ? <Button
+                                disabled={this.isLoadingConfirmation}
+                                onClick={this.confirmClickHandler}
+                                className={classes.confirmButton}
+                                variant='outlined'>
                                 {
                                     this.isLoadingConfirmation
-                                    ? <LoadingMask size={20} />
-                                    : 'Підтвердити'
+                                        ? <LoadingMask size={20}/>
+                                        : 'Підтвердити'
                                 }
-                          </Button>
+                            </Button>
                         : <>
-                            <Typography variant='body2' className={cx(classes.deposit, classes.text)}>
+                            <Typography
+                                variant='body2'
+                                onClick={this.depositModalHandler}
+                                className={cx(classes.deposit, classes.text)}>
                                 { deposit || 0 }
                             </Typography>
                             <IconButton onClick={this.editClickHandler}>

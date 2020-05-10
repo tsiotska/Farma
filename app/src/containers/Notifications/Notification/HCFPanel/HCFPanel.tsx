@@ -72,8 +72,8 @@ class HCFPanel extends Component<IProps> {
                 address,
                 phone1,
                 phone2,
-                ffmConfirm,
-                rmConfirm
+                FFMCommit,
+                RMCommit
             }
         } = this.props;
 
@@ -81,8 +81,8 @@ class HCFPanel extends Component<IProps> {
             <>
                 <Grid xs={3} alignItems='center' container item>
                     <>
-                        <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm} />
-                        <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm} />
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit} />
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit} />
                     </>
                     <Typography className={classes.text} variant='body2'>
                         { name || '-' }

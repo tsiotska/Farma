@@ -58,6 +58,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     setPharmacyDemand?: (value: boolean) => void;
     openModal?: (modalName: string) => void;
+    acceptPharmacy?: (lpu: ILPU) => boolean;
     loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
@@ -70,6 +71,7 @@ interface IProps extends WithStyles<typeof styles> {
             setPharmacyDemand,
             unconfirmedPharmacies,
             loadUnconfirmedPharmacies,
+            acceptPharmacy,
             loadTypes
         },
         uiStore: {
@@ -90,6 +92,7 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmedPharmacies,
     loadUnconfirmedPharmacies,
     openModal,
+    acceptPharmacy,
     loadTypes
 }))
 @observer
@@ -97,8 +100,8 @@ class Pharmacy extends Component<IProps> {
     autorunDisposer: any;
     reactionDisposer: any;
 
-    @observable showSnackbar: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable snackbarMessage: string = null;
     @observable types: string[] = [];
     @observable preparedPharmacies: ILPU[] = [];
 
@@ -126,15 +129,28 @@ class Pharmacy extends Component<IProps> {
         this.snackbarType = isDeleted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-        this.showSnackbar = true;
+        this.snackbarMessage = isDeleted
+            ? 'Аптеку видалено'
+            : 'Видалити аптеку не вдалося';
     }
 
     snackbarCloseHandler = () => {
-        this.showSnackbar = false;
+        this.snackbarMessage = null;
     }
 
     retryClickHandler = () => {
         this.props.loadPharmacies(true);
+    }
+
+    confirmPharmacyHandler = async (pharmacy: ILPU) => {
+        const isAccepted = await this.props.acceptPharmacy(pharmacy);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isAccepted
+            ? 'Аптеку підтверджено'
+            : 'Підтвердити аптеку не вдалося';
+        return isAccepted;
     }
 
     addPharmacyClickHandler = () => this.props.openModal(ADD_PHARMACY_MODAL);
@@ -209,13 +225,14 @@ class Pharmacy extends Component<IProps> {
                         </Typography>
                         <HCFList
                             onDelete={this.deleteCallback}
+                            confirmHandler={this.confirmPharmacyHandler}
                             data={unconfirmedPharmacies}
                             unconfirmed
                         />
                     </Grid>
                 }
                 {
-                    this.isUnconfirmedPharmaciesLoading && <LinearProgress />
+                    this.isUnconfirmedPharmaciesLoading && <LinearProgress/>
                 }
                 <Grid
                     className={classes.header}
@@ -267,6 +284,12 @@ class Pharmacy extends Component<IProps> {
                     setCurrentPage={setCurrentPage}
                     className={classes.pagination}
                 />
+                <Snackbar
+                    open={!!this.snackbarMessage}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={this.snackbarMessage}
+                />
                 <AddPharmacy types={this.types} />
                 <EditPharmacy types={this.types} />
                 <DeletePopover
@@ -278,16 +301,6 @@ class Pharmacy extends Component<IProps> {
                         vertical: 'top',
                         horizontal: 'right',
                     }}
-                />
-                <Snackbar
-                    open={this.showSnackbar}
-                    onClose={this.snackbarCloseHandler}
-                    type={this.snackbarType}
-                    message={
-                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                            ? 'ЛПУ успішно видалено'
-                            : 'Неможливо видалити ЛПУ'
-                    }
                 />
             </Grid>
         );

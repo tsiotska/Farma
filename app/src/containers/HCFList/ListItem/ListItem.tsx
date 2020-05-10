@@ -8,13 +8,15 @@ import {
     IconButton,
     Button
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { ILPU } from '../../../interfaces/ILPU';
 import cx from 'classnames';
 import { Edit, Delete } from '@material-ui/icons';
 import { gridStyles } from '../gridStyles';
 import { ILocation } from '../../../interfaces/ILocation';
 import CommitBadge from '../../../components/CommitBadge';
+import LoadingMask from '../../../components/LoadingMask';
+import { observable, toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -22,6 +24,8 @@ const styles = (theme: any) => createStyles({
         marginBottom: 1,
         minHeight: 48,
         padding: '5px 0',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
             : theme.palette.primary.white,
@@ -78,14 +82,26 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     pharmacy: ILPU;
-    unconfirmed: boolean;
+    unconfirmed?: boolean;
     region: ILocation;
     editClickHandler?: (lpu: ILPU) => void;
     deleteClickHandler?: (lpu: ILPU, anchorEl: Element) => void;
+    confirmHandler?: (pharmacy: ILPU) => void;
 }
 
 @observer
 class ListItem extends Component<IProps> {
+
+    @observable isLoadingConfirmation: boolean = false;
+
+    confirmClickHandler = async () => {
+        const { confirmHandler, pharmacy } = this.props;
+        if (!confirmHandler) return;
+        this.isLoadingConfirmation = true;
+        await confirmHandler(pharmacy);
+        this.isLoadingConfirmation = false;
+    }
+
     get regionName(): string {
         const { region } = this.props;
         return region
@@ -117,43 +133,43 @@ class ListItem extends Component<IProps> {
                 address,
                 phone1,
                 phone2,
-                ffmConfirm,
-                rmConfirm
+                FFMCommit,
+                RMCommit
             }
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='flex-start' container>
+            <Grid className={classes.root} alignItems='center' container>
                 <Grid className={cx(classes.cell, classes.name)} xs alignItems='center' container item>
                     {
                         unconfirmed &&
                         <>
-                            <CommitBadge className={classes.badge} title='ФФМ' committed={ffmConfirm} />
-                            <CommitBadge className={classes.badge} title='РМ' committed={rmConfirm} />
+                            <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                            <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                         </>
                     }
                     <Typography className={classes.text} variant='body2'>
-                        { name }
+                        {name}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { this.regionName }
+                        {this.regionName}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.oblast)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { oblast }
+                        {oblast}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { city }
+                        {city}
                     </Typography>
                 </Grid>
                 <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { address }
+                        {address}
                     </Typography>
                 </Grid>
                 <Grid
@@ -164,20 +180,28 @@ class ListItem extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span className={classes.phoneText}>{ phone1 }</span>
-                        <span className={classes.phoneText}>{ phone2 }</span>
+                        <span className={classes.phoneText}>{phone1}</span>
+                        <span className={classes.phoneText}>{phone2}</span>
                     </Typography>
                     {
                         unconfirmed
-                        ? <Button variant='outlined' className={classes.confirmButton}>
-                            Підтвердити
-                          </Button>
-                        : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
-                            <Edit className={classes.icon} />
-                          </IconButton>
+                            ? <Button
+                                disabled={this.isLoadingConfirmation}
+                                onClick={this.confirmClickHandler}
+                                className={classes.confirmButton}
+                                variant='outlined'>
+                                {
+                                    this.isLoadingConfirmation
+                                        ? <LoadingMask size={20}/>
+                                        : 'Підтвердити'
+                                }
+                            </Button>
+                            : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
+                                <Edit className={classes.icon}/>
+                            </IconButton>
                     }
                     <IconButton onClick={this.deleteClickHandler} className={classes.iconButton}>
-                        <Delete className={classes.icon} />
+                        <Delete className={classes.icon}/>
                     </IconButton>
                 </Grid>
             </Grid>

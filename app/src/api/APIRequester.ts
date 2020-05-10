@@ -6,8 +6,11 @@ import { medsStatNormalizer } from './../helpers/normalizers/medsStatNormalizer'
 import { ILPU } from './../interfaces/ILPU';
 import { positionsNormalizer } from './../helpers/normalizers/positionsNormalizer';
 import { medsNormalizer } from './../helpers/normalizers/medsNormalizer';
-import axios, { AxiosInstance } from 'axios';
+import { depositNormalizer } from './../helpers/normalizers/depositNormalizer';
 
+import axios, { AxiosInstance } from 'axios';
+import { IDeposit } from '../interfaces/IDeposit';
+import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { IDepartment } from '../interfaces/IDepartment';
 import { branchesNormalizer, branchNormalizer } from '../helpers/normalizers/branchesNormalizer';
 import { IUser } from '../interfaces';
@@ -30,12 +33,13 @@ import { notificationsNormalizer } from '../helpers/normalizers/notificationsNor
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
 import { doctorsNormalizer, doctorNormalizer } from '../helpers/normalizers/doctorsNormalizer';
-import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormaliser';
+import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormalizer';
 import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer';
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
+import { toJS } from 'mobx';
 
 export interface ICachedPromise<T> {
     promise: Promise<T>;
@@ -210,10 +214,10 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    editPharmacy(id: number, data: any): Promise<boolean> {
-        return this.instance.put(`/api/pharmacy/${id}`, data)
-        .then(() => true)
-        .catch(this.defaultErrorHandler(false));
+    editPharmacy(depId: number, data: any): Promise<boolean> {
+        return this.instance.put(`/api/pharmacy/${depId}`, data)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
     }
 
     deleteLpu(id: number): Promise<boolean> {
@@ -548,6 +552,20 @@ export class APIRequester {
                     : CONFIRM_STATUS.CONFIRMED;
             })
             .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
+    }
+
+    getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
+        return this.instance.get(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`)
+            .then(depositNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    postDeposit(departmentId: number, mpId: number, doctorId: number, payload: any): Promise<boolean> {
+        return this.instance.post(`/api/branch/${departmentId}/mp/${mpId}/agent/${doctorId}/deposit`, payload)
+            .then(({ status }) => {
+                return status === 200;
+            })
+            .catch(this.defaultErrorHandler());
     }
 
     getDocsPositions(): Promise<string[]> {

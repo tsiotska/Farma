@@ -14,6 +14,8 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { USER_ROLE } from '../../constants/Roles';
 import { LOCATION_TITLE } from './List/List';
 import ExcelIcon from '../../components/ExcelIcon';
+import { IDoctor } from '../../interfaces/IDoctor';
+import UnconfirmedDoctorsList from './UnconfirmedDoctorsList/UnconfirmedDoctorsList';
 import { ADD_WORKER_MODAL } from '../../constants/Modals';
 import DeletePopover from '../../components/DeletePopover';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
@@ -65,6 +67,8 @@ interface IProps extends WithStyles<typeof styles> {
     firedWorkers?: IWorker[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     role?: USER_ROLE;
+    loadUnconfirmedDoctors: () => IDoctor[];
+    pureAgentConfirm?: (doctor: IDoctor) => boolean;
     openModal?: (modalName: string, payload: any) => void;
 }
 
@@ -81,7 +85,9 @@ type TabValue = 'all' | 'fired';
             firedWorkers,
             getAsyncStatus,
             loadWorkersExcel,
-            resetWorkers
+            resetWorkers,
+            loadUnconfirmedDoctors,
+            pureAgentConfirm
         },
         userStore: {
             role
@@ -100,15 +106,18 @@ type TabValue = 'all' | 'fired';
     firedWorkers,
     getAsyncStatus,
     resetWorkers,
+    role,
+    loadUnconfirmedDoctors,
+    pureAgentConfirm,
     openModal,
-    role
 }))
 @withRouter
 @observer
 class Workers extends Component<IProps> {
-    @observable showSnackbar: boolean = false;
-    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable tab: TabValue = 'all';
+    @observable unconfirmedDoctors: IDoctor[] = null;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable snackbarMessage: string = null;
 
     get isFFM(): boolean {
         return this.props.role === USER_ROLE.FIELD_FORCE_MANAGER;
@@ -130,12 +139,13 @@ class Workers extends Component<IProps> {
 
     loadExcel = () => this.props.loadWorkersExcel();
 
-    loadData = () => {
-        const { loadWorkers, loadFiredWorkers } = this.props;
+    loadData = async () => {
+        const { loadWorkers, loadFiredWorkers, loadUnconfirmedDoctors } = this.props;
         const action = this.tab === 'all'
             ? loadWorkers
             : loadFiredWorkers;
         action();
+        this.unconfirmedDoctors = await loadUnconfirmedDoctors();
     }
 
     tabChangeHandler = (event: any, value: TabValue) => {
@@ -159,11 +169,27 @@ class Workers extends Component<IProps> {
         this.snackbarType = workerRemoved
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-        this.showSnackbar = true;
+        this.snackbarMessage = workerRemoved
+            ? 'Видалити працівника не вдалося'
+            : 'Працівник успішно видалений';
     }
 
     snackbarCloseHandler = () => {
-        this.showSnackbar = false;
+        this.snackbarMessage = null;
+    }
+
+    confirmHandler = async (doc: IDoctor) => {
+        const { pureAgentConfirm, loadUnconfirmedDoctors } = this.props;
+        const isConfirmed = await pureAgentConfirm(doc);
+        this.snackbarType = isConfirmed
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isConfirmed
+            ? 'Лікаря підтверджено'
+            : 'Підтвердити лікаря не вдалося';
+        if (isConfirmed) {
+            this.unconfirmedDoctors = await loadUnconfirmedDoctors();
+        }
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -201,6 +227,13 @@ class Workers extends Component<IProps> {
 
         return (
             <Grid className={classes.root} direction='column' container>
+                {
+                    (this.unconfirmedDoctors && this.unconfirmedDoctors.length > 0) &&
+                    <UnconfirmedDoctorsList
+                        unconfirmedDoctors={this.unconfirmedDoctors}
+                        confirmHandler={this.confirmHandler}
+                    />
+                }
                 <Grid wrap='nowrap' container alignItems='center'>
                     <Tabs
                         classes={{
@@ -238,20 +271,16 @@ class Workers extends Component<IProps> {
                     }
                     headerAppend={
                         <IconButton className={classes.excelButton} onClick={this.loadExcel}>
-                            <ExcelIcon size={24} />
+                            <ExcelIcon size={24}/>
                         </IconButton>
                     }
                 />
                 <DeletePopover />
                 <Snackbar
-                    open={this.showSnackbar}
+                    open={!!this.snackbarMessage}
                     type={this.snackbarType}
                     onClose={this.snackbarCloseHandler}
-                    message={
-                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                            ? 'Працівника видалено'
-                            : 'Видалити працівника невдалося'
-                    }
+                    message={this.snackbarMessage}
                 />
             </Grid>
         );

@@ -10,7 +10,7 @@ import { IProps } from '.';
 
 @observer
 class InputFormRow<T> extends Component<IProps<T>> {
-    changeHandler = ({ target: { value }}: any) => {
+    changeHandler = ({ target: { value } }: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
     }
@@ -34,7 +34,7 @@ class InputFormRow<T> extends Component<IProps<T>> {
                     required={required}
                     disableAnimation
                     shrink>
-                    { label }
+                    {label}
                 </InputLabel>
                 <Input
                     onChange={this.changeHandler}
@@ -42,13 +42,13 @@ class InputFormRow<T> extends Component<IProps<T>> {
                     disableUnderline
                     type={
                         password
-                        ? 'password'
-                        : 'text'
+                            ? 'password'
+                            : 'text'
                     }
                     value={
                         value === undefined
-                        ? values[propName]
-                        : value
+                            ? values[propName]
+                            : value
                     }
                 />
                 {

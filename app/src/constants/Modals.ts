@@ -13,3 +13,5 @@ export const EDIT_PHARMACY_MODAL: string = 'EDIT_PHARMACY_MODAL';
 export const ADD_BONUS_MODAL: string = 'ADD_BONUS_MODAL';
 export const ADD_WORKER_MODAL: string = 'ADD_WORKER_MODAL';
 export const EDIT_WORKER_MODAL: string = 'EDIT_WORKER_MODAL';
+
+export const EDIT_DEPOSIT_MODAL: string = 'EDIT_DEPOSIT_MODAL';
