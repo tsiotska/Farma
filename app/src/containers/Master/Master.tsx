@@ -70,6 +70,7 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     currentDepartmentId?: number;
     isUserFetched?: boolean;
     setCurrentDepartment?: (departmentId: number) => void;
+    previewUser?: IUser;
 }
 
 export interface IRoleContent {
@@ -94,7 +95,8 @@ const doctors = { title: 'Лікарі', path: DOCTORS_ROUTE, component: Doctors
             role,
             isAdmin,
             user,
-            isUserFetched
+            isUserFetched,
+            previewUser
         },
         departmentsStore: {
             currentDepartmentId,
@@ -107,6 +109,7 @@ const doctors = { title: 'Лікарі', path: DOCTORS_ROUTE, component: Doctors
     isAdmin,
     currentDepartmentId,
     isUserFetched,
+    previewUser,
     setCurrentDepartment
 }))
 @withRouter
@@ -168,19 +171,35 @@ export class Master extends Component<IProps, null> {
         const {
             setCurrentDepartment,
             currentDepartmentId,
-            location: { pathname }
+            history,
+            location: { pathname },
+            previewUser
         } = this.props;
 
         const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
-
+        console.log('previewUser: ', toJS(previewUser));
         if (matchDepartmentPath) {
-            const departmentId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
-            ? +((matchDepartmentPath.params as any).departmentId)
-            : null;
+            const urlDepId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
+                ? +((matchDepartmentPath.params as any).departmentId)
+                : null;
 
-            if (departmentId && departmentId !== currentDepartmentId) {
-                setCurrentDepartment(departmentId);
+            const userDepartment = previewUser
+                ? previewUser.department
+                : null;
+
+            if (userDepartment) {
+                if (userDepartment !== currentDepartmentId) {
+                    setCurrentDepartment(userDepartment);
+                }
+                if (userDepartment !== urlDepId && this.redirectPath) {
+                    history.push(this.redirectPath);
+                }
             }
+
+            // const isDepEqual = (!!userDepartment && userDepartment) === (!!urlDepId && urlDepId);
+            // if (urlDepId && urlDepId !== currentDepartmentId) {
+            //     setCurrentDepartment(urlDepId);
+            // }
         } else if (!!matchPath(pathname, ADMIN_ROUTE)) {
             setCurrentDepartment(null);
         }
