@@ -4,6 +4,7 @@ import { computed, action, observable, toJS } from 'mobx';
 
 import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
+
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
@@ -15,6 +16,8 @@ import { INotification } from '../interfaces/iNotification';
 import uniq from 'lodash/uniq';
 import format from 'date-fns/format';
 import { IMedicine } from '../interfaces/IMedicine';
+import { IDeposit } from '../interfaces/IDeposit';
+import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 
 export interface IMarkFraction {
     payments: number;
@@ -58,8 +61,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @computed
     get isAdmin(): boolean {
         return this.user
-        ? multiDepartmentRoles.includes(this.user.position)
-        : false;
+            ? multiDepartmentRoles.includes(this.user.position)
+            : false;
     }
 
     @computed
@@ -75,13 +78,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @computed
     get role(): USER_ROLE {
         return this.previewUser
-        ? this.previewUser.position
-        : USER_ROLE.UNKNOWN;
+            ? this.previewUser.position
+            : USER_ROLE.UNKNOWN;
     }
 
     @computed
     get filteredMeds(): IMedicine[] {
-        const { departmentsStore: { currentDepartmentMeds }} = this.rootStore;
+        const { departmentsStore: { currentDepartmentMeds } } = this.rootStore;
         if (!this.previewBonus) return [];
         const { sales } = this.previewBonus;
         return currentDepartmentMeds.filter(x => sales.has(x.id));
@@ -92,8 +95,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         const userId = this.previewUser
-        ? this.previewUser.id
-        : null;
+            ? this.previewUser.id
+            : null;
 
         const urls: any = {
             [USER_ROLE.FIELD_FORCE_MANAGER]: {
@@ -113,8 +116,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const dateToString = format(dateTo, `yyyy-'${monthTo}'-dd`);
 
         const url = urls[this.role]
-        ? `${urls[this.role][mode]}?from=${dateFromString}&to=${dateToString}`
-        : null;
+            ? `${urls[this.role][mode]}?from=${dateFromString}&to=${dateToString}`
+            : null;
 
         if (userId === null || !url) return;
 
@@ -177,8 +180,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         const id = this.previewUser
-        ? this.previewUser.id
-        : null;
+            ? this.previewUser.id
+            : null;
 
         if (!this.previewBonus || id === null || currentDepartmentId === null) return;
 
@@ -187,17 +190,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const marks = agents.reduce((acc, curr) => {
             const { marks: agentMarks, id: agent } = curr;
             const preparedMarks = [...agentMarks.values()].map(({
-                deposit,
-                drugId,
-                mark,
-                payments
-            }) => ({
-                agent,
-                drug: drugId,
-                payments: payments,
-                deposit: deposit,
-                drug_mark: mark,
-            }));
+                    deposit,
+                    drugId,
+                    mark,
+                    payments
+                }) => ({
+                    agent,
+                    drug: drugId,
+                    payments: payments,
+                    deposit: deposit,
+                    drug_mark: mark,
+                })
+            );
             return [...acc, ...preparedMarks];
         }, []);
 
@@ -301,7 +305,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     async loadBonusesData() {
-        const { api, departmentsStore: { currentDepartmentId }} = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         if (!currentDepartmentId || !this.previewUser) return;
 
@@ -429,12 +433,20 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     changeMedSalary(level: number, medId: number, propName: keyof IMedSalary, value: number) {
-        try { this.userSalary.get(level).meds[medId][propName] = value; } catch { return; }
+        try {
+            this.userSalary.get(level).meds[medId][propName] = value;
+        } catch {
+            return;
+        }
     }
 
     @action.bound
     changeUserSalary(level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) {
-        try { this.userSalary.get(level)[propName] = value; } catch { return; }
+        try {
+            this.userSalary.get(level)[propName] = value;
+        } catch {
+            return;
+        }
     }
 
     @action.bound
@@ -540,7 +552,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 setCurrentDepartment,
                 loadFFMs,
                 loadLocations
-        } } = this.rootStore;
+            }
+        } = this.rootStore;
 
         this.setLoading(requestName);
         const user = await api.getUser();
@@ -575,7 +588,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const requestName = 'logout';
         const {
             api,
-            departmentsStore: { resetStore: resetDepartmentsStore  },
+            departmentsStore: { resetStore: resetDepartmentsStore },
             salesStore: { resetStore: resetSalesStore }
         } = this.rootStore;
 
@@ -606,8 +619,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
             const userFetched = await this.loadUserProfile();
 
             const callback = userFetched
-            ? this.setSuccess
-            : this.setError;
+                ? this.setSuccess
+                : this.setError;
             callback(requestName);
 
             return userFetched;
@@ -619,9 +632,12 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     private getNextRole(): USER_ROLE {
         switch (this.role) {
-            case USER_ROLE.FIELD_FORCE_MANAGER: return USER_ROLE.REGIONAL_MANAGER;
-            case USER_ROLE.REGIONAL_MANAGER: return USER_ROLE.MEDICAL_AGENT;
-            default: return USER_ROLE.UNKNOWN;
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                return USER_ROLE.REGIONAL_MANAGER;
+            case USER_ROLE.REGIONAL_MANAGER:
+                return USER_ROLE.MEDICAL_AGENT;
+            default:
+                return USER_ROLE.UNKNOWN;
         }
     }
 
@@ -662,5 +678,52 @@ export default class UserStore extends AsyncStore implements IUserStore {
         });
 
         return res;
+    }
+
+    @action.bound
+    loadDepositHistory(): Promise<IDeposit[]> {
+        const requestName = 'loadDepositHistory';
+        const {
+            api,
+            departmentsStore: {
+                currentDepartment
+            },
+            uiStore: {
+                modalPayload: doctor
+            }
+        } = this.rootStore;
+
+        return this.dispatchRequest(
+            api.getDepositHistory(
+                currentDepartment.id,
+                this.previewUser.id,
+                doctor.id
+            ),
+            requestName
+        );
+    }
+
+    @action.bound
+    insertDeposit(docId: number, { deposit, message }: IDepositFormValue): Promise<boolean> {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        const mpId = (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? this.previewUser.id
+            : null;
+
+        const preparedData = {
+            message,
+            deposit: +deposit
+        };
+
+        return this.dispatchRequest(
+            api.postDeposit(
+                currentDepartmentId,
+                mpId,
+                docId,
+                preparedData
+            ),
+            'insertDeposit'
+        );
     }
 }

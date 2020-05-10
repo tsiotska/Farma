@@ -7,8 +7,7 @@ import Header from './Header';
 import { ILPU } from '../../interfaces/ILPU';
 
 const styles = (theme: any) => createStyles({
-    root: {
-    },
+    root: {},
     pagination: {
         margin: '16px 0 60px auto'
     }
@@ -17,6 +16,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     data?: ILPU[];
     showHeader?: boolean;
+    confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
     onDelete?: (deleted: boolean) => void;
 }
@@ -29,13 +29,15 @@ class HCFList extends Component<IProps> {
             data,
             showHeader,
             unconfirmed,
-            onDelete
+            onDelete,
+            confirmHandler
         } = this.props;
 
         return (
             <Grid direction='column' className={classes.root} container>
                 { showHeader && <Header />}
                 <PharmaciesList
+                    confirmHandler={confirmHandler}
                     onDelete={onDelete}
                     data={data}
                     unconfirmed={unconfirmed} />

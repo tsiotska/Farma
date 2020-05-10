@@ -67,6 +67,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @observable workers: IWorker[] = []; // agents store
     @observable expandedWorker: IExpandedWorker = null;  // agents store
     @observable firedWorkers: IWorker[] = []; // agents store
+
     @observable doctors: IDoctor[] = []; // docs store
     @observable previewDoctorId: number = null;
 
@@ -1283,6 +1284,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
+        const { api } = this.rootStore;
+        return CONFIRM_STATUS.REJECTED !== await api.accept(doctor.id, 'agent');
+    }
+
+    @action.bound
     async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File | string) {
         const { api } = this.rootStore;
 
@@ -1454,6 +1461,32 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return workerRemoved;
     }
 
+    async acceptPharmacy(pharmacy: ILPU) {
+        const { api } = this.rootStore;
+        const status = await api.accept(pharmacy.id, 'pharmacy');
+
+        if (status === CONFIRM_STATUS.ACCEPTED) {
+            await this.loadUnconfirmedPharmacies();
+        } else if (status === CONFIRM_STATUS.CONFIRMED) {
+            // push doc from unconfirmed to confirmed
+            const indexOfLpu = this.unconfirmedPharmacies
+                ? this.unconfirmedPharmacies.indexOf(pharmacy)
+                : -1;
+
+            if (indexOfLpu !== -1) {
+                this.unconfirmedPharmacies.splice(indexOfLpu, 1);
+            }
+
+            pharmacy.confirmed = true;
+            if (this.pharmacies) this.pharmacies.push(pharmacy);
+            else this.pharmacies = [pharmacy];
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @action.bound
     private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
         const { userStore: { previewUser }} = this.rootStore;
         if (!previewUser || !this.currentDepartmentId) return null;

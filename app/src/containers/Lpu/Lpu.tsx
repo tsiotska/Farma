@@ -57,6 +57,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     loadUnconfirmedLPUs?: () => void;
     openModal?: (modalName: string) => void;
+    acceptLpu?: (lpu: ILPU) => boolean;
     loadTypes?: (targetProp: string) => Promise<string[]>;
 }
 
@@ -66,9 +67,12 @@ interface IProps extends WithStyles<typeof styles> {
             getAsyncStatus,
             loadLPUs,
             sortedLpus: LPUs,
+            currentDepartmentId,
             loadUnconfirmedLPUs,
             unconfirmedLPUs,
+            acceptLpu,
             loadTypes,
+
         },
         uiStore: {
             openModal,
@@ -87,6 +91,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadUnconfirmedLPUs,
     unconfirmedLPUs,
     openModal,
+    acceptLpu,
     loadTypes
 }))
 @observer
@@ -94,7 +99,7 @@ class Lpu extends Component<IProps> {
     autorunDisposer: any;
     reactionDisposer: any;
 
-    @observable showSnackbar: boolean = false;
+    @observable snackbarMessage: string = null;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable preparedLPUs: ILPU[] = [];
     @observable types: string[] = [];
@@ -123,11 +128,13 @@ class Lpu extends Component<IProps> {
         this.snackbarType = isDeleted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-        this.showSnackbar = true;
+        this.snackbarMessage = isDeleted
+            ? 'ЛПУ успішно видалено'
+            : 'Неможливо видалити ЛПУ';
     }
 
     snackbarCloseHandler = () => {
-        this.showSnackbar = false;
+        this.snackbarMessage = null;
     }
 
     retryClickHandler = () => this.props.loadLPUs();
@@ -136,6 +143,16 @@ class Lpu extends Component<IProps> {
         const { loadLPUs, loadUnconfirmedLPUs } = this.props;
         await loadUnconfirmedLPUs();
         await loadLPUs();
+    }
+
+    confirmLpuHandler = async (lpu: ILPU) => {
+        const isAccepted = await this.props.acceptLpu(lpu);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isAccepted
+            ? 'ЛПУ успішно підтверджений'
+            : 'Підтвердити ЛПУ неможливо';
     }
 
     openAddLpuModal = () => this.props.openModal(ADD_LPU_MODAL);
@@ -203,17 +220,18 @@ class Lpu extends Component<IProps> {
             <Grid direction='column' className={classes.root} container>
                 {
                     (Array.isArray(unconfirmedLPUs) && unconfirmedLPUs.length !== 0) &&
-                      <Grid className={classes.unconfirmedList} direction='column' container>
+                    <Grid className={classes.unconfirmedList} direction='column' container>
                         <Typography className={classes.unconfirmedText} color='textSecondary'>
                             Додані ЛПУ
                         </Typography>
                         <HCFList
+                            confirmHandler={this.confirmLpuHandler}
                             onDelete={this.deleteCallback}
                             data={unconfirmedLPUs}
                             unconfirmed />
                       </Grid>
                 }
-                { this.isUnconfirmedLPUsLoading && <LinearProgress /> }
+                {this.isUnconfirmedLPUsLoading && <LinearProgress/>}
                 <Grid
                     className={classes.header}
                     justify='space-between'
@@ -275,14 +293,10 @@ class Lpu extends Component<IProps> {
                     }}
                 />
                 <Snackbar
-                    open={this.showSnackbar}
+                    open={!!this.snackbarMessage}
                     onClose={this.snackbarCloseHandler}
                     type={this.snackbarType}
-                    message={
-                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                            ? 'ЛПУ успішно видалено'
-                            : 'Неможливо видалити ЛПУ'
-                    }
+                    message={this.snackbarMessage}
                 />
             </Grid>
         );

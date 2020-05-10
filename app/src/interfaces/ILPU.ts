@@ -9,8 +9,8 @@ export interface ILPU {
     phone1: string;
     phone2: string;
 
-    ffmConfirm?: boolean;
-    rmConfirm?: boolean;
+    FFMCommit?: boolean;
+    RMCommit?: boolean;
     confirmed?: boolean;
 
     lpu?: number;

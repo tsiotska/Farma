@@ -17,6 +17,7 @@ import DoctorListItem from './DoctorListItem';
 import Pagination from '../../components/Pagination';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import EditDepositModal from './EditDepositModal';
 import CreateDoctorModal from './CreateDoctorModal';
 import EditDoctorModal from './EditDoctorModal.tsx';
 import DeletePopover from '../../components/DeletePopover';
@@ -46,6 +47,7 @@ interface IProps extends WithStyles<typeof styles> {
     previewUser?: IUser;
     previewDoctorId?: number;
     setPreviewDoctor?: (id: number) => void;
+    acceptAgent?: (doc: IDoctor) => boolean;
 }
 
 @inject(({
@@ -57,7 +59,8 @@ interface IProps extends WithStyles<typeof styles> {
             doctors,
             removeDoctor,
             previewDoctorId,
-            setPreviewDoctor
+            setPreviewDoctor,
+            acceptAgent
         },
         uiStore: {
             setCurrentPage,
@@ -71,6 +74,7 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     removeDoctor,
+    acceptAgent,
     loadDoctors,
     getAsyncStatus,
     clearDoctors,
@@ -139,14 +143,15 @@ class Doctors extends Component<IProps> {
         this.isSnackbarOpen = false;
     }
 
-    confirmationCallback =  (success: boolean) => {
-        this.snackbarType = success
+    confirmHandler = async (doc: IDoctor) => {
+        const { acceptAgent } = this.props;
+        const isAccepted = await acceptAgent(doc);
+        this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
-        this.snackbarMessage = success
+        this.snackbarMessage = isAccepted
             ? 'Лікар успішно підтверджений'
             : 'Підтвердити лікаря неможливо';
-        this.isSnackbarOpen = true;
     }
 
     clearTarget = () => {
@@ -228,7 +233,7 @@ class Doctors extends Component<IProps> {
                             removeHighlighting={this.removeHighlight}
                             unconfirmed={doc.confirmed === false}
                             deleteHandler={this.deleteHandler}
-                            confirmationCallback={this.confirmationCallback}
+                            confirmHandler={this.confirmHandler}
                             rootRef={(el: any) => {
                                 try {
                                     if (doc.id === this.target) {
@@ -255,6 +260,7 @@ class Doctors extends Component<IProps> {
                     type={this.snackbarType}
                     message={this.snackbarMessage}
                 />
+                <EditDepositModal/>
                 <CreateDoctorModal />
                 <EditDoctorModal />
                 <DeletePopover

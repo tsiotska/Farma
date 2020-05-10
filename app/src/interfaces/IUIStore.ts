@@ -6,4 +6,5 @@ export interface IUIStore {
     currentPage: number;
     LpuSortSettings: ISortBy;
     LpuFilterSettings: IFilterBy;
+    modalPayload: any;
 }
