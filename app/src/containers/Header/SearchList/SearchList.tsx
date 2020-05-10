@@ -1,5 +1,5 @@
 import React, { Component, RefObject } from 'react';
-import { createStyles, WithStyles, Popper, Typography, Paper } from '@material-ui/core';
+import { createStyles, WithStyles, Popper, Typography, Paper, Button } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ISearchResult } from '../../../interfaces/ISearchResult';
@@ -12,22 +12,36 @@ const styles = (theme: any) => createStyles({
     },
     paper: {
         maxHeight: '30vh',
-        overflowY: 'auto'
+        overflow: 'hidden auto',
+        padding: '10px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+    },
+    loadButton: {
+        marginTop: 16,
+        marginBottom: 10
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;
-    // anchor: HTMLElement | RefObject<HTMLElement>;
     items: ISearchResult[];
 }
 
 @observer
 class SearchList extends Component<IProps> {
+    readonly maxCount: number = 50;
+
+    @computed
+    get anchorWidth(): number {
+        return this.props.anchor.offsetWidth;
+    }
+
     @computed
     get paperWidth(): { width: number } {
-        const { anchor } = this.props;
-        return { width: anchor.offsetWidth };
+        return { width: this.anchorWidth };
     }
 
     get shouldDisplayData(): boolean {
@@ -40,26 +54,44 @@ class SearchList extends Component<IProps> {
         return !items || !items.length;
     }
 
+    clickHandler = (e: any) => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+    }
+
     render() {
         const { items, anchor, classes } = this.props;
 
         return (
             <Popper
+                onClick={this.clickHandler}
                 className={classes.root}
                 open={items !== null}
                 anchorEl={anchor}>
                     <Paper className={classes.paper} style={this.paperWidth}>
-                        {
-                            this.shouldDisplayData &&
-                            items.map(x => (
-                                <SearchItem key={`${x.id}${x.mp}`} item={x} />
-                            ))
-                        }
+                        <div>
+                            {
+                                this.shouldDisplayData &&
+                                items.map(x => (
+                                    <SearchItem
+                                        key={`${x.id}${x.mp}`}
+                                        maxWidth={this.anchorWidth}
+                                        item={x}
+                                    />
+                                ))
+                            }
+                        </div>
                         {
                             this.hasNoData &&
                             <Typography>
                                 За вашим пошуком нічого не знайдено
                             </Typography>
+                        }
+                        {
+                            this.shouldDisplayData && items.length === this.maxCount &&
+                            <Button className={classes.loadButton} variant='contained' color='primary'>
+                                Завантажити ще лікарів...
+                            </Button>
                         }
                     </Paper>
             </Popper>

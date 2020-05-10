@@ -26,7 +26,8 @@ interface IProps extends WithStyles<typeof styles> {
 
 enum INPUT_STATE {
     SEARCH,
-    CLEAR
+    CLEAR,
+    HIDDEN
 }
 
 @inject(({
@@ -51,6 +52,28 @@ class Search extends Component<IProps> {
             mpName: 'Вакансия Кривой Рог (Шумакова) ',
             name: '. Вікторія Олексіївна',
             rm: 17,
+        },
+        {
+            address: 'просп. Перемоги (30-річчя Перемоги), 2',
+            city: 'г. Кривой Рог',
+            ffm: 2,
+            id: 8587,
+            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
+            mp: 124,
+            mpName: 'Вакансия Кривой Рог (Шумакова) ',
+            name: '. Вікторія Олексіївна',
+            rm: 17,
+        },
+        {
+            address: 'просп. Перемоги (30-річчя Перемоги), 2',
+            city: 'г. Кривой Рог',
+            ffm: 24,
+            id: 85807,
+            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
+            mp: 124,
+            mpName: 'Вакансия Кривой Рог (Шумакова) ',
+            name: '. Вікторія Олексіївна',
+            rm: 17,
         }
     ];
     @observable query: string = '';
@@ -60,6 +83,12 @@ class Search extends Component<IProps> {
     @observable status: INPUT_STATE = INPUT_STATE.CLEAR;
     @observable page: number = 1;
     @observable inputRef = React.createRef<HTMLElement>();
+
+    get suggestItems(): ISearchResult[] {
+        return this.status === INPUT_STATE.HIDDEN
+            ? null
+            : this.searchResult;
+    }
 
     searchClickHandler = async () => {
         const { loadSearchQuery } = this.props;
@@ -83,13 +112,45 @@ class Search extends Component<IProps> {
         this.searchResult = null;
     }
 
+    enterPressHandler = ({ keyCode }: any) => {
+        if (keyCode === 13) this.searchClickHandler();
+    }
+
+    focusHandler = () => {
+        document.addEventListener('keypress', this.enterPressHandler);
+    }
+
+    blurHandler = () => {
+        document.removeEventListener('keypress', this.enterPressHandler);
+    }
+
+    clickHandler =  (e: any) => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+        this.status = INPUT_STATE.SEARCH;
+    }
+
+    globalClickHandler = () => {
+        this.status = INPUT_STATE.HIDDEN;
+    }
+
+    componentDidMount() {
+        document.addEventListener('click', this.globalClickHandler);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('click', this.globalClickHandler);
+    }
+
     render() {
         const { classes } = this.props;
-        // console.log(this.inputRef, this.inputRef.current);
-        console.log(toJS(this.isProcessing), toJS(this.searchResult));
+
         return (
             <>
                 <Input
+                    onClick={this.clickHandler}
+                    onFocus={this.focusHandler}
+                    onBlur={this.blurHandler}
                     ref={this.inputRef}
                     className={classes.input}
                     value={this.query}
@@ -118,7 +179,7 @@ class Search extends Component<IProps> {
                     !!this.inputRef && !!this.inputRef.current &&
                     <SearchList
                         anchor={this.inputRef.current}
-                        items={this.searchResult}
+                        items={this.suggestItems}
                     />
                 }
             </>
