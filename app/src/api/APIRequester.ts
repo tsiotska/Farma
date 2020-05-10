@@ -527,32 +527,6 @@ export class APIRequester {
     }
 
     getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
-        return Promise.resolve(
-            {
-                data:
-                    {data:
-                            [{
-                                deposit: 150,
-                                message: 'Виплата',
-                                datetime: '2020-05-09 12:35:40'
-                            },
-                                {
-                                    deposit: -100,
-                                    message: 'Списання',
-                                    datetime: '2020-05-09 12:35:40'
-                                },
-                                {
-                                    deposit: 50,
-                                    message: 'Виплата',
-                                    datetime: '2020-05-09 12:35:40'
-                                }]}
-            }
-        ).then((data) => {
-            console.log('data');
-            console.log(data);
-            return depositNormalizer(data);
-        })
-            .catch(this.defaultErrorHandler());
         return this.instance.get(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`)
             .then(depositNormalizer)
             .catch(this.defaultErrorHandler());
