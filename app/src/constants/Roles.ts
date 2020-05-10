@@ -9,13 +9,13 @@ export enum USER_ROLE {
 }
 
 export const singleDepartmentRoles: USER_ROLE[] = [
-    USER_ROLE.PRODUCT_MANAGER,
     USER_ROLE.MEDICAL_AGENT,
     USER_ROLE.REGIONAL_MANAGER,
     USER_ROLE.FIELD_FORCE_MANAGER,
 ];
 
 export const multiDepartmentRoles: USER_ROLE[] = [
+    USER_ROLE.PRODUCT_MANAGER,
     USER_ROLE.ADMIN,
     USER_ROLE.SUPER_ADMIN
 ];

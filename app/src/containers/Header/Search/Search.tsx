@@ -41,45 +41,9 @@ enum INPUT_STATE {
 }))
 @observer
 class Search extends Component<IProps> {
-    readonly mockItems: ISearchResult[] = [
-        {
-            address: 'просп. Перемоги (30-річчя Перемоги), 2',
-            city: 'г. Кривой Рог',
-            ffm: 2,
-            id: 8587,
-            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
-            mp: 184,
-            mpName: 'Вакансия Кривой Рог (Шумакова) ',
-            name: '. Вікторія Олексіївна',
-            rm: 17,
-        },
-        {
-            address: 'просп. Перемоги (30-річчя Перемоги), 2',
-            city: 'г. Кривой Рог',
-            ffm: 2,
-            id: 8587,
-            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
-            mp: 124,
-            mpName: 'Вакансия Кривой Рог (Шумакова) ',
-            name: '. Вікторія Олексіївна',
-            rm: 17,
-        },
-        {
-            address: 'просп. Перемоги (30-річчя Перемоги), 2',
-            city: 'г. Кривой Рог',
-            ffm: 24,
-            id: 85807,
-            lpuName: 'Криворізька міська клінічна лікарня №2 КЗ ДОР',
-            mp: 124,
-            mpName: 'Вакансия Кривой Рог (Шумакова) ',
-            name: '. Вікторія Олексіївна',
-            rm: 17,
-        }
-    ];
     @observable query: string = '';
     @observable isProcessing: boolean = false;
-    @observable searchResult: ISearchResult[] = [...this.mockItems];
-    // @observable searchResult: ISearchResult[] = null;
+    @observable searchResult: ISearchResult[] = null;
     @observable status: INPUT_STATE = INPUT_STATE.CLEAR;
     @observable page: number = 1;
     @observable inputRef = React.createRef<HTMLElement>();
@@ -123,6 +87,10 @@ class Search extends Component<IProps> {
                 : res;
             this.isProcessing = false;
         });
+    }
+
+    hideList = () => {
+        this.status = INPUT_STATE.HIDDEN;
     }
 
     enterPressHandler = ({ keyCode }: any) => {
@@ -191,6 +159,7 @@ class Search extends Component<IProps> {
                 {
                     !!this.inputRef && !!this.inputRef.current &&
                     <SearchList
+                        hideList={this.hideList}
                         anchor={this.inputRef.current}
                         items={this.suggestItems}
                         loadMoreHandler={this.loadMoreHandler}

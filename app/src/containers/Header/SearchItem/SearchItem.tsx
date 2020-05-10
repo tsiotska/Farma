@@ -3,6 +3,7 @@ import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ISearchResult } from '../../../interfaces/ISearchResult';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -10,13 +11,14 @@ const styles = (theme: any) => createStyles({
         padding: 8,
         minHeight: 48,
         cursor: 'pointer',
+        borderBottom: '1px solid #aaa',
         maxWidth: ({ maxWidth }: any) => maxWidth,
         '&:hover': {
             backgroundColor: '#f3f3f3'
         },
-        // '&:not(:last-of-type)': {
-        borderBottom: '1px solid #aaa',
-        // }
+    },
+    rootLoading: {
+        opacity: 0.5
     },
     mpText: {
         color: '#aaa',
@@ -33,13 +35,21 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     item: ISearchResult;
     maxWidth: number;
+    isLoading: boolean;
+    clickHandler: (item: ISearchResult) => void;
 }
 
 @observer
 class SearchItem extends Component<IProps> {
+    clickHandler = () => {
+        const { clickHandler, item, isLoading } = this.props;
+        if (!isLoading) clickHandler(item);
+    }
+
     render() {
         const {
             classes,
+            isLoading,
             item: {
                 name,
                 mpName,
@@ -49,7 +59,11 @@ class SearchItem extends Component<IProps> {
         } } = this.props;
 
         return (
-            <Grid className={classes.root} container alignItems='flex-start'>
+            <Grid
+                onClick={this.clickHandler}
+                className={cx(classes.root, { [classes.rootLoading]: isLoading })}
+                alignItems='flex-start'
+                container>
                 <Grid className={classes.item} direction='column' xs container item  zeroMinWidth>
                     <Typography className={classes.mpText} variant='body2'>
                         МП: { mpName }

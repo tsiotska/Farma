@@ -309,9 +309,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     setCurrentDepartment(department: number | string | IDepartment) {
         if (typeof department === 'string') {
-            this.currentDepartment = this.departments.find(({ name }) => name === department);
+            this.currentDepartment = this.departments.find(({ name }) => name === department) || null;
         } else if (typeof department === 'number') {
-            this.currentDepartment = this.departments.find(({ id }) => id === department);
+            this.currentDepartment = this.departments.find(({ id }) => id === department) || null;
         } else {
             this.currentDepartment = department;
         }
@@ -414,12 +414,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (!initialUrl) return;
 
-        console.log('start loading lpu');
         this.setLoading(requestName);
         while (keepDoing) {
             const url = `${initialUrl}?page=${page}`;
             const part = await api.getMedicalDepartments(url);
-            console.log('lpu part is loaded');
             if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
                 this.LPUs = null;
                 break;
@@ -437,7 +435,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             keepDoing = !!part && part.length === 1000;
         }
         this.setSuccess(requestName);
-        console.log('finish lpu loading');
     }
 
     @action.bound
@@ -1149,7 +1146,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 ? { ...acc, [propName]: (actualValue || '') }
                 : acc;
         }, {});
-        console.log('payload: ', toJS(initialDoc), payload);
+
         const isEdited = await this.dispatchRequest(
             api.editDoc(
                 this.currentDepartmentId,
@@ -1161,7 +1158,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (isEdited) {
-            console.log('edited!');
             const inverted = invert(namesMap);
             [...Object.keys(payload)].forEach((key) => {
                 const propName = inverted[key];
@@ -1177,7 +1173,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     initialDoc.LPUId = lpuId;
                     initialDoc.LPUName = lpuName;
                 } else {
-                    console.log(propName, value);
                     initialDoc[propName] = value;
                 }
 
@@ -1319,12 +1314,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
                 const jsonPropName = namesMap[key];
 
-                console.log(
-                    jsonPropName,
-                    initialValue,
-                    value,
-                    initialValue === value
-                );
                 if (!jsonPropName || initialValue === value) return acc;
 
                 if (jsonPropName === namesMap.card) {
@@ -1337,7 +1326,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             {}
         );
 
-        console.log('initial: ', toJS(initialWorker), payload);
         const { edited, avatar } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
             'editWorker'
@@ -1440,7 +1428,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async removeWorker(worker: IWorker): Promise<boolean> {
-        console.log('remove worker');
         const { api, userStore: { role } } = this.rootStore;
         if (!this.currentDepartmentId) return false;
         const workerRemoved = await api.deleteWorker(this.currentDepartmentId, role, worker.id);

@@ -1,10 +1,14 @@
-import React, { Component, RefObject } from 'react';
+import React, { Component } from 'react';
 import { createStyles, WithStyles, Popper, Typography, Paper, Button } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ISearchResult } from '../../../interfaces/ISearchResult';
 import SearchItem from '../SearchItem';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { IUser } from '../../../interfaces';
+import { USER_ROLE, multiDepartmentRoles } from '../../../constants/Roles';
+import { DOCTORS_ROUTE } from '../../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -25,15 +29,40 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<any>> {
     anchor: HTMLElement;
     items: ISearchResult[];
     loadMoreHandler: () => void;
+    hideList: () => void;
+    user?: IUser;
+    getUser?: (userId: number) => IUser;
+    historyReplace?: (users: IUser[]) => void;
+    setCurrentDepartment?: (depId: number) => void;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            getUser,
+            historyReplace,
+            user
+        },
+        departmentsStore: {
+            setCurrentDepartment,
+        }
+    }
+}) => ({
+    getUser,
+    historyReplace,
+    setCurrentDepartment,
+    user
+}))
+@withRouter
 @observer
 class SearchList extends Component<IProps> {
     readonly maxCount: number = 50;
+
+    @observable isLoading: boolean = false;
 
     @computed
     get anchorWidth(): number {
@@ -60,8 +89,57 @@ class SearchList extends Component<IProps> {
         e.nativeEvent.stopImmediatePropagation();
     }
 
+    itemClickHandler = async ({ ffm, rm, mp }: ISearchResult) => {
+        const {
+            getUser,
+            history,
+            historyReplace,
+            setCurrentDepartment,
+            hideList,
+            user
+        } = this.props;
+        this.isLoading = true;
+
+        const presets: any = {
+            default: [ffm, rm, mp],
+            [USER_ROLE.FIELD_FORCE_MANAGER]: [rm, mp],
+            [USER_ROLE.REGIONAL_MANAGER]: [mp],
+            [USER_ROLE.MEDICAL_AGENT]: [],
+        };
+        const targetRoles = presets[user.position] || presets.default;
+        const promises = targetRoles.map((x: number) => getUser(x));
+        const loadedUsers: IUser[] = await Promise.all(promises);
+        const filtered = loadedUsers.filter(x => !!x);
+        this.isLoading = false;
+
+        const targetDep = user.department ||  filtered[0].department;
+        if (!targetDep) return;
+
+        if (filtered.length > 1) {
+            const isFromOneDepartment = filtered.reduce((flag, { department }) => flag && department === targetDep, true);
+            const isValid = !!filtered.length
+                && isFromOneDepartment
+                && filtered[filtered.length - 1].position === USER_ROLE.MEDICAL_AGENT;
+            if (!isValid) return;
+            setCurrentDepartment(targetDep);
+        }
+
+        const newUserHistory = multiDepartmentRoles.includes(user.position)
+            ? filtered
+            : [ user, ...filtered ];
+        historyReplace(newUserHistory);
+
+        history.push(DOCTORS_ROUTE.replace(':departmentId', `${targetDep}`));
+        hideList();
+    }
+
     render() {
-        const { items, anchor, classes, loadMoreHandler } = this.props;
+        const {
+            items,
+            anchor,
+            classes,
+            loadMoreHandler,
+        } = this.props;
 
         return (
             <Popper
@@ -77,6 +155,8 @@ class SearchList extends Component<IProps> {
                                     <SearchItem
                                         key={`${x.id}${x.mp}`}
                                         maxWidth={this.anchorWidth}
+                                        clickHandler={this.itemClickHandler}
+                                        isLoading={this.isLoading}
                                         item={x}
                                     />
                                 ))

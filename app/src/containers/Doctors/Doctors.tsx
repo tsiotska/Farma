@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed, toJS, observable } from 'mobx';
+import { computed, toJS, observable, reaction } from 'mobx';
 import Header from './Header';
 import ListHeader from './ListHeader';
 import { IDoctor } from '../../interfaces/IDoctor';
@@ -21,6 +21,8 @@ import CreateDoctorModal from './CreateDoctorModal';
 import EditDoctorModal from './EditDoctorModal.tsx';
 import DeletePopover from '../../components/DeletePopover';
 import { IDeletePopoverSettings } from '../../stores/UIStore';
+import { IUser } from '../../interfaces';
+import { USER_ROLE } from '../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -41,6 +43,7 @@ interface IProps extends WithStyles<typeof styles> {
     itemsPerPage?: number;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeDoctor?: (doc: IDoctor) => boolean;
+    previewUser: IUser;
 }
 
 @inject(({
@@ -57,6 +60,9 @@ interface IProps extends WithStyles<typeof styles> {
             currentPage,
             itemsPerPage,
             openDelPopper
+        },
+        userStore: {
+            previewUser
         }
     }
 }) => ({
@@ -68,10 +74,13 @@ interface IProps extends WithStyles<typeof styles> {
     setCurrentPage,
     currentPage,
     itemsPerPage,
-    openDelPopper
+    openDelPopper,
+    previewUser
 }))
 @observer
 class Doctors extends Component<IProps> {
+    reactionDisposer: any;
+
     @observable isSnackbarOpen: boolean = false;
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable snackbarMessage: string = '';
@@ -125,11 +134,22 @@ class Doctors extends Component<IProps> {
     }
 
     componentDidMount() {
-        this.props.clearDoctors();
-        this.props.loadDoctors();
+        this.reactionDisposer = reaction(
+            () => this.props.previewUser,
+            (user: IUser) => {
+                const { clearDoctors, loadDoctors } = this.props;
+                const shouldReloadData = !!user && user.position === USER_ROLE.MEDICAL_AGENT;
+                if (shouldReloadData) {
+                    clearDoctors();
+                    loadDoctors();
+                }
+            },
+            { fireImmediately: true }
+        );
     }
 
     componentWillUnmount() {
+        if (this.reactionDisposer) this.reactionDisposer();
         this.props.clearDoctors();
         this.props.setCurrentPage(0);
     }
