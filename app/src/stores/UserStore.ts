@@ -653,4 +653,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         return res;
     }
+
+  /*  @action.bound
+    async getInfoData(lpu: IUserCredentials): Promise<ILPU> {
+
+    }
+    */
 }

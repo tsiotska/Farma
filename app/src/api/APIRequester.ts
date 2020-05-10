@@ -520,4 +520,10 @@ export class APIRequester {
         })
         .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
+
+    getLpuInfo(): Promise<ISpecialty[]> {
+        return this.instance.get('/api/agent/speciality')
+            .then(specialtyNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
 }

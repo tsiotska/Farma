@@ -13,10 +13,10 @@ import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import cx from 'classnames';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
-import Icon from '../../../components/InfoIcon';
 import InfoWindow from '../../../components/InfoWindow';
+import DoctorInfoWindowForm from '../DoctorInfoWindowForm';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -58,14 +58,12 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px',
         minWidth: 100
     },
+    infoIcon: {
+        alignSelf: 'center'
+    },
     deposit: {
         width: '100%',
         color: '#7B8FFE'
-    },
-    infoIcon: {
-        '&:hover': {
-            cursor: 'pointer'
-        }
     },
     paper: {
         color: 'red'
@@ -91,7 +89,6 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
-    @observable anchorEl: any = false;
 
     confirmClickHandler = async () => {
         const { acceptAgent, doctor, unconfirmed, confirmationCallback } = this.props;
@@ -100,24 +97,6 @@ class DoctorListItem extends Component<IProps> {
         const isConfirmed = await acceptAgent(doctor);
         this.isLoadingConfirmation = false;
         confirmationCallback(isConfirmed);
-    }
-
-    handleClick = (event: React.FormEvent<EventTarget>): void => {
-        this.anchorEl = this.anchorEl ? null : event.currentTarget;
-    }
-
-    closeInfo = (): void => {
-        this.anchorEl = null;
-    }
-
-    @computed
-    get open() {
-        return Boolean(this.anchorEl);
-    }
-
-    @computed
-    get id() {
-        return this.anchorEl ? 'simple-popper' : undefined;
     }
 
     render() {
@@ -136,21 +115,22 @@ class DoctorListItem extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
+            <Grid className={classes.root} alignItems='flex-start' wrap='nowrap' container>
                 <Grid xs={2} container item>
                     <Typography className={classes.text}>
                         {LPUName || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={1} container item>
-                    <Icon aria-describedby={this.id} onClick={this.handleClick} className={classes.infoIcon}/>
-                    <Popover onClose={this.closeInfo} id={this.id} open={this.open} anchorEl={this.anchorEl}
-                             anchorOrigin={{
-                                 vertical: 'bottom',
-                                 horizontal: 'left',
-                             }}>
-                        <InfoWindow/>
-                    </Popover>
+                <Grid xs={1} className={classes.infoIcon} container item>
+
+                    <InfoWindow
+                        children={
+                            <DoctorInfoWindowForm
+                                phoneNumber='+38096207445'
+                                address='Проспект мира 8'
+                            />
+                        }
+                    />
                 </Grid>
 
                 <Grid xs={3} container item>

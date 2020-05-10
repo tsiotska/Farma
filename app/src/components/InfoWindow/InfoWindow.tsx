@@ -1,46 +1,56 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Card, CardContent, Grid, Typography } from '@material-ui/core';
-
+import { createStyles, withStyles, WithStyles, Popover } from '@material-ui/core';
+import Icon from '../../components/InfoIcon';
+import { computed, observable } from 'mobx';
+import { observer } from 'mobx-react';
 const styles = (theme: any) => createStyles({
-    root: {
-        padding: '10px'
+    root: {},
+    infoIcon: {
+        '&:hover': {
+            cursor: 'pointer'
+        }
     },
-    column: {
-        '&:not(:first-child)': { marginTop: '15px' }
-    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    phoneNumber?: string;
-    address?: string;
+   children: JSX.Element;
 }
 
+@observer
 class InfoWindow extends Component<IProps> {
+    @observable anchorEl: any = false;
+
+    handleClick = (event: React.FormEvent<EventTarget>): void => {
+        this.anchorEl = this.anchorEl ? null : event.currentTarget;
+    }
+
+    closeInfo = (): void => {
+        this.anchorEl = null;
+    }
+
+    @computed
+    get open() {
+        return Boolean(this.anchorEl);
+    }
+
+    @computed
+    get id() {
+        return this.anchorEl ? 'simple-popper' : undefined;
+    }
     render() {
-        const { classes, phoneNumber = '+38096207445', address = 'Проспект мира 8' } = this.props;
+        const { classes, children } = this.props;
 
         return (
-            <Card className={classes.root}>
-                <CardContent>
-                    <Grid className={classes.column}>
-                        <Typography color='textSecondary'>
-                            телефон
-                        </Typography>
-                        <Typography>
-                            {phoneNumber}
-                        </Typography>
-                    </Grid>
-
-                    <Grid className={classes.column}>
-                        <Typography color='textSecondary'>
-                            адрес
-                        </Typography>
-                        <Typography>
-                            {address}
-                        </Typography>
-                    </Grid>
-                </CardContent>
-            </Card>
+            <>
+                <Icon aria-describedby={this.id} onClick={this.handleClick} className={classes.infoIcon}/>
+                <Popover onClose={this.closeInfo} id={this.id} open={this.open} anchorEl={this.anchorEl}
+                         anchorOrigin={{
+                             vertical: 'bottom',
+                             horizontal: 'left',
+                         }}>
+                   {children}
+                </Popover>
+            </>
         );
     }
 }
