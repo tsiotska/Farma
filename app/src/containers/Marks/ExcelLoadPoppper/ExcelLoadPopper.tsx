@@ -50,11 +50,15 @@ interface IProps extends WithStyles<typeof styles> {
     closeHandler: () => void;
 }
 
+export type ViewMode = 'datePick' | 'default';
+export type DataMode = 'payment' | 'deposit';
+
 @observer
 class ExcelLoadPopper extends Component<IProps> {
     @observable dateFrom: Date = new Date();
     @observable dateTo: Date = new Date();
-    @observable mode: 'datePick' | 'default' = 'default';
+    @observable mode: ViewMode = 'default';
+    @observable activeMode: DataMode = 'payment';
 
     constructor(props: IProps) {
         super(props);
@@ -84,6 +88,10 @@ class ExcelLoadPopper extends Component<IProps> {
         this.mode = 'datePick';
     }
 
+    activeModeChangeHandler = (mode: DataMode) => {
+        this.activeMode = mode;
+    }
+
     render() {
         const { classes, anchor, closeHandler } = this.props;
 
@@ -111,6 +119,8 @@ class ExcelLoadPopper extends Component<IProps> {
                                     closeHandler={closeHandler}
                                     from={this.dateFrom}
                                     to={this.dateTo}
+                                    mode={this.activeMode}
+                                    modeChangeHandler={this.activeModeChangeHandler}
                                 />
                             }
                     </Grid>

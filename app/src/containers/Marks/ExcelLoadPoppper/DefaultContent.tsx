@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/styles';
 import { observable, computed } from 'mobx';
 import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
+import { DataMode } from './ExcelLoadPopper';
 
 const styles = (theme: any) => createStyles({
     row: {
@@ -41,6 +42,8 @@ interface IProps extends WithStyles<typeof styles> {
     from: Date;
     to: Date;
     loadBonusesExcel?: (mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) => void;
+    mode: DataMode;
+    modeChangeHandler: (newMode: DataMode) => void;
 }
 
 @inject(({
@@ -54,8 +57,6 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class DefaultContent extends Component<IProps> {
-    @observable activeMode: 'payment' | 'deposit' = 'payment';
-
     @computed
     get dateString() {
         const { from, to } = this.props;
@@ -72,15 +73,15 @@ class DefaultContent extends Component<IProps> {
     }
 
     depositChangeHandler = () => {
-        this.activeMode = 'deposit';
+        this.props.modeChangeHandler('deposit');
     }
 
     paymentsChangeHandler = () => {
-        this.activeMode = 'payment';
+        this.props.modeChangeHandler('payment');
     }
 
     submitHandler = () => {
-        const { loadBonusesExcel, from, to } = this.props;
+        const { loadBonusesExcel, from, to, mode } = this.props;
 
         const dateFrom = new Date(
             from.getFullYear(),
@@ -94,14 +95,15 @@ class DefaultContent extends Component<IProps> {
             1
         );
 
-        loadBonusesExcel(this.activeMode, dateFrom, dateTo);
+        loadBonusesExcel(mode, dateFrom, dateTo);
     }
 
     render() {
         const {
             classes,
             closeHandler,
-            onDateClick
+            onDateClick,
+            mode
         } = this.props;
 
         return (
@@ -117,7 +119,7 @@ class DefaultContent extends Component<IProps> {
                     container>
                     <FormControlLabel
                         control={
-                            <Checkbox checked={this.activeMode === 'payment'}
+                            <Checkbox checked={mode === 'payment'}
                                 onChange={this.paymentsChangeHandler}
                                 size='small'
                                 color='default'
@@ -130,7 +132,7 @@ class DefaultContent extends Component<IProps> {
                         className={classes.label}
                         control={
                             <Checkbox
-                                checked={this.activeMode === 'deposit'}
+                                checked={mode === 'deposit'}
                                 onChange={this.depositChangeHandler}
                                 size='small'
                                 color='default'

@@ -170,8 +170,8 @@ class Workers extends Component<IProps> {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.snackbarMessage = workerRemoved
-            ? 'Видалити працівника не вдалося'
-            : 'Працівник успішно видалений';
+            ? 'Працівник успішно видалений'
+            : 'Видалити працівника не вдалося';
     }
 
     snackbarCloseHandler = () => {

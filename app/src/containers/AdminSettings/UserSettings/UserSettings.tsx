@@ -77,7 +77,6 @@ class UserSettings extends Component<IProps> {
     }
 
     deleteHandler = (removed: boolean) => {
-        const { loadAdminWorkers } = this.props;
         this.snackbarType = removed
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
@@ -98,8 +97,10 @@ class UserSettings extends Component<IProps> {
                     workers.map(worker => (
                         <ListItem
                             key={worker.id}
+                            deleteHandler={this.deleteHandler}
                             worker={worker}
                             positions={positions}
+
                         />
                     ))
                 }

@@ -182,7 +182,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             else this.bonuses = [newBonusInfo];
 
             this.setPreviewBonus(newBonusInfo);
-            this.setBonusesYear(year, false);
+            this.setBonusesYear(year, false, true);
         }
 
         return isCreated;
@@ -264,11 +264,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    setBonusesYear(value: number, shouldPostData: boolean) {
+    setBonusesYear(value: number, shouldPostData: boolean, loadBonuses: boolean) {
         if (shouldPostData) this.updateBonuses();
         this.bonusesYear = value;
         this.clearPreviewBonusTotal();
-        this.loadBonuses();
+        if (loadBonuses) this.loadBonuses();
     }
 
     @action.bound

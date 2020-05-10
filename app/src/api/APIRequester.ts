@@ -1,3 +1,4 @@
+import { multiDepartmentRoles } from './../constants/Roles';
 import isEqual from 'lodash/isEqual';
 import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
 import { workersNormalizer, workerNormalizer } from './../helpers/workersNormalizer';
@@ -581,13 +582,23 @@ export class APIRequester {
             .catch(this.defaultErrorHandler([]));
     }
 
-    deleteWorker(depId: number, role: USER_ROLE, workerId: number): Promise<boolean> {
-        let roleParam: string;
-        if (role === USER_ROLE.FIELD_FORCE_MANAGER) roleParam = 'ffm';
-        if (role === USER_ROLE.REGIONAL_MANAGER) roleParam = 'rm';
-        if (!roleParam) return Promise.resolve(false);
-        // return this.instance.delete(`​/api​/branch​/${depId}​/${roleParam​}​/worker​/${workerId}`)
-        return this.instance.delete(`api/branch/${depId}/${roleParam}/worker/${workerId}`)
+    deleteWorker(depId: number, { id, position }: IWorker): Promise<boolean> {
+        let url: string;
+        if (multiDepartmentRoles.includes(position)) {
+            url = `api/worker/${id}`;
+        } else if (position === USER_ROLE.REGIONAL_MANAGER) {
+            url = depId
+                ? `api/branch/${depId}/rm/worker/${id}`
+                : null;
+        } else if (position === USER_ROLE.MEDICAL_AGENT) {
+            url = depId
+                ? `api/branch/${depId}/mp/worker/${id}`
+                : null;
+        }
+
+        if (!url) return Promise.resolve(false);
+
+        return this.instance.delete(url)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

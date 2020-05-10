@@ -20,6 +20,7 @@ const styles = createStyles({
 interface IProps extends WithStyles<typeof styles> {
     worker: IWorker;
     positions: Map<number, IPosition>;
+    deleteHandler: (removed: boolean) => void;
     openModal?: (modalName: string, payload: any) => void;
 }
 
@@ -52,7 +53,7 @@ class ListItem extends Component<IProps> {
     }
 
     render() {
-        const { worker, positions, classes } = this.props;
+        const { worker, positions, classes, deleteHandler } = this.props;
 
         return (
             <WorkerListItem
@@ -61,6 +62,7 @@ class ListItem extends Component<IProps> {
                 worker={worker}
                 fired={false}
                 isExpanded={false}
+                deleteHandler={deleteHandler}
                 disableClick
                 classes={{
                     root: classes.root,

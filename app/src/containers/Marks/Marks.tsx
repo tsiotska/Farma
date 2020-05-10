@@ -55,7 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     role?: USER_ROLE;
     loadDoctors?: () => void;
     bonusesYear?: number;
-    setBonusesYear?: (value: number, shouldPostData: boolean) => void;
+    setBonusesYear?: (value: number, shouldPostData: boolean, loadData: boolean) => void;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     clearDoctors?: () => void;
@@ -180,12 +180,12 @@ class Marks extends Component<IProps> {
 
     incrementYear = () => {
         const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear, role === USER_ROLE.MEDICAL_AGENT);
+        setBonusesYear(bonusesYear, role === USER_ROLE.MEDICAL_AGENT, true);
     }
 
     decrementYear = () => {
         const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear - 1, role === USER_ROLE.MEDICAL_AGENT);
+        setBonusesYear(bonusesYear - 1, role === USER_ROLE.MEDICAL_AGENT, true);
     }
 
     openExcelPopper = ({ target }: any) => {
@@ -242,7 +242,8 @@ class Marks extends Component<IProps> {
         if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
         setBonusesYear(
             new Date().getFullYear(),
-            role === USER_ROLE.MEDICAL_AGENT
+            role === USER_ROLE.MEDICAL_AGENT,
+            false
         );
     }
 

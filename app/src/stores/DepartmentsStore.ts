@@ -667,7 +667,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     @action.bound
     async deletePharmacy(lpu: ILPU, unconfirmed: boolean) {
         const { api } = this.rootStore;
-        const isDeleted = await api.deleteLpu(lpu.id);
+        const isDeleted = await api.deletePharmacy(lpu.id);
 
         if (isDeleted) {
             const source = unconfirmed
@@ -1445,9 +1445,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async removeWorker(worker: IWorker): Promise<boolean> {
-        const { api, userStore: { role } } = this.rootStore;
-        if (!this.currentDepartmentId) return false;
-        const workerRemoved = await api.deleteWorker(this.currentDepartmentId, role, worker.id);
+        const { api } = this.rootStore;
+        const workerRemoved = await api.deleteWorker(this.currentDepartmentId, worker);
         if (workerRemoved) {
             const workerId = this.workers
                 ? this.workers.indexOf(worker)
