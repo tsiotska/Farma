@@ -728,7 +728,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             message,
             deposit: +deposit
         };
-
+        console.log(deposit, message, preparedData);
         return this.dispatchRequest(
             api.postDeposit(
                 currentDepartmentId,

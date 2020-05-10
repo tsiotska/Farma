@@ -113,7 +113,8 @@ class FormContent extends Component<IProps> {
         if (propName === 'deposit') {
             const isValid = !!value
                 && numberValidator(value)
-                && moneyValidator(value);
+                && +value
+                && +value >= 1;
             this.fieldsErrorStatuses[propName] = !isValid;
         } else {
             const trimmed = value.replace(/ /g, '');
@@ -128,6 +129,7 @@ class FormContent extends Component<IProps> {
     }
 
     submitHandler = () => {
+        console.log('form values: ', toJS(this.formValues));
         if (this.isSubmitAllowed) this.props.submitHandler(this.formValues);
     }
 
@@ -172,13 +174,14 @@ class FormContent extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    this.allowedRoles.includes(this.userRole) &&
+                    // this.allowedRoles.includes(this.userRole) &&
+                    true &&
                     <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
                         <Grid xs container item>
                             <FormRow
                                 label='Сумма'
                                 values={this.formValues}
-                                propName='sum'
+                                propName='deposit'
                                 onChange={this.onChangeHandler}
                                 error={this.fieldsErrorStatuses.deposit}
                                 fullWidth
@@ -189,7 +192,7 @@ class FormContent extends Component<IProps> {
                             <FormRow
                                 label='Причина'
                                 values={this.formValues}
-                                propName='reason'
+                                propName='message'
                                 onChange={this.onChangeHandler}
                                 error={this.fieldsErrorStatuses.message}
                                 fullWidth
