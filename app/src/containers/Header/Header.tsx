@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
-import { AppBar, Typography, IconButton } from '@material-ui/core';
+import { AppBar, Typography, IconButton, Grid } from '@material-ui/core';
 import { IDepartment } from '../../interfaces/IDepartment';
 import SalaryReviewModal from './SalaryReviewModal';
 import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES, DEPARTMENT_ROUTE, NOTIFICATIONS_ROUTE } from '../../constants/Router';
@@ -13,6 +13,7 @@ import { ArrowBack } from '@material-ui/icons';
 import cx from 'classnames';
 import AddWorkerModal from './AddWorkerModal';
 import EditWorkerModal from './EditWorkerModal';
+import Search from './Search';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -104,21 +105,30 @@ export class Header extends Component<IProps, {}> {
                     color='primary'
                     position='relative'
                     className={classes.root}>
-                    <Typography className={classes.title} variant='h5'>
-                        {
-                            this.isSettingsRoute &&
-                            <IconButton onClick={this.backClickHandler} className={cx(classes.backButton, classes.settingsButton)}>
-                                <ArrowBack width={22} height={22} />
-                            </IconButton>
-                        }
-                        { this.title }
-                    </Typography>
-                    {
-                        this.showSettingsBtn &&
-                        <IconButton onClick={this.settingsClickHandler} className={classes.settingsButton}>
-                            <Settings width={22} height={22} />
-                        </IconButton>
-                    }
+                        <Grid container alignItems='center'>
+                            <Grid xs container item>
+                                <Typography className={classes.title} variant='h5'>
+                                    {
+                                        this.isSettingsRoute &&
+                                        <IconButton onClick={this.backClickHandler} className={cx(classes.backButton, classes.settingsButton)}>
+                                            <ArrowBack width={22} height={22} />
+                                        </IconButton>
+                                    }
+                                    { this.title }
+                                </Typography>
+                            </Grid>
+                            <Grid xs={8} item>
+                                <Search />
+                            </Grid>
+                            <Grid xs container item>
+                                {
+                                    this.showSettingsBtn &&
+                                    <IconButton onClick={this.settingsClickHandler} className={classes.settingsButton}>
+                                        <Settings width={22} height={22} />
+                                    </IconButton>
+                                }
+                            </Grid>
+                    </Grid>
                 </AppBar>
                 <SalaryReviewModal />
                 <AddWorkerModal showLocationsBlock={!this.isSettingsRoute} />

@@ -1,13 +1,12 @@
+import { observable, action, reaction, toJS, computed, when, transaction } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
 import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
 import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
 import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
-import { ADD_PHARMACY_MODAL } from './../constants/Modals';
 import { IValuesMap } from './../helpers/normalizers/normalizer';
 import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
-import { observable, action, reaction, toJS, computed, when, flow, transaction } from 'mobx';
 import { ILPU } from '../interfaces/ILPU';
 import { IDepartment } from './../interfaces/IDepartment';
 import { IRootStore } from './../interfaces/IRootStore';
