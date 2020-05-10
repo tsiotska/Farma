@@ -142,9 +142,13 @@ class PharmacyModal extends Component<IProps> {
 
     submitHandler = () => {
         const { lpu, ...rest } = this.formValues;
+        const targetLpu = this.lpus.find(({ name }) => name === lpu);
+        const lpuId = targetLpu
+            ? targetLpu.id
+            : '';
         const convertedPharmacy = {
             ...rest,
-            lpu: +lpu
+            lpu: lpuId
         };
         this.props.onSubmit(convertedPharmacy);
     }
