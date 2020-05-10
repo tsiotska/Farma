@@ -11,7 +11,8 @@ const styles = (theme: any) => createStyles({
         },
         '& .MuiListItemIcon-root': {
             minWidth: 20
-        }
+        },
+        textTransform: 'capitalize'
     }
 });
 

@@ -4,7 +4,7 @@ import {
     withStyles,
     WithStyles,
     Grid,
-    Button
+    Button,
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IWorker } from '../../../interfaces/IWorker';
@@ -14,6 +14,9 @@ import { IPosition } from '../../../interfaces/IPosition';
 import { ADD_WORKER_MODAL } from '../../../constants/Modals';
 import { USER_ROLE } from '../../../constants/Roles';
 import DeletePopover from '../../../components/DeletePopover';
+import { observable } from 'mobx';
+import Snackbar from '../../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -51,6 +54,13 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class UserSettings extends Component<IProps> {
+    @observable showSnackbar: boolean = false;
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+
+    snackbarCloseHandler = () => {
+        this.showSnackbar = false;
+    }
+
     openAddWorkerModal = () => {
         const { openModal, positions } = this.props;
         const allowedPositions: USER_ROLE[] = [
@@ -64,6 +74,14 @@ class UserSettings extends Component<IProps> {
             }
         });
         openModal(ADD_WORKER_MODAL, filteredPositions);
+    }
+
+    deleteHandler = (removed: boolean) => {
+        const { loadAdminWorkers } = this.props;
+        this.snackbarType = removed
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.showSnackbar = true;
     }
 
     componentDidMount() {
@@ -92,6 +110,16 @@ class UserSettings extends Component<IProps> {
                     Додати користувача
                 </Button>
                 <DeletePopover />
+                <Snackbar
+                    open={this.showSnackbar}
+                    type={this.snackbarType}
+                    onClose={this.snackbarCloseHandler}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Працівника видалено'
+                            : 'Під час видалення працівника трапилась помилка'
+                    }
+                />
             </Grid>
         );
     }

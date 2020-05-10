@@ -17,6 +17,7 @@ import { ILocation } from '../../../interfaces/ILocation';
 import CommitBadge from '../../../components/CommitBadge';
 import LoadingMask from '../../../components/LoadingMask';
 import { observable, toJS } from 'mobx';
+import DeleteButton from '../DeleteButton';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -87,11 +88,11 @@ interface IProps extends WithStyles<typeof styles> {
     editClickHandler?: (lpu: ILPU) => void;
     deleteClickHandler?: (lpu: ILPU, anchorEl: Element) => void;
     confirmHandler?: (pharmacy: ILPU) => void;
+    type: 'hcf' | 'pharmacy';
 }
 
 @observer
 class ListItem extends Component<IProps> {
-
     @observable isLoadingConfirmation: boolean = false;
 
     confirmClickHandler = async () => {
@@ -124,6 +125,7 @@ class ListItem extends Component<IProps> {
             classes,
             unconfirmed,
             editClickHandler,
+            type: generalType,
             pharmacy: {
                 name,
                 type,
@@ -200,9 +202,13 @@ class ListItem extends Component<IProps> {
                                 <Edit className={classes.icon}/>
                             </IconButton>
                     }
-                    <IconButton onClick={this.deleteClickHandler} className={classes.iconButton}>
-                        <Delete className={classes.icon}/>
-                    </IconButton>
+                    <DeleteButton
+                        unconfirmed={unconfirmed}
+                        type={generalType}
+                        className={classes.iconButton}
+                        onClick={this.deleteClickHandler}>
+                            <Delete className={classes.icon}/>
+                    </DeleteButton>
                 </Grid>
             </Grid>
         );

@@ -142,7 +142,7 @@ class WorkerModal extends Component<IProps> {
     @computed
     get optionalValues(): Array<keyof IWorkerModalValues> {
         const { open, initialWorker } = this.props;
-        const defaultValues: Array<keyof IWorkerModalValues> = ['mobilePhone', 'workPhone'];
+        const defaultValues: Array<keyof IWorkerModalValues> = ['mobilePhone', 'workPhone', 'card'];
         if (open && initialWorker) return [...defaultValues, 'password' ];
         return defaultValues;
     }

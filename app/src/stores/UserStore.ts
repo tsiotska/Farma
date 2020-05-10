@@ -18,6 +18,7 @@ import format from 'date-fns/format';
 import { IMedicine } from '../interfaces/IMedicine';
 import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
+import { PERMISSIONS } from '../constants/Permissions';
 
 export interface IMarkFraction {
     payments: number;
@@ -50,6 +51,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
         super();
         this.rootStore = rootStore;
         this.loadUserProfile();
+    }
+
+    @computed
+    get userPermissions(): PERMISSIONS[] {
+        const { departmentsStore: { positions }} = this.rootStore;
+
+        if (!this.user || !positions) return [];
+
+        const userPosition = positions.get(this.user.position);
+        return userPosition
+            ? userPosition.permissions
+            : [];
     }
 
     @computed

@@ -75,7 +75,7 @@ export interface IDoctorModalValues {
 @observer
 class DoctorModal extends Component<IProps> {
     readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
-    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'mobilePhone', 'workPhone', 'position' ];
+    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'mobilePhone', 'workPhone', 'position', 'card'];
     readonly allFields: Array<keyof IDoctorModalValues>;
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {

@@ -224,6 +224,7 @@ class Pharmacy extends Component<IProps> {
                             Додані аптеки
                         </Typography>
                         <HCFList
+                            type='pharmacy'
                             onDelete={this.deleteCallback}
                             confirmHandler={this.confirmPharmacyHandler}
                             data={unconfirmedPharmacies}
@@ -249,6 +250,7 @@ class Pharmacy extends Component<IProps> {
                 {
                     !!this.preparedPharmacies.length &&
                     <HCFList
+                        type='pharmacy'
                         data={this.preparedPharmacies}
                         onDelete={this.deleteCallback}
                         showHeader

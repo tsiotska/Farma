@@ -19,6 +19,7 @@ interface IProps extends WithStyles<typeof styles> {
     confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
     onDelete?: (deleted: boolean) => void;
+    type: 'hcf' | 'pharmacy';
 }
 
 @observer
@@ -30,7 +31,8 @@ class HCFList extends Component<IProps> {
             showHeader,
             unconfirmed,
             onDelete,
-            confirmHandler
+            confirmHandler,
+            type
         } = this.props;
 
         return (
@@ -40,6 +42,7 @@ class HCFList extends Component<IProps> {
                     confirmHandler={confirmHandler}
                     onDelete={onDelete}
                     data={data}
+                    type={type}
                     unconfirmed={unconfirmed} />
             </Grid>
         );

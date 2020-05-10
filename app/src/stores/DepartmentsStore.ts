@@ -1465,6 +1465,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         return workerRemoved;
     }
 
+    @action.bound
     async acceptPharmacy(pharmacy: ILPU) {
         const { api } = this.rootStore;
         const status = await api.accept(pharmacy.id, 'pharmacy');

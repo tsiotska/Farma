@@ -225,6 +225,7 @@ class Lpu extends Component<IProps> {
                             Додані ЛПУ
                         </Typography>
                         <HCFList
+                            type='hcf'
                             confirmHandler={this.confirmLpuHandler}
                             onDelete={this.deleteCallback}
                             data={unconfirmedLPUs}
@@ -247,6 +248,7 @@ class Lpu extends Component<IProps> {
                 {
                     !!this.preparedLPUs.length &&
                     <HCFList
+                        type='hcf'
                         data={this.preparedLPUs}
                         onDelete={this.deleteCallback}
                         showHeader

@@ -56,7 +56,6 @@ interface IProps extends WithStyles<typeof styles> {
     insertDeposit,
     modalPayload
 }))
-
 @observer
 class EditDepositModal extends Component<IProps> {
     @observable isSnackbarOpen: boolean = false;

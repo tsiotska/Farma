@@ -586,7 +586,8 @@ export class APIRequester {
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) roleParam = 'ffm';
         if (role === USER_ROLE.REGIONAL_MANAGER) roleParam = 'rm';
         if (!roleParam) return Promise.resolve(false);
-        return this.instance.delete(`​/api​/branch​/${depId}​/${roleParam​}​/worker​/${workerId}`)
+        // return this.instance.delete(`​/api​/branch​/${depId}​/${roleParam​}​/worker​/${workerId}`)
+        return this.instance.delete(`api/branch/${depId}/${roleParam}/worker/${workerId}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

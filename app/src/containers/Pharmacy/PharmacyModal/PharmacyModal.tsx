@@ -42,7 +42,7 @@ export interface IPharmacyModalValues {
     name: string;
     oblast: string;
     city: ILocation;
-    lpu: string;
+    lpu: string | number; // hotfix
     address: string;
     phone1: string;
     phone2: string;
@@ -140,7 +140,14 @@ class PharmacyModal extends Component<IProps> {
         return res;
     }
 
-    submitHandler = () => this.props.onSubmit(this.formValues);
+    submitHandler = () => {
+        const { lpu, ...rest } = this.formValues;
+        const convertedPharmacy = {
+            ...rest,
+            lpu: +lpu
+        };
+        this.props.onSubmit(convertedPharmacy);
+    }
 
     validateValue = (propName: keyof IPharmacyModalValues, value: string) => {
         if (this.optionalFields.includes(propName)) {

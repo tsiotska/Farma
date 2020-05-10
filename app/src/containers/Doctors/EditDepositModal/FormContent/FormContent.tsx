@@ -13,6 +13,7 @@ import { IDeposit } from '../../../../interfaces/IDeposit';
 import { IDoctor } from '../../../../interfaces/IDoctor';
 import { numberValidator, moneyValidator } from '../../../../helpers/validators';
 import { USER_ROLE } from '../../../../constants/Roles';
+import { IUser } from '../../../../interfaces';
 
 const styles = (theme: any) => createStyles({
     head: {
@@ -24,7 +25,9 @@ const styles = (theme: any) => createStyles({
         color: '#1ba61f',
         fontSize: 22
     },
-    FIO: {},
+    FIO: {
+        textTransform: 'capitalize'
+    },
     body: {
         flexWrap: 'nowrap',
         maxHeight: 300,
@@ -68,17 +71,17 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     deposits: IDeposit[];
     doctor: IDoctor;
-    role?: USER_ROLE;
+    user?: IUser;
 }
 
 @inject(({
     appState: {
         userStore: {
-            role
+            user
         }
     }
 }) => ({
-    role
+    user
 }))
 @observer
 class FormContent extends Component<IProps> {
@@ -97,6 +100,13 @@ class FormContent extends Component<IProps> {
     @computed
     get isSubmitAllowed(): boolean {
         return true;
+    }
+
+    get userRole(): USER_ROLE {
+        const { user } = this.props;
+        return user
+            ? user.position
+            : USER_ROLE.UNKNOWN;
     }
 
     validate = (propName: keyof IDepositFormValue, value: string) => {
@@ -122,7 +132,7 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading, deposits, doctor, role } = this.props;
+        const { classes, isLoading, deposits, doctor } = this.props;
         return (
             <>
                 {
@@ -162,7 +172,7 @@ class FormContent extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    this.allowedRoles.includes(role) &&
+                    this.allowedRoles.includes(this.userRole) &&
                     <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
                         <Grid xs container item>
                             <FormRow

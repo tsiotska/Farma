@@ -21,6 +21,7 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
     onDelete?: (isRemoved: boolean) => void;
     confirmHandler?: (pharmacy: ILPU) => void;
     unconfirmed?: boolean;
+    type: 'hcf' | 'pharmacy';
 }
 
 @inject(({
@@ -80,7 +81,8 @@ class PharmaciesList extends Component<IProps> {
             data,
             unconfirmed,
             regions,
-            confirmHandler
+            confirmHandler,
+            type
         } = this.props;
 
         return (
@@ -96,6 +98,7 @@ class PharmaciesList extends Component<IProps> {
                                 deleteClickHandler={this.deleteClickHandler}
                                 confirmHandler={confirmHandler}
                                 unconfirmed={unconfirmed}
+                                type={type}
                             />
                         ))
                     }

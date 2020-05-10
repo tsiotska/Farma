@@ -3,8 +3,10 @@ import { IMedicine } from './IMedicine';
 import { ILocation } from './ILocation';
 import { IUserCommonInfo } from './IUser';
 import { ILPU } from './ILPU';
+import { IPosition } from './IPosition';
 
 export interface IDepartmentsStore {
+    positions: Map<number, IPosition>;
     departments: IDepartment[];
     currentDepartment: IDepartment;
     currentDepartmentId: number;
