@@ -526,7 +526,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
     }
 
-   getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
+    getDepositHistory(departmentId: number, previewUserId: number, doctorId: number): Promise<IDeposit[]> {
         return this.instance.get(`/api/branch/${departmentId}/mp/${previewUserId}/agent/${doctorId}/deposit`)
             .then(depositNormalizer)
             .catch(this.defaultErrorHandler());

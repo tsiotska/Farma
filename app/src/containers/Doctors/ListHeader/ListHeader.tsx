@@ -41,36 +41,36 @@ class ListHeader extends Component<IProps> {
         const { classes, loadDocsExcel, unconfirmed } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                {
-                    unconfirmed &&
-                    <Grid className={classes.accessContainer}>
-                        <Typography variant='body2' color='textSecondary'>
-                            Підтверджено
-                        </Typography>
-                    </Grid>
-                }
-                <Grid xs={3} container item>
+            <Grid className={classes.root} alignItems='center' container>
+                <Grid xs container item>
+                    {
+                        unconfirmed &&
+                        <Grid className={classes.accessContainer}>
+                            <Typography variant='body2' color='textSecondary'>
+                                Підтверджено
+                            </Typography>
+                        </Grid>
+                    }
                     <Typography variant='body2' color='textSecondary'>
                         ЛПУ
                     </Typography>
                 </Grid>
-                <Grid xs={3} container item>
+                <Grid xs container item>
                     <Typography variant='body2' color='textSecondary'>
                         ПІБ лікаря
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Спецільність
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         Телефон
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' color='textSecondary'>
                         № карти
                     </Typography>

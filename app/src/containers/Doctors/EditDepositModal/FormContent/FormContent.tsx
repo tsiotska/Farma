@@ -128,7 +128,7 @@ class FormContent extends Component<IProps> {
                 }
                 <Grid direction='column' className={classes.body} container item>
                     {
-                        !!deposits ? deposits.map((elem: any, i: number) => (
+                        !!deposits && deposits.length > 0 ? deposits.map((elem: any, i: number) => (
 
                                 <Grid key={i} direction='row' className={classes.field} container item>
                                     <Grid xs={4} item>

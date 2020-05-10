@@ -34,6 +34,7 @@ class UnconfirmedDoctorsList extends Component<IProps> {
                    key={doc.id}
                    doctor={doc}
                    unconfirmed
+                   showBadges
                    confirmHandler={confirmHandler}
                />
                ))}

@@ -18,13 +18,24 @@ import CommitBadge from '../../../components/CommitBadge';
 import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
 const styles = (theme: any) => createStyles({
     root: {
+        marginBottom: 1,
+        minHeight: 48,
+        padding: '5px 0',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
-            : 'white',
-        marginBottom: 1,
-        padding: '5px 0 5px 5px',
-        '& > .MuiGrid-container': {
-            overflowX: 'hidden'
+            : theme.palette.primary.white,
+        color: ({ unconfirmed }: any) => unconfirmed
+            ? theme.palette.primary.white
+            : theme.palette.primary.gray.main,
+        '&:first-of-type': {
+            borderTopLeftRadius: 2,
+            borderTopRightRadius: 2,
+        },
+        '&:last-of-type': {
+            borderBottomLeftRadius: 2,
+            borderBottomRightRadius: 2,
         }
     },
     column: {
@@ -54,10 +65,13 @@ const styles = (theme: any) => createStyles({
             : theme.palette.primary.gray.light
     },
     text: {
-        color: ({ unconfirmed }: any) => unconfirmed
-            ? 'white'
-            : theme.palette.primary.gray.main,
-        paddingRight: 5
+        lineHeight: 1.5,
+        marginRight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
     confirmButton: {
         color: 'white',
@@ -78,6 +92,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
     unconfirmed?: boolean;
+    showBadges?: boolean;
     confirmHandler?: (doc: IDoctor) => void;
     openModal?: (modalName: string, payload: any) => void;
 }
@@ -105,14 +120,13 @@ class DoctorListItem extends Component<IProps> {
 
     depositModalHandler = () => {
         const { openModal, doctor } = this.props;
-        console.log('doctor');
-        console.log(toJS(doctor));
         openModal(EDIT_DEPOSIT_MODAL, doctor);
     }
 
     render() {
         const {
             unconfirmed,
+            showBadges,
             classes,
             doctor: {
                 FFMCommit,
@@ -128,30 +142,30 @@ class DoctorListItem extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                {
-                    unconfirmed &&
-                    <Grid className={classes.badgesContainer}>
-                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
-                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
-                    </Grid>
-                }
-                <Grid xs={3} container item>
+            <Grid className={classes.root} alignItems='center' container>
+                <Grid xs container item>
+                    {
+                        unconfirmed && showBadges &&
+                        <Grid className={classes.badgesContainer}>
+                            <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                            <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
+                        </Grid>
+                    }
                     <Typography className={classes.text}>
                         {LPUName || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={3} container item>
+                <Grid xs container item>
                     <Typography className={classes.text}>
                         {name || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography className={classes.text}>
                         {specialty || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
@@ -163,13 +177,13 @@ class DoctorListItem extends Component<IProps> {
                         }
                     </Typography>
                 </Grid>
-                <Grid xs className={classes.column} container item>
+                <Grid xs={1} className={classes.column} container item>
                     <Typography className={classes.text}>
                         {card || '-'}
                     </Typography>
                 </Grid>
 
-                <Grid xs={3} alignItems='center' justify='flex-end' wrap='nowrap' container item>
+                <Grid xs={3} alignItems='center' wrap='nowrap' container item>
                     {
                         unconfirmed
                             ? <Button

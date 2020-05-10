@@ -17,5 +17,5 @@ export const depositNormalizer = ({ data: { data } }: any) => objectArrayNormali
     data,
     defaultDeposit,
     valuesMap,
-    { requiredProps: ['deposit', 'message', 'date'] }
+    { requiredProps: ['deposit', 'message', 'datetime'] }
 );
