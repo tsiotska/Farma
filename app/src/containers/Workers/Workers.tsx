@@ -61,25 +61,25 @@ interface IProps extends WithStyles<typeof styles> {
 type TabValue = 'all' | 'fired';
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     currentDepartment,
-                     loadWorkers,
-                     loadFiredWorkers,
-                     positions,
-                     workers,
-                     firedWorkers,
-                     getAsyncStatus,
-                     loadWorkersExcel,
-                     resetWorkers,
-                     loadUnconfirmedDoctors,
-                     pureAgentConfirm
-                 },
-                 userStore: {
-                     role
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            currentDepartment,
+            loadWorkers,
+            loadFiredWorkers,
+            positions,
+            workers,
+            firedWorkers,
+            getAsyncStatus,
+            loadWorkersExcel,
+            resetWorkers,
+            loadUnconfirmedDoctors,
+            pureAgentConfirm
+        },
+        userStore: {
+            role
+        }
+    }
+}) => ({
     currentDepartment,
     loadWorkers,
     loadFiredWorkers,

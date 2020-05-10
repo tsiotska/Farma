@@ -81,15 +81,6 @@ interface IProps extends WithStyles<typeof styles> {
     confirmHandler?: (doc: IDoctor) => void;
 }
 
-@inject(({
-             appState: {
-                 departmentsStore: {
-                     acceptAgent
-                 }
-             }
-         }) => ({
-    acceptAgent
-}))
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
