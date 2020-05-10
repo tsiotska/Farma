@@ -72,11 +72,7 @@ class LpuModal extends Component<IProps> {
         phone2: 'Телефон має склададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
     };
-
-    @observable cities: ILocation[] = [];
-
-    @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
-    @observable formValues: ILpuModalValues = {
+    readonly initialValues: ILpuModalValues = {
         name: '',
         oblast: null,
         city: null,
@@ -85,6 +81,11 @@ class LpuModal extends Component<IProps> {
         phone1: '',
         phone2: '',
     };
+
+    @observable cities: ILocation[] = [];
+
+    @observable errors: Map<keyof ILpuModalValues, boolean | string> = new Map();
+    @observable formValues: ILpuModalValues = { ...this.initialValues };
 
     @computed
     get oblastListItems(): ILocation[] {
@@ -217,14 +218,14 @@ class LpuModal extends Component<IProps> {
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { initialLpu: prevInitial } = prevProps;
+        const { open: wasOpen, initialLpu: prevInitial } = prevProps;
         const { open: isOpen, initialLpu } = this.props;
 
         const shouldSetInitial = !prevInitial && !!initialLpu;
+        const becomeClosed = wasOpen && !open;
 
-        if (isOpen && shouldSetInitial) {
-            this.initFromInitial();
-        }
+        if (isOpen && shouldSetInitial) this.initFromInitial();
+        else if (becomeClosed) this.formValues = { ...this.initialValues };
     }
 
     async componentDidMount() {

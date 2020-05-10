@@ -464,9 +464,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const newPropName = namesMap[propName];
 
             let actualValue: any = value;
-            if (objectFields.includes(propName)) {
+            if (propName === 'city') {
                 actualValue = (value && 'id' in value)
                     ? value.id
+                    : null;
+            } else if (propName === 'oblast') {
+                actualValue = (value && 'name' in value)
+                    ? value.name
                     : null;
             }
 

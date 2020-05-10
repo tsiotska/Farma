@@ -103,9 +103,7 @@ class Notifications extends Component<IProps> {
                         return (
                             <React.Fragment key={id}>
                                 { before }
-                                <Notification
-                                    notification={notification}
-                                />
+                                <Notification notification={notification} />
                             </React.Fragment>
                         );
                     })

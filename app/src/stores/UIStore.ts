@@ -1,8 +1,7 @@
-import { ADD_MEDICINE_MODAL, ADD_LPU_MODAL } from './../constants/Modals';
-import AsyncStore from './AsyncStore';
+import { INotification } from './../interfaces/iNotification';
+import { SNACKBAR_TYPE } from './../constants/Snackbars';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action } from 'mobx';
-import { SALARY_PREVIEW_MODAL, ADD_DEPARTMENT_MODAL } from '../constants/Modals';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 
 export enum SORT_ORDER {
@@ -25,7 +24,16 @@ export interface IDeletePopoverSettings {
     callback: (confirm: boolean) => void;
 }
 
+export interface INotificationSnackbar {
+    type: SNACKBAR_TYPE;
+    message: string;
+}
+
 export class UIStore implements IUIStore {
+    @observable notificationSnackbar: INotificationSnackbar = {
+        type: SNACKBAR_TYPE.SUCCESS,
+        message: ''
+    };
     @observable salesHeaderHeight: number;
     @observable openedModal: string;
     @observable modalPayload: any;
@@ -84,5 +92,15 @@ export class UIStore implements IUIStore {
     @action.bound
     clearLpuFilters() {
         this.LpuFilterSettings = null;
+    }
+
+    @action.bound
+    openNotificationSnackbar(newNotification: INotificationSnackbar) {
+        if (newNotification === null) this.notificationSnackbar.message = null;
+        const snackbarIsOpen = !!this.notificationSnackbar.message;
+        if (snackbarIsOpen) this.notificationSnackbar.message = '';
+        setTimeout(() => {
+            this.notificationSnackbar = newNotification;
+        }, 300);
     }
 }

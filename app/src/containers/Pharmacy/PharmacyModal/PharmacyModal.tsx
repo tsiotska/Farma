@@ -64,15 +64,7 @@ export interface IPharmacyModalValues {
 }))
 @observer
 class PharmacyModal extends Component<IProps> {
-    oblastReactionDisposer: any;
-    cityReactionDisposer: any;
-
-    @observable cities: ILocation[] = [];
-    @observable lpus: ILPU[] = [];
-
-    @observable errors: Map<keyof IPharmacyModalValues, boolean | string> = new Map();
-    @observable optionalFields: Array<keyof IPharmacyModalValues> = [ 'lpu', 'phone1', 'phone2' ];
-    @observable formValues: IPharmacyModalValues = {
+    readonly initialValues: IPharmacyModalValues = {
         name: '',
         oblast: '',
         lpu: '',
@@ -82,6 +74,15 @@ class PharmacyModal extends Component<IProps> {
         phone1: '',
         phone2: '',
     };
+    oblastReactionDisposer: any;
+    cityReactionDisposer: any;
+
+    @observable cities: ILocation[] = [];
+    @observable lpus: ILPU[] = [];
+
+    @observable errors: Map<keyof IPharmacyModalValues, boolean | string> = new Map();
+    @observable optionalFields: Array<keyof IPharmacyModalValues> = [ 'lpu', 'phone1', 'phone2' ];
+    @observable formValues: IPharmacyModalValues = { ...this.initialValues };
 
     readonly errorMessages: {[key: string]: string} = {
         phone1: 'Телефон має скададатись з 10 або 12 цифр',
@@ -240,12 +241,14 @@ class PharmacyModal extends Component<IProps> {
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { initialPharmacy: prevInitial } = prevProps;
+        const { open: wasOpen, initialPharmacy: prevInitial } = prevProps;
         const { open, initialPharmacy } = this.props;
 
         const shouldSetInititial = !prevInitial && !!initialPharmacy;
+        const becomeClosed = wasOpen && !open;
 
         if (open && shouldSetInititial) this.initFromInitial();
+        else if (becomeClosed) this.formValues = { ...this.initialValues };
     }
 
     componentWillUnmount() {

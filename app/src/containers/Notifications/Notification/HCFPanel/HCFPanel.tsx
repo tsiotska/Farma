@@ -79,7 +79,7 @@ class HCFPanel extends Component<IProps> {
 
         return (
             <>
-                <Grid xs={3} alignItems='center' container item>
+                <Grid xs={3} alignItems='center' wrap='nowrap' container item>
                     <>
                         <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit} />
                         <CommitBadge className={classes.badge} title='РМ' committed={RMCommit} />
