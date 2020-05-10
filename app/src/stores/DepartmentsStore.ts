@@ -228,23 +228,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
-        return Promise.resolve([{
-            id: 1,
-            name: 'test',
-            LPUId: 2,
-            LPUName: 'test',
-            FFMCommit: true,
-            RMCommit: false,
-            specialty: 'test',
-            position: 'test',
-            workPhone: 'test',
-            mobilePhone: 'test',
-            card: 'test',
-            created: null,
-            confirmed: false,
-            deposit: 5
-        }]);
-
         const { api, userStore: { previewUser } } = this.rootStore;
         const condition = this.currentDepartmentId
             && previewUser
@@ -348,26 +331,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedPharmacies() {
-        Promise.resolve([{
-            id: 1,
-            name: 'pharmacy',
-            type: 'pharmacy',
-            region: 123,
-            oblast: 'pharmacy',
-            city: 'pharmacy',
-            address: 'pharmacy',
-            phone1: '1123213',
-            phone2: '1234321',
-            FFMCommit: true,
-            RMCommit: false,
-            confirmed: false,
-            lpu: 213,
-            lpuName: 'pharmacy'
-        }]).then((res) => this.unconfirmedPharmacies = res)
-            .catch((err) => console.log(err));
-        return;
-        // Production
-        /*
         const requestName = 'loadUnconfirmedPharmacies';
         const { api } = this.rootStore;
         const url = this.getPharmacyApiUrl(true);
@@ -382,7 +345,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         if (res && url === this.getPharmacyApiUrl(true)) {
             this.unconfirmedPharmacies = res;
-        }*/
+        }
     }
 
     @action.bound
@@ -411,24 +374,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedLPUs() {
-        this.unconfirmedLPUs = [{
-            id: 1,
-            name: 'name',
-            type: 'lpu',
-            region: 123,
-            oblast: 'awdawd',
-            city: 'awdawd',
-            address: 'awda',
-            phone1: '1123213',
-            phone2: '1234321',
-            FFMCommit: true,
-            RMCommit: false,
-            confirmed: false,
-            lpu: 213,
-            lpuName: 'lpuname'
-        }];
-        return;
-
         const requestName = 'loadUnconfirmedLPUs';
         const { api, userStore: { previewUser } } = this.rootStore;
 
