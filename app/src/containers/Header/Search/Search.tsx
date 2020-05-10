@@ -12,7 +12,8 @@ const styles = (theme: any) => createStyles({
         border: '1px solid #aaa',
         borderRadius: 2,
         width: '100%',
-        paddingLeft: 5
+        paddingLeft: 5,
+        background: 'white'
     },
     iconButton: {
         borderRadius: 2,
