@@ -21,7 +21,7 @@ const styles = (theme: any) => createStyles({
         marginBottom: 1,
         minHeight: 48,
         padding: '5px 0',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue

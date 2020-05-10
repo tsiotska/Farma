@@ -65,19 +65,9 @@ interface IProps extends WithStyles<typeof styles> {
     submitHandler: (data: any) => void;
     isLoading: boolean;
     deposits: IDeposit[];
-    modalPayload?: IDoctor;
+    doctor: IDoctor;
 }
 
-@inject(({
-             appState: {
-                 uiStore: {
-                     modalPayload
-                 }
-             }
-         }) => ({
-    modalPayload
-}))
-@observer
 class FormContent extends Component<IProps> {
     readonly initialValue: IDepositFormValue = {
         deposit: '',
@@ -109,7 +99,7 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading, deposits, modalPayload: doctor } = this.props;
+        const { classes, isLoading, deposits, doctor } = this.props;
         return (
             <>
                 { !!doctor &&

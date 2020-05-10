@@ -105,7 +105,7 @@ class EditDepositModal extends Component<IProps> {
     }
 
     render() {
-        const { openedModal, classes } = this.props;
+        const { modalPayload, classes } = this.props;
 
         return (
             <>
@@ -115,6 +115,7 @@ class EditDepositModal extends Component<IProps> {
                     onClose={this.closeHandler}
                     maxWidth='md'>
                     <FormContent
+                        doctor={modalPayload}
                         deposits={this.deposits}
                         submitHandler={this.submitHandler}
                         isLoading={this.isLoading}
