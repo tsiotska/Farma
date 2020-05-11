@@ -1,6 +1,6 @@
 import { IDoctor } from './../interfaces/IDoctor';
 import { IBonusInfo, IAgentInfo, IMark } from './../interfaces/IBonusInfo';
-import { computed, action, observable, toJS } from 'mobx';
+import { computed, action, observable, toJS, runInAction } from 'mobx';
 
 import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
@@ -95,13 +95,21 @@ export default class UserStore extends AsyncStore implements IUserStore {
             : USER_ROLE.UNKNOWN;
     }
 
-    // @computed
-    // get filteredMeds(): IMedicine[] {
-    //     const { departmentsStore: { currentDepartmentMeds } } = this.rootStore;
-    //     if (!this.previewBonus) return [];
-    //     const { sales } = this.previewBonus;
-    //     return currentDepartmentMeds.filter(x => sales.has(x.id));
-    // }
+    @computed
+    get totalSold(): {[key: number]: number} {
+
+        const total: any = {};
+        if (!this.previewBonus) return total;
+
+        for (const agent of this.previewBonus.agents) {
+            for (const [, mark] of agent.marks) {
+                const { deposit, payments, drugId } = mark;
+                total[drugId] = (total[drugId] || 0) + deposit + payments;
+            }
+        }
+
+        return total;
+    }
 
     @action.bound
     loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) {
@@ -343,8 +351,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         if (!res || !isDataRelevant) return;
 
-        this.previewBonus.agents = res.agents;
-        this.previewBonus.sales = res.sales;
+        runInAction(() => {
+            this.previewBonus.agents = res.agents;
+            this.previewBonus.sales = res.sales;
+        });
     }
 
     @action.bound

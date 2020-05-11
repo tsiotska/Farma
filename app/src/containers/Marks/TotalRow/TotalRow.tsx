@@ -167,8 +167,6 @@ class TotalRow extends Component<IProps> {
             ? 2
             : 1;
 
-        console.log(toJS(this.props));
-
         return (
             <TableRow className={classes.root}>
                 <TableCell

@@ -15,7 +15,7 @@ import { withStyles } from '@material-ui/styles';
 import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
 import TabItem from './TabItem';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { computed, toJS, observable } from 'mobx';
+import { computed, toJS, observable, reaction } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
 import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
@@ -51,6 +51,7 @@ interface IProps extends WithStyles<typeof styles> {
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     previewUser?: IUser;
+    setPreviewBonus?: (previewBonus: IBonusInfo) => void;
 }
 
 @inject(({
@@ -62,7 +63,8 @@ interface IProps extends WithStyles<typeof styles> {
             role,
             bonusesYear,
             updateBonuses,
-            previewUser
+            previewUser,
+            setPreviewBonus
         },
         uiStore: {
             openModal
@@ -76,14 +78,14 @@ interface IProps extends WithStyles<typeof styles> {
     openModal,
     bonusesYear,
     updateBonuses,
-    previewUser
+    previewUser,
+    setPreviewBonus
 }))
 @observer
 class Marks extends Component<IProps> {
     readonly currentYear = new Date().getFullYear();
-
+    reactionDisposer: any;
     @observable excelPopperAnchor: HTMLElement = null;
-    @observable changedAgents: IAgentInfo[] = [];
 
     @computed
     get isBonusesLoading(): boolean {
@@ -105,48 +107,6 @@ class Marks extends Component<IProps> {
     }
 
     @computed
-    get agents(): IAgentInfo[] {
-        const { previewBonus } = this.props;
-        return previewBonus
-            ? previewBonus.agents
-            : [];
-    }
-
-    @computed
-    get sales(): Map<number, IDrugSale>  {
-        const { previewBonus } = this.props;
-        return previewBonus
-            ? previewBonus.sales
-            : new Map();
-    }
-
-    @computed
-    get totalSoldCount(): {[key: number]: number} {
-        const { previewBonus } = this.props;
-
-        if (!previewBonus) return {};
-
-        const agentsMarks = previewBonus.agents.map(({ marks }) => (
-            [...marks.values()]
-        )).reduce((total, curr) => {
-                total.push(...curr);
-                return total;
-            }, []
-        );
-
-        const obj: any = agentsMarks.reduce(
-            (total, curr) => {
-                const { deposit, payments, drugId } = curr;
-                total[drugId] = (total[drugId] || 0) + deposit + payments;
-                return total;
-            },
-            {}
-        );
-
-        return obj;
-    }
-
-    @computed
     get showLpuColumn(): boolean {
         return this.props.role === USER_ROLE.MEDICAL_AGENT;
     }
@@ -161,20 +121,21 @@ class Marks extends Component<IProps> {
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
-    componentDidUpdate({ role: prevRole }: IProps) {
-        const { role: currentRole, loadBonuses } = this.props;
-
-        if (prevRole === currentRole) return;
-        loadBonuses();
-    }
-
     componentDidMount() {
-        const { loadBonuses } = this.props;
-        loadBonuses();
+        this.props.loadBonuses();
+        this.reactionDisposer = reaction(
+            () => this.props.role,
+            () => {
+                const { loadBonuses, setPreviewBonus } = this.props;
+                setPreviewBonus(null);
+                loadBonuses();
+            }
+        );
     }
 
     componentWillUnmount() {
         const { updateBonuses, role } = this.props;
+        this.reactionDisposer();
         if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
     }
 
@@ -187,7 +148,7 @@ class Marks extends Component<IProps> {
             role,
             previewUser
         } = this.props;
-        console.log('previewBonus: ', toJS(previewBonus));
+
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
@@ -231,18 +192,11 @@ class Marks extends Component<IProps> {
                             </Button>
                         }
                     </Grid>
-                    <TableHeader
-                        showLpu={this.showLpuColumn}
-                        sales={this.sales}
-                        totalSold={this.totalSoldCount}
-                    />
+                    <TableHeader showLpu={this.showLpuColumn} />
                     {
                         !!previewBonus &&
                         <Table
                             isLoading={this.isBonusesLoading || this.isBonusDataLoading}
-                            agentsInfo={this.agents}
-                            sales={this.sales}
-                            totalSold={this.totalSoldCount}
                             parentUser={previewUser}
                         />
                     }

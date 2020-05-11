@@ -60,8 +60,8 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     showLpu: boolean;
-    sales: Map<number, IDrugSale>;
-    totalSold: { [key: number]: number };
+    totalSold?: { [key: number]: number };
+
     meds?: IMedicine[];
     previewBonus?: IBonusInfo;
 }
@@ -72,21 +72,29 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds: meds
         },
         userStore: {
-            previewBonus
+            previewBonus,
+            totalSold
         }
     }
 }) => ({
     meds,
-    previewBonus
+    previewBonus,
+    totalSold
 }))
 @observer
 class TableHeader extends Component<IProps> {
+    get sales(): Map<number, IDrugSale> {
+        const { previewBonus } = this.props;
+        return previewBonus
+            ? previewBonus.sales
+            : new Map();
+    }
+
     render() {
         const {
             classes,
             meds,
             showLpu,
-            sales,
             totalSold,
             previewBonus
         } = this.props;
@@ -115,7 +123,7 @@ class TableHeader extends Component<IProps> {
                             {
                                 meds.length
                                 ? meds.map(x => {
-                                    const saleInfo = sales.get(x.id);
+                                    const saleInfo = this.sales.get(x.id);
 
                                     return (
                                         <TableCell
