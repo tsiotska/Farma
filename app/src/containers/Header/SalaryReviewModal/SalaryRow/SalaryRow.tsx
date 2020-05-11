@@ -16,6 +16,9 @@ const styles = (theme: any) => createStyles({
     wideColumn: {
         width: 200
     },
+    mediumColumn: {
+        width: 100
+    },
     cell: {
         border: '2px solid transparent'
     },
@@ -126,6 +129,11 @@ class SalaryRow extends Component<IProps> {
     }
 
     @computed
+    get fact(): number | string {
+        return 0;
+    }
+
+    @computed
     get deficit(): number | string {
         const { salary, medicine: { id } } = this.props;
 
@@ -161,7 +169,12 @@ class SalaryRow extends Component<IProps> {
                         {name}
                     </Typography>
                 </Grid>
-                <Grid className={classes.wideColumn} justify='center' alignItems='center' container>
+                <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
+                    <Typography align='center'>
+                        {this.fact}
+                    </Typography>
+                </Grid>
+                <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
                     <Typography align='center'>
                         {this.deficit}
                     </Typography>
@@ -170,15 +183,12 @@ class SalaryRow extends Component<IProps> {
                     levels.map(i => (
                             <Grid
                                 key={i}
-                                className={
-                                    cx(
-                                        classes.withOffset,
-                                        classes.cell,
-                                        {
-                                            [userColors[i - 1]]: i === userLevel,
-                                            [this.borderColors[i - 1]]: i === this.valueLevel
-                                        }
-                                    )
+                                className={cx(classes.withOffset, classes.cell,
+                                    {
+                                        [userColors[i - 1]]: i === userLevel,
+                                        [this.borderColors[i - 1]]: i === this.valueLevel
+                                    }
+                                )
                                 }
                                 alignItems='center'
                                 justify='center'

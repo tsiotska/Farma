@@ -13,6 +13,9 @@ const styles = (theme: any) => createStyles({
     wideColumn: {
         width: 200
     },
+    mediumColumn: {
+        width: 100
+    },
     text: {
         fontFamily: 'Source Sans Pro SemiBold'
     },
@@ -110,12 +113,17 @@ class SalaryHeader extends Component<IProps> {
 
         return (
             <Grid className={classes.root} alignItems='center' wrap='nowrap' container>
-                <Grid className={cx(classes.withOffset, classes.wideColumn)}>
+                <Grid className={cx(classes.wideColumn, classes.withOffset)}>
                     <Typography className={classes.text} color='textSecondary'>
                         Препарати
                     </Typography>
                 </Grid>
-                <Grid className={classes.wideColumn}>
+                <Grid className={classes.mediumColumn}>
+                    <Typography className={classes.text} align='center' color='textSecondary'>
+                        Факт
+                    </Typography>
+                </Grid>
+                <Grid className={classes.mediumColumn}>
                     <Typography className={classes.text} align='center' color='textSecondary'>
                         Кількість до наступного рівня
                     </Typography>

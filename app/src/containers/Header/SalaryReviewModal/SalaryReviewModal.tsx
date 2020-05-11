@@ -102,7 +102,6 @@ class SalaryReviewModal extends Component<IProps> {
 
     yearChangeHandler = (value: number) => {
         this.year = value;
-        console.log(value)
     }
 
     monthChangeHandler = (value: number) => {
