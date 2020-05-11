@@ -15,6 +15,8 @@ import SideNavButton from '../SideNavButton';
 import { ADMIN_ROUTE, SALES_ROUTE, NOTIFICATIONS_ROUTE } from '../../../constants/Router';
 import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import DateRangeModal from '../../Sales/DateRangeModal';
+import HomeIcon from '-!react-svg-loader!../../../../assets/icons/home.svg';
+import logOutIcon from '../../../../assets/icons/logout.png';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -65,6 +67,10 @@ const styles = (theme: any) => createStyles({
         width: 50,
         height: 50
     },
+    logoutIcon: {
+        width: 22,
+        height: 24
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -204,7 +210,9 @@ class SideNav extends Component<IProps> {
                         clickHandler={this.homeClickHandler}
                         disabled={false}
                         tooltip='home'>
-                            <HomeOutlined className={classes.iconSm} fontSize='small' />
+                            <HomeIcon />
+                            {/* <HomeIcon width={36} height={36} /> */}
+                            {/* <HomeOutlined className={classes.iconSm} fontSize='small' /> */}
                     </SideNavButton>
                 }
                 {
@@ -234,7 +242,7 @@ class SideNav extends Component<IProps> {
                     </Badge>
                 </Button>
                 <Button onClick={logout} className={classes.action}>
-                    Out
+                    <img className={classes.logoutIcon} src={logOutIcon} />
                 </Button>
                 <DateRangeModal />
             </Drawer>
