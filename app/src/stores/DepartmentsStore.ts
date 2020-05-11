@@ -771,6 +771,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async addMedicine(data: IFormValues, image: File) {
+        const { api } = this.rootStore;
         const intValues = ['dosage', 'mark', 'price'];
         const namesMap: Readonly<Partial<IFormValues>> = {
             name: 'name',
@@ -781,7 +782,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             price: 'price',
             barcode: 'barcode',
         };
-        const { api } = this.rootStore;
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {

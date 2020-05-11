@@ -26,6 +26,7 @@ import ExcelLoadPopper from './ExcelLoadPoppper';
 import { ADD_DOC_MODAL, ADD_BONUS_MODAL } from '../../constants/Modals';
 import AddDocsModal from './AddDocsModal';
 import AddBonusModal from './AddBonusModal';
+import MonthPicker from './MonthPicker';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -37,25 +38,17 @@ const styles = (theme: any) => createStyles({
     paper: {
         padding: 20
     },
-    iconButton: {
-        borderRadius: 2,
-        minHeight: 64
-    },
-    addDocButton: {
-
-    }
+    addDocButton: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {
     loadBonuses?: () => void;
-    bonuses?: IBonusInfo[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadLocationsAgents?: () => void;
     previewBonus?: IBonusInfo;
     role?: USER_ROLE;
     loadDoctors?: () => void;
     bonusesYear?: number;
-    setBonusesYear?: (value: number, shouldPostData: boolean, loadData: boolean) => void;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     clearDoctors?: () => void;
@@ -65,12 +58,10 @@ interface IProps extends WithStyles<typeof styles> {
     appState: {
         userStore: {
             loadBonuses,
-            bonuses,
             getAsyncStatus,
             previewBonus,
             role,
             bonusesYear,
-            setBonusesYear,
             updateBonuses,
 
         },
@@ -86,7 +77,6 @@ interface IProps extends WithStyles<typeof styles> {
 }) => ({
     clearDoctors,
     loadBonuses,
-    bonuses,
     previewBonus,
     getAsyncStatus,
     loadLocationsAgents,
@@ -94,7 +84,6 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     openModal,
     bonusesYear,
-    setBonusesYear,
     updateBonuses,
 }))
 @observer
@@ -112,14 +101,6 @@ class Marks extends Component<IProps> {
     @computed
     get isBonusDataLoading(): boolean {
         return this.props.getAsyncStatus('loadBonusesData').loading;
-    }
-
-    @computed
-    get previewBonusMonth(): number {
-        const { previewBonus } = this.props;
-        return previewBonus
-            ? previewBonus.month
-            : null;
     }
 
     @computed
@@ -178,16 +159,6 @@ class Marks extends Component<IProps> {
         return this.props.role === USER_ROLE.MEDICAL_AGENT;
     }
 
-    incrementYear = () => {
-        const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear, role === USER_ROLE.MEDICAL_AGENT, true);
-    }
-
-    decrementYear = () => {
-        const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear - 1, role === USER_ROLE.MEDICAL_AGENT, true);
-    }
-
     openExcelPopper = ({ target }: any) => {
         this.excelPopperAnchor = target;
     }
@@ -195,8 +166,6 @@ class Marks extends Component<IProps> {
     closeExcelPopper = () => {
         this.excelPopperAnchor = null;
     }
-
-    createBonus = () => this.props.openModal(ADD_BONUS_MODAL);
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
@@ -238,60 +207,24 @@ class Marks extends Component<IProps> {
     }
 
     componentWillUnmount() {
-        const { updateBonuses, role, setBonusesYear } = this.props;
+        const { updateBonuses, role } = this.props;
         if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
-        setBonusesYear(
-            new Date().getFullYear(),
-            role === USER_ROLE.MEDICAL_AGENT,
-            false
-        );
     }
 
     render() {
         const {
-            bonuses,
             classes,
             bonusesYear,
             updateBonuses,
             role,
-            previewBonus
         } = this.props;
-        console.log('previewBonus: ', toJS(previewBonus));
+
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
                     Бали за {bonusesYear} рік
                 </Typography>
-                <Grid container alignItems='center'>
-                    <IconButton
-                        onClick={this.decrementYear}
-                        disabled={!bonuses || !bonuses.length}
-                        className={classes.iconButton}>
-                        <ArrowLeft fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                        onClick={this.createBonus}
-                        disabled={this.isBonusesLoading || this.isBonusDataLoading}
-                        className={classes.iconButton}>
-                        <Add fontSize='small' />
-                    </IconButton>
-                    {
-                        bonuses && bonuses.map(bonusInfo => (
-                            <TabItem
-                                key={bonusInfo.month}
-                                bonus={bonusInfo}
-                                selected={this.previewBonusMonth === bonusInfo.month}
-                            />
-                        ))
-                    }
-                    <IconButton
-                        disabled={bonusesYear >= this.currentYear}
-                        onClick={this.incrementYear}
-                        className={classes.iconButton}>
-                        <ArrowRight fontSize='small' />
-                    </IconButton>
-                </Grid>
-
+                <MonthPicker isLoading={this.isBonusesLoading || this.isBonusDataLoading} />
                 {
                     (this.isBonusDataLoading || this.isBonusesLoading) &&
                     <LinearProgress />
@@ -304,17 +237,17 @@ class Marks extends Component<IProps> {
                         {
                             role !== USER_ROLE.MEDICAL_AGENT &&
                             <>
-                            <IconButton onClick={
-                                this.excelPopperAnchor
-                                    ? this.closeExcelPopper
-                                    : this.openExcelPopper
-                                }>
-                                <ExcelIcon />
-                            </IconButton>
-                            <ExcelLoadPopper
-                                anchor={this.excelPopperAnchor}
-                                closeHandler={this.closeExcelPopper}
-                            />
+                                <IconButton onClick={
+                                    this.excelPopperAnchor
+                                        ? this.closeExcelPopper
+                                        : this.openExcelPopper
+                                    }>
+                                    <ExcelIcon />
+                                </IconButton>
+                                <ExcelLoadPopper
+                                    anchor={this.excelPopperAnchor}
+                                    closeHandler={this.closeExcelPopper}
+                                />
                             </>
                         }
                     </Grid>
