@@ -155,10 +155,10 @@ class Marks extends Component<IProps> {
                     Бали за {bonusesYear} рік
                 </Typography>
                 <MonthPicker isLoading={this.isBonusesLoading || this.isBonusDataLoading} />
-                {
+                {/* {
                     (this.isBonusDataLoading || this.isBonusesLoading) &&
                     <LinearProgress />
-                }
+                } */}
                 <Paper className={classes.paper}>
                     <Grid alignItems='center' justify='space-between' container>
                         <Typography variant='h5'>

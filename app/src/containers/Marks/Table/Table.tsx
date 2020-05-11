@@ -6,7 +6,8 @@ import {
     TableBody,
     Table as MuiTable,
     Paper,
-    Collapse
+    Collapse,
+    LinearProgress
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -78,6 +79,7 @@ class Table extends Component<IProps> {
     @observable leftOffset: number = 0;
     @observable expandedAgent: number = null;
     @observable agents: IUserInfo[] = [];
+    @observable agentsLoaded: boolean = false;
 
     @computed
     get agentsInfo(): IAgentInfo[] {
@@ -174,6 +176,7 @@ class Table extends Component<IProps> {
             ? await loadConfirmedDoctors(parentUser)
             : await getLocationsAgents(currentDepartmentId, position);
         this.agents = newAgents || [];
+        this.agentsLoaded = true;
         this.reactionDisposer = reaction(
             () => this.props.role,
             () => { this.agents = []; }
@@ -185,12 +188,14 @@ class Table extends Component<IProps> {
     }
 
     render() {
-        const { classes, role } = this.props;
+        const { classes, role, isLoading } = this.props;
 
         const lastIndex = this.agentsInfo.length - 1;
+        const showLoader = this.agentsLoaded === false || isLoading === true;
 
         return (
             <>
+            { showLoader && <LinearProgress /> }
             <TableContainer>
                 <MuiTable padding='none'>
                     <TableBody>

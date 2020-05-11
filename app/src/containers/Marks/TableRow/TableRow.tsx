@@ -197,15 +197,7 @@ class TableRow extends Component<IProps> {
                         onClick={this.expandHandler}
                         padding='none'
                         className={cx(classes.cell, classes.wideColumn)}>
-                        <Grid container>
-                            {
-                                this.isExpandable &&
-                                <KeyboardArrowDown
-                                    className={cx(classes.expandIcon, { rotate: expanded === true })}
-                                    fontSize='small' />
-                            }
                             { LPUName }
-                        </Grid>
                     </TableCell>
                 }
                 <TableCell
