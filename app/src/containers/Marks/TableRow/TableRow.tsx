@@ -6,10 +6,13 @@ import {
     TableCell,
     Grid,
     Divider,
+    Collapse,
+    Typography
 } from '@material-ui/core';
+import { KeyboardArrowDown } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, observable } from 'mobx';
 import cx from 'classnames';
 import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
 import { IMedicine } from '../../../interfaces/IMedicine';
@@ -29,7 +32,7 @@ const styles = (theme: any) => createStyles({
         width: 70
     },
     cell: {
-        verticalAlign: 'center',
+        verticalAlign: 'middle',
         border: 'none',
         borderBottom: '10px solid white',
         backgroundColor: '#F7F7F9'
@@ -61,6 +64,12 @@ const styles = (theme: any) => createStyles({
         '& > *': {
             textAlign: 'center'
         }
+    },
+    expandIcon: {
+        transition: '0.3s',
+        '&.rotate': {
+            transform: 'rotate(180deg)'
+        }
     }
 });
 
@@ -72,6 +81,8 @@ interface IProps extends WithStyles<typeof styles> {
     meds?: IMedicine[];
     tooltips: { [key: number]: string };
     itemRef?: any;
+    expanded?: boolean | null; // true/false - isExpanded, null - not expandable
+    expandHandler?: (id: number, isExpanded: boolean) => void;
 }
 
 @inject(({
@@ -150,6 +161,22 @@ class TableRow extends Component<IProps> {
         : <TableCell />;
     }
 
+    @computed
+    get columnsCount(): number {
+        const { meds, showLpu } = this.props;
+        return 4 + meds.length + (showLpu ? 1 : 0);
+    }
+
+    get isExpandable(): boolean {
+        const { expandHandler, expanded } = this.props;
+        return !!expandHandler && typeof expanded === 'boolean';
+    }
+
+    expandHandler = () => {
+        const { expandHandler, expanded, agent } = this.props;
+        if (this.isExpandable) expandHandler(agent.id, !expanded);
+    }
+
     render() {
         const {
             classes,
@@ -157,6 +184,7 @@ class TableRow extends Component<IProps> {
             agentName,
             lpuName,
             itemRef,
+            expanded,
             agent: {
                 lastDeposit,
                 lastPayment,
@@ -164,22 +192,39 @@ class TableRow extends Component<IProps> {
         } = this.props;
 
         return (
+            <>
             <MuiTableRow ref={itemRef} className={classes.root}>
                 {
                     showLpu &&
                     <TableCell
+                        onClick={this.expandHandler}
                         padding='none'
                         className={cx(classes.cell, classes.wideColumn)}>
-                        { lpuName }
+                        <Grid container>
+                            {
+                                this.isExpandable &&
+                                <KeyboardArrowDown
+                                    className={cx(classes.expandIcon, { rotate: expanded === true })}
+                                    fontSize='small' />
+                            }
+                            { lpuName }
+                        </Grid>
                     </TableCell>
                 }
                 <TableCell
+                    onClick={this.expandHandler}
                     padding='none'
                     className={cx(
                         classes.cell, {
                         [classes.doubleWidthColumn]: !showLpu,
                         [classes.wideColumn]: showLpu,
                     })}>
+                    {
+                        this.isExpandable === true && showLpu === false &&
+                        <KeyboardArrowDown
+                            className={cx(classes.expandIcon, { rotate: expanded === true })}
+                            fontSize='small' />
+                    }
                     { agentName }
                 </TableCell>
                 { this.medsContent }
@@ -229,6 +274,21 @@ class TableRow extends Component<IProps> {
                     </Grid>
                 </TableCell>
             </MuiTableRow>
+            {
+                this.isExpandable &&
+                <MuiTableRow>
+                    <TableCell
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={this.columnsCount}>
+                        <Collapse in={expanded} timeout='auto' unmountOnExit>
+                            <Typography>
+                                hello
+                            </Typography>
+                        </Collapse>
+                    </TableCell>
+                </MuiTableRow>
+            }
+            </>
         );
     }
 }

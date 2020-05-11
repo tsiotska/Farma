@@ -5,7 +5,8 @@ import {
     TableContainer,
     TableBody,
     Table as MuiTable,
-    Paper
+    Paper,
+    Collapse
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -57,6 +58,7 @@ class Table extends Component<IProps> {
     @observable totalRowPosition: 'initial' | 'fixed' = 'fixed';
     @observable tableWidth: number = 0;
     @observable leftOffset: number = 0;
+    @observable expandedAgent: number = null;
 
     @computed
     get showTotalRow(): boolean {
@@ -102,6 +104,10 @@ class Table extends Component<IProps> {
         };
     }
 
+    expandChangeHandler = (id: number, isExpanded: boolean) => {
+        this.expandedAgent = isExpanded ? id : null;
+    }
+
     render() {
         const { agents, showLpu, classes } = this.props;
 
@@ -122,6 +128,8 @@ class Table extends Component<IProps> {
                                         agent={x}
                                         showLpu={showLpu}
                                         tooltips={this.tooltips}
+                                        expanded={this.expandedAgent === x.id}
+                                        expandHandler={this.expandChangeHandler}
                                         lpuName={
                                             (agent && 'LPUName' in agent)
                                             ? agent.LPUName
