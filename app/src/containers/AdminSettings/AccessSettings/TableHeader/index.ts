@@ -1,2 +1,2 @@
-import TableHeaderRefactored from './TableHeaderRefactored';
+import TableHeaderRefactored from './TableHeader';
 export default TableHeaderRefactored;

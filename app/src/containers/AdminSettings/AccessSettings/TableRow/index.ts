@@ -1,2 +1,2 @@
-import TableRowRefactor from './TableRowRefactor';
+import TableRowRefactor from './TableRow';
 export default TableRowRefactor;

@@ -6,15 +6,8 @@ import { PERMISSIONS } from '../../../../constants/Permissions';
 
 const styles = createStyles({
     complexHeader: {
-        width: 270,
-        marginLeft: 5,
         backgroundColor: '#fafcfe',
-        '&.wider': {
-            width: 350,
-        },
-        '& > *': {
-            // width: '100%'
-        }
+        borderBottom: '1px solid #E4EDF7'
     }
 });
 
@@ -32,19 +25,19 @@ class TableRow extends Component<IProps> {
         const { classes, title, permissions } = this.props;
 
         return (
-            <Grid alignItems='flex-end' wrap='nowrap' container>
-                <Grid xs item>
+            <Grid direction='column' wrap='nowrap' container>
+                <Grid justify='center' xs container item>
                     <Typography variant='body2'>
                         {title}
                     </Typography>
                 </Grid>
-                <Grid justify='center' xs={1} container item>
+                <Grid className={cx(classes.complexHeader)} justify='center' xs container item>
                     <Typography variant='body2'>
                         <Checkbox onChange={this.changeHandler(PERMISSIONS.SEE_REPORT)} checked={permissions.includes(PERMISSIONS.SEE_REPORT)} size='small' color='default' />
                     </Typography>
                 </Grid>
 
-                <Grid className={cx(classes.complexHeader, { wider: true })} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_USER)} checked={permissions.includes(PERMISSIONS.EDIT_USER)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_SALARY)} checked={permissions.includes(PERMISSIONS.EDIT_SALARY)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_DRUG)} checked={permissions.includes(PERMISSIONS.EDIT_DRUG)} size='small' color='default' />
@@ -53,14 +46,14 @@ class TableRow extends Component<IProps> {
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_AGENT)} checked={permissions.includes(PERMISSIONS.EDIT_AGENT)} size='small' color='default' />
                 </Grid>
 
-                <Grid className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_DRUG)} checked={permissions.includes(PERMISSIONS.ADD_DRUG)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_HCF)} checked={permissions.includes(PERMISSIONS.ADD_HCF)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_PHARMACY)} checked={permissions.includes(PERMISSIONS.ADD_PHARMACY)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_AGENT)} checked={permissions.includes(PERMISSIONS.ADD_AGENT)} size='small' color='default' />
                 </Grid>
 
-                <Grid className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_DRUG)} checked={permissions.includes(PERMISSIONS.DELETE_DRUG)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_HCF)} checked={permissions.includes(PERMISSIONS.DELETE_HCF)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_PHARMACY)} checked={permissions.includes(PERMISSIONS.DELETE_PHARMACY)} size='small' color='default' />
