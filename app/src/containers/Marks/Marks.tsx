@@ -42,7 +42,14 @@ const styles = (theme: any) => createStyles({
         minHeight: 64
     },
     addDocButton: {
-
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
     }
 });
 

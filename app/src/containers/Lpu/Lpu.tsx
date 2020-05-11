@@ -44,6 +44,16 @@ const styles = (theme: any) => createStyles({
     unconfirmedText: {
         fontFamily: 'Source Sans Pro SemiBold',
         paddingBottom: 18
+    },
+    addButton: {
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
     }
 });
 
@@ -241,7 +251,7 @@ class Lpu extends Component<IProps> {
                     <Typography variant='h5'>
                         ЛПУ
                     </Typography>
-                    <Button onClick={this.openAddLpuModal}>
+                    <Button className={classes.addButton} onClick={this.openAddLpuModal}>
                         Додати ЛПУ
                     </Button>
                 </Grid>
