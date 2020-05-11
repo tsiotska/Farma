@@ -41,6 +41,7 @@ interface IProps extends WithStyles<typeof styles> {
     disableClick?: boolean;
     hideLevel?: boolean;
     openModal?: (modalName: string, payload: any) => void;
+    disableText?: boolean;
 }
 
 @inject(({
@@ -107,7 +108,7 @@ class UserShortInfo extends Component<IProps> {
     }
 
     render() {
-        const { classes, user, disableClick } = this.props;
+        const { classes, user, disableClick, disableText } = this.props;
 
         return (
             <>
@@ -132,9 +133,10 @@ class UserShortInfo extends Component<IProps> {
                                 label: classes.levelButtonLabel
                             }}>
                             <Level user={user} />
-                            Подивитись заплату
+                            { !disableText && <Typography>Подивитись заплату </Typography>}
                         </Button>
                     }
+
                 </Grid>
             </>
         );

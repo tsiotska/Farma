@@ -328,8 +328,9 @@ export class APIRequester {
             });
     }
 
-    getUserSalary(departmentId: number, userId: number): Promise<any> {
-        return this.instance.get(`/api/branch/${departmentId}/salary/${userId}`)
+    getUserSalary(departmentId: number, userId: number, time: string): Promise<any> {
+        // time validation missed
+        return this.instance.get(`/api/branch/${departmentId}/salary/${userId}${time}`)
             .then(salaryNormalizer)
             .catch(this.defaultErrorHandler());
     }
