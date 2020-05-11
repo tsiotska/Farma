@@ -36,6 +36,11 @@ export interface ICreateDepartmentReport {
     isFFMCreated: boolean;
 }
 
+export interface IUserLikeObject {
+    id: number;
+    position: USER_ROLE;
+}
+
 export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     rootStore: IRootStore;
     readonly lpuCount: number = 1000;
@@ -255,21 +260,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadConfirmedDoctors(): Promise<IDoctor[]> {
-        const { api, userStore: { previewUser } } = this.rootStore;
+    async loadConfirmedDoctors(targetUser: IUserLikeObject): Promise<IDoctor[]> {
+        const { api } = this.rootStore;
         const condition = this.currentDepartmentId
-            && previewUser
-            && previewUser.id
-            && previewUser.position === USER_ROLE.MEDICAL_AGENT;
+            && targetUser
+            && targetUser.id
+            && targetUser.position === USER_ROLE.MEDICAL_AGENT;
         if (!condition) return;
         return this.dispatchRequest(
-            api.getDoctors(this.currentDepartmentId, previewUser.id),
+            api.getDoctors(this.currentDepartmentId, targetUser.id),
             'loadDoctors'
         );
     }
 
     @action.bound
     async loadDoctors() {
+        const { userStore: { previewUser } } = this.rootStore;
         const unconfirmedDocs = await this.loadUnconfirmedDoctors();
 
         if (unconfirmedDocs) {
@@ -279,7 +285,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             this.doctors.push(...unconfirmedDocs);
         }
 
-        const confirmedDocs = await this.loadConfirmedDoctors();
+        const confirmedDocs = await this.loadConfirmedDoctors(previewUser);
 
         if (confirmedDocs) {
             this.doctors.push(...confirmedDocs);
@@ -998,24 +1004,31 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         });
     }
 
+    getLocationsAgents = (depId: number, role: USER_ROLE): Promise<IUser[]> => {
+        const { api } = this.rootStore;
+
+        let loadPositionsId: USER_ROLE;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
+        if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
+
+        if (!depId || !role) return null;
+
+        return api.getAgents(depId, loadPositionsId);
+    }
+
     @action.bound
     async loadLocationsAgents() {
         const requestName = 'loadLocationsAgents';
         const { api, userStore: { role } } = this.rootStore;
 
-        const branchId = this.currentDepartmentId;
+        const depId = this.currentDepartmentId;
         const userRole = role;
 
-        let loadPositionsId: USER_ROLE;
-        if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
-        if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
-        if (!branchId || !loadPositionsId) return;
-
-        this.locationsAgents.clear();
         this.setLoading(requestName);
-        const res = await api.getAgents(branchId, loadPositionsId);
+        const res = await this.getLocationsAgents(depId, userRole);
 
-        if (branchId !== this.currentDepartmentId || userRole !== this.rootStore.userStore.role) return;
+        const dataIsRelevant = this.currentDepartmentId === depId && userRole === this.rootStore.userStore.role;
+        if (!dataIsRelevant) return;
 
         if (res) {
             const mapped = res.map((x): [number, IUser] => ([x.id, x]));
@@ -1027,6 +1040,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             : this.setError;
 
         callback(requestName);
+    }
+
+    @action.bound
+    clearLocationsAgents() {
+        this.locationsAgents = new Map();
     }
 
     @action.bound

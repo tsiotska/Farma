@@ -14,9 +14,10 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { computed, toJS, observable } from 'mobx';
 import cx from 'classnames';
-import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
+import { IAgentInfo, IDrugSale, IMark } from '../../../interfaces/IBonusInfo';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import HoverableCell from '../HoverableCell';
+import { IUserInfo } from '../Table/Table';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -74,10 +75,9 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    agent: IAgentInfo;
+    agentInfo: IAgentInfo;
     showLpu: boolean;
-    agentName: string;
-    lpuName: string;
+    agent: IUserInfo;
     meds?: IMedicine[];
     tooltips: { [key: number]: string };
     itemRef?: any;
@@ -87,9 +87,9 @@ interface IProps extends WithStyles<typeof styles> {
 
 @inject(({
     appState: {
-        userStore: {
-            filteredMeds: meds
-        },
+        departmentsStore: {
+            currentDepartmentMeds: meds
+        }
     }
 }) => ({
     meds,
@@ -97,11 +97,20 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableRow extends Component<IProps> {
     @computed
+    get agentMarks(): Map<number, IMark> {
+        const { agentInfo } = this.props;
+        return agentInfo
+            ? agentInfo.marks
+            : new Map();
+    }
+
+    @computed
     get packs(): [number, number] {
-        const { meds, agent: { marks }} = this.props;
+        const { meds} = this.props;
+
         return meds.length
             ? meds.reduce((total, { id }) => {
-                const mark = marks.get(id);
+                const mark = this.agentMarks.get(id);
 
                 if (mark) {
                     total[0] += mark.payments;
@@ -115,11 +124,11 @@ class TableRow extends Component<IProps> {
 
     @computed
     get total(): [number, number] {
-        const { meds, agent: { marks }} = this.props;
+        const { meds } = this.props;
 
         return meds.length
             ? meds.reduce((total, { id }) => {
-                const mark = marks.get(id);
+                const mark = this.agentMarks.get(id);
 
                 if (mark) {
                     total[0] += mark.payments * mark.mark;
@@ -129,36 +138,6 @@ class TableRow extends Component<IProps> {
                 return total;
               }, [0, 0])
             : [0, 0];
-    }
-
-    @computed
-    get medsContent(): JSX.Element[] | JSX.Element {
-        const {
-            classes,
-            meds,
-            tooltips,
-            agent
-        } = this.props;
-
-        return meds.length
-        ? meds.map(({ id }) => {
-
-            return (
-                <HoverableCell
-                    key={id}
-                    agent={agent}
-                    medId={id}
-                    tooltip={tooltips[id] || ''}
-                    classes={{
-                        cell: classes.cell,
-                        tooltip: classes.tooltip,
-                        divider: classes.divider,
-                        input: classes.input
-                    }}
-                />
-            );
-          })
-        : <TableCell />;
     }
 
     @computed
@@ -173,23 +152,41 @@ class TableRow extends Component<IProps> {
     }
 
     expandHandler = () => {
-        const { expandHandler, expanded, agent } = this.props;
-        if (this.isExpandable) expandHandler(agent.id, !expanded);
+        const { expandHandler, expanded, agent: { id } } = this.props;
+        if (this.isExpandable) expandHandler(id, !expanded);
     }
 
     render() {
         const {
             classes,
             showLpu,
-            agentName,
-            lpuName,
+            agent: { LPUName, name },
             itemRef,
             expanded,
-            agent: {
-                lastDeposit,
-                lastPayment,
-            }
+            agentInfo,
+            meds,
+            tooltips
         } = this.props;
+
+        const lastPayment = agentInfo ? agentInfo.lastPayment : '-';
+        const lastDeposit = agentInfo ? agentInfo.lastDeposit : '-';
+
+        const medsContent = meds.length
+            ? meds.map(({ id }) => (
+                <HoverableCell
+                    key={id}
+                    agent={agentInfo}
+                    medId={id}
+                    tooltip={tooltips[id] || ''}
+                    classes={{
+                        cell: classes.cell,
+                        tooltip: classes.tooltip,
+                        divider: classes.divider,
+                        input: classes.input
+                    }}
+                />
+              ))
+            : <TableCell />;
 
         return (
             <>
@@ -207,7 +204,7 @@ class TableRow extends Component<IProps> {
                                     className={cx(classes.expandIcon, { rotate: expanded === true })}
                                     fontSize='small' />
                             }
-                            { lpuName }
+                            { LPUName }
                         </Grid>
                     </TableCell>
                 }
@@ -225,9 +222,9 @@ class TableRow extends Component<IProps> {
                             className={cx(classes.expandIcon, { rotate: expanded === true })}
                             fontSize='small' />
                     }
-                    { agentName }
+                    { name }
                 </TableCell>
-                { this.medsContent }
+                { medsContent }
                 <TableCell
                     align='center'
                     padding='none'

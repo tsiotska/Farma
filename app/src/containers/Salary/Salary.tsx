@@ -21,6 +21,7 @@ interface IProps extends WithStyles<typeof styles> {
     setExpandedSalary?: (salary: IUserSalary, year: number, month: number) => void;
     expandedSalary?: IUserSalary;
     loadSubLocationAgents?: () => void;
+    clearLocationsAgents?: () => void;
 }
 
 @inject(({
@@ -33,7 +34,8 @@ interface IProps extends WithStyles<typeof styles> {
             loadLocationsAgents,
             setExpandedSalary,
             expandedSalary,
-            loadSubLocationAgents
+            loadSubLocationAgents,
+            clearLocationsAgents
         }
     }
 }) => ({
@@ -44,7 +46,8 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents,
     setExpandedSalary,
     expandedSalary,
-    loadSubLocationAgents
+    loadSubLocationAgents,
+    clearLocationsAgents
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -105,8 +108,9 @@ class Salary extends Component<IProps> {
     }
 
     componentWillUnmount() {
-        const { clearSalaries } = this.props;
+        const { clearSalaries, clearLocationsAgents } = this.props;
         clearSalaries();
+        clearLocationsAgents();
     }
 
     render() {

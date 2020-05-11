@@ -27,6 +27,7 @@ import { ADD_DOC_MODAL, ADD_BONUS_MODAL } from '../../constants/Modals';
 import AddDocsModal from './AddDocsModal';
 import AddBonusModal from './AddBonusModal';
 import MonthPicker from './MonthPicker';
+import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -44,14 +45,12 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     loadBonuses?: () => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    loadLocationsAgents?: () => void;
     previewBonus?: IBonusInfo;
     role?: USER_ROLE;
-    loadDoctors?: () => void;
     bonusesYear?: number;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
-    clearDoctors?: () => void;
+    previewUser?: IUser;
 }
 
 @inject(({
@@ -63,28 +62,21 @@ interface IProps extends WithStyles<typeof styles> {
             role,
             bonusesYear,
             updateBonuses,
-
-        },
-        departmentsStore: {
-            loadLocationsAgents,
-            loadDoctors,
-            clearDoctors
+            previewUser
         },
         uiStore: {
             openModal
         }
     }
 }) => ({
-    clearDoctors,
     loadBonuses,
     previewBonus,
     getAsyncStatus,
-    loadLocationsAgents,
-    loadDoctors,
     role,
     openModal,
     bonusesYear,
     updateBonuses,
+    previewUser
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -170,40 +162,15 @@ class Marks extends Component<IProps> {
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     componentDidUpdate({ role: prevRole }: IProps) {
-        const {
-            role: currentRole,
-            loadDoctors,
-            loadLocationsAgents,
-            loadBonuses,
-            clearDoctors
-        } = this.props;
+        const { role: currentRole, loadBonuses } = this.props;
 
         if (prevRole === currentRole) return;
-
-        if (currentRole === USER_ROLE.MEDICAL_AGENT) {
-            clearDoctors();
-            loadDoctors();
-        } else {
-            loadLocationsAgents();
-        }
         loadBonuses();
     }
 
     componentDidMount() {
-        const {
-            role,
-            loadBonuses,
-            loadLocationsAgents,
-            loadDoctors,
-            clearDoctors
-        } = this.props;
+        const { loadBonuses } = this.props;
         loadBonuses();
-        if (role === USER_ROLE.MEDICAL_AGENT) {
-            clearDoctors();
-            loadDoctors();
-        } else {
-            loadLocationsAgents();
-        }
     }
 
     componentWillUnmount() {
@@ -216,9 +183,11 @@ class Marks extends Component<IProps> {
             classes,
             bonusesYear,
             updateBonuses,
+            previewBonus,
             role,
+            previewUser
         } = this.props;
-
+        console.log('previewBonus: ', toJS(previewBonus));
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>
@@ -267,13 +236,17 @@ class Marks extends Component<IProps> {
                         sales={this.sales}
                         totalSold={this.totalSoldCount}
                     />
-                    <Table
-                        sales={this.sales}
-                        totalSold={this.totalSoldCount}
-                        showLpu={this.showLpuColumn}
-                        agents={this.agents} />
+                    {
+                        !!previewBonus &&
+                        <Table
+                            isLoading={this.isBonusesLoading || this.isBonusDataLoading}
+                            agentsInfo={this.agents}
+                            sales={this.sales}
+                            totalSold={this.totalSoldCount}
+                            parentUser={previewUser}
+                        />
+                    }
                 </Paper>
-                <AddDocsModal />
                 <AddBonusModal />
             </Grid>
         );

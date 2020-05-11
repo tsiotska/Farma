@@ -95,13 +95,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
             : USER_ROLE.UNKNOWN;
     }
 
-    @computed
-    get filteredMeds(): IMedicine[] {
-        const { departmentsStore: { currentDepartmentMeds } } = this.rootStore;
-        if (!this.previewBonus) return [];
-        const { sales } = this.previewBonus;
-        return currentDepartmentMeds.filter(x => sales.has(x.id));
-    }
+    // @computed
+    // get filteredMeds(): IMedicine[] {
+    //     const { departmentsStore: { currentDepartmentMeds } } = this.rootStore;
+    //     if (!this.previewBonus) return [];
+    //     const { sales } = this.previewBonus;
+    //     return currentDepartmentMeds.filter(x => sales.has(x.id));
+    // }
 
     @action.bound
     loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) {
@@ -242,7 +242,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
         const { sales } = this.previewBonus;
         const { marks } = agent;
-
+        console.log('store handler: ', propName, value);
         const salesObj = sales.get(medId);
 
         const mark = salesObj

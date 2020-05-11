@@ -7,7 +7,6 @@ import {
     Divider,
     Input
 } from '@material-ui/core';
-import debounce from 'lodash/debounce';
 import { observer, inject } from 'mobx-react';
 import { IMark, IAgentInfo } from '../../../interfaces/IBonusInfo';
 import { observable, computed, action } from 'mobx';
@@ -52,15 +51,19 @@ class HoverableCell extends Component<IProps> {
 
     @computed
     get payments(): number {
-        const { agent: {marks}, medId} = this.props;
-        const mark = marks.get(medId);
-        return mark ? mark.payments : 0;
+        const { agent, medId} = this.props;
+        const mark = agent
+            ? agent.marks.get(medId)
+            : null;
+        return mark
+            ? mark.payments
+            : 0;
     }
 
     @computed
     get deposit(): number {
-        const { agent: {marks}, medId} = this.props;
-        const mark = marks.get(medId);
+        const { agent, medId} = this.props;
+        const mark = agent ? agent.marks.get(medId) : null;
         return mark ? mark.deposit : 0;
     }
 
@@ -72,38 +75,22 @@ class HoverableCell extends Component<IProps> {
         this.openTooltip = false;
     }
 
-    paymentChangeHandler = ({ target: { value }}: any) => {
+    dispatchChange = (propName: 'payments' | 'deposit', value: number) => {
         const { previewBonusChangeHandler, agent, medId } = this.props;
-        const numberValue = +value;
-
-        if (Number.isNaN(numberValue) || numberValue < 0) return;
-
+        console.log('handler, value: ', value);
+        if (Number.isNaN(value) || value < 0) return;
         previewBonusChangeHandler(
-            'payments',
+            propName,
             agent,
             medId,
-            numberValue > this.maxValue
-            ? this.maxValue
-            : numberValue
+            value > this.maxValue
+                ? this.maxValue
+                : value
         );
     }
 
-    @action.bound
-    depositChangeHandler = ({ target: { value }}: any) => {
-        const { previewBonusChangeHandler, agent, medId } = this.props;
-        const numberValue = +value;
-
-        if (Number.isNaN(numberValue) || numberValue < 0) return;
-
-        previewBonusChangeHandler(
-            'deposit',
-            agent,
-            medId,
-            numberValue > this.maxValue
-            ? this.maxValue
-            : numberValue
-        );
-    }
+    paymentChangeHandler = ({ target: { value }}: any) => this.dispatchChange('payments', +value);
+    depositChangeHandler = ({ target: { value }}: any) => this.dispatchChange('deposit', +value);
 
     render() {
         const { classes, tooltip } = this.props;

@@ -35,7 +35,7 @@ import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
 import { doctorsNormalizer, doctorNormalizer } from '../helpers/normalizers/doctorsNormalizer';
 import { bonusInfoNormalizer, bonusesDataNormalizer } from '../helpers/normalizers/bonusInfoNormalizer';
-import { IDrugSale, IAgentInfo } from '../interfaces/IBonusInfo';
+import { IDrugSale, IAgentInfo, IBonusInfo } from '../interfaces/IBonusInfo';
 import { IUserSalary } from '../interfaces/IUserSalary';
 import { ISpecialty } from '../interfaces/ISpecialty';
 import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer';
@@ -452,7 +452,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getBonusInfo(depId: number, year: number, { id, position }: IUser) {
+    getBonusInfo(depId: number, year: number, { id, position }: IUser): Promise<IBonusInfo[]> {
         const urls: any = {
             [USER_ROLE.FIELD_FORCE_MANAGER]: `api/branch/${depId}/ffm/marks`,
             [USER_ROLE.REGIONAL_MANAGER]: `api/branch/${depId}/rm/${id}/marks`,

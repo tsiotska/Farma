@@ -11,12 +11,14 @@ import {
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAgentInfo, IDrugSale } from '../../../interfaces/IBonusInfo';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS, when } from 'mobx';
 import TableRow from '../TableRow';
 import { IUser } from '../../../interfaces';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import { USER_ROLE } from '../../../constants/Roles';
 import TotalRow from '../TotalRow';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import AddDocsModal from '../AddDocsModal';
 
 const styles = (theme: any) => createStyles({
     fixedTable: {
@@ -28,28 +30,39 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    agents: IAgentInfo[];
-    showLpu: boolean;
+    agentsInfo: IAgentInfo[];
     sales: Map<number, IDrugSale>;
-    locationsAgents?: Map<number, IUser>;
-    doctors?: IDoctor[];
-    role?: USER_ROLE;
     totalSold: { [key: number]: number };
+    isLoading: boolean;
+
+    parentUser: IUserInfo & IUserLikeObject;
+    loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
+    getLocationsAgents?: (depId: number, role: USER_ROLE) => IUser[];
+    currentDepartmentId?: number;
+    role?: USER_ROLE;
+}
+
+export interface IUserInfo {
+    id: number;
+    name: string;
+    LPUName?: string;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
-            locationsAgents,
-            doctors
+            loadConfirmedDoctors,
+            getLocationsAgents,
+            currentDepartmentId
         },
         userStore: {
             role
         }
     }
 }) => ({
-    locationsAgents,
-    doctors,
+    loadConfirmedDoctors,
+    getLocationsAgents,
+    currentDepartmentId,
     role
 }))
 @observer
@@ -59,28 +72,24 @@ class Table extends Component<IProps> {
     @observable tableWidth: number = 0;
     @observable leftOffset: number = 0;
     @observable expandedAgent: number = null;
+    @observable agents: IUserInfo[] = [];
 
     @computed
     get showTotalRow(): boolean {
-        const { agents } = this.props;
-        return !!agents.length;
+        return !!this.agents.length;
     }
 
     @computed
-    get docsMap(): Map<number, IDoctor> {
-        const { doctors } = this.props;
-
-        const mappedDocs: Array<[number, IDoctor]> = doctors.map(x => ([ x.id, x ]));
-
-        return new Map(mappedDocs);
+    get userIsMedicalAgent(): boolean {
+        const { parentUser: { position }} = this.props;
+        return position === USER_ROLE.MEDICAL_AGENT;
     }
 
     @computed
-    get targetAgents(): Map<number, IDoctor | IUser> {
-        const { role, locationsAgents } = this.props;
-        return role === USER_ROLE.MEDICAL_AGENT
-            ? this.docsMap
-            : locationsAgents;
+    get expandHandler(): (id: number, isExpanded: boolean) => void {
+        return this.userIsMedicalAgent
+            ? null
+            : this.expandChangeHandler;
     }
 
     @computed
@@ -108,60 +117,71 @@ class Table extends Component<IProps> {
         this.expandedAgent = isExpanded ? id : null;
     }
 
+    refHandler = (el: any) => {
+        if (!el) return;
+        const lastItemRect = el.getBoundingClientRect();
+        this.tableWidth = lastItemRect.width + 40;
+        this.leftOffset = lastItemRect.left - 20;
+
+        this.totalRowPosition = window.innerHeight < document.body.offsetHeight
+            ? 'fixed'
+            : 'initial';
+    }
+
+    async componentDidMount() {
+        const {
+            loadConfirmedDoctors,
+            getLocationsAgents,
+            parentUser,
+            currentDepartmentId,
+        } = this.props;
+        const { position } = parentUser;
+
+        await when(() => this.props.isLoading === false);
+        if (position === USER_ROLE.MEDICAL_AGENT) {
+            this.agents = await loadConfirmedDoctors(parentUser) || [];
+        } else {
+            this.agents = await getLocationsAgents(currentDepartmentId, position) || [];
+        }
+    }
+
     render() {
-        const { agents, showLpu, classes } = this.props;
+        const { agentsInfo, classes, role } = this.props;
 
-        const lastIndex = agents.length - 1;
-
+        const lastIndex = agentsInfo.length - 1;
+        // console.log(toJS(this.agents));
+        // console.log(toJS(agentsInfo));
+        // console.log('total row: ', this.showTotalRow, this.totalRowPosition);
         return (
             <>
             <TableContainer>
                 <MuiTable padding='none'>
                     <TableBody>
                         {
-                            agents.map((x, i) => {
-                                const agent = this.targetAgents.get(x.id);
-
-                                return (
-                                    <TableRow
-                                        key={x.id}
-                                        agent={x}
-                                        showLpu={showLpu}
-                                        tooltips={this.tooltips}
-                                        expanded={this.expandedAgent === x.id}
-                                        expandHandler={this.expandChangeHandler}
-                                        lpuName={
-                                            (agent && 'LPUName' in agent)
-                                            ? agent.LPUName
+                            Array.isArray(this.agents) &&
+                            this.agents.map((x, i) => (
+                                <TableRow
+                                    key={x.id}
+                                    agentInfo={(agentsInfo || []).find(({ id }) => id === x.id)}
+                                    agent={x}
+                                    showLpu={this.userIsMedicalAgent}
+                                    tooltips={this.tooltips}
+                                    expanded={this.expandedAgent === x.id}
+                                    expandHandler={this.expandHandler}
+                                    itemRef={
+                                        i === lastIndex
+                                            ? this.refHandler
                                             : null
-                                        }
-                                        agentName={
-                                            agent
-                                            ? agent.name
-                                            : null
-                                        }
-                                        itemRef={
-                                            (el: any) => {
-                                                if (!el || i !== lastIndex) return;
-                                                const lastItemRect = el.getBoundingClientRect();
-                                                this.tableWidth = lastItemRect.width + 40;
-                                                this.leftOffset = lastItemRect.left - 20;
-
-                                                this.totalRowPosition = window.innerHeight < document.body.offsetHeight
-                                                ? 'fixed'
-                                                : 'initial';
-                                            }
-                                        }
-                                    />
-                                );
-                            })
+                                    }
+                                />
+                            ))
                         }
                         {
                             (this.showTotalRow && this.totalRowPosition === 'initial') &&
                             <TotalRow
-                                agents={agents}
+                                agents={agentsInfo}
                                 position={this.totalRowPosition}
-                                showLpu={showLpu}
+                                showLpu={this.userIsMedicalAgent}
                             />
                         }
                     </TableBody>
@@ -177,13 +197,20 @@ class Table extends Component<IProps> {
                         <TableBody>
                             <TotalRow
                                 position={this.totalRowPosition}
-                                agents={agents}
-                                showLpu={showLpu}
+                                agents={agentsInfo}
+                                showLpu={this.userIsMedicalAgent}
                             />
                         </TableBody>
                     </MuiTable>
                 </TableContainer>
             }
+            <AddDocsModal
+                docs={
+                    role === USER_ROLE.MEDICAL_AGENT
+                        ? (this.agents as IDoctor[])
+                        : []
+                }
+            />
             </>
         );
     }

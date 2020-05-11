@@ -42,6 +42,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadAllStat?: () => void;
     setPharmacyDemand?: (demand: boolean) => void;
     loadSalesExcel?: () => void;
+    clearLocationsAgents?: () => void;
 }
 
 @inject(({
@@ -58,7 +59,8 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds,
             currentDepartmentId,
             loadLocationsAgents,
-            setPharmacyDemand
+            setPharmacyDemand,
+            clearLocationsAgents
         }
     }
 }) => ({
@@ -69,7 +71,8 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents,
     loadAllStat,
     setPharmacyDemand,
-    loadSalesExcel
+    loadSalesExcel,
+    clearLocationsAgents
 }))
 @observer
 class Sales extends Component<IProps> {
@@ -120,6 +123,7 @@ class Sales extends Component<IProps> {
 
     componentWillUnmount() {
         this.reactionDisposer();
+        this.props.clearLocationsAgents();
     }
 
     render() {

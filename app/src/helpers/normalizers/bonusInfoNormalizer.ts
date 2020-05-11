@@ -81,13 +81,6 @@ export const bonusesDataNormalizer = ({
     sales: Map<number, IDrugSale>,
     agents: IAgentInfo[]
 } => {
-    const normalizedSales: Array<[number, IDrugSale]> = objectArrayNormalizer(
-        sales,
-        defaultDrugSale,
-        drugSaleValuesMap,
-        { requiredProps: ['drug', 'amount', 'mark']}
-    ).map(x => ([ x.id, x ]));
-
     const groupedMarks = groupBy(marks, 'agent');
 
     const normalizedAgents: IAgentInfo[] = objectArrayNormalizer(
@@ -111,6 +104,13 @@ export const bonusesDataNormalizer = ({
 
         return agent;
     });
+
+    const normalizedSales: Array<[number, IDrugSale]> = objectArrayNormalizer(
+        sales,
+        defaultDrugSale,
+        drugSaleValuesMap,
+        { requiredProps: ['drug', 'amount', 'mark']}
+    ).map(x => ([ x.id, x ]));
 
     return {
         sales: new Map(normalizedSales),

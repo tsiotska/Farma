@@ -15,7 +15,7 @@ import { withStyles } from '@material-ui/styles';
 import { computed } from 'mobx';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
-import { IDrugSale } from '../../../interfaces/IBonusInfo';
+import { IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -59,20 +59,25 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    meds?: IMedicine[];
     showLpu: boolean;
-    sales?: Map<number, IDrugSale>;
-    totalSold?: { [key: number]: number };
+    sales: Map<number, IDrugSale>;
+    totalSold: { [key: number]: number };
+    meds?: IMedicine[];
+    previewBonus?: IBonusInfo;
 }
 
 @inject(({
     appState: {
+        departmentsStore: {
+            currentDepartmentMeds: meds
+        },
         userStore: {
-            filteredMeds: meds
+            previewBonus
         }
     }
 }) => ({
-    meds
+    meds,
+    previewBonus
 }))
 @observer
 class TableHeader extends Component<IProps> {
@@ -82,7 +87,8 @@ class TableHeader extends Component<IProps> {
             meds,
             showLpu,
             sales,
-            totalSold
+            totalSold,
+            previewBonus
         } = this.props;
 
         return (
@@ -122,15 +128,18 @@ class TableHeader extends Component<IProps> {
                                                 <Typography className={classes.medItem}>
                                                     { x.name }
                                                 </Typography>
-                                                <Typography variant='subtitle1' className={classes.salesStat}>
-                                                    <span className={classes.span}>
-                                                        { totalSold[x.id] || 0 }
-                                                    </span>
-                                                    <span>/</span>
-                                                    <span className={classes.span}>
-                                                        { saleInfo ? saleInfo.amount : '-' }
-                                                    </span>
-                                                </Typography>
+                                                {
+                                                    !!previewBonus &&
+                                                    <Typography variant='subtitle1' className={classes.salesStat}>
+                                                        <span className={classes.span}>
+                                                            { totalSold[x.id] || 0 }
+                                                        </span>
+                                                        <span>/</span>
+                                                        <span className={classes.span}>
+                                                            { saleInfo ? saleInfo.amount : 0 }
+                                                        </span>
+                                                    </Typography>
+                                                }
                                             </Grid>
                                         </TableCell>
                                     );

@@ -44,10 +44,11 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    meds?: IMedicine[];
+    agents: IAgentInfo[];
     position: 'initial' | 'fixed';
     showLpu: boolean;
-    agents: IAgentInfo[];
+
+    meds?: IMedicine[];
     setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
     clearPreviewBonusTotal?: () => void;
 }
@@ -57,7 +58,10 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             setPreviewBonusTotal,
             clearPreviewBonusTotal,
-            filteredMeds: meds
+            // filteredMeds: meds
+        },
+        departmentsStore: {
+            currentDepartmentMeds: meds
         }
     }
 }) => ({
@@ -162,6 +166,8 @@ class TotalRow extends Component<IProps> {
         : showLpu
             ? 2
             : 1;
+
+        console.log(toJS(this.props));
 
         return (
             <TableRow className={classes.root}>

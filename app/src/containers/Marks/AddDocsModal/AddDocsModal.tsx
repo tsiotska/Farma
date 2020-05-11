@@ -20,6 +20,9 @@ import { IDoctor } from '../../../interfaces/IDoctor';
 import SuggestListItem from '../SuggestListItem';
 import debounce from 'lodash/debounce';
 import { IBonusInfo } from '../../../interfaces/IBonusInfo';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import LoadingMask from '../../../components/LoadingMask';
+import { IUser } from '../../../interfaces';
 
 const styles = (theme: any) => createStyles({
     select: {
@@ -58,12 +61,15 @@ interface IProps extends WithStyles<typeof styles> {
     openedModal?: string;
     specialties?: ISpecialty[];
     LPUs?: ILPU[];
-    doctors?: IDoctor[];
     openModal?: (modalName: string) => void;
     loadSpecialties?: () => void;
     loadLPUs?: () => void;
     addDocsToBonus?: (docs: IDoctor[]) => void;
     previewBonus?: IBonusInfo;
+    docs: IDoctor[];
+    // loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
+    // clearDoctors?: () => void;
+    // previewUser?: IUser;
 }
 
 @inject(({
@@ -77,23 +83,27 @@ interface IProps extends WithStyles<typeof styles> {
             specialties,
             loadLPUs,
             LPUs,
-            doctors,
+            // loadConfirmedDoctors,
+            // clearDoctors
         },
         userStore: {
             addDocsToBonus,
-            previewBonus
+            previewBonus,
+            // previewUser
         }
     }
 }) => ({
     previewBonus,
     openedModal,
     openModal,
-    doctors,
     loadSpecialties,
     addDocsToBonus,
     specialties,
     loadLPUs,
-    LPUs
+    LPUs,
+    // loadConfirmedDoctors,
+    // clearDoctors,
+    // previewUser
 }))
 @observer
 class AddDocsModal extends Component<IProps> {
@@ -101,16 +111,18 @@ class AddDocsModal extends Component<IProps> {
     @observable selectedPharmacy: string = '';
     @observable selectedDocs: IDoctor[] = [];
     @observable searchName: string = '';
+    // @observable docs: IDoctor[] = [];
+    // @observable docsLoaded: boolean = false;
 
     @computed
     get docsToPick(): IDoctor[] {
-        const { doctors, previewBonus } = this.props;
+        const { previewBonus, docs } = this.props;
         const idsToFilter = (
             previewBonus
             ? previewBonus.agents
             : []
         ).map(({ id }) => id);
-        return doctors.filter(({ id }) => idsToFilter.includes(id) === false);
+        return docs.filter(({ id }) => idsToFilter.includes(id) === false);
     }
 
     @computed
@@ -164,15 +176,34 @@ class AddDocsModal extends Component<IProps> {
         this.selectedDocs = [];
     }
 
-    componentDidUpdate(props: IProps) {
+    async componentDidUpdate(props: IProps) {
         const { openedModal: prevModal } = props;
-        const { openedModal, loadSpecialties, loadLPUs } = this.props;
+        const {
+            openedModal,
+            loadSpecialties,
+            loadLPUs,
+            // loadConfirmedDoctors,
+            // previewUser
+        } = this.props;
         const becomeOpen = prevModal !== ADD_DOC_MODAL && openedModal === ADD_DOC_MODAL;
-        if (becomeOpen) {
-            loadSpecialties();
-            loadLPUs();
+        const becomeClosed = prevModal === ADD_DOC_MODAL && openedModal !== ADD_DOC_MODAL;
+        if (becomeClosed) {
+            this.selectedSpecialty = '';
+            this.selectedPharmacy = '';
+            this.selectedDocs = [];
+            this.searchName = '';
+        } else if (becomeOpen) {
+            await loadSpecialties();
+            await loadLPUs();
+            // const newDocs = await loadConfirmedDoctors(previewUser);
+            // this.docs = newDocs || [];
+            // this.docsLoaded = true;
         }
     }
+
+    // componentWillUnmount() {
+    //     this.props.clearDoctors();
+    // }
 
     render() {
         const {
@@ -226,7 +257,7 @@ class AddDocsModal extends Component<IProps> {
                     <MenuItem className={classes.listItem} value='' />
                     {
                         specialties.map(({ id, name }) => (
-                                <MenuItem key={id} value={name}>
+                            <MenuItem key={id} value={name}>
                                 { name }
                             </MenuItem>
                         ))
@@ -246,32 +277,28 @@ class AddDocsModal extends Component<IProps> {
                 />
                 {
                     this.filteredDocs.length
-                    ? (
-                        <List className={classes.list}>
-                            {
-                                this.filteredDocs.map(x => (
-                                    <SuggestListItem
-                                        key={x.id}
-                                        onClick={this.listItemClickHandler}
-                                        checked={this.selectedDocs.includes(x)}
-                                        doc={x}
-                                    />
-                                ))
-                            }
+                    ? <List className={classes.list}>
+                        {
+                            this.filteredDocs.map(x => (
+                                <SuggestListItem
+                                    key={x.id}
+                                    onClick={this.listItemClickHandler}
+                                    checked={this.selectedDocs.includes(x)}
+                                    doc={x}
+                                />
+                            ))
+                        }
                         </List>
-                    )
-                    : (
-                        <Typography className={classes.list}>
-                            {
-                                (
-                                    this.searchName
-                                    || this.selectedPharmacy
-                                    || this.selectedSpecialty
-                                ) ? 'Жоден лікар не відповідає вказаним параметрам пошуку'
-                                : 'Список лікарів пустий'
-                            }
+                    : <Typography className={classes.list}>
+                        {
+                            (
+                                this.searchName
+                                || this.selectedPharmacy
+                                || this.selectedSpecialty
+                            ) ? 'Жоден лікар не відповідає вказаним параметрам пошуку'
+                            : 'Список лікарів пустий'
+                        }
                         </Typography>
-                    )
                 }
                 <Button
                     color='primary'
