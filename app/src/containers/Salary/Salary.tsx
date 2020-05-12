@@ -8,7 +8,6 @@ import ListHeader from './ListHeader';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
 import ListItem from './ListItem';
-import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({});
 
@@ -105,7 +104,6 @@ class Salary extends Component<IProps> {
             this.month
         );
         this.mpAgentsInfo = await loadMpAgentsInfo(userSalary.id);
-        console.log(this.mpAgentsInfo);
     }
 
     async componentDidMount() {
@@ -114,8 +112,6 @@ class Salary extends Component<IProps> {
         await loadLocationsAgents();
         loadSubLocationAgents();
         this.rmAgentsInfo = await loadRmAgentsInfo();
-        // console.log(toJS(this.rmAgentsInfo));
-        // console.log(toJS(this.props.salaries));
     }
 
     componentWillUnmount() {
@@ -125,8 +121,6 @@ class Salary extends Component<IProps> {
 
     render() {
         const { salaries, expandedSalary } = this.props;
-        console.log(toJS(this.rmAgentsInfo));
-        console.log(toJS(salaries));
         return (
             <Grid container direction='column'>
                 <Header

@@ -1583,7 +1583,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
         if (this.currentDepartmentId === null) return;
         const data = await api.getRmAgentsInfo(this.currentDepartmentId);
-
         if (!data) return;
         return data.map((item: any) => ({
             ...item,

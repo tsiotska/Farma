@@ -17,6 +17,9 @@ import DateSelectPopper from '../DateSelectPopper';
 import {IUserSalary} from '../../../interfaces/IUserSalary';
 
 const styles = (theme: any) => createStyles({
+    header: {
+      paddingLeft: 10
+    },
     iconButton: {
         marginLeft: 'auto'
     },
@@ -29,6 +32,7 @@ const styles = (theme: any) => createStyles({
         height: 42
     },
     title: {
+        whiteSpace: 'nowrap',
         color: '#555555'
     },
     lastDateContainer: {
@@ -86,8 +90,8 @@ class Header extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid wrap='nowrap'  alignItems='center' container>
-                <Grid wrap='nowrap' item>
+            <Grid className={classes.header}wrap='nowrap' alignItems='center' container>
+                <Grid item>
                 <Typography variant='h5' className={classes.title}>
                     Заробітня плата
                 </Typography>
