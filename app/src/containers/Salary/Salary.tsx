@@ -21,6 +21,8 @@ interface IProps extends WithStyles<typeof styles> {
     setExpandedSalary?: (salary: IUserSalary, year: number, month: number) => void;
     expandedSalary?: IUserSalary;
     loadSubLocationAgents?: () => void;
+    loadRmAgentsInfo?: () => void;
+    loadMpAgentsInfo?: (userId: number) => void;
 }
 
 @inject(({
@@ -33,7 +35,9 @@ interface IProps extends WithStyles<typeof styles> {
             loadLocationsAgents,
             setExpandedSalary,
             expandedSalary,
-            loadSubLocationAgents
+            loadSubLocationAgents,
+            loadRmAgentsInfo,
+            loadMpAgentsInfo
         }
     }
 }) => ({
@@ -44,7 +48,9 @@ interface IProps extends WithStyles<typeof styles> {
     loadLocationsAgents,
     setExpandedSalary,
     expandedSalary,
-    loadSubLocationAgents
+    loadSubLocationAgents,
+    loadRmAgentsInfo,
+    loadMpAgentsInfo
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -53,6 +59,9 @@ class Salary extends Component<IProps> {
 
     @observable year: number = this.currentYear;
     @observable month: number = this.currentMonth;
+
+    @observable rmAgentsInfo: any;
+    @observable mpAgentsInfo: any;
 
     @computed
     get isLoading(): boolean {
@@ -86,8 +95,8 @@ class Salary extends Component<IProps> {
         loadSalaries(this.year, this.month + 1);
     }
 
-    expandHandler = (userSalary: IUserSalary, e: any, expanded: boolean) => {
-        const { setExpandedSalary } = this.props;
+   expandHandler = async (userSalary: IUserSalary, e: any, expanded: boolean) => {
+        const { setExpandedSalary, loadMpAgentsInfo } = this.props;
         setExpandedSalary(
             expanded
             ? userSalary
@@ -95,13 +104,18 @@ class Salary extends Component<IProps> {
             this.year,
             this.month
         );
+        this.mpAgentsInfo = await loadMpAgentsInfo(userSalary.id);
+        console.log(this.mpAgentsInfo);
     }
 
     async componentDidMount() {
-        const { loadSalaries, loadLocationsAgents, salaries, loadSubLocationAgents } = this.props;
+        const { loadSalaries, loadLocationsAgents, loadSubLocationAgents, loadRmAgentsInfo } = this.props;
         loadSalaries(this.year, this.month + 1);
         await loadLocationsAgents();
         loadSubLocationAgents();
+        this.rmAgentsInfo = await loadRmAgentsInfo();
+        // console.log(toJS(this.rmAgentsInfo));
+        // console.log(toJS(this.props.salaries));
     }
 
     componentWillUnmount() {
@@ -111,7 +125,8 @@ class Salary extends Component<IProps> {
 
     render() {
         const { salaries, expandedSalary } = this.props;
-
+        console.log(toJS(this.rmAgentsInfo));
+        console.log(toJS(salaries));
         return (
             <Grid container direction='column'>
                 <Header
@@ -129,6 +144,12 @@ class Salary extends Component<IProps> {
                     ? salaries.length
                         ? salaries.map(x => (
                             <ListItem
+                                agentInfo={
+                                    this.rmAgentsInfo
+                                        ? this.rmAgentsInfo.find(({ id }: { id: number }) => id === x.id)
+                                        : null
+                                }
+                                expandedAgentsInfo={this.mpAgentsInfo && this.mpAgentsInfo}
                                 key={x.id}
                                 expandable={true}
                                 isExpanded={x === expandedSalary}

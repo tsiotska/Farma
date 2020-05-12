@@ -86,18 +86,23 @@ class Header extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid alignItems='center' container>
+            <Grid wrap='nowrap'  alignItems='center' container>
+                <Grid wrap='nowrap' item>
                 <Typography variant='h5' className={classes.title}>
                     Заробітня плата
                 </Typography>
+                </Grid>
+                <Grid item>
                 <DateSelectPopper
                     year={year}
                     month={month}
                     changeMonth={changeMonth}
                     changeYear={changeYear}
                 />
+                </Grid>
                 {
                     showCalculateButton &&
+                        <Grid item>
                     <Button
                         disabled={this.isSalaryCalculating}
                         onClick={this.calculateClickHandler}
@@ -108,11 +113,11 @@ class Header extends Component<IProps> {
                                 : 'Розрахувати зарплату'
                             }
                     </Button>
+                        </Grid>
                 }
                 {
                     lastSalary &&
-                    <Grid className={classes.lastDateContainer}
-                          direction='column'>
+                    <Grid className={classes.lastDateContainer} item container direction='column'>
                         <Typography color='textSecondary'>
                             Розраховано
                         </Typography>

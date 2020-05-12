@@ -1,30 +1,30 @@
-import { observable, action, reaction, toJS, computed, when, transaction } from 'mobx';
+import {action, computed, observable, reaction, transaction, when} from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
-import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
-import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
-import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
-import { IValuesMap } from './../helpers/normalizers/normalizer';
-import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
-import { ILPU } from '../interfaces/ILPU';
-import { IDepartment } from './../interfaces/IDepartment';
-import { IRootStore } from './../interfaces/IRootStore';
+import {IDoctorModalValues} from './../containers/Doctors/DoctorModal/DoctorModal';
+import {IWorkerModalValues} from './../containers/Header/WorkerModal/WorkerModal';
+import {IPharmacyModalValues} from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
+import {IValuesMap} from './../helpers/normalizers/normalizer';
+import {IFormValues} from './../containers/Medicines/FormContent/FormContent';
+import {ILPU} from '../interfaces/ILPU';
+import {IDepartment} from './../interfaces/IDepartment';
+import {IRootStore} from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
-import { IMedicine } from '../interfaces/IMedicine';
-import { IPosition } from '../interfaces/IPosition';
-import { IWorker } from '../interfaces/IWorker';
-import { USER_ROLE } from '../constants/Roles';
-import { ILocation } from '../interfaces/ILocation';
-import { IUser } from '../interfaces/IUser';
-import { PERMISSIONS } from '../constants/Permissions';
-import { IDoctor } from '../interfaces/IDoctor';
-import { IUserSalary } from '../interfaces/IUserSalary';
-import { ISpecialty } from '../interfaces/ISpecialty';
-import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
-import { SORT_ORDER } from './UIStore';
-import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
+import {IDepartmentsStore} from '../interfaces/IDepartmentsStore';
+import {IMedicine} from '../interfaces/IMedicine';
+import {IPosition} from '../interfaces/IPosition';
+import {IWorker} from '../interfaces/IWorker';
+import {USER_ROLE} from '../constants/Roles';
+import {ILocation} from '../interfaces/ILocation';
+import {IUser} from '../interfaces/IUser';
+import {PERMISSIONS} from '../constants/Permissions';
+import {IDoctor} from '../interfaces/IDoctor';
+import {IUserSalary} from '../interfaces/IUserSalary';
+import {ISpecialty} from '../interfaces/ISpecialty';
+import {ILpuModalValues} from '../containers/Lpu/LpuModal/LpuModal';
+import {SORT_ORDER} from './UIStore';
+import {CONFIRM_STATUS} from '../constants/ConfirmationStatuses';
 
 export interface IExpandedWorker {
     id: number;
@@ -1576,5 +1576,30 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             default:
                 return null;
         }
+    }
+
+    @action.bound
+   async loadRmAgentsInfo(): Promise<any> {
+        const { api } = this.rootStore;
+        if (this.currentDepartmentId === null) return;
+        const data = await api.getRmAgentsInfo(this.currentDepartmentId);
+
+        if (!data) return;
+        return data.map((item: any) => ({
+            ...item,
+            region: this.regions.get(item.region) || null
+        }));
+    }
+
+    @action.bound
+    async loadMpAgentsInfo(userId: number): Promise<any> {
+        const { api } = this.rootStore;
+        if (this.currentDepartmentId === null) return null;
+        const data = await  api.getMpAgentsInfo(this.currentDepartmentId, userId);
+        if (!data) return;
+        return data.map((item: any) => ({
+            ...item,
+            region: this.regions.get(item.region) || null
+        }));
     }
 }
