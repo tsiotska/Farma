@@ -42,6 +42,7 @@ interface IProps extends WithStyles<typeof styles> {
     secondColumnValue?: any;
     changeHandler?: (level: number, e: any) => void;
     emptyPlaceholder?: string;
+    children?: JSX.Element;
 }
 
 @observer
@@ -58,11 +59,13 @@ class SumRow extends Component<IProps> {
             userColors = {},
             userLevel,
             changeHandler,
-            emptyPlaceholder
+            emptyPlaceholder,
+            children
         } = this.props;
 
         return (
             <Grid className={classes.root} container>
+                {children}
                 <Grid
                     container
                     alignItems='center'
@@ -79,7 +82,7 @@ class SumRow extends Component<IProps> {
                 </Grid>
                 {
                     secondColumnValue !== undefined &&
-                    <Grid className={cx(classes.wideColumn)} container alignItems='center' justify='center'>
+                    <Grid className={cx(classes.wideColumn)} container alignItems='center' justify='flex-start'>
                         <Typography>
                             { secondColumnValue || '-' }
                         </Typography>
