@@ -610,4 +610,10 @@ export class APIRequester {
             .then(searchNormalizer)
             .catch(this.defaultErrorHandler(null));
     }
+
+    getMPs(depId: number, rmId: number): Promise<IUser[]> {
+        return this.instance.get(`/api/branch/${depId}/rm/${rmId}/worker`)
+            .then(multipleUserNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
 }

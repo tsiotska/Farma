@@ -34,7 +34,17 @@ const styles = (theme: any) => createStyles({
         border: 'none',
         borderBottom: '10px solid white',
         backgroundColor: '#F7F7F9',
-        padding: 5
+        padding: 5,
+        // '&.clickable': {
+        //     cursor: 'pointer'
+        // }
+    },
+    clickable: {
+        cursor: 'pointer',
+        transition: '0.3s',
+        '&:hover': {
+            background: '#ececec'
+        }
     },
     divider: {
         minWidth: 30,
@@ -97,6 +107,13 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonusMonth?: number;
     role?: USER_ROLE;
     isNested: boolean;
+    previewBonusChangeHandler?: (
+        propName: 'payments' | 'deposit',
+        agent: IUserLikeObject,
+        agentInfo: IAgentInfo,
+        medId: number,
+        value: number
+    ) => void;
 }
 
 @inject(({
@@ -106,6 +123,7 @@ interface IProps extends WithStyles<typeof styles> {
         },
         userStore: {
             bonuses,
+            previewBonusChangeHandler,
             previewBonusMonth,
             role
         }
@@ -114,6 +132,7 @@ interface IProps extends WithStyles<typeof styles> {
     meds,
     role,
     bonuses,
+    previewBonusChangeHandler,
     previewBonusMonth
 }))
 @observer
@@ -192,6 +211,11 @@ class TableRow extends Component<IProps> {
         return 150 - this.nestLevel * 16 / 2;
     }
 
+    get isEditable(): boolean {
+        const { agent: { position } } = this.props;
+        return typeof position === 'string';
+    }
+
     get isExpandable(): boolean {
         const { expandHandler, expanded } = this.props;
         return !!expandHandler && typeof expanded === 'boolean';
@@ -200,6 +224,22 @@ class TableRow extends Component<IProps> {
     expandHandler = () => {
         const { expandHandler, expanded, agent: { id } } = this.props;
         if (this.isExpandable) expandHandler(id, !expanded);
+    }
+
+    cellValueChangeHandler = (
+        propName: 'payments' | 'deposit',
+        agentInfo: IAgentInfo,
+        medId: number,
+        value: number
+    ) => {
+        const { previewBonusChangeHandler, agent } = this.props;
+        previewBonusChangeHandler(
+            propName,
+            agent,
+            agentInfo,
+            medId,
+            value
+        );
     }
 
     render() {
@@ -214,7 +254,7 @@ class TableRow extends Component<IProps> {
             tooltips,
             isNested
         } = this.props;
-        const { LPUName, name } = agent;
+        const { LPUName, name, position } = agent;
 
         const lastPayment = agentInfo ? agentInfo.lastPayment : '-';
         const lastDeposit = agentInfo ? agentInfo.lastDeposit : '-';
@@ -223,7 +263,9 @@ class TableRow extends Component<IProps> {
             ? meds.map(({ id }) => (
                 <HoverableCell
                     key={id}
-                    agent={agentInfo}
+                    agentInfo={agentInfo}
+                    onChange={this.cellValueChangeHandler}
+                    editable={this.isEditable}
                     medId={id}
                     tooltip={tooltips[id] || ''}
                     classes={{
@@ -253,7 +295,9 @@ class TableRow extends Component<IProps> {
                     onClick={this.expandHandler}
                     padding='none'
                     style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
-                    className={classes.cell}>
+                    // className={cx(classes.cell, { clickable: this.isEditable })}
+                    className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}
+                    >
                         <Grid container alignItems='center'>
                             {
                                 this.isExpandable === true && showLpu === false &&

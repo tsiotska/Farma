@@ -20,6 +20,7 @@ import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IUserLikeObject } from './DepartmentsStore';
+import { IUserInfo } from '../containers/Marks/Table/Table';
 
 export interface IMarkFraction {
     payments: number;
@@ -262,34 +263,75 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
-        // const { sales } = this.previewBonus;
-        // const { marks } = agent;
-        // console.log('store handler: ', propName, value);
-        // const salesObj = sales.get(medId);
+    previewBonusChangeHandler(
+            propName: 'payments' | 'deposit',
+            { position }: IUserLikeObject,
+            agentInfo: IAgentInfo,
+            medId: number,
+            value: number
+        ) {
+            // const targetMark = marks.get(medId);
+            const targetMark = agentInfo
+                ? agentInfo.marks.get(medId)
+                : null;
+            if (targetMark) {
+                targetMark[propName] = value;
+            } else {
+                // const previewBonus = this.bonuses[position] && this.bonuses[position].find(({ month }) => month === this.previewBonusMonth);
+                // if (!previewBonus) return;
+                // const { sales } = previewBonus;
+                // const salesObj = sales.get(medId);
 
-        // const mark = salesObj
-        //     ? salesObj.mark
-        //     : null;
+                // const mark = salesObj
+                //     ? salesObj.mark
+                //     : null;
 
-        // const targetMark = marks.get(medId);
-        // if (targetMark) {
-        //     targetMark[propName] = value;
-        // } else {
-        //     const newMark: IMark = {
-        //         deposit: propName === 'deposit' ? value : 0,
-        //         payments: propName === 'payments' ? value : 0,
-        //         drugId: medId,
-        //         mark,
-        //     };
-        //     marks.set(medId, newMark);
-        // }
+                // const newMark: IMark = {
+                //     deposit: propName === 'deposit' ? value : 0,
+                //     payments: propName === 'payments' ? value : 0,
+                //     drugId: medId,
+                //     mark: mark
+                // };
+                // previewBonus.agents.push({
+                //     id
+                //     lastPayment
+                //     lastDeposit
+                //     deposit
+                //     marks
+                // })
+                // marks.set(medId, newMark);
+            }
     }
+
+    // @action.bound
+    // previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
+    //     const { sales } = this.previewBonus;
+    //     const { marks } = agent;
+    //     console.log('store handler: ', propName, value);
+
+    //     const targetMark = marks.get(medId);
+    //     if (targetMark) {
+    //         targetMark[propName] = value;
+    //     } else {
+            // const salesObj = sales.get(medId);
+
+            // const mark = salesObj
+            //     ? salesObj.mark
+            //     : null;
+
+    //         const newMark: IMark = {
+    //             deposit: propName === 'deposit' ? value : 0,
+    //             payments: propName === 'payments' ? value : 0,
+    //             drugId: medId,
+    //             mark,
+    //         };
+    //         marks.set(medId, newMark);
+    //     }
+    // }
 
     @action.bound
     setBonusesYear(value: number, shouldPostData: boolean, loadBonuses: boolean) {
         if (shouldPostData) this.updateBonuses();
-        console.log('new year: ', value);
         this.bonusesYear = value;
         this.clearPreviewBonusTotal();
         if (loadBonuses) this.loadBonuses(this.previewUser);
@@ -311,7 +353,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     setPreviewBonusMonth = (month: number) => {
         this.previewBonusMonth = month;
-        console.log('new month :', month);
     }
 
     @action.bound
@@ -332,7 +373,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             'loadBonuses'
         );
         this.bonuses[user.position] = userBonuses || [];
-
+        console.log('loaded: ', userBonuses);
         if (!userBonuses || !userBonuses.length) return;
 
         const targetBonuses = this.bonuses[this.role] || [];
@@ -344,6 +385,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 : null;
             this.setPreviewBonusMonth(newMonth);
         }
+        console.log('bonuses: ', toJS(this.bonuses));
     }
 
     @action.bound

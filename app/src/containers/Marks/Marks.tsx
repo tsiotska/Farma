@@ -149,7 +149,7 @@ class Marks extends Component<IProps> {
             () => this.props.previewBonusMonth,
             () => {
                 const { loadBonusesData, previewUser } = this.props;
-                this.props.loadBonusesData(previewUser);
+                loadBonusesData(previewUser);
             }
         );
     }

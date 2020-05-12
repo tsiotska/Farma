@@ -22,6 +22,7 @@ interface IProps extends WithStyles<typeof styles> {
     role?: USER_ROLE;
     bonuses: IBonusInfo[];
     previewBonusMonth?: number;
+    setPreviewBonusMonth?: (month: number) => void;
     openModal?: (modaName: string) => void;
 }
 
@@ -30,6 +31,7 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             setBonusesYear,
             bonusesYear,
+            setPreviewBonusMonth,
             previewBonusMonth,
             role
         },
@@ -38,6 +40,7 @@ interface IProps extends WithStyles<typeof styles> {
         }
     }
 }) => ({
+    setPreviewBonusMonth,
     setBonusesYear,
     bonusesYear,
     previewBonusMonth,
@@ -61,12 +64,13 @@ class MontPicker extends Component<IProps> {
     createBonus = () => this.props.openModal(ADD_BONUS_MODAL);
 
     componentWillUnmount() {
-        const { setBonusesYear, role } = this.props;
+        const { setBonusesYear, role, setPreviewBonusMonth} = this.props;
         setBonusesYear(
             new Date().getFullYear(),
             role === USER_ROLE.MEDICAL_AGENT,
             false
         );
+        setPreviewBonusMonth(null);
     }
 
     render() {

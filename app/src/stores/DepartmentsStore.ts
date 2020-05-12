@@ -1,3 +1,4 @@
+import { IUserLikeObject } from './DepartmentsStore';
 import { observable, action, reaction, toJS, computed, when, transaction } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
@@ -1004,15 +1005,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         });
     }
 
-    getLocationsAgents = (depId: number, role: USER_ROLE): Promise<IUser[]> => {
+    @action.bound
+    getLocationsAgents = (depId: number, { id, position }: IUserLikeObject): Promise<IUser[]> => {
         const { api } = this.rootStore;
 
-        let loadPositionsId: USER_ROLE;
-        if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
-        if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
-        if (!depId || !role) return null;
-
-        return api.getAgents(depId, loadPositionsId);
+        if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
+        if (position === USER_ROLE.REGIONAL_MANAGER) return api.getMPs(depId, id);
+        return null;
     }
 
     @action.bound
@@ -1023,8 +1022,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const depId = this.currentDepartmentId;
         const userRole = role;
 
+        let loadPositionsId: USER_ROLE;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
+        if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
+        if (!depId || !role) return;
+
         this.setLoading(requestName);
-        const res = await this.getLocationsAgents(depId, userRole);
+        const res = await  api.getAgents(depId, loadPositionsId);
 
         const dataIsRelevant = this.currentDepartmentId === depId && userRole === this.rootStore.userStore.role;
         if (!dataIsRelevant) return;

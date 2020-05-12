@@ -8,9 +8,10 @@ import {
     Input
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { IMark, IAgentInfo } from '../../../interfaces/IBonusInfo';
-import { observable, computed, action } from 'mobx';
+import { IAgentInfo } from '../../../interfaces/IBonusInfo';
+import { observable, computed, toJS } from 'mobx';
 import { USER_ROLE } from '../../../constants/Roles';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 
 const styles = {
     cell: {},
@@ -21,23 +22,17 @@ const styles = {
 
 interface IProps extends WithStyles<typeof styles> {
     tooltip: string;
-    role?: USER_ROLE;
-    agent: IAgentInfo;
+    editable: boolean;
+    agentInfo: IAgentInfo;
     medId: number;
-    previewBonusChangeHandler?: (propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) => void;
+    onChange?: (
+        propName: 'payments' | 'deposit',
+        agentInfo: IAgentInfo,
+        medId: number,
+        value: number
+    ) => void;
 }
 
-@inject(({
-    appState: {
-        userStore: {
-            role,
-            previewBonusChangeHandler
-        }
-    }
-}) => ({
-    role,
-    previewBonusChangeHandler
-}))
 @observer
 class HoverableCell extends Component<IProps> {
     readonly maxValue: number = 99999;
@@ -45,15 +40,10 @@ class HoverableCell extends Component<IProps> {
     @observable openTooltip: boolean = false;
 
     @computed
-    get isEditable(): boolean {
-        return this.props.role === USER_ROLE.MEDICAL_AGENT;
-    }
-
-    @computed
     get payments(): number {
-        const { agent, medId} = this.props;
-        const mark = agent
-            ? agent.marks.get(medId)
+        const { agentInfo, medId} = this.props;
+        const mark = agentInfo
+            ? agentInfo.marks.get(medId)
             : null;
         return mark
             ? mark.payments
@@ -62,8 +52,8 @@ class HoverableCell extends Component<IProps> {
 
     @computed
     get deposit(): number {
-        const { agent, medId} = this.props;
-        const mark = agent ? agent.marks.get(medId) : null;
+        const { agentInfo, medId} = this.props;
+        const mark = agentInfo ? agentInfo.marks.get(medId) : null;
         return mark ? mark.deposit : 0;
     }
 
@@ -76,12 +66,11 @@ class HoverableCell extends Component<IProps> {
     }
 
     dispatchChange = (propName: 'payments' | 'deposit', value: number) => {
-        const { previewBonusChangeHandler, agent, medId } = this.props;
-        console.log('handler, value: ', value);
+        const { onChange, agentInfo, medId } = this.props;
         if (Number.isNaN(value) || value < 0) return;
-        previewBonusChangeHandler(
+        onChange(
             propName,
-            agent,
+            agentInfo,
             medId,
             value > this.maxValue
                 ? this.maxValue
@@ -93,7 +82,7 @@ class HoverableCell extends Component<IProps> {
     depositChangeHandler = ({ target: { value }}: any) => this.dispatchChange('deposit', +value);
 
     render() {
-        const { classes, tooltip } = this.props;
+        const { classes, tooltip, editable, agentInfo } = this.props;
 
         return (
             <TableCell className={classes.cell}>
@@ -104,7 +93,7 @@ class HoverableCell extends Component<IProps> {
                     alignItems='center'
                     container>
                         {
-                            this.isEditable
+                            editable
                             ? <Input
                                 disableUnderline
                                 className={classes.input}
@@ -128,7 +117,7 @@ class HoverableCell extends Component<IProps> {
                             <Divider className={classes.divider} />
                         </Tooltip>
                         {
-                            this.isEditable
+                            editable
                             ? <Input
                                 disableUnderline
                                 className={classes.input}

@@ -28,6 +28,12 @@ const styles = (theme: any) => createStyles({
         tableLayout: 'fixed',
         padding: '0 20px',
         bottom: 0,
+    },
+    emptyText: {
+        marginBottom: 12
+    },
+    progress: {
+        marginBottom: 12
     }
 });
 
@@ -39,10 +45,11 @@ interface IProps extends WithStyles<typeof styles> {
 
     totalSold?: { [key: number]: number };
     loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
-    getLocationsAgents?: (depId: number, role: USER_ROLE) => IUser[];
+    getLocationsAgents?: (depId: number, user: IUserLikeObject) => IUser[];
     currentDepartmentId?: number;
     role?: USER_ROLE;
-    // previewBonus?: IBonusInfo;
+    loadBonuses?: (user: IUserLikeObject) => Promise<void>;
+    loadBonusesData?: (user: IUserLikeObject) => Promise<void>;
 }
 
 export interface IUserInfo {
@@ -61,6 +68,8 @@ export interface IUserInfo {
         userStore: {
             role,
             totalSold,
+            loadBonuses,
+            loadBonusesData
             // previewBonus
         }
     }
@@ -68,6 +77,8 @@ export interface IUserInfo {
     loadConfirmedDoctors,
     getLocationsAgents,
     currentDepartmentId,
+    loadBonuses,
+    loadBonusesData,
     role,
     totalSold,
     // previewBonus
@@ -134,11 +145,12 @@ class Table extends Component<IProps> {
     }
 
     get preparedAgents(): IUserInfo[] {
-        const { role } = this.props;
-        if (role === USER_ROLE.MEDICAL_AGENT) {
-            return this.agentsInfo.length
+        const { parentUser: { position } } = this.props;
+        if (position === USER_ROLE.MEDICAL_AGENT) {
+            const res = this.agentsInfo.length
                 ? this.agents.filter(x => this.agentsInfo.some(y => y.id === x.id))
                 : [];
+            return res;
         }
         return this.agents.slice(0, 50);
     }
@@ -166,20 +178,31 @@ class Table extends Component<IProps> {
             : 'initial';
     }
 
+    componentDidUpdate({ previewBonus }: IProps) {
+        const { previewBonus: actualBonus } = this.props;
+        if (previewBonus !== actualBonus) this.expandedAgent = null;
+    }
+
     async componentDidMount() {
         const {
             loadConfirmedDoctors,
             getLocationsAgents,
             parentUser,
             currentDepartmentId,
-            isNested
+            isNested,
+            loadBonuses,
+            loadBonusesData
         } = this.props;
-        const { position } = parentUser;
+
+        if (isNested) {
+            await loadBonuses(parentUser);
+            await loadBonusesData(parentUser);
+        }
 
         await when(() => this.props.isLoading === false);
-        const newAgents = position === USER_ROLE.MEDICAL_AGENT
+        const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
             ? await loadConfirmedDoctors(parentUser)
-            : await getLocationsAgents(currentDepartmentId, position);
+            : await getLocationsAgents(currentDepartmentId, parentUser);
         this.agents = newAgents || [];
         this.agentsLoaded = true;
         this.reactionDisposer = reaction(
@@ -189,7 +212,7 @@ class Table extends Component<IProps> {
     }
 
     componentWillUnmount() {
-        this.reactionDisposer();
+        if (this.reactionDisposer) this.reactionDisposer();
     }
 
     render() {
@@ -202,11 +225,16 @@ class Table extends Component<IProps> {
         } = this.props;
 
         const lastIndex = this.agentsInfo.length - 1;
-        const showLoader = this.agentsLoaded === false || isLoading === true;
 
         return (
             <>
-            { showLoader && <LinearProgress /> }
+            { this.agentsLoaded === false && <LinearProgress className={classes.progress} /> }
+            {
+                this.agentsLoaded && !this.preparedAgents.length &&
+                <Typography className={classes.emptyText}>
+                    Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
+                </Typography>
+            }
             <TableContainer>
                 <MuiTable padding='none'>
                     <TableBody>
