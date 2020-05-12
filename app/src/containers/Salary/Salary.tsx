@@ -3,7 +3,7 @@ import { createStyles, WithStyles, Grid, LinearProgress, Typography } from '@mat
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import ListHeader from './ListHeader';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
@@ -98,7 +98,7 @@ class Salary extends Component<IProps> {
     }
 
     async componentDidMount() {
-        const { loadSalaries, loadLocationsAgents, loadSubLocationAgents } = this.props;
+        const { loadSalaries, loadLocationsAgents, salaries, loadSubLocationAgents } = this.props;
         loadSalaries(this.year, this.month + 1);
         await loadLocationsAgents();
         loadSubLocationAgents();
@@ -111,10 +111,10 @@ class Salary extends Component<IProps> {
 
     render() {
         const { salaries, expandedSalary } = this.props;
-
         return (
             <Grid container direction='column'>
                 <Header
+                    lastSalary={salaries && salaries.length > 0 && salaries[0].date}
                     year={this.year}
                     month={this.month}
                     changeMonth={this.changeMonth}

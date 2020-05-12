@@ -14,6 +14,7 @@ import { observable } from 'mobx';
 import ExcelIcon from '../../../components/ExcelIcon';
 import LoadingMask from '../../../components/LoadingMask';
 import DateSelectPopper from '../DateSelectPopper';
+import {IUserSalary} from '../../../interfaces/IUserSalary';
 
 const styles = (theme: any) => createStyles({
     iconButton: {
@@ -29,6 +30,9 @@ const styles = (theme: any) => createStyles({
     },
     title: {
         color: '#555555'
+    },
+    lastDateContainer: {
+        marginLeft: 20
     }
 });
 
@@ -40,6 +44,7 @@ interface IProps extends WithStyles<typeof styles> {
     changeMonth: (value: number) => void;
     calculateSalaries?: (year: number, month: number) => void;
     loadSalariesExcel?: (year: number, month: number) => void;
+    lastSalary?: Date;
 }
 
 @inject(({
@@ -76,7 +81,8 @@ class Header extends Component<IProps> {
             changeYear,
             month,
             changeMonth,
-            showCalculateButton
+            showCalculateButton,
+            lastSalary
         } = this.props;
 
         return (
@@ -102,6 +108,18 @@ class Header extends Component<IProps> {
                                 : 'Розрахувати зарплату'
                             }
                     </Button>
+                }
+                {
+                    lastSalary &&
+                    <Grid className={classes.lastDateContainer}
+                          direction='column'>
+                        <Typography color='textSecondary'>
+                            Розраховано
+                        </Typography>
+                        <Typography>
+                            {lastSalary}
+                        </Typography>
+                    </Grid>
                 }
                 <IconButton onClick={this.excelClickHandler} className={classes.iconButton}>
                     <ExcelIcon />
