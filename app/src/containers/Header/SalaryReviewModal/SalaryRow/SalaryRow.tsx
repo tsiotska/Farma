@@ -129,11 +129,6 @@ class SalaryRow extends Component<IProps> {
     }
 
     @computed
-    get fact(): number | string {
-        return 0;
-    }
-
-    @computed
     get deficit(): number | string {
         const { salary, medicine: { id } } = this.props;
 
@@ -171,7 +166,7 @@ class SalaryRow extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
                     <Typography align='center'>
-                        {this.fact}
+                        {this.userValue}
                     </Typography>
                 </Grid>
                 <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>

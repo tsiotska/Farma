@@ -24,7 +24,7 @@ import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
 import DateSelect from '../../../components/DateSelect';
 import { Add, ArrowLeft, ArrowRight } from '@material-ui/icons';
-import TabItem from '../../Marks/Marks';
+import DateSelectPopper from '../../Salary/DateSelectPopper';
 
 const styles = createStyles({
     header: {
@@ -80,25 +80,6 @@ class SalaryReviewModal extends Component<IProps> {
     @observable showSnackbar: boolean = false;
     @observable year: number = new Date().getFullYear();
     @observable month: number = new Date().getMonth();
-    @observable anchorEl: any = false;
-
-    handleClick = (event: React.FormEvent<EventTarget>): void => {
-        this.anchorEl = this.anchorEl ? null : event.currentTarget;
-    }
-
-    closeDateWindow = (): void => {
-        this.anchorEl = null;
-    }
-
-    @computed
-    get open() {
-        return Boolean(this.anchorEl);
-    }
-
-    @computed
-    get id() {
-        return this.anchorEl ? 'simple-popper' : undefined;
-    }
 
     yearChangeHandler = (value: number) => {
         this.year = value;
@@ -137,7 +118,7 @@ class SalaryReviewModal extends Component<IProps> {
         this.showSnackbar = true;
     }
 
-   async componentDidUpdate(prevProps: IProps) {
+    async componentDidUpdate(prevProps: IProps) {
         const { openedModal: prevModal } = prevProps;
         const { openedModal, user, loadUserSalaryInfo } = this.props;
         const becomeOpen = prevModal !== SALARY_PREVIEW_MODAL && openedModal === SALARY_PREVIEW_MODAL;
@@ -167,46 +148,12 @@ class SalaryReviewModal extends Component<IProps> {
                     Заробітня плата
                 </Typography>
 
-                <Grid container alignItems='center'>
-                    <IconButton
-                        disabled
-                        className={classes.iconButton}>
-                        <ArrowLeft fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                        onClick={this.handleClick}
-                       /* disabled={this.isSalesLoading || this.isSalesLoading}*/
-                        className={classes.iconButton}>
-                        <Add fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                        disabled
-                        className={classes.iconButton}>
-                        <ArrowRight fontSize='small' />
-                    </IconButton>
-                </Grid>
-
-                <Popover
-                    id={this.id}
-                    open={this.open}
-                    anchorEl={this.anchorEl}
-                    onClose={this.closeDateWindow}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                    }}
-                >
-                    <DateSelect
-                        year={this.year}
-                        month={this.month}
-                        changeYear={this.yearChangeHandler}
-                        changeMonth={this.monthChangeHandler}
-                    />
-                </Popover>
+                <DateSelectPopper
+                    year={this.year}
+                    month={this.month}
+                    changeMonth={this.monthChangeHandler}
+                    changeYear={this.yearChangeHandler}
+                />
 
                 <SalaryHeader levelsCount={this.levelsCount}/>
                 <UserContent
