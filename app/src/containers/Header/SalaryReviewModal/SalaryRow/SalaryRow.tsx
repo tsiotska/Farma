@@ -166,7 +166,7 @@ class SalaryRow extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
                     <Typography align='center'>
-                        {this.userValue}
+                        {this.userValue || 0}
                     </Typography>
                 </Grid>
                 <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>

@@ -34,6 +34,7 @@ interface IProps extends WithStyles<typeof styles> {
     month: number;
     changeYear: (value: number) => void;
     changeMonth: (value: number) => void;
+    makeRequest?: () => void;
 }
 
 @observer
@@ -55,6 +56,7 @@ class DateSelectPopper extends Component<IProps> {
             month,
             changeYear,
             changeMonth,
+            makeRequest
         } = this.props;
 
         return (
@@ -82,7 +84,11 @@ class DateSelectPopper extends Component<IProps> {
                     }}
                     anchorEl={this.popperAnchor}
                     open={!!this.popperAnchor}
-                    onClose={this.closeHandler}>
+                    onClose={ () => {
+                        this.closeHandler();
+                        makeRequest();
+                        }
+                    }>
                         <DateSelect
                             year={year}
                             month={month}

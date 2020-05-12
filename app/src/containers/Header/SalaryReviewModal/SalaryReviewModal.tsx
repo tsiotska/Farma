@@ -40,6 +40,11 @@ const styles = createStyles({
         borderRadius: 2,
         minHeight: 64
     },
+    titleContainer: {
+        display: 'flex',
+        flexWrap: 'nowrap',
+        alignItems: 'center'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -87,6 +92,13 @@ class SalaryReviewModal extends Component<IProps> {
 
     monthChangeHandler = (value: number) => {
         this.month = value;
+    }
+
+    makeRequest = async () => {
+        const { user, loadUserSalaryInfo } = this.props;
+        this.isSalesLoading = true;
+        await loadUserSalaryInfo(user, this.year, this.month);
+        this.isSalesLoading = false;
     }
 
     get levelsCount() {
@@ -144,17 +156,22 @@ class SalaryReviewModal extends Component<IProps> {
                         <UserShortInfo user={user} disableClick disableText/>
                     </Grid>
                 </Grid>
+
+                <Grid className={classes.titleContainer}>
                 <Typography className={classes.headerText} variant='h5'>
                     Заробітня плата
                 </Typography>
 
-                <DateSelectPopper
-                    year={this.year}
-                    month={this.month}
-                    changeMonth={this.monthChangeHandler}
-                    changeYear={this.yearChangeHandler}
-                />
-
+                    <Grid>
+                    <DateSelectPopper
+                        year={this.year}
+                        month={this.month}
+                        makeRequest={this.makeRequest}
+                        changeMonth={this.monthChangeHandler}
+                        changeYear={this.yearChangeHandler}
+                    />
+                    </Grid>
+                </Grid>
                 <SalaryHeader levelsCount={this.levelsCount}/>
                 <UserContent
                     levelsCount={this.levelsCount}
