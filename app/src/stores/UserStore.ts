@@ -51,8 +51,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable previewBonusTotal: ITotalMarks = null;
     @observable bonusesYear: number = new Date().getFullYear();
 
+    // userId, medId
     @observable changedMarks: Map<number, Map<number, IMark>> = new Map();
     @observable bonusUsers: IUserLikeObject[] = [];
+
     notificationsUpdateInterval: any = null;
 
     constructor(rootStore: IRootStore) {
@@ -105,24 +107,23 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get totalSold(): {[key: number]: number} {
-
-        return {};
-        // const total: any = {};
-        // if (!this.previewBonus) return total;
-
-        // for (const agent of this.previewBonus.agents) {
-        //     for (const [, mark] of agent.marks) {
-        //         const { deposit, payments, drugId } = mark;
-        //         total[drugId] = (total[drugId] || 0) + deposit + payments;
-        //     }
-        // }
-
-        // return total;
+        const bonuses = this.bonuses[this.role];
+        const actual: IBonusInfo = bonuses
+            ? bonuses.find(({ month }) => month === this.previewBonusMonth)
+            : null;
+        if (!actual) return {};
+        return actual.agents.reduce((acc, { marks }) => {
+            const values = [...marks.values()];
+            values.forEach(({ deposit, payments, drugId }: IMark) => {
+                acc[drugId] = (acc[drugId] || 0) + deposit + payments;
+            });
+            return acc;
+        }, {});
     }
 
     @action.bound
     loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId  } } = this.rootStore;
 
         const userId = this.previewUser
             ? this.previewUser.id
@@ -440,7 +441,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 currentDepartmentId,
                 user,
                 this.bonusesYear,
-                this.previewBonusMonth
+                this.previewBonusMonth + 1
             ),
             'loadBonusesData'
         );

@@ -45,6 +45,9 @@ const styles = (theme: any) => createStyles({
         verticalAlign: 'bottom',
         border: 'none',
         paddingBottom: '5px !important',
+        '&:last-of-type': {
+            paddingRight: 5
+        }
     },
     span: {
         width: '100%',
@@ -165,7 +168,7 @@ class TableHeader extends Component<IProps> {
                                     бонуси
                             </TableCell>
                             <TableCell
-                                align='center'
+                                align='right'
                                 padding='none'
                                 className={cx(classes.cell, classes.column)}>
                                     всього

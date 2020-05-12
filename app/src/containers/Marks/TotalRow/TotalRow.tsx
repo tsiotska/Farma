@@ -12,7 +12,7 @@ import { withStyles } from '@material-ui/styles';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 import { IAgentInfo, IMark } from '../../../interfaces/IBonusInfo';
-import { computed, reaction } from 'mobx';
+import { computed, reaction, toJS } from 'mobx';
 import { IMarkFraction } from '../../../stores/UserStore';
 
 const styles = (theme: any) => createStyles({
@@ -28,7 +28,10 @@ const styles = (theme: any) => createStyles({
         // : 'auto',
     },
     column: {
-        width: 70
+        width: 70,
+        '&:last-of-type': {
+            paddingRight: 5
+        }
     },
     cell: {
         verticalAlign: 'center',
@@ -41,6 +44,9 @@ const styles = (theme: any) => createStyles({
     divider: {
         minWidth: 30,
         width: '50%'
+    },
+    gridItem: {
+        width: 'auto'
     }
 });
 
@@ -49,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     position: 'initial' | 'fixed';
     showLpu: boolean;
 
+    changedMarks?: Map<number, Map<number, IMark>>;
     meds?: IMedicine[];
     setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
     clearPreviewBonusTotal?: () => void;
@@ -59,6 +66,7 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             setPreviewBonusTotal,
             clearPreviewBonusTotal,
+            changedMarks
         },
         departmentsStore: {
             currentDepartmentMeds: meds
@@ -66,6 +74,7 @@ interface IProps extends WithStyles<typeof styles> {
     }
 }) => ({
     meds,
+    changedMarks,
     setPreviewBonusTotal,
     clearPreviewBonusTotal
 }))
@@ -75,9 +84,20 @@ class TotalRow extends Component<IProps> {
 
     @computed
     get flattenMedsInfo(): IMark[] {
-        return this.props.agents.reduce((acc, curr) => {
-            const { marks } = curr;
-            return [...acc, ...marks.values()];
+        const { agents, changedMarks } = this.props;
+        console.log('agents: ', toJS(agents));
+        return agents.reduce((acc, curr) => {
+            const { marks, id } = curr;
+            const changedAgentMarks = changedMarks.get(id);
+
+            if (!changedAgentMarks) {
+                return [...acc, ...marks.values()];
+            }
+
+            const filteredAgentValues = [...marks.values()]
+                .filter(x => changedAgentMarks.has(x.drugId) === false);
+
+            return [...acc, ...changedAgentMarks.values(), ...filteredAgentValues];
         }, []);
     }
 
@@ -147,9 +167,8 @@ class TotalRow extends Component<IProps> {
             () => ([ this.summedPacks, this.summedTotal ]),
             ([ summedPacks, summedTotal ]: [ IMarkFraction, IMarkFraction ]) => {
                 setPreviewBonusTotal(summedPacks, summedTotal);
-            }, {
-                fireImmediately: true
-            }
+            },
+            { fireImmediately: true }
         );
     }
 
@@ -243,19 +262,22 @@ class TotalRow extends Component<IProps> {
                 </TableCell>
                 <TableCell
                     className={cx(classes.cell, classes.column)}
-                    align='center'
+                    align='right'
                     padding='none'>
-                    <Grid
-                        alignItems='center'
-                        direction='column'
-                        container>
-                        <span>
-                            { this.summedTotal.payments }
-                        </span>
-                        <Divider className={classes.divider} />
-                        <span>
-                            { this.summedTotal.deposit }
-                        </span>
+                    <Grid container justify='flex-end'>
+                            <Grid
+                                className={classes.gridItem}
+                                alignItems='center'
+                                direction='column'
+                                container>
+                                <span>
+                                    { this.summedTotal.payments }
+                                </span>
+                                <Divider className={classes.divider} />
+                                <span>
+                                    { this.summedTotal.deposit }
+                                </span>
+                            </Grid>
                     </Grid>
                 </TableCell>
             </TableRow>

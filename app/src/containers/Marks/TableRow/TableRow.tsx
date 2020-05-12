@@ -51,7 +51,7 @@ const styles = (theme: any) => createStyles({
         width: '50%'
     },
     divider2: {
-        backgroundColor: '#797979'
+        // backgroundColor: '#797979'
     },
     alignCenter: {
         textAlign: 'center'
@@ -91,7 +91,21 @@ const styles = (theme: any) => createStyles({
     },
     subheader: {
         marginBottom: 12
-    }
+    },
+    span1: {
+        marginTop: 'auto',
+        borderTop: '1px solid #0000001f',
+        padding: '1px 5px 0 5px',
+        background: '#DEE6EA'
+    },
+    span: {
+        maxWidth: 35,
+        minWidth: 25,
+        textAlign: 'center'
+    },
+    lastGridItem: {
+        paddingRight: 8
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -264,12 +278,15 @@ class TableRow extends Component<IProps> {
             tooltips,
         } = this.props;
         const { LPUName, name, id: agentId } = agent;
+        // console.log('deposit: ', toJS(agent))
+
+        const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 
         const lastPayment = agentInfo
-            ? agentInfo.lastPayment
+            ? agentInfo.lastPayment || '-'
             : '-';
         const lastDeposit = agentInfo
-            ? agentInfo.lastDeposit
+            ? agentInfo.lastDeposit || '-'
             : '-';
 
         const medsContent = meds.length
@@ -348,19 +365,24 @@ class TableRow extends Component<IProps> {
                     padding='none'
                     className={cx(classes.cell, classes.column)}>
                     <Grid
-                        justify='center'
+                        justify='flex-end'
                         alignItems='center'
+                        wrap='nowrap'
+                        className={classes.lastGridItem}
                         container>
+                            <span className={cx(classes.span1, classes.span)}>
+                                {this.total[1]}
+                            </span>
                             <Grid
                                 container
                                 direction='column'
                                 className={classes.paymentsContainer}>
-                                <span className={classes.alignCenter}>
+                                <span className={cx(classes.span, classes.alignCenter)}>
                                     {this.total[0]}
                                 </span>
                                 <Divider className={classes.divider2} />
-                                <span className={classes.alignCenter}>
-                                    {this.total[1]}
+                                <span className={cx(classes.span, classes.alignCenter)}>
+                                    { deposit + this.total[1]}
                                 </span>
                             </Grid>
                     </Grid>
