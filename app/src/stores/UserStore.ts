@@ -351,7 +351,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.bonusesYear = value;
         this.bonusUsers = [];
         this.clearPreviewBonusTotal();
-        if (loadBonuses) this.loadBonuses(this.previewUser);
+        this.bonuses = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: [],
+            [USER_ROLE.REGIONAL_MANAGER]: [],
+            [USER_ROLE.MEDICAL_AGENT]: [],
+        };
+        this.loadBonuses(this.previewUser);
+        // if (loadBonuses) this.loadBonuses(this.previewUser);
     }
 
     @action.bound
