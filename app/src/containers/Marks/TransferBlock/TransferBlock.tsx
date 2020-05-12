@@ -7,6 +7,7 @@ import { ITotalMarks } from '../../../stores/UserStore';
 import { USER_ROLE } from '../../../constants/Roles';
 import { IUser } from '../../../interfaces';
 import { IBonusInfo } from '../../../interfaces/IBonusInfo';
+import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -33,6 +34,19 @@ const styles = (theme: any) => createStyles({
     },
     textContainer: {
         padding: '4px 8px'
+    },
+    wrapper: {
+        width: 'auto'
+    },
+    gray: {
+        color: '#aaa'
+    },
+    dark: {
+        color: '#959595',
+        fontFamily: 'Source Sans Pro SemiBold',
+    },
+    text: {
+        marginBottom: 6
     }
 });
 
@@ -42,6 +56,7 @@ interface IProps extends WithStyles<typeof styles> {
     updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
     previewBonusTotal?: ITotalMarks;
     role?: USER_ROLE;
+    salarySettings?: ISalarySettings;
 }
 
 @inject(({
@@ -50,12 +65,14 @@ interface IProps extends WithStyles<typeof styles> {
             updateBonus,
             previewBonusTotal,
             role,
+            salarySettings
         }
     }
 }) => ({
     updateBonus,
     previewBonusTotal,
     role,
+    salarySettings
 }))
 @observer
 class TransferBlock extends Component<IProps> {
@@ -93,6 +110,22 @@ class TransferBlock extends Component<IProps> {
             : 0;
     }
 
+    @computed
+    get bonuses(): [number, number] {
+        const { salarySettings } = this.props;
+        if (!salarySettings) return null;
+        const initialBonus = salarySettings.payments;
+        const bonus = initialBonus * 100;
+        const res = 100 - bonus;
+        const isValid = bonus >= 0
+            && bonus <= 100
+            && res >= 0
+            && res <= 100;
+        return isValid
+            ? [bonus, res]
+            : [100, 0];
+    }
+
     submitHandler = async () => {
         const { updateBonus, previewBonus } = this.props;
         this.isLoading = true;
@@ -110,42 +143,48 @@ class TransferBlock extends Component<IProps> {
         const status = previewBonus ? previewBonus.status : true;
 
         return (
-            <Grid className={classes.root} direction='column' container>
-                <Grid className={classes.textContainer} wrap='nowrap' container>
-                    <Grid xs={5} direction='column' container item>
-                        <Typography className={classes.typography} variant='subtitle1'>
-                            Всього для виплат
-                        </Typography>
-                        <Typography className={classes.typography} variant='subtitle1'>
-                            Всього на депозит
-                        </Typography>
+            <Grid className={classes.wrapper} direction='column' container>
+                <Typography className={classes.text} variant='body2'>
+                    <span className={classes.gray}>Розподіл балів - </span>
+                    <span className={classes.dark}>{this.bonuses[0]} / {this.bonuses[1]}</span>
+                </Typography>
+                <Grid className={classes.root} direction='column' container>
+                    <Grid className={classes.textContainer} wrap='nowrap' container>
+                        <Grid xs={5} direction='column' container item>
+                            <Typography className={classes.typography} variant='subtitle1'>
+                                Всього для виплат
+                            </Typography>
+                            <Typography className={classes.typography} variant='subtitle1'>
+                                Всього на депозит
+                            </Typography>
+                        </Grid>
+                        <Grid xs direction='column' container item>
+                            <Typography  align='right' className={classes.typography} variant='subtitle1'>
+                                <span className={classes.bolderText}>{this.totalPacksPayments}</span> уп.
+                            </Typography>
+                            <Typography  align='right' className={classes.typography} variant='subtitle1'>
+                                <span className={classes.bolderText}>{this.totalPacksDeposit}</span> уп.
+                            </Typography>
+                        </Grid>
+                        <Grid xs direction='column' container item>
+                            <Typography align='right' className={classes.typography} variant='subtitle1'>
+                                <span className={classes.bolderText}>{this.totalMarksPayments}</span> бал.
+                            </Typography>
+                            <Typography align='right' className={classes.typography} variant='subtitle1'>
+                                <span className={classes.bolderText}>{this.totalMarksDeposit}</span> бал.
+                            </Typography>
+                        </Grid>
                     </Grid>
-                    <Grid xs direction='column' container item>
-                        <Typography  align='right' className={classes.typography} variant='subtitle1'>
-                            <span className={classes.bolderText}>{this.totalPacksPayments}</span> уп.
-                        </Typography>
-                        <Typography  align='right' className={classes.typography} variant='subtitle1'>
-                            <span className={classes.bolderText}>{this.totalPacksDeposit}</span> уп.
-                        </Typography>
-                    </Grid>
-                    <Grid xs direction='column' container item>
-                        <Typography align='right' className={classes.typography} variant='subtitle1'>
-                            <span className={classes.bolderText}>{this.totalMarksPayments}</span> бал.
-                        </Typography>
-                        <Typography align='right' className={classes.typography} variant='subtitle1'>
-                            <span className={classes.bolderText}>{this.totalMarksDeposit}</span> бал.
-                        </Typography>
-                    </Grid>
+                    {
+                        role === USER_ROLE.MEDICAL_AGENT && status === false &&
+                        <Button
+                            className={classes.submitButton}
+                            onClick={this.submitHandler}
+                            disabled={this.isLoading}>
+                                Зберегти
+                        </Button>
+                    }
                 </Grid>
-                {
-                    role === USER_ROLE.MEDICAL_AGENT && status === false &&
-                    <Button
-                        className={classes.submitButton}
-                        onClick={this.submitHandler}
-                        disabled={this.isLoading}>
-                            Зберегти
-                    </Button>
-                }
             </Grid>
         );
     }
