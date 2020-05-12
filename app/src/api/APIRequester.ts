@@ -1,3 +1,5 @@
+import { IUserLikeObject } from './../stores/DepartmentsStore';
+import { IUserInfo } from './../containers/Marks/Table/Table';
 import { multiDepartmentRoles } from './../constants/Roles';
 import isEqual from 'lodash/isEqual';
 import { salariesNormalizer } from './../helpers/normalizers/salariesNormalizer';
@@ -452,7 +454,7 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
-    getBonusInfo(depId: number, year: number, { id, position }: IUser): Promise<IBonusInfo[]> {
+    getBonusInfo(depId: number, year: number, { id, position }: IUserLikeObject): Promise<IBonusInfo[]> {
         const urls: any = {
             [USER_ROLE.FIELD_FORCE_MANAGER]: `api/branch/${depId}/ffm/marks`,
             [USER_ROLE.REGIONAL_MANAGER]: `api/branch/${depId}/rm/${id}/marks`,
@@ -470,7 +472,7 @@ export class APIRequester {
 
     getBonusesData(
         depId: number,
-        { position, id }: IUser,
+        { position, id }: IUserLikeObject,
         year: number,
         month: number
     ): Promise<{

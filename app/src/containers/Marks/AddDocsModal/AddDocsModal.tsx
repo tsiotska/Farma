@@ -58,6 +58,9 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    previewBonus: IBonusInfo;
+    docs: IDoctor[];
+
     openedModal?: string;
     specialties?: ISpecialty[];
     LPUs?: ILPU[];
@@ -65,11 +68,6 @@ interface IProps extends WithStyles<typeof styles> {
     loadSpecialties?: () => void;
     loadLPUs?: () => void;
     addDocsToBonus?: (docs: IDoctor[]) => void;
-    previewBonus?: IBonusInfo;
-    docs: IDoctor[];
-    // loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
-    // clearDoctors?: () => void;
-    // previewUser?: IUser;
 }
 
 @inject(({
@@ -83,17 +81,12 @@ interface IProps extends WithStyles<typeof styles> {
             specialties,
             loadLPUs,
             LPUs,
-            // loadConfirmedDoctors,
-            // clearDoctors
         },
         userStore: {
             addDocsToBonus,
-            previewBonus,
-            // previewUser
         }
     }
 }) => ({
-    previewBonus,
     openedModal,
     openModal,
     loadSpecialties,
@@ -101,9 +94,6 @@ interface IProps extends WithStyles<typeof styles> {
     specialties,
     loadLPUs,
     LPUs,
-    // loadConfirmedDoctors,
-    // clearDoctors,
-    // previewUser
 }))
 @observer
 class AddDocsModal extends Component<IProps> {

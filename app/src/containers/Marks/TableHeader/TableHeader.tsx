@@ -19,10 +19,10 @@ import { IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
-        width: 290
+        width: 284
     },
     wideColumn: {
-        width: 170
+        width: 284 / 2
     },
     column: {
         width: 70
@@ -60,10 +60,10 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     showLpu: boolean;
-    totalSold?: { [key: number]: number };
+    previewBonus: IBonusInfo;
 
+    totalSold?: { [key: number]: number };
     meds?: IMedicine[];
-    previewBonus?: IBonusInfo;
 }
 
 @inject(({
@@ -72,13 +72,11 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds: meds
         },
         userStore: {
-            previewBonus,
             totalSold
         }
     }
 }) => ({
     meds,
-    previewBonus,
     totalSold
 }))
 @observer

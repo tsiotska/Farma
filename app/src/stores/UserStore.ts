@@ -19,6 +19,7 @@ import { IMedicine } from '../interfaces/IMedicine';
 import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
+import { IUserLikeObject } from './DepartmentsStore';
 
 export interface IMarkFraction {
     payments: number;
@@ -40,8 +41,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable notificationsCount: number = 0;
     @observable notifications: INotification[] = [];
 
-    @observable bonuses: IBonusInfo[] = null;
-    @observable previewBonus: IBonusInfo = null;
+    // @observable bonuses: IBonusInfo[] = null;
+    @observable bonuses: Partial<Record<USER_ROLE, IBonusInfo[]>> = {
+        [USER_ROLE.FIELD_FORCE_MANAGER]: [],
+        [USER_ROLE.REGIONAL_MANAGER]: [],
+        [USER_ROLE.MEDICAL_AGENT]: [],
+    };
+    @observable previewBonusMonth: number = null;
+    // @observable previewBonus: IBonusInfo = null;
     @observable previewBonusTotal: ITotalMarks = null;
     @observable bonusesYear: number = new Date().getFullYear();
 
@@ -98,17 +105,18 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @computed
     get totalSold(): {[key: number]: number} {
 
-        const total: any = {};
-        if (!this.previewBonus) return total;
+        return {};
+        // const total: any = {};
+        // if (!this.previewBonus) return total;
 
-        for (const agent of this.previewBonus.agents) {
-            for (const [, mark] of agent.marks) {
-                const { deposit, payments, drugId } = mark;
-                total[drugId] = (total[drugId] || 0) + deposit + payments;
-            }
-        }
+        // for (const agent of this.previewBonus.agents) {
+        //     for (const [, mark] of agent.marks) {
+        //         const { deposit, payments, drugId } = mark;
+        //         total[drugId] = (total[drugId] || 0) + deposit + payments;
+        //     }
+        // }
 
-        return total;
+        // return total;
     }
 
     @action.bound
@@ -154,129 +162,137 @@ export default class UserStore extends AsyncStore implements IUserStore {
             lastDeposit: 0,
             marks: new Map(),
         }));
-
-        this.previewBonus.agents.push(...preparedDocs);
+        const targetRole = USER_ROLE.MEDICAL_AGENT;
+        const targetBonuses = this.bonuses[targetRole];
+        const targetBonus = targetBonuses
+            ? targetBonuses.find(x => x.month = this.previewBonusMonth)
+            : null;
+        if (targetBonus) {
+            targetBonus.agents.push(...preparedDocs);
+        }
     }
 
     @action.bound
     async createBonus(year: number, month: number): Promise<boolean> {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
-        const userId = this.previewUser
-            ? this.previewUser.id
-            : null;
+        // const userId = this.previewUser
+        //     ? this.previewUser.id
+        //     : null;
 
-        if (!userId || !currentDepartmentId) return false;
+        // if (!userId || !currentDepartmentId) return false;
 
-        const isCreated = await api.updateBonusesData(
-            currentDepartmentId,
-            userId,
-            year,
-            month + 1,
-            {}
-        );
+        // const isCreated = await api.updateBonusesData(
+        //     currentDepartmentId,
+        //     userId,
+        //     year,
+        //     month + 1,
+        //     {}
+        // );
 
-        if (isCreated) {
-            const newBonusInfo: IBonusInfo = {
-                month: month,
-                payments: null,
-                deposit: null,
-                status: false,
-                sales: new Map(),
-                agents: [],
-            };
+        // if (isCreated) {
+        //     const newBonusInfo: IBonusInfo = {
+        //         month: month,
+        //         payments: null,
+        //         deposit: null,
+        //         status: false,
+        //         sales: new Map(),
+        //         agents: [],
+        //     };
 
-            if (this.bonuses) this.bonuses.push(newBonusInfo);
-            else this.bonuses = [newBonusInfo];
+        //     if (this.bonuses) this.bonuses.push(newBonusInfo);
+        //     else this.bonuses = [newBonusInfo];
 
-            this.setPreviewBonus(newBonusInfo);
-            this.setBonusesYear(year, false, true);
-        }
+        //     this.setPreviewBonus(newBonusInfo);
+        //     this.setBonusesYear(year, false, true);
+        // }
 
-        return isCreated;
+        // return isCreated;
+        return false;
     }
 
     @action.bound
     updateBonuses() {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        // const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
-        const id = this.previewUser
-            ? this.previewUser.id
-            : null;
+        // const id = this.previewUser
+        //     ? this.previewUser.id
+        //     : null;
 
-        if (!this.previewBonus || id === null || currentDepartmentId === null) return;
+        // if (!this.previewBonus || id === null || currentDepartmentId === null) return;
 
-        const { month, agents } = this.previewBonus;
+        // const { month, agents } = this.previewBonus;
 
-        const marks = agents.reduce((acc, curr) => {
-            const { marks: agentMarks, id: agent } = curr;
-            const preparedMarks = [...agentMarks.values()].map(({
-                    deposit,
-                    drugId,
-                    mark,
-                    payments
-                }) => ({
-                    agent,
-                    drug: drugId,
-                    payments: payments,
-                    deposit: deposit,
-                    drug_mark: mark,
-                })
-            );
-            return [...acc, ...preparedMarks];
-        }, []);
+        // const marks = agents.reduce((acc, curr) => {
+        //     const { marks: agentMarks, id: agent } = curr;
+        //     const preparedMarks = [...agentMarks.values()].map(({
+        //             deposit,
+        //             drugId,
+        //             mark,
+        //             payments
+        //         }) => ({
+        //             agent,
+        //             drug: drugId,
+        //             payments: payments,
+        //             deposit: deposit,
+        //             drug_mark: mark,
+        //         })
+        //     );
+        //     return [...acc, ...preparedMarks];
+        // }, []);
 
-        if (!marks.length) return;
+        // if (!marks.length) return;
 
-        const data: any = {
-            marks,
-            deposit: this.previewBonusTotal.marks.deposit,
-            payments: this.previewBonusTotal.marks.payments
-        };
+        // const data: any = {
+        //     marks,
+        //     deposit: this.previewBonusTotal.marks.deposit,
+        //     payments: this.previewBonusTotal.marks.payments
+        // };
 
-        this.dispatchRequest(
-            api.updateBonusesData(
-                currentDepartmentId,
-                id,
-                this.bonusesYear,
-                month,
-                data
-            ),
-            'updateBonuses'
-        );
+        // this.dispatchRequest(
+        //     api.updateBonusesData(
+        //         currentDepartmentId,
+        //         id,
+        //         this.bonusesYear,
+        //         month,
+        //         data
+        //     ),
+        //     'updateBonuses'
+        // );
     }
 
     @action.bound
     previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
-        const { sales } = this.previewBonus;
-        const { marks } = agent;
-        console.log('store handler: ', propName, value);
-        const salesObj = sales.get(medId);
+        // const { sales } = this.previewBonus;
+        // const { marks } = agent;
+        // console.log('store handler: ', propName, value);
+        // const salesObj = sales.get(medId);
 
-        const mark = salesObj
-            ? salesObj.mark
-            : null;
+        // const mark = salesObj
+        //     ? salesObj.mark
+        //     : null;
 
-        const targetMark = marks.get(medId);
-        if (targetMark) {
-            targetMark[propName] = value;
-        } else {
-            const newMark: IMark = {
-                deposit: propName === 'deposit' ? value : 0,
-                payments: propName === 'payments' ? value : 0,
-                drugId: medId,
-                mark,
-            };
-            marks.set(medId, newMark);
-        }
+        // const targetMark = marks.get(medId);
+        // if (targetMark) {
+        //     targetMark[propName] = value;
+        // } else {
+        //     const newMark: IMark = {
+        //         deposit: propName === 'deposit' ? value : 0,
+        //         payments: propName === 'payments' ? value : 0,
+        //         drugId: medId,
+        //         mark,
+        //     };
+        //     marks.set(medId, newMark);
+        // }
     }
 
     @action.bound
     setBonusesYear(value: number, shouldPostData: boolean, loadBonuses: boolean) {
         if (shouldPostData) this.updateBonuses();
+        console.log('new year: ', value);
         this.bonusesYear = value;
         this.clearPreviewBonusTotal();
-        if (loadBonuses) this.loadBonuses();
+        if (loadBonuses) this.loadBonuses(this.previewUser);
     }
 
     @action.bound
@@ -293,68 +309,72 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    setPreviewBonus = (bonusInfo: IBonusInfo) => {
-        const shouldLoadData = bonusInfo !== this.previewBonus;
-        this.previewBonus = bonusInfo;
-        if (shouldLoadData && !!this.previewBonus) {
-            this.loadBonusesData();
-        }
+    setPreviewBonusMonth = (month: number) => {
+        this.previewBonusMonth = month;
+        console.log('new month :', month);
     }
 
     @action.bound
-    async loadBonuses() {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+    async loadSpecifiedUserBonuses(user: IUserLikeObject) {
+        const { api, departmentsStore: { currentDepartmentId }} = this.rootStore;
+        return api.getBonusInfo(
+            currentDepartmentId,
+            this.bonusesYear,
+            user
+        );
+    }
 
-        this.bonuses = await this.dispatchRequest(
-            api.getBonusInfo(currentDepartmentId, this.bonusesYear, this.previewUser),
+    @action.bound
+    async loadBonuses(user: IUserLikeObject) {
+        this.bonuses[user.position] = [];
+        const userBonuses = await this.dispatchRequest(
+            this.loadSpecifiedUserBonuses(user),
             'loadBonuses'
         );
+        this.bonuses[user.position] = userBonuses || [];
 
-        if (this.bonuses && this.bonuses.length) {
-            const currentPreviewBonusMonth = this.previewBonus
-                ? this.previewBonus.month
+        if (!userBonuses || !userBonuses.length) return;
+
+        const targetBonuses = this.bonuses[this.role] || [];
+        const includesPreviewMonth = targetBonuses.some(x => x.month === this.previewBonusMonth);
+
+        if (!includesPreviewMonth) {
+            const newMonth = targetBonuses.length
+                ? targetBonuses[targetBonuses.length - 1].month
                 : null;
-            const updatedBonus = currentPreviewBonusMonth
-                ? this.bonuses.find(({ month }) => month === currentPreviewBonusMonth)
-                : null;
-            const itemToSet = updatedBonus || this.bonuses[this.bonuses.length - 1];
-            this.setPreviewBonus(itemToSet);
-        } else {
-            this.setPreviewBonus(null);
+            this.setPreviewBonusMonth(newMonth);
         }
     }
 
     @action.bound
-    async loadBonusesData() {
+    async loadBonusesData(user: IUserLikeObject) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         if (!currentDepartmentId || !this.previewUser) return;
 
-        const bonusMonth = this.previewBonus.month;
-
-        const request = api.getBonusesData(
-            currentDepartmentId,
-            this.previewUser,
-            this.bonusesYear,
-            this.previewBonus.month
-        );
-
+        const initialBonus = this.bonuses[user.position]
+            && this.bonuses[user.position].find(({ month }) => month === this.previewBonusMonth);
         const res = await this.dispatchRequest(
-            request,
+            api.getBonusesData(
+                currentDepartmentId,
+                user,
+                this.bonusesYear,
+                this.previewBonusMonth
+            ),
             'loadBonusesData'
         );
+        const targetBonus = this.bonuses[user.position]
+            && this.bonuses[user.position].find(({ month }) => month === this.previewBonusMonth);
 
-        const currentBonusMonth = this.previewBonus
-            ? this.previewBonus.month
-            : null;
-        const isDataRelevant = currentBonusMonth === bonusMonth;
+        const dataIsRelevant = !!initialBonus && !!targetBonus && initialBonus === targetBonus;
 
-        if (!res || !isDataRelevant) return;
-
-        runInAction(() => {
-            this.previewBonus.agents = res.agents;
-            this.previewBonus.sales = res.sales;
-        });
+        if (!res || !dataIsRelevant) return;
+        if (targetBonus) {
+            runInAction(() => {
+                targetBonus.agents = res.agents;
+                targetBonus.sales = res.sales;
+            });
+        }
     }
 
     @action.bound
@@ -622,8 +642,12 @@ export default class UserStore extends AsyncStore implements IUserStore {
         this.notifications = [];
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
-        this.previewBonus = null;
-        this.bonuses = null;
+        this.bonuses = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: [],
+            [USER_ROLE.REGIONAL_MANAGER]: [],
+            [USER_ROLE.MEDICAL_AGENT]: [],
+        };
+        this.previewBonusMonth = null;
         window.clearInterval(this.notificationsUpdateInterval);
         this.notificationsUpdateInterval = null;
         resetDepartmentsStore();

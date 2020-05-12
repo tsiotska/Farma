@@ -114,19 +114,19 @@ class HoverableCell extends Component<IProps> {
                                 { this.payments }
                             </span>
                         }
-                    <Tooltip
-                        arrow
-                        open={this.openTooltip}
-                        placement='right'
-                        title={tooltip}
-                        TransitionProps={{
-                            timeout: this.openTooltip
-                            ? 300
-                            : 0
-                        }}
-                        classes={{ tooltip: classes.tooltip }}>
-                        <Divider className={classes.divider} />
-                    </Tooltip>
+                        <Tooltip
+                            arrow
+                            open={this.openTooltip}
+                            placement='right'
+                            title={tooltip}
+                            TransitionProps={{
+                                timeout: this.openTooltip
+                                ? 300
+                                : 0
+                            }}
+                            classes={{ tooltip: classes.tooltip }}>
+                            <Divider className={classes.divider} />
+                        </Tooltip>
                         {
                             this.isEditable
                             ? <Input

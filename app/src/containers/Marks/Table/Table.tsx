@@ -7,7 +7,8 @@ import {
     Table as MuiTable,
     Paper,
     Collapse,
-    LinearProgress
+    LinearProgress,
+    Typography
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -33,13 +34,15 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     parentUser: IUserInfo & IUserLikeObject;
+    isNested: boolean;
+    previewBonus: IBonusInfo;
 
     totalSold?: { [key: number]: number };
     loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
     getLocationsAgents?: (depId: number, role: USER_ROLE) => IUser[];
     currentDepartmentId?: number;
     role?: USER_ROLE;
-    previewBonus?: IBonusInfo;
+    // previewBonus?: IBonusInfo;
 }
 
 export interface IUserInfo {
@@ -58,7 +61,7 @@ export interface IUserInfo {
         userStore: {
             role,
             totalSold,
-            previewBonus
+            // previewBonus
         }
     }
 }) => ({
@@ -67,7 +70,7 @@ export interface IUserInfo {
     currentDepartmentId,
     role,
     totalSold,
-    previewBonus
+    // previewBonus
 }))
 @observer
 class Table extends Component<IProps> {
@@ -100,7 +103,8 @@ class Table extends Component<IProps> {
 
     @computed
     get showTotalRow(): boolean {
-        return !!this.agents.length;
+        const { isNested } = this.props;
+        return !!this.agents.length === true && isNested === false;
     }
 
     @computed
@@ -129,14 +133,6 @@ class Table extends Component<IProps> {
         );
     }
 
-    @computed
-    get fixedTableStyles(): any {
-        return {
-            width: this.tableWidth,
-            left: this.leftOffset,
-        };
-    }
-
     get preparedAgents(): IUserInfo[] {
         const { role } = this.props;
         if (role === USER_ROLE.MEDICAL_AGENT) {
@@ -145,6 +141,14 @@ class Table extends Component<IProps> {
                 : [];
         }
         return this.agents.slice(0, 50);
+    }
+
+    @computed
+    get fixedTableStyles(): any {
+        return {
+            width: this.tableWidth,
+            left: this.leftOffset,
+        };
     }
 
     expandChangeHandler = (id: number, isExpanded: boolean) => {
@@ -168,6 +172,7 @@ class Table extends Component<IProps> {
             getLocationsAgents,
             parentUser,
             currentDepartmentId,
+            isNested
         } = this.props;
         const { position } = parentUser;
 
@@ -188,7 +193,13 @@ class Table extends Component<IProps> {
     }
 
     render() {
-        const { classes, role, isLoading } = this.props;
+        const {
+            classes,
+            role,
+            isLoading,
+            isNested,
+            previewBonus
+        } = this.props;
 
         const lastIndex = this.agentsInfo.length - 1;
         const showLoader = this.agentsLoaded === false || isLoading === true;
@@ -204,7 +215,8 @@ class Table extends Component<IProps> {
                                 <TableRow
                                     key={x.id}
                                     agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
-                                    agent={x}
+                                    isNested={isNested}
+                                    agent={(x as IUserInfo & IUserLikeObject)}
                                     showLpu={this.userIsMedicalAgent}
                                     tooltips={this.tooltips}
                                     expanded={this.expandedAgent === x.id}
@@ -245,13 +257,17 @@ class Table extends Component<IProps> {
                     </MuiTable>
                 </TableContainer>
             }
-            <AddDocsModal
-                docs={
-                    role === USER_ROLE.MEDICAL_AGENT
-                        ? (this.agents as IDoctor[])
-                        : []
-                }
-            />
+            {
+                isNested === false &&
+                <AddDocsModal
+                    previewBonus={previewBonus}
+                    docs={
+                        role === USER_ROLE.MEDICAL_AGENT
+                            ? (this.agents as IDoctor[])
+                            : []
+                    }
+                />
+            }
             </>
         );
     }

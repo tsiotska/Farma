@@ -7,27 +7,24 @@ import {
     Grid,
     Divider,
     Collapse,
-    Typography
+    Typography,
+    Paper
 } from '@material-ui/core';
 import { KeyboardArrowDown } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { computed, toJS, observable } from 'mobx';
 import cx from 'classnames';
-import { IAgentInfo, IDrugSale, IMark } from '../../../interfaces/IBonusInfo';
+import { IAgentInfo, IDrugSale, IMark, IBonusInfo } from '../../../interfaces/IBonusInfo';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import HoverableCell from '../HoverableCell';
-import { IUserInfo } from '../Table/Table';
+import Table, { IUserInfo } from '../Table/Table';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     root: {
         textTransform: 'capitalize'
-    },
-    doubleWidthColumn: {
-        width: 290
-    },
-    wideColumn: {
-        width: 170
     },
     column: {
         width: 70
@@ -36,7 +33,8 @@ const styles = (theme: any) => createStyles({
         verticalAlign: 'middle',
         border: 'none',
         borderBottom: '10px solid white',
-        backgroundColor: '#F7F7F9'
+        backgroundColor: '#F7F7F9',
+        padding: 5
     },
     divider: {
         minWidth: 30,
@@ -68,40 +66,75 @@ const styles = (theme: any) => createStyles({
     },
     expandIcon: {
         transition: '0.3s',
+        margin: 5,
         '&.rotate': {
             transform: 'rotate(180deg)'
         }
+    },
+    nestedContainer: {
+        paddingBottom: 0,
+        paddingTop: 0,
+        '&.nest': {
+            paddingLeft: 16
+        }
+        // paddingLeft: this.nestLevel ? 16 : 0
+    },
+    subheader: {
+        marginBottom: 12
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     agentInfo: IAgentInfo;
     showLpu: boolean;
-    agent: IUserInfo;
+    agent: IUserInfo & IUserLikeObject;
     meds?: IMedicine[];
     tooltips: { [key: number]: string };
     itemRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
     expandHandler?: (id: number, isExpanded: boolean) => void;
+    bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
+    previewBonusMonth?: number;
+    role?: USER_ROLE;
+    isNested: boolean;
 }
 
 @inject(({
     appState: {
         departmentsStore: {
             currentDepartmentMeds: meds
+        },
+        userStore: {
+            bonuses,
+            previewBonusMonth,
+            role
         }
     }
 }) => ({
     meds,
+    role,
+    bonuses,
+    previewBonusMonth
 }))
 @observer
 class TableRow extends Component<IProps> {
+    readonly paddingLeft: number = 10;
     @computed
     get agentMarks(): Map<number, IMark> {
         const { agentInfo } = this.props;
         return agentInfo
             ? agentInfo.marks
             : new Map();
+    }
+
+    @computed
+    get nestLevel(): number {
+        const { role, agent } = this.props;
+        // console.log('agent pos: ', agent.position, USER_ROLE[agent.position]);
+        const userRole = typeof agent.position === 'string'
+            ? USER_ROLE.MEDICAL_AGENT + 1
+            : agent.position;
+        return userRole - role;
     }
 
     @computed
@@ -146,6 +179,19 @@ class TableRow extends Component<IProps> {
         return 4 + meds.length + (showLpu ? 1 : 0);
     }
 
+    @computed
+    get childBonus(): IBonusInfo {
+        const { bonuses, agent, previewBonusMonth} = this.props;
+        return bonuses[agent.position]
+            ? bonuses[agent.position].find(({ month }) => month === previewBonusMonth)
+            : null;
+    }
+
+    @computed
+    get columnWidth(): number {
+        return 150 - this.nestLevel * 16 / 2;
+    }
+
     get isExpandable(): boolean {
         const { expandHandler, expanded } = this.props;
         return !!expandHandler && typeof expanded === 'boolean';
@@ -160,13 +206,15 @@ class TableRow extends Component<IProps> {
         const {
             classes,
             showLpu,
-            agent: { LPUName, name },
+            agent,
             itemRef,
             expanded,
             agentInfo,
             meds,
-            tooltips
+            tooltips,
+            isNested
         } = this.props;
+        const { LPUName, name } = agent;
 
         const lastPayment = agentInfo ? agentInfo.lastPayment : '-';
         const lastDeposit = agentInfo ? agentInfo.lastDeposit : '-';
@@ -196,25 +244,25 @@ class TableRow extends Component<IProps> {
                     <TableCell
                         onClick={this.expandHandler}
                         padding='none'
-                        className={cx(classes.cell, classes.wideColumn)}>
+                        style={{ width: this.columnWidth }}
+                        className={classes.cell}>
                             { LPUName }
                     </TableCell>
                 }
                 <TableCell
                     onClick={this.expandHandler}
                     padding='none'
-                    className={cx(
-                        classes.cell, {
-                        [classes.doubleWidthColumn]: !showLpu,
-                        [classes.wideColumn]: showLpu,
-                    })}>
-                    {
-                        this.isExpandable === true && showLpu === false &&
-                        <KeyboardArrowDown
-                            className={cx(classes.expandIcon, { rotate: expanded === true })}
-                            fontSize='small' />
-                    }
-                    { name }
+                    style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
+                    className={classes.cell}>
+                        <Grid container alignItems='center'>
+                            {
+                                this.isExpandable === true && showLpu === false &&
+                                <KeyboardArrowDown
+                                    className={cx(classes.expandIcon, { rotate: expanded === true })}
+                                    fontSize='small' />
+                            }
+                            { name }
+                        </Grid>
                 </TableCell>
                 { medsContent }
                 <TableCell
@@ -267,12 +315,19 @@ class TableRow extends Component<IProps> {
                 this.isExpandable &&
                 <MuiTableRow>
                     <TableCell
-                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        className={cx(classes.nestedContainer, { nest: !!this.nestLevel })}
                         colSpan={this.columnsCount}>
                         <Collapse in={expanded} timeout='auto' unmountOnExit>
-                            <Typography>
-                                hello
+                            <Typography className={classes.subheader}>
+                                { agent.position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
+                                { agent.position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
                             </Typography>
+                            <Table
+                                previewBonus={this.childBonus}
+                                isLoading={false}
+                                parentUser={agent}
+                                isNested
+                            />
                         </Collapse>
                     </TableCell>
                 </MuiTableRow>

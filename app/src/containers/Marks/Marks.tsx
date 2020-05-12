@@ -28,6 +28,7 @@ import AddDocsModal from './AddDocsModal';
 import AddBonusModal from './AddBonusModal';
 import MonthPicker from './MonthPicker';
 import { IUser } from '../../interfaces';
+import { IUserLikeObject } from '../../stores/DepartmentsStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -43,15 +44,18 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    loadBonuses?: () => void;
+    loadBonuses?: (user: IUserLikeObject) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    previewBonus?: IBonusInfo;
+    // previewBonus?: IBonusInfo;
+    bonuses: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     role?: USER_ROLE;
     bonusesYear?: number;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     previewUser?: IUser;
-    setPreviewBonus?: (previewBonus: IBonusInfo) => void;
+    previewBonusMonth: number;
+    loadBonusesData?: (user: IUserLikeObject) => void;
+    // setPreviewBonus?: (previewBonus: IBonusInfo) => void;
 }
 
 @inject(({
@@ -59,32 +63,38 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             loadBonuses,
             getAsyncStatus,
-            previewBonus,
+            // previewBonus,
             role,
             bonusesYear,
             updateBonuses,
             previewUser,
-            setPreviewBonus
+            // setPreviewBonus
+            loadBonusesData,
+            previewBonusMonth,
+            bonuses
         },
         uiStore: {
             openModal
         }
     }
 }) => ({
+    previewBonusMonth,
     loadBonuses,
-    previewBonus,
+    loadBonusesData,
+    // previewBonus,
+    bonuses,
     getAsyncStatus,
     role,
     openModal,
     bonusesYear,
     updateBonuses,
     previewUser,
-    setPreviewBonus
 }))
 @observer
 class Marks extends Component<IProps> {
     readonly currentYear = new Date().getFullYear();
     reactionDisposer: any;
+    monthReaction: any;
     @observable excelPopperAnchor: HTMLElement = null;
 
     @computed
@@ -99,16 +109,21 @@ class Marks extends Component<IProps> {
 
     @computed
     get monthName(): string {
-        const { previewBonus } = this.props;
-        const month = previewBonus
-            ? previewBonus.month
-            : null;
-        return uaMonthsNames[month];
+        const { previewBonusMonth } = this.props;
+        return uaMonthsNames[previewBonusMonth];
     }
 
     @computed
     get showLpuColumn(): boolean {
         return this.props.role === USER_ROLE.MEDICAL_AGENT;
+    }
+
+    get previewBonus(): IBonusInfo {
+        const { bonuses, previewBonusMonth, previewUser } = this.props;
+        const targetBonus = previewUser.position in bonuses
+            ? bonuses[previewUser.position].find(x => x.month === previewBonusMonth)
+            : null;
+        return targetBonus || null;
     }
 
     openExcelPopper = ({ target }: any) => {
@@ -122,13 +137,19 @@ class Marks extends Component<IProps> {
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     componentDidMount() {
-        this.props.loadBonuses();
+        const { loadBonuses } = this.props;
+        loadBonuses(this.props.previewUser);
         this.reactionDisposer = reaction(
-            () => this.props.role,
+            () => this.props.previewUser,
+            (user: IUserLikeObject) => {
+                loadBonuses(user);
+            }
+        );
+        this.monthReaction = reaction(
+            () => this.props.previewBonusMonth,
             () => {
-                const { loadBonuses, setPreviewBonus } = this.props;
-                setPreviewBonus(null);
-                loadBonuses();
+                const { loadBonusesData, previewUser } = this.props;
+                this.props.loadBonusesData(previewUser);
             }
         );
     }
@@ -136,6 +157,7 @@ class Marks extends Component<IProps> {
     componentWillUnmount() {
         const { updateBonuses, role } = this.props;
         this.reactionDisposer();
+        this.monthReaction();
         if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
     }
 
@@ -144,9 +166,9 @@ class Marks extends Component<IProps> {
             classes,
             bonusesYear,
             updateBonuses,
-            previewBonus,
             role,
-            previewUser
+            previewUser,
+            bonuses,
         } = this.props;
 
         return (
@@ -154,11 +176,10 @@ class Marks extends Component<IProps> {
                 <Typography variant='h5' className={classes.title}>
                     Бали за {bonusesYear} рік
                 </Typography>
-                <MonthPicker isLoading={this.isBonusesLoading || this.isBonusDataLoading} />
-                {/* {
-                    (this.isBonusDataLoading || this.isBonusesLoading) &&
-                    <LinearProgress />
-                } */}
+                <MonthPicker
+                    bonuses={bonuses[previewUser.position]}
+                    isLoading={this.isBonusesLoading || this.isBonusDataLoading}
+                />
                 <Paper className={classes.paper}>
                     <Grid alignItems='center' justify='space-between' container>
                         <Typography variant='h5'>
@@ -192,12 +213,14 @@ class Marks extends Component<IProps> {
                             </Button>
                         }
                     </Grid>
-                    <TableHeader showLpu={this.showLpuColumn} />
+                    <TableHeader previewBonus={this.previewBonus} showLpu={this.showLpuColumn} />
                     {
-                        !!previewBonus &&
+                        !!this.previewBonus &&
                         <Table
+                            previewBonus={this.previewBonus}
                             isLoading={this.isBonusesLoading || this.isBonusDataLoading}
                             parentUser={previewUser}
+                            isNested={false}
                         />
                     }
                 </Paper>

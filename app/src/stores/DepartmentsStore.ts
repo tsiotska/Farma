@@ -1010,7 +1010,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let loadPositionsId: USER_ROLE;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
         if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
-
         if (!depId || !role) return null;
 
         return api.getAgents(depId, loadPositionsId);

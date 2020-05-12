@@ -73,23 +73,23 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     bonus: IBonusInfo;
     selected: boolean;
-    setPreviewBonus?: (bonus: IBonusInfo) => void;
+    setPreviewBonusMonth?: (month: number) => void;
 }
 
 @inject(({
     appState: {
         userStore: {
-            setPreviewBonus
+            setPreviewBonusMonth
         }
     }
 }) => ({
-    setPreviewBonus
+    setPreviewBonusMonth
 }))
 @observer
 class TabItem extends Component<IProps> {
     clickHandler = () => {
-        const { setPreviewBonus, bonus } = this.props;
-        setPreviewBonus(bonus);
+        const { setPreviewBonusMonth, bonus: { month } } = this.props;
+        setPreviewBonusMonth(month);
     }
 
     render() {
@@ -100,7 +100,7 @@ class TabItem extends Component<IProps> {
                 <ExcelIcon className={classes.icon} size={35} />
                 <Grid className={classes.textContainer} alignItems='flex-start' direction='column' container>
                     <Typography className={cx(classes.text, classes.leadText)}>
-                        { uaMonthsNames[month - 1] }
+                        { uaMonthsNames[month] }
                     </Typography>
                     <Typography className={cx(classes.text, classes.secondaryText)} variant='body2'>
                         { payments } / { deposit }

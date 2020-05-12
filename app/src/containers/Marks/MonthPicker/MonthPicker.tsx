@@ -20,8 +20,8 @@ interface IProps extends WithStyles<typeof styles> {
     setBonusesYear?: (value: number, shouldPostData: boolean, loadData: boolean) => void;
     bonusesYear?: number;
     role?: USER_ROLE;
-    bonuses?: IBonusInfo[];
-    previewBonus?: IBonusInfo;
+    bonuses: IBonusInfo[];
+    previewBonusMonth?: number;
     openModal?: (modaName: string) => void;
 }
 
@@ -30,8 +30,7 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             setBonusesYear,
             bonusesYear,
-            bonuses,
-            previewBonus,
+            previewBonusMonth,
             role
         },
         uiStore: {
@@ -41,8 +40,7 @@ interface IProps extends WithStyles<typeof styles> {
 }) => ({
     setBonusesYear,
     bonusesYear,
-    previewBonus,
-    bonuses,
+    previewBonusMonth,
     role,
     openModal
 }))
@@ -50,16 +48,9 @@ interface IProps extends WithStyles<typeof styles> {
 class MontPicker extends Component<IProps> {
     readonly currentYear = new Date().getFullYear();
 
-    get previewBonusMonth(): number {
-        const { previewBonus } = this.props;
-        return previewBonus
-            ? previewBonus.month
-            : null;
-    }
-
     incrementYear = () => {
         const { setBonusesYear, bonusesYear, role } = this.props;
-        setBonusesYear(bonusesYear, role === USER_ROLE.MEDICAL_AGENT, true);
+        setBonusesYear(bonusesYear + 1, role === USER_ROLE.MEDICAL_AGENT, true);
     }
 
     decrementYear = () => {
@@ -83,7 +74,8 @@ class MontPicker extends Component<IProps> {
             classes,
             bonuses,
             isLoading,
-            bonusesYear
+            bonusesYear,
+            previewBonusMonth
         } = this.props;
 
         return (
@@ -105,7 +97,7 @@ class MontPicker extends Component<IProps> {
                         <TabItem
                             key={bonusInfo.month}
                             bonus={bonusInfo}
-                            selected={this.previewBonusMonth === bonusInfo.month}
+                            selected={previewBonusMonth === bonusInfo.month}
                         />
                     ))
                 }

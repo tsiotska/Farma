@@ -65,7 +65,10 @@ export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayN
     bonusInfoValuesMap,
     {
         requiredProps: ['month', 'payments', 'deposit' ],
-        valueNormalizers: { status: (value: number) => !!value }
+        valueNormalizers: {
+            status: (value: number) => !!value,
+            month: (value: number) => value - 1 >= 0 ? value - 1 : 0
+        }
     }
 );
 
