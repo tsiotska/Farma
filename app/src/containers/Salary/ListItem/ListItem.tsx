@@ -186,6 +186,7 @@ class ListItem extends Component<IProps> {
                                 }}
                                 disableClick
                                 hideLevel
+                                hidePosition
                             />
                             {
                                 agentInfo &&
