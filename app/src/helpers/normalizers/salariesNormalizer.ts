@@ -26,7 +26,7 @@ const namesMap: IValuesMap = {
     fact_money: 'money',
     total: 'total',
     position: 'position',
-    date: 'datetime'
+    date: 'date'
 };
 
 export const salariesNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(

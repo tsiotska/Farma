@@ -111,6 +111,8 @@ class Salary extends Component<IProps> {
 
     render() {
         const { salaries, expandedSalary } = this.props;
+        console.log('salaries');
+        console.log(toJS(salaries));
         return (
             <Grid container direction='column'>
                 <Header
