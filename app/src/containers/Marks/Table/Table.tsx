@@ -173,6 +173,15 @@ class Table extends Component<IProps> {
         );
     }
 
+    get isEmpty(): boolean {
+        return this.agentsLoaded && !this.preparedAgents.length;
+    }
+
+    get showButtons(): boolean {
+        const { isNested, parentUser: { position }} = this.props;
+        return isNested && position === USER_ROLE.MEDICAL_AGENT && !this.isEmpty;
+    }
+
     get preparedAgents(): IUserInfo[] {
         const { parentUser: { position } } = this.props;
         if (position === USER_ROLE.MEDICAL_AGENT) {
@@ -246,7 +255,23 @@ class Table extends Component<IProps> {
 
     componentWillUnmount() {
         if (this.reactionDisposer) this.reactionDisposer();
-        const {removeBonusUser, clearChangedMarks, parentUser } = this.props;
+        const {
+            removeBonusUser,
+            clearChangedMarks,
+            parentUser,
+            previewBonus,
+            updateBonus,
+            changedMarks
+        } = this.props;
+
+        const condition = (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
+            && !this.isEmpty
+            && changedMarks.size;
+
+        if (condition) {
+            updateBonus(previewBonus, false);
+        }
+
         clearChangedMarks();
         removeBonusUser(parentUser);
         window.clearTimeout(this.initializationTimeout);
@@ -267,9 +292,6 @@ class Table extends Component<IProps> {
 
         const lastIndex = this.agentsInfo.length - 1;
 
-        const isEmpty = this.agentsLoaded && !this.preparedAgents.length;
-        const showButtons = isNested && position === USER_ROLE.MEDICAL_AGENT && !isEmpty;
-
         return (
             <>
             { this.agentsLoaded === false && <LinearProgress className={classes.progress} /> }
@@ -282,7 +304,7 @@ class Table extends Component<IProps> {
                         { position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
                     </Typography>
                     {
-                        showButtons &&
+                        this.showButtons &&
                         <>
                             <Button
                                 onClick={this.updateBonus}
@@ -302,7 +324,7 @@ class Table extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    isEmpty &&
+                    this.isEmpty &&
                     <Typography variant='body2' className={classes.emptyText}>
                         Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
                     </Typography>
@@ -322,7 +344,7 @@ class Table extends Component<IProps> {
                                     showLpu={this.userIsMedicalAgent}
                                     tooltips={this.tooltips}
                                     expanded={bonusUsers.some(({ id }) => id === x.id)}
-                                    // expanded={this.expandedAgent === x.id}
+                                    allowEdit={previewBonus ? !previewBonus.status : false}
                                     expandHandler={this.expandHandler}
                                     itemRef={
                                         i === lastIndex

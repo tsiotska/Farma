@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { ITotalMarks } from '../../../stores/UserStore';
 import { USER_ROLE } from '../../../constants/Roles';
+import { IUser } from '../../../interfaces';
+import { IBonusInfo } from '../../../interfaces/IBonusInfo';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -35,24 +37,30 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    previewBonus: IBonusInfo;
+    parentUser: IUser;
+    updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
     previewBonusTotal?: ITotalMarks;
-    // updateBonuses: () => void;
     role?: USER_ROLE;
 }
 
 @inject(({
     appState: {
         userStore: {
+            updateBonus,
             previewBonusTotal,
             role,
         }
     }
 }) => ({
+    updateBonus,
     previewBonusTotal,
     role,
 }))
 @observer
 class TransferBlock extends Component<IProps> {
+    @observable isLoading: boolean = false;
+
     @computed
     get totalPacksPayments(): number {
         const { previewBonusTotal } = this.props;
@@ -85,12 +93,21 @@ class TransferBlock extends Component<IProps> {
             : 0;
     }
 
+    submitHandler = async () => {
+        const { updateBonus, previewBonus } = this.props;
+        this.isLoading = true;
+        await updateBonus(previewBonus, true);
+        this.isLoading = false;
+    }
+
     render() {
         const {
             classes,
             role,
-            // updateBonuses
+            previewBonus
         } = this.props;
+
+        const status = previewBonus ? previewBonus.status : true;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -121,11 +138,12 @@ class TransferBlock extends Component<IProps> {
                     </Grid>
                 </Grid>
                 {
-                    role === USER_ROLE.MEDICAL_AGENT &&
+                    role === USER_ROLE.MEDICAL_AGENT && status === false &&
                     <Button
-                        // onClick={updateBonuses}
-                        className={classes.submitButton}>
-                        Зберегти
+                        className={classes.submitButton}
+                        onClick={this.submitHandler}
+                        disabled={this.isLoading}>
+                            Зберегти
                     </Button>
                 }
             </Grid>

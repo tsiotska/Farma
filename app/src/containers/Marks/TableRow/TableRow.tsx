@@ -111,23 +111,25 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     agentInfo: IAgentInfo;
     showLpu: boolean;
-    agent: IUserInfo & IUserLikeObject;
-    meds?: IMedicine[];
     tooltips: { [key: number]: string };
+    agent: IUserInfo & IUserLikeObject;
+    isNested: boolean;
+    allowEdit: boolean;
+
+    meds?: IMedicine[];
     itemRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
-    expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
     role?: USER_ROLE;
-    isNested: boolean;
+    changedMarks?: Map<number,  Map<number, IMark>>;
     previewBonusChangeHandler?: (
         propName: 'payments' | 'deposit',
         agentInfo: IAgentInfo,
         medId: number,
         value: number
     ) => void;
-    changedMarks?: Map<number,  Map<number, IMark>>;
+    expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
 }
 
 @inject(({
@@ -237,8 +239,8 @@ class TableRow extends Component<IProps> {
     }
 
     get isEditable(): boolean {
-        const { agent: { position } } = this.props;
-        return typeof position === 'string';
+        const { agent: { position }, allowEdit } = this.props;
+        return typeof position === 'string' && allowEdit === true;
     }
 
     get isExpandable(): boolean {

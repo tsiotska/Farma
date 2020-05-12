@@ -203,7 +203,7 @@ class Marks extends Component<IProps> {
                         }
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
-                        <TransferBlock />
+                        <TransferBlock parentUser={previewUser} previewBonus={this.previewBonus} />
                         {/* <TransferBlock updateBonuses={updateBonuses} /> */}
                         {
                             role === USER_ROLE.MEDICAL_AGENT &&
