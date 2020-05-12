@@ -246,10 +246,12 @@ class UserContent extends Component<IProps> {
             isAdmin
         } = this.props;
 
+        console.log(toJS(currentDepartmentMeds));
+
         return (
             <>
                 {
-                    currentDepartmentMeds.map(medicine => (
+                    currentDepartmentMeds.filter(({ deleted }) => deleted === false).map(medicine => (
                         <SalaryRow
                             key={medicine.id}
                             userSales={userSales}
