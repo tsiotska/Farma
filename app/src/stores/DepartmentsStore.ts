@@ -322,7 +322,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     setCurrentDepartment(department: number | string | IDepartment) {
-        console.log('set current dep: ', department);
         if (typeof department === 'string') {
             this.currentDepartment = this.departments.find(({ name }) => name === department) || null;
         } else if (typeof department === 'number') {

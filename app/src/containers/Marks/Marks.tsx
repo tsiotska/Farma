@@ -44,18 +44,18 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    loadBonuses?: (user: IUserLikeObject) => void;
-    getAsyncStatus?: (key: string) => IAsyncStatus;
-    // previewBonus?: IBonusInfo;
     bonuses: Partial<Record<USER_ROLE, IBonusInfo[]>>;
+    previewBonusMonth: number;
+
     role?: USER_ROLE;
     bonusesYear?: number;
+    previewUser?: IUser;
+
+    loadBonuses?: (user: IUserLikeObject) => void;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
-    previewUser?: IUser;
-    previewBonusMonth: number;
     loadBonusesData?: (user: IUserLikeObject) => void;
-    // setPreviewBonus?: (previewBonus: IBonusInfo) => void;
 }
 
 @inject(({
@@ -158,7 +158,7 @@ class Marks extends Component<IProps> {
         const { updateBonuses, role } = this.props;
         this.reactionDisposer();
         this.monthReaction();
-        if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
+        // if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
     }
 
     render() {
@@ -203,7 +203,8 @@ class Marks extends Component<IProps> {
                         }
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
-                        <TransferBlock updateBonuses={updateBonuses} />
+                        <TransferBlock />
+                        {/* <TransferBlock updateBonuses={updateBonuses} /> */}
                         {
                             role === USER_ROLE.MEDICAL_AGENT &&
                             <Button

@@ -42,20 +42,17 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable notificationsCount: number = 0;
     @observable notifications: INotification[] = [];
 
-    // @observable bonuses: IBonusInfo[] = null;
     @observable bonuses: Partial<Record<USER_ROLE, IBonusInfo[]>> = {
         [USER_ROLE.FIELD_FORCE_MANAGER]: [],
         [USER_ROLE.REGIONAL_MANAGER]: [],
         [USER_ROLE.MEDICAL_AGENT]: [],
     };
     @observable previewBonusMonth: number = null;
-    // @observable previewBonus: IBonusInfo = null;
     @observable previewBonusTotal: ITotalMarks = null;
     @observable bonusesYear: number = new Date().getFullYear();
 
-    // @computed
-    // get
-
+    @observable changedMarks: Map<number, Map<number, IMark>> = new Map();
+    @observable bonusUsers: IUserLikeObject[] = [];
     notificationsUpdateInterval: any = null;
 
     constructor(rootStore: IRootStore) {
@@ -216,61 +213,95 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    updateBonuses() {
-        // const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+    async updateBonus(bonus: IBonusInfo, sale: boolean) {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
-        // const id = this.previewUser
-        //     ? this.previewUser.id
-        //     : null;
+        const id = this.previewUser
+            ? this.previewUser.id
+            : null;
 
-        // if (!this.previewBonus || id === null || currentDepartmentId === null) return;
+        if (!bonus || id === null || currentDepartmentId === null) return;
 
-        // const { month, agents } = this.previewBonus;
+        const { month, agents } = bonus;
 
-        // const marks = agents.reduce((acc, curr) => {
-        //     const { marks: agentMarks, id: agent } = curr;
-        //     const preparedMarks = [...agentMarks.values()].map(({
-        //             deposit,
-        //             drugId,
-        //             mark,
-        //             payments
-        //         }) => ({
-        //             agent,
-        //             drug: drugId,
-        //             payments: payments,
-        //             deposit: deposit,
-        //             drug_mark: mark,
-        //         })
-        //     );
-        //     return [...acc, ...preparedMarks];
-        // }, []);
+        const marks = agents.reduce((acc, curr) => {
+            const {
+                marks: agentMarks,
+                id: agentId
+            } = curr;
 
-        // if (!marks.length) return;
+            const changedMarks = this.changedMarks.get(agentId);
+            const mergedMarks = new Map(agentMarks.entries());
 
-        // const data: any = {
-        //     marks,
-        //     deposit: this.previewBonusTotal.marks.deposit,
-        //     payments: this.previewBonusTotal.marks.payments
-        // };
+            if (changedMarks) {
+                changedMarks.forEach(mark => {
+                    mergedMarks.set(mark.drugId, mark);
+                });
+            }
 
-        // this.dispatchRequest(
-        //     api.updateBonusesData(
-        //         currentDepartmentId,
-        //         id,
-        //         this.bonusesYear,
-        //         month,
-        //         data
-        //     ),
-        //     'updateBonuses'
-        // );
+            const preparedMarks = [...mergedMarks.values()].map(({
+                    deposit,
+                    drugId,
+                    mark,
+                    payments
+                }) => {
+                    return {
+                        agent: agentId,
+                        deposit: deposit,
+                        drug: drugId,
+                        drug_mark: mark,
+                        payments: payments,
+                    };
+                }
+            );
+            return [...acc, ...preparedMarks];
+        }, []);
+
+        if (!marks.length) return;
+
+        const data: any = {
+            marks,
+            deposit: this.previewBonusTotal.marks.deposit,
+            payments: this.previewBonusTotal.marks.payments
+        };
+        console.log('data: ', data);
+
+        await this.dispatchRequest(
+            api.updateBonusesData(
+                currentDepartmentId,
+                id,
+                this.bonusesYear,
+                month,
+                data,
+                sale
+            ),
+            'updateBonuses'
+        );
+        this.changedMarks = new Map();
+
+        for (const user of this.bonusUsers.reverse()) {
+            await this.loadBonuses(user);
+            await this.loadBonusesData(user);
+        }
+
+    }
+
+    @computed
+    get currentMpBonus(): IBonusInfo {
+        const mpBonuses = this.bonuses[USER_ROLE.MEDICAL_AGENT];
+        return mpBonuses.find(({ month }) => this.previewBonusMonth === month);
     }
 
     @computed
     get currentMPMarks(): { [key: number]: number } {
-        const mpBonuses = this.bonuses[USER_ROLE.MEDICAL_AGENT];
-        const currentBonus = mpBonuses.find(({ month }) => this.previewBonusMonth === month);
-        if (!currentBonus) return {};
-        return [...currentBonus.sales.values()].reduce((total, { id, mark }) => ({ ...total, [id]: mark }), {});
+        if (!this.currentMpBonus) return {};
+        return [...this.currentMpBonus.sales.values()]
+            .reduce((total, { id, mark }) => ({ ...total, [id]: mark }), {});
+    }
+
+    @action.bound
+    clearChangedMarks() {
+        this.changedMarks = new Map();
     }
 
     @action.bound
@@ -280,33 +311,44 @@ export default class UserStore extends AsyncStore implements IUserStore {
         medId: number,
         value: number
     ) {
-        const marks = agentInfo
-            ? agentInfo.marks
-            : null;
-        if (!marks) return;
-        const targetMark = marks
-            ? marks.get(medId)
-            : null;
+        if (!agentInfo) return;
 
-        if (targetMark) {
-            targetMark[propName] = value;
+        const { marks, id } = agentInfo;
+
+        let initialMark: IMark;
+        if (this.changedMarks.has(id) && this.changedMarks.get(id).has(medId)) {
+            initialMark = this.changedMarks.get(id).get(medId);
+        } else if (marks.has(medId)) {
+            initialMark = marks.get(medId);
         } else {
-            const mark = this.currentMPMarks[medId];
-            const newMark: IMark = {
-                deposit: propName === 'deposit' ? value : 0,
-                payments: propName === 'payments' ? value : 0,
+            initialMark = {
+                deposit: 0,
+                payments: 0,
                 drugId: medId,
-                mark: mark || 0
+                mark: this.currentMPMarks[medId] || 0
             };
+        }
 
-            marks.set(medId, newMark);
+        const newMark = { ...initialMark, [propName]: value };
+
+        if (this.changedMarks.has(agentInfo.id)) {
+            console.log(toJS(initialMark), toJS(newMark));
+            const target = this.changedMarks.get(agentInfo.id);
+            target.set(medId, newMark);
+        } else {
+            this.changedMarks.set(agentInfo.id, new Map([[ medId, newMark ]]));
         }
     }
 
     @action.bound
-    setBonusesYear(value: number, shouldPostData: boolean, loadBonuses: boolean) {
-        if (shouldPostData) this.updateBonuses();
+    setBonusesYear(
+        value: number,
+        // shouldPostData: boolean,
+        loadBonuses: boolean
+    ) {
+        // if (shouldPostData) this.updateBonuses();
         this.bonusesYear = value;
+        this.bonusUsers = [];
         this.clearPreviewBonusTotal();
         if (loadBonuses) this.loadBonuses(this.previewUser);
     }
@@ -327,6 +369,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     setPreviewBonusMonth = (month: number) => {
         this.previewBonusMonth = month;
+        this.bonusUsers = [];
     }
 
     @action.bound
@@ -337,6 +380,28 @@ export default class UserStore extends AsyncStore implements IUserStore {
             this.bonusesYear,
             user
         );
+    }
+
+    @action.bound
+    addBonusUser(user: IUserLikeObject) {
+        if (this.bonusUsers.includes(user)) return;
+        runInAction(() => {
+            const toDelete = this.bonusUsers.filter(({ position }) => user.position <= position);
+            const filtered = this.bonusUsers.filter(({ id }) => !toDelete.some(x => x.id === id));
+            const newArray = [...filtered, user].sort((a, b) => b.position - a.position);
+            this.bonusUsers = newArray;
+        });
+    }
+
+    @action.bound
+    removeBonusUser(user: IUserLikeObject) {
+        const ind = this.bonusUsers.indexOf(user);
+        if (ind === -1) return;
+        runInAction(() => {
+            const toDelete = this.bonusUsers.filter(({ position, id }) => user.position <= position || id === user.id);
+            const filtered = this.bonusUsers.filter(({ id }) => !toDelete.some(x => x.id === id));
+            this.bonusUsers = filtered.sort((a, b) => b.position - a.position);
+        });
     }
 
     @action.bound

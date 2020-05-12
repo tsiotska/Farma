@@ -102,7 +102,7 @@ interface IProps extends WithStyles<typeof styles> {
     tooltips: { [key: number]: string };
     itemRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
-    expandHandler?: (id: number, isExpanded: boolean) => void;
+    expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
     role?: USER_ROLE;
@@ -113,6 +113,7 @@ interface IProps extends WithStyles<typeof styles> {
         medId: number,
         value: number
     ) => void;
+    changedMarks?: Map<number,  Map<number, IMark>>;
 }
 
 @inject(({
@@ -124,19 +125,24 @@ interface IProps extends WithStyles<typeof styles> {
             bonuses,
             previewBonusChangeHandler,
             previewBonusMonth,
-            role
+            role,
+            userMarks,
+            changedMarks
         }
     }
 }) => ({
     meds,
     role,
     bonuses,
+    userMarks,
     previewBonusChangeHandler,
-    previewBonusMonth
+    previewBonusMonth,
+    changedMarks
 }))
 @observer
 class TableRow extends Component<IProps> {
     readonly paddingLeft: number = 10;
+
     @computed
     get agentMarks(): Map<number, IMark> {
         const { agentInfo } = this.props;
@@ -156,12 +162,18 @@ class TableRow extends Component<IProps> {
     }
 
     @computed
+    get userChangedMarks(): Map<number, IMark> {
+        const { changedMarks, agent: { id } } = this.props;
+        return changedMarks.get(id) || new Map();
+    }
+
+    @computed
     get packs(): [number, number] {
-        const { meds} = this.props;
+        const { meds } = this.props;
 
         return meds.length
             ? meds.reduce((total, { id }) => {
-                const mark = this.agentMarks.get(id);
+                const mark = this.userChangedMarks.get(id) || this.agentMarks.get(id);
 
                 if (mark) {
                     total[0] += mark.payments;
@@ -179,7 +191,7 @@ class TableRow extends Component<IProps> {
 
         return meds.length
             ? meds.reduce((total, { id }) => {
-                const mark = this.agentMarks.get(id);
+                const mark = this.userChangedMarks.get(id) || this.agentMarks.get(id);
 
                 if (mark) {
                     total[0] += mark.payments * mark.mark;
@@ -221,8 +233,8 @@ class TableRow extends Component<IProps> {
     }
 
     expandHandler = () => {
-        const { expandHandler, expanded, agent: { id } } = this.props;
-        if (this.isExpandable) expandHandler(id, !expanded);
+        const { expandHandler, expanded, agent } = this.props;
+        if (this.isExpandable) expandHandler(agent, !expanded);
     }
 
     cellValueChangeHandler = (
@@ -231,7 +243,7 @@ class TableRow extends Component<IProps> {
         medId: number,
         value: number
     ) => {
-        const { previewBonusChangeHandler, agent } = this.props;
+        const { previewBonusChangeHandler } = this.props;
         previewBonusChangeHandler(
             propName,
             agentInfo,
@@ -250,18 +262,22 @@ class TableRow extends Component<IProps> {
             agentInfo,
             meds,
             tooltips,
-            isNested
         } = this.props;
-        const { LPUName, name, position } = agent;
+        const { LPUName, name, id: agentId } = agent;
 
-        const lastPayment = agentInfo ? agentInfo.lastPayment : '-';
-        const lastDeposit = agentInfo ? agentInfo.lastDeposit : '-';
+        const lastPayment = agentInfo
+            ? agentInfo.lastPayment
+            : '-';
+        const lastDeposit = agentInfo
+            ? agentInfo.lastDeposit
+            : '-';
 
         const medsContent = meds.length
             ? meds.map(({ id }) => (
                 <HoverableCell
                     key={id}
                     agentInfo={agentInfo}
+                    agentId={agentId}
                     onChange={this.cellValueChangeHandler}
                     editable={this.isEditable}
                     medId={id}
@@ -282,7 +298,6 @@ class TableRow extends Component<IProps> {
                 {
                     showLpu &&
                     <TableCell
-                        onClick={this.expandHandler}
                         padding='none'
                         style={{ width: this.columnWidth }}
                         className={classes.cell}>
@@ -358,10 +373,6 @@ class TableRow extends Component<IProps> {
                         className={cx(classes.nestedContainer, { nest: !!this.nestLevel })}
                         colSpan={this.columnsCount}>
                         <Collapse in={expanded} timeout='auto' unmountOnExit>
-                            <Typography className={classes.subheader}>
-                                { agent.position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
-                                { agent.position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
-                            </Typography>
                             <Table
                                 previewBonus={this.childBonus}
                                 isLoading={false}

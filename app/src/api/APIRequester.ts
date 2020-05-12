@@ -501,9 +501,10 @@ export class APIRequester {
         userId: number,
         year: number,
         month: number,
-        data: any
+        data: any,
+        sale: boolean
     ): Promise<boolean> {
-        return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}`, data)
+        return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${sale ? '?sale=1' : ''}`, data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

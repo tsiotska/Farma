@@ -8,11 +8,14 @@ import {
     Paper,
     Collapse,
     LinearProgress,
-    Typography
+    Typography,
+    Button,
+    Grid,
+    IconButton
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IAgentInfo, IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
+import { IAgentInfo, IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
 import { computed, observable, toJS, when, reaction } from 'mobx';
 import TableRow from '../TableRow';
 import { IUser } from '../../../interfaces';
@@ -21,6 +24,7 @@ import { USER_ROLE } from '../../../constants/Roles';
 import TotalRow from '../TotalRow';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import AddDocsModal from '../AddDocsModal';
+import { Close } from '@material-ui/icons';
 
 const styles = (theme: any) => createStyles({
     fixedTable: {
@@ -34,6 +38,14 @@ const styles = (theme: any) => createStyles({
     },
     progress: {
         marginBottom: 12
+    },
+    submitButton: {
+        marginLeft: 'auto'
+    },
+    cancelChanges: {
+        borderRadius: 2,
+        padding: 8,
+        marginLeft: 8
     }
 });
 
@@ -44,12 +56,19 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonus: IBonusInfo;
 
     totalSold?: { [key: number]: number };
-    loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
-    getLocationsAgents?: (depId: number, user: IUserLikeObject) => IUser[];
+    changedMarks?: Map<number,  Map<number, IMark>>;
     currentDepartmentId?: number;
     role?: USER_ROLE;
+    bonusUsers?: IUserLikeObject[];
+
+    loadConfirmedDoctors?: (targetUser: IUserLikeObject) => IDoctor[];
+    getLocationsAgents?: (depId: number, user: IUserLikeObject) => IUser[];
     loadBonuses?: (user: IUserLikeObject) => Promise<void>;
     loadBonusesData?: (user: IUserLikeObject) => Promise<void>;
+    clearChangedMarks?: () => void;
+    updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
+    addBonusUser?: (user: IUserLikeObject) => void;
+    removeBonusUser?: (user: IUserLikeObject) => void;
 }
 
 export interface IUserInfo {
@@ -69,8 +88,13 @@ export interface IUserInfo {
             role,
             totalSold,
             loadBonuses,
-            loadBonusesData
-            // previewBonus
+            loadBonusesData,
+            clearChangedMarks,
+            changedMarks,
+            updateBonus,
+            addBonusUser,
+            removeBonusUser,
+            bonusUsers
         }
     }
 }) => ({
@@ -81,17 +105,22 @@ export interface IUserInfo {
     loadBonusesData,
     role,
     totalSold,
-    // previewBonus
+    clearChangedMarks,
+    changedMarks,
+    updateBonus,
+    addBonusUser,
+    removeBonusUser,
+    bonusUsers
 }))
 @observer
 class Table extends Component<IProps> {
     readonly totalRowHeight: number = 48;
     reactionDisposer: any;
+    initializationTimeout: any;
 
     @observable totalRowPosition: 'initial' | 'fixed' = 'fixed';
     @observable tableWidth: number = 0;
     @observable leftOffset: number = 0;
-    @observable expandedAgent: number = null;
     @observable agents: IUserInfo[] = [];
     @observable agentsLoaded: boolean = false;
 
@@ -125,7 +154,7 @@ class Table extends Component<IProps> {
     }
 
     @computed
-    get expandHandler(): (id: number, isExpanded: boolean) => void {
+    get expandHandler(): (user: IUserLikeObject, isExpanded: boolean) => void {
         return this.userIsMedicalAgent
             ? null
             : this.expandChangeHandler;
@@ -163,8 +192,15 @@ class Table extends Component<IProps> {
         };
     }
 
-    expandChangeHandler = (id: number, isExpanded: boolean) => {
-        this.expandedAgent = isExpanded ? id : null;
+    expandChangeHandler = (user: IUserLikeObject, isExpanded: boolean) => {
+        const { addBonusUser, removeBonusUser } = this.props;
+        if (isExpanded) addBonusUser(user);
+        else removeBonusUser(user);
+    }
+
+    updateBonus = () => {
+        const { updateBonus, previewBonus } = this.props;
+        updateBonus(previewBonus, true);
     }
 
     refHandler = (el: any) => {
@@ -178,11 +214,6 @@ class Table extends Component<IProps> {
             : 'initial';
     }
 
-    componentDidUpdate({ previewBonus }: IProps) {
-        const { previewBonus: actualBonus } = this.props;
-        if (previewBonus !== actualBonus) this.expandedAgent = null;
-    }
-
     async componentDidMount() {
         const {
             loadConfirmedDoctors,
@@ -191,28 +222,34 @@ class Table extends Component<IProps> {
             currentDepartmentId,
             isNested,
             loadBonuses,
-            loadBonusesData
+            loadBonusesData,
         } = this.props;
 
-        if (isNested) {
-            await loadBonuses(parentUser);
-            await loadBonusesData(parentUser);
-        }
+        this.initializationTimeout = window.setTimeout(async () => {
+            if (isNested) {
+                await loadBonuses(parentUser);
+                await loadBonusesData(parentUser);
+            }
 
-        await when(() => this.props.isLoading === false);
-        const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
-            ? await loadConfirmedDoctors(parentUser)
-            : await getLocationsAgents(currentDepartmentId, parentUser);
-        this.agents = newAgents || [];
-        this.agentsLoaded = true;
-        this.reactionDisposer = reaction(
-            () => this.props.role,
-            () => { this.agents = []; }
-        );
+            await when(() => this.props.isLoading === false);
+            const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
+                ? await loadConfirmedDoctors(parentUser)
+                : await getLocationsAgents(currentDepartmentId, parentUser);
+            this.agents = newAgents || [];
+            this.agentsLoaded = true;
+            this.reactionDisposer = reaction(
+                () => this.props.role,
+                () => { this.agents = []; }
+            );
+        }, 500);
     }
 
     componentWillUnmount() {
         if (this.reactionDisposer) this.reactionDisposer();
+        const {removeBonusUser, clearChangedMarks, parentUser } = this.props;
+        clearChangedMarks();
+        removeBonusUser(parentUser);
+        window.clearTimeout(this.initializationTimeout);
     }
 
     render() {
@@ -221,19 +258,56 @@ class Table extends Component<IProps> {
             role,
             isLoading,
             isNested,
-            previewBonus
+            previewBonus,
+            parentUser: { position },
+            changedMarks,
+            clearChangedMarks,
+            bonusUsers
         } = this.props;
 
         const lastIndex = this.agentsInfo.length - 1;
+
+        const isEmpty = this.agentsLoaded && !this.preparedAgents.length;
+        const showButtons = isNested && position === USER_ROLE.MEDICAL_AGENT && !isEmpty;
 
         return (
             <>
             { this.agentsLoaded === false && <LinearProgress className={classes.progress} /> }
             {
-                this.agentsLoaded && !this.preparedAgents.length &&
-                <Typography className={classes.emptyText}>
-                    Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
-                </Typography>
+                isNested &&
+                <>
+                <Grid container className={classes.emptyText} alignItems='center'>
+                    <Typography>
+                        { position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
+                        { position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
+                    </Typography>
+                    {
+                        showButtons &&
+                        <>
+                            <Button
+                                onClick={this.updateBonus}
+                                className={classes.submitButton}
+                                variant='contained'
+                                disabled={!changedMarks.size}
+                                color='primary'>
+                                    Зберегти зміни
+                            </Button>
+                            <IconButton
+                                disabled={!changedMarks.size}
+                                onClick={clearChangedMarks}
+                                className={classes.cancelChanges}>
+                                <Close fontSize='small' />
+                            </IconButton>
+                        </>
+                    }
+                </Grid>
+                {
+                    isEmpty &&
+                    <Typography variant='body2' className={classes.emptyText}>
+                        Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
+                    </Typography>
+                }
+                </>
             }
             <TableContainer>
                 <MuiTable padding='none'>
@@ -247,7 +321,8 @@ class Table extends Component<IProps> {
                                     agent={(x as IUserInfo & IUserLikeObject)}
                                     showLpu={this.userIsMedicalAgent}
                                     tooltips={this.tooltips}
-                                    expanded={this.expandedAgent === x.id}
+                                    expanded={bonusUsers.some(({ id }) => id === x.id)}
+                                    // expanded={this.expandedAgent === x.id}
                                     expandHandler={this.expandHandler}
                                     itemRef={
                                         i === lastIndex

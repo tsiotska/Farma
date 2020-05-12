@@ -36,7 +36,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     previewBonusTotal?: ITotalMarks;
-    updateBonuses: () => void;
+    // updateBonuses: () => void;
     role?: USER_ROLE;
 }
 
@@ -86,7 +86,11 @@ class TransferBlock extends Component<IProps> {
     }
 
     render() {
-        const { classes, role, updateBonuses } = this.props;
+        const {
+            classes,
+            role,
+            // updateBonuses
+        } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -118,7 +122,9 @@ class TransferBlock extends Component<IProps> {
                 </Grid>
                 {
                     role === USER_ROLE.MEDICAL_AGENT &&
-                    <Button onClick={updateBonuses} className={classes.submitButton}>
+                    <Button
+                        // onClick={updateBonuses}
+                        className={classes.submitButton}>
                         Зберегти
                     </Button>
                 }

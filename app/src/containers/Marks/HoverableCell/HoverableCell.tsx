@@ -7,9 +7,9 @@ import {
     Divider,
     Input
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
-import { IAgentInfo } from '../../../interfaces/IBonusInfo';
-import { observable, computed } from 'mobx';
+import { observer, inject } from 'mobx-react';
+import { IAgentInfo, IMark } from '../../../interfaces/IBonusInfo';
+import { observable, computed, toJS } from 'mobx';
 
 const styles = {
     cell: {},
@@ -23,36 +23,69 @@ interface IProps extends WithStyles<typeof styles> {
     editable: boolean;
     agentInfo: IAgentInfo;
     medId: number;
+    agentId: number;
     onChange?: (
         propName: 'payments' | 'deposit',
         agentInfo: IAgentInfo,
         medId: number,
         value: number
     ) => void;
+    changedMarks?: Map<number,  Map<number, IMark>>;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            changedMarks
+        }
+    }
+}) => ({
+    changedMarks
+}))
 @observer
 class HoverableCell extends Component<IProps> {
     readonly maxValue: number = 99999;
 
     @observable openTooltip: boolean = false;
 
+    @computed get mark(): IMark {
+        const {
+            agentId,
+            agentInfo,
+            changedMarks,
+            medId,
+            editable
+        } = this.props;
+
+        if (editable) {
+            const agentMarks = changedMarks.get(agentId);
+            const res = agentMarks
+                ? agentMarks.get(medId)
+                : null;
+            if (res) return res;
+            // console.log('agent marks: ', toJS(agentMarks));
+            // if (agentMarks) {
+            //     return agentMarks.get(medId);
+            // }
+        }
+
+        return agentInfo && agentInfo.marks
+            ? agentInfo.marks.get(medId) || null
+            : null;
+    }
+
     @computed
     get payments(): number {
-        const { agentInfo, medId} = this.props;
-        const mark = agentInfo
-            ? agentInfo.marks.get(medId)
-            : null;
-        return mark
-            ? mark.payments
+        return this.mark
+            ? this.mark.payments
             : 0;
     }
 
     @computed
     get deposit(): number {
-        const { agentInfo, medId} = this.props;
-        const mark = agentInfo ? agentInfo.marks.get(medId) : null;
-        return mark ? mark.deposit : 0;
+        return this.mark
+            ? this.mark.deposit
+            : 0;
     }
 
     onHover = () => {
