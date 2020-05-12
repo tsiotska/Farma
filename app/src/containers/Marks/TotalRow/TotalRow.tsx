@@ -20,11 +20,12 @@ const styles = (theme: any) => createStyles({
         height: 48
     },
     firstColumn: {
-        width: ({ position, showLpu }: any) => position === 'fixed'
-        ? showLpu
-            ? 284 / 2
-            : 284
-        : 'auto',
+        width: 284
+        // width: ({ position, showLpu }: any) => position === 'fixed'
+        // ? showLpu
+        //     ? 284 / 2
+        //     : 284
+        // : 'auto',
     },
     column: {
         width: 70

@@ -110,6 +110,11 @@ class UserContent extends Component<IProps> {
         return [...new Array(levelsCount)].map((x, i) => i + 1);
     }
 
+    get deletedMedsIds(): number[] {
+        const { currentDepartmentMeds } = this.props;
+        return currentDepartmentMeds.filter(({ deleted }) => deleted === true).map(({ id }) => id);
+    }
+
     @computed
     get plannedCosts(): number[] {
         const { salary } = this.props;
@@ -235,7 +240,7 @@ class UserContent extends Component<IProps> {
         return (
             <>
                 {
-                    currentDepartmentMeds.map(medicine => (
+                    currentDepartmentMeds.filter(({ deleted }) => deleted === false).map(medicine => (
                         <SalaryRow
                             key={medicine.id}
                             userSales={userSales}

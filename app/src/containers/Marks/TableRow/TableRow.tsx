@@ -109,7 +109,6 @@ interface IProps extends WithStyles<typeof styles> {
     isNested: boolean;
     previewBonusChangeHandler?: (
         propName: 'payments' | 'deposit',
-        agent: IUserLikeObject,
         agentInfo: IAgentInfo,
         medId: number,
         value: number
@@ -235,7 +234,6 @@ class TableRow extends Component<IProps> {
         const { previewBonusChangeHandler, agent } = this.props;
         previewBonusChangeHandler(
             propName,
-            agent,
             agentInfo,
             medId,
             value
@@ -295,10 +293,8 @@ class TableRow extends Component<IProps> {
                     onClick={this.expandHandler}
                     padding='none'
                     style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
-                    // className={cx(classes.cell, { clickable: this.isEditable })}
-                    className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}
-                    >
-                        <Grid container alignItems='center'>
+                    className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
+                        <Grid container  wrap='nowrap' alignItems='center'>
                             {
                                 this.isExpandable === true && showLpu === false &&
                                 <KeyboardArrowDown

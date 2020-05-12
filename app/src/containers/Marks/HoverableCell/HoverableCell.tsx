@@ -7,11 +7,9 @@ import {
     Divider,
     Input
 } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { IAgentInfo } from '../../../interfaces/IBonusInfo';
-import { observable, computed, toJS } from 'mobx';
-import { USER_ROLE } from '../../../constants/Roles';
-import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import { observable, computed } from 'mobx';
 
 const styles = {
     cell: {},

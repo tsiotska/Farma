@@ -53,6 +53,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable previewBonusTotal: ITotalMarks = null;
     @observable bonusesYear: number = new Date().getFullYear();
 
+    // @computed
+    // get
+
     notificationsUpdateInterval: any = null;
 
     constructor(rootStore: IRootStore) {
@@ -262,72 +265,43 @@ export default class UserStore extends AsyncStore implements IUserStore {
         // );
     }
 
-    @action.bound
-    previewBonusChangeHandler(
-            propName: 'payments' | 'deposit',
-            { position }: IUserLikeObject,
-            agentInfo: IAgentInfo,
-            medId: number,
-            value: number
-        ) {
-            // const targetMark = marks.get(medId);
-            const targetMark = agentInfo
-                ? agentInfo.marks.get(medId)
-                : null;
-            if (targetMark) {
-                targetMark[propName] = value;
-            } else {
-                // const previewBonus = this.bonuses[position] && this.bonuses[position].find(({ month }) => month === this.previewBonusMonth);
-                // if (!previewBonus) return;
-                // const { sales } = previewBonus;
-                // const salesObj = sales.get(medId);
-
-                // const mark = salesObj
-                //     ? salesObj.mark
-                //     : null;
-
-                // const newMark: IMark = {
-                //     deposit: propName === 'deposit' ? value : 0,
-                //     payments: propName === 'payments' ? value : 0,
-                //     drugId: medId,
-                //     mark: mark
-                // };
-                // previewBonus.agents.push({
-                //     id
-                //     lastPayment
-                //     lastDeposit
-                //     deposit
-                //     marks
-                // })
-                // marks.set(medId, newMark);
-            }
+    @computed
+    get currentMPMarks(): { [key: number]: number } {
+        const mpBonuses = this.bonuses[USER_ROLE.MEDICAL_AGENT];
+        const currentBonus = mpBonuses.find(({ month }) => this.previewBonusMonth === month);
+        if (!currentBonus) return {};
+        return [...currentBonus.sales.values()].reduce((total, { id, mark }) => ({ ...total, [id]: mark }), {});
     }
 
-    // @action.bound
-    // previewBonusChangeHandler(propName: 'payments' | 'deposit', agent: IAgentInfo, medId: number, value: number) {
-    //     const { sales } = this.previewBonus;
-    //     const { marks } = agent;
-    //     console.log('store handler: ', propName, value);
+    @action.bound
+    previewBonusChangeHandler(
+        propName: 'payments' | 'deposit',
+        agentInfo: IAgentInfo,
+        medId: number,
+        value: number
+    ) {
+        const marks = agentInfo
+            ? agentInfo.marks
+            : null;
+        if (!marks) return;
+        const targetMark = marks
+            ? marks.get(medId)
+            : null;
 
-    //     const targetMark = marks.get(medId);
-    //     if (targetMark) {
-    //         targetMark[propName] = value;
-    //     } else {
-            // const salesObj = sales.get(medId);
+        if (targetMark) {
+            targetMark[propName] = value;
+        } else {
+            const mark = this.currentMPMarks[medId];
+            const newMark: IMark = {
+                deposit: propName === 'deposit' ? value : 0,
+                payments: propName === 'payments' ? value : 0,
+                drugId: medId,
+                mark: mark || 0
+            };
 
-            // const mark = salesObj
-            //     ? salesObj.mark
-            //     : null;
-
-    //         const newMark: IMark = {
-    //             deposit: propName === 'deposit' ? value : 0,
-    //             payments: propName === 'payments' ? value : 0,
-    //             drugId: medId,
-    //             mark,
-    //         };
-    //         marks.set(medId, newMark);
-    //     }
-    // }
+            marks.set(medId, newMark);
+        }
+    }
 
     @action.bound
     setBonusesYear(value: number, shouldPostData: boolean, loadBonuses: boolean) {

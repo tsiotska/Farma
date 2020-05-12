@@ -9,6 +9,7 @@ import {
     Checkbox
 } from '@material-ui/core';
 import { ILocation } from '../../../interfaces/ILocation';
+import { toJS } from 'mobx';
 
 const styles = createStyles({
     label: {
