@@ -251,8 +251,7 @@ class UserContent extends Component<IProps> {
         return (
             <>
                 {
-                    currentDepartmentMeds.map(medicine => (
-                        !medicine.deleted &&
+                    currentDepartmentMeds.filter(({ deleted }) => deleted === false).map(medicine => (
                         <SalaryRow
                             key={medicine.id}
                             userSales={userSales}
