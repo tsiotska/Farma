@@ -128,7 +128,7 @@ class UserContent extends Component<IProps> {
     get plannedCosts(): number[] {
         const { salary } = this.props;
         return this.levels.map(level => {
-            const infoItem = salary.get(level);;
+            const infoItem = salary.get(level);
             const plannedCost = infoItem
                 ? [...Object.values(infoItem.meds)].reduce((total, { amount, price }) => (total + (amount || 0) * (price || 0)), 0)
                 : 0;
