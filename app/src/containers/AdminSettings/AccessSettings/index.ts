@@ -1,2 +1,2 @@
-import AccessSettings from './AccessSettings';
-export default AccessSettings;
+import AccessSettingsRefactor from './AccessSettings';
+export default AccessSettingsRefactor;
