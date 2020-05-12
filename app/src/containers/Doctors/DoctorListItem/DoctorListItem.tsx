@@ -185,6 +185,7 @@ class DoctorListItem extends Component<IProps> {
                 workPhone,
                 deposit,
                 card,
+                address
             }
         } = this.props;
 
@@ -200,6 +201,9 @@ class DoctorListItem extends Component<IProps> {
                 <Grid xs container item>
                     <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
+                    </Typography>
+                    <Typography color='textSecondary'>
+                        { address }
                     </Typography>
                 </Grid>
                 <Grid xs container item>

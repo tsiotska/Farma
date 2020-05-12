@@ -16,6 +16,7 @@ export const defaultDoctor: IDoctor = {
     confirmed: null,
     position: null,
     deposit: null,
+    address: null
 };
 
 export const doctorValuesMap: IValuesMap = {
@@ -32,7 +33,8 @@ export const doctorValuesMap: IValuesMap = {
     created: 'created',
     confirmed: 'confirmed',
     position: 'position',
-    deposit: 'deposit'
+    deposit: 'deposit',
+    hcf_address: 'address'
 };
 
 const valueNormalizers = {
