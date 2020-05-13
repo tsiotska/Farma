@@ -79,25 +79,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         return new Map(data);
     }
 
-    // @computed
-    // get sortedLocationSalesStat(): ISalesStat[] {
-    //     // const {
-    //     //     userStore: { role },
-    //     //     uiStore: { salesPharmacyFilter: { map }}
-    //     // } = this.rootStore;
-
-    //     // if (role !== USER_ROLE.MEDICAL_AGENT || !map || !this.locationSalesStat) {
-    //     //     return this.locationSalesStat;
-    //     // }
-
-    //     // return this.locationSalesStat.sort((a, b) => {
-    //     //     const aIndx = map.indexOf(a.id);
-    //     //     const bIndx = map.indexOf(b.id);
-    //     //     return aIndx - bIndx;
-    //     // });
-    //     return this.locationSalesStat;
-    // }
-
     @computed
     get sortedLocationSalesStat(): ISalesStat[] {
         const {
@@ -227,8 +208,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             const { id, [this.agentsTargetProperty]: location} = agent;
             if (location === locationId) callback.call(this.ignoredAgents, id);
         });
-        // this.sortAgentsSales();
-        // this.sortLocationsSales();
     }
 
     @action.bound

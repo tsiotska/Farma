@@ -144,7 +144,7 @@ class Plot extends Component<IProps> {
 
                 if (period) {
                     i += 1;
-                    return period[propName];
+                    return Math.floor(period[propName]);
                 }
 
                 return 0;
@@ -236,7 +236,8 @@ class Plot extends Component<IProps> {
                             maintainAspectRatio: false,
                             tooltips: {
                                 mode: 'x',
-                                xAlign: 'left',
+                                // xAlign: 'left',
+                                position: 'nearest',
                                 callbacks: {
                                     title: this.titleRenderer,
                                 }
