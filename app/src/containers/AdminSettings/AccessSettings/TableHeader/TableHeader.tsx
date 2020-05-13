@@ -11,7 +11,6 @@ const styles = createStyles({
         width: '100%'
     },
     complexHeader: {
-        width: 150,
         backgroundColor: '#fafcfe',
         borderBottom: '1px solid #E4EDF7',
     },
