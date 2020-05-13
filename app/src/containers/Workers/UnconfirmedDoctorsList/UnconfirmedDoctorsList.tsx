@@ -7,6 +7,9 @@ import DoctorListItem from '../../Doctors/DoctorListItem';
 import ListHeader from '../../Doctors/ListHeader';
 
 const styles = (theme: any) => createStyles({
+    root: {
+      padding: '20px 0'
+    },
     title: {
         fontSize: 16,
         fontWeight: 600,
@@ -26,7 +29,7 @@ class UnconfirmedDoctorsList extends Component<IProps> {
         const {classes, unconfirmedDoctors, confirmHandler} = this.props;
 
         return (
-           <Grid container>
+           <Grid className={classes.root} container>
                <Typography className={classes.title}> Додані лікарі </Typography>
                <ListHeader unconfirmed/>
                {unconfirmedDoctors.map((doc) => (
