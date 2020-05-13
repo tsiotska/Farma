@@ -339,7 +339,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    setBonusesYear(
+    async setBonusesYear(
         value: number,
         // shouldPostData: boolean,
         loadBonuses: boolean
@@ -353,7 +353,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
             [USER_ROLE.REGIONAL_MANAGER]: [],
             [USER_ROLE.MEDICAL_AGENT]: [],
         };
-        this.loadBonuses(this.previewUser);
+        await this.loadBonuses(this.previewUser);
+        this.loadBonusesData(this.previewUser);
         // if (loadBonuses) this.loadBonuses(this.previewUser);
     }
 

@@ -12,8 +12,11 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { USER_ROLE } from '../../../constants/Roles';
 import { Close } from '@material-ui/icons';
-import { IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
+import { IBonusInfo, IMark, IAgentInfo } from '../../../interfaces/IBonusInfo';
 import { ADD_DOC_MODAL } from '../../../constants/Modals';
+import cx from 'classnames';
+import { IMarkFraction } from '../../../stores/UserStore';
+import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 
 const styles = (theme: any) => createStyles({
     emptyText: {
@@ -41,6 +44,15 @@ const styles = (theme: any) => createStyles({
         // marginBottom: 12,
         width: '100%'
     },
+    saveButton: {
+        '&.Mui-disabled.invalid': {
+            background: '#EE6969',
+            color: 'white'
+        }
+    },
+    isInvalid: {
+        background: 'red'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -48,10 +60,12 @@ interface IProps extends WithStyles<typeof styles> {
     position: USER_ROLE;
     agentsLoaded: boolean;
     previewBonus: IBonusInfo;
-    hasAgents: boolean;
+    agents: IAgentInfo[];
+    summedTotal: IMarkFraction;
 
-    clearChangedMarks?: () => void;
     changedMarks?: Map<number,  Map<number, IMark>>;
+    salarySettings?: ISalarySettings;
+    clearChangedMarks?: () => void;
     openModal?: (modalName: string) => void;
     updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
 }
@@ -61,7 +75,8 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             changedMarks,
             clearChangedMarks,
-            updateBonus
+            updateBonus,
+            salarySettings
         },
         uiStore: {
             openModal
@@ -71,7 +86,8 @@ interface IProps extends WithStyles<typeof styles> {
     changedMarks,
     clearChangedMarks,
     openModal,
-    updateBonus
+    updateBonus,
+    salarySettings
 }))
 @observer
 class TableSubheader extends Component<IProps> {
@@ -86,8 +102,19 @@ class TableSubheader extends Component<IProps> {
     }
 
     get isEmpty(): boolean {
-        const { agentsLoaded, hasAgents } = this.props;
-        return agentsLoaded === true && hasAgents === false;
+        const { agentsLoaded, agents } = this.props;
+        return agentsLoaded === true && !agents.length;
+    }
+
+    get isValid(): boolean {
+        const {
+            summedTotal: { payments, deposit },
+            salarySettings
+        } = this.props;
+        const current = (deposit * 100) / (payments + deposit);
+        const settingsPayments = (salarySettings ? salarySettings.payments : 1) * 100;
+        console.log('total: ', current, settingsPayments);
+        return current >= settingsPayments;
     }
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
@@ -129,7 +156,9 @@ class TableSubheader extends Component<IProps> {
                                 <Button
                                     onClick={this.updateBonus}
                                     variant='contained'
-                                    disabled={!changedMarks.size}
+                                    disabled={!changedMarks.size || !this.isValid}
+                                    className={cx(classes.saveButton, { invalid: !this.isValid })}
+                                    // className={cx({ [classes.isInvalid]: !this.isValid })}
                                     color='primary'>
                                         Зберегти зміни
                                 </Button>

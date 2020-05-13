@@ -350,8 +350,9 @@ class Table extends Component<IProps> {
         return (
             <>
             <TableSubheader
+                summedTotal={this.summedTotal}
                 isNested={isNested}
-                hasAgents={!!this.agents.length}
+                agents={this.agentsInfo}
                 position={position}
                 agentsLoaded={this.agentsLoaded}
                 previewBonus={previewBonus}

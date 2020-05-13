@@ -168,10 +168,8 @@ class Marks extends Component<IProps> {
     }
 
     componentWillUnmount() {
-        const { updateBonuses, role } = this.props;
         this.reactionDisposer();
         this.monthReaction();
-        // if (role === USER_ROLE.MEDICAL_AGENT) updateBonuses();
     }
 
     render() {

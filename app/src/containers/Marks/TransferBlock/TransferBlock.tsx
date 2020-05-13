@@ -8,21 +8,29 @@ import { USER_ROLE } from '../../../constants/Roles';
 import { IUser } from '../../../interfaces';
 import { IBonusInfo } from '../../../interfaces/IBonusInfo';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     root: {
         width: 280,
         backgroundColor: theme.palette.primary.green.main,
+        '&.invalid': {
+            backgroundColor: '#EE6969',
+        },
         '& > *': {
             color: 'white'
-        }
+        },
     },
     submitButton: {
         backgroundColor: 'transparent',
         borderTop: '1px solid white',
         color: 'white',
         fontFamily: 'Source Sans Pro SemiBold',
-        fontSize: theme.typography.pxToRem(15)
+        fontSize: theme.typography.pxToRem(15),
+        '&.Mui-disabled.invalid': {
+            background: '#EE6969',
+            color: 'white'
+        }
     },
     bolderText: {
         fontFamily: 'Source Sans Pro SemiBold',
@@ -126,6 +134,17 @@ class TransferBlock extends Component<IProps> {
             : [100, 0];
     }
 
+    get isValid(): boolean {
+        const { previewBonus } = this.props;
+        const current = (this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit);
+        const settingsValue = this.bonuses
+            ? this.bonuses[0]
+            : 100;
+        return previewBonus
+            ? current >= settingsValue
+            : true;
+    }
+
     submitHandler = async () => {
         const { updateBonus, previewBonus } = this.props;
         this.isLoading = true;
@@ -148,7 +167,10 @@ class TransferBlock extends Component<IProps> {
                     <span className={classes.gray}>Розподіл балів - </span>
                     <span className={classes.dark}>{this.bonuses[0]} / {this.bonuses[1]}</span>
                 </Typography>
-                <Grid className={classes.root} direction='column' container>
+                <Grid
+                    className={cx(classes.root, { invalid: !this.isValid })}
+                    direction='column'
+                    container>
                     <Grid className={classes.textContainer} wrap='nowrap' container>
                         <Grid xs={5} direction='column' container item>
                             <Typography className={classes.typography} variant='subtitle1'>
@@ -178,9 +200,9 @@ class TransferBlock extends Component<IProps> {
                     {
                         role === USER_ROLE.MEDICAL_AGENT && status === false &&
                         <Button
-                            className={classes.submitButton}
+                            className={cx(classes.submitButton, { invalid: this.isValid === false })}
                             onClick={this.submitHandler}
-                            disabled={this.isLoading}>
+                            disabled={this.isLoading || this.isValid === false}>
                                 Зберегти
                         </Button>
                     }
