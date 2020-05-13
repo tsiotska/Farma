@@ -254,10 +254,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let query = '';
         switch (previewUser.position) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
-                query = 'ffm/agent/unconfirmed';
+                query = 'ffm/agent/unconfirmed=1';
                 break;
             case USER_ROLE.REGIONAL_MANAGER:
-                query = `rm/${previewUser.id}/agent/unconfirmed`;
+                query = `rm/${previewUser.id}/agent/unconfirmed=1`;
                 break;
             case USER_ROLE.MEDICAL_AGENT:
                 query = `mp/${previewUser.id}/agent?unconfirmed=1`;
