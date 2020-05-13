@@ -14,4 +14,5 @@ export interface IDoctor {
     confirmed: boolean;
     deposit: number;
     address: 'string';
+    mp_user: number;
 }

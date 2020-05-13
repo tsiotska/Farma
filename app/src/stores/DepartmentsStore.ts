@@ -241,7 +241,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-     loadUnconfirmedDoctors(): Promise<IDoctor[]> {
+    async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
         const {api, userStore: {previewUser}} = this.rootStore;
         const condition = (this.currentDepartmentId
             && previewUser
@@ -254,20 +254,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let query = '';
         switch (previewUser.position) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
-                query = 'ffm/agent/unconfirmed=1';
+                query = 'ffm/agent?unconfirmed=1';
                 break;
             case USER_ROLE.REGIONAL_MANAGER:
-                query = `rm/${previewUser.id}/agent/unconfirmed=1`;
+                query = `rm/${previewUser.id}/agent?unconfirmed=1`;
                 break;
             case USER_ROLE.MEDICAL_AGENT:
                 query = `mp/${previewUser.id}/agent?unconfirmed=1`;
                 break;
         }
-
-        return this.dispatchRequest(
-            api.getUnconfirmedDoctors(this.currentDepartmentId, query),
-            'loadUnconfirmedDoctors'
-        );
+        return await this.dispatchRequest(api.getUnconfirmedDoctors(this.currentDepartmentId, query),
+            'loadUnconfirmedDoctors');
     }
 
     @action.bound
@@ -330,7 +327,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     setCurrentDepartment(department: number | string | IDepartment) {
-        console.log('set current dep: ', department);
         if (typeof department === 'string') {
             this.currentDepartment = this.departments.find(({ name }) => name === department) || null;
         } else if (typeof department === 'number') {
@@ -1303,12 +1299,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
-        const { api } = this.rootStore;
-        return CONFIRM_STATUS.REJECTED !== await api.accept(doctor.id, 'agent');
-    }
-
-    @action.bound
     async editWorker(initialWorker: IWorker, values: IWorkerModalValues, newAvatar: File | string) {
         const { api } = this.rootStore;
 
@@ -1409,9 +1399,20 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async acceptAgent(doctor: IDoctor) {
+    async pureAgentConfirm(doctor: IDoctor): Promise<boolean> {
         const { api } = this.rootStore;
-        const status = await api.accept(doctor.id, 'agent');
+        return CONFIRM_STATUS.REJECTED !== await api.acceptDoctor(this.currentDepartmentId, doctor.mp_user, doctor.id);
+    }
+
+    @action.bound
+    async acceptAgent(doctor: IDoctor) {
+        const { api, userStore: { previewUser } } = this.rootStore;
+        const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
+            ? previewUser.id
+            : doctor.mp_user;
+        const depId = this.currentDepartmentId;
+        const docId = doctor.id;
+        const status = await api.acceptDoctor(depId, mpId, docId);
 
         if (status === CONFIRM_STATUS.ACCEPTED) {
             // reload unconfirmed

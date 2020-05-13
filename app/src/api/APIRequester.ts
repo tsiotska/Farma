@@ -550,7 +550,17 @@ export class APIRequester {
             .catch(this.defaultErrorHandler([]));
     }
 
-    accept(id: number, objectType: 'agent' | 'hcf' | 'pharmacy'): Promise<CONFIRM_STATUS> {
+    acceptDoctor(departmentId: number, mpId: number, doctorId: number): Promise<CONFIRM_STATUS> {
+        return this.instance.put(`/api/branch/${departmentId}/mp/${mpId}/agent/${doctorId}/accept`)
+            .then(({ status }) => {
+                return status === 200
+                    ? CONFIRM_STATUS.ACCEPTED
+                    : CONFIRM_STATUS.CONFIRMED;
+            })
+            .catch(this.defaultErrorHandler(CONFIRM_STATUS.REJECTED));
+    }
+
+    accept(id: number, objectType: 'hcf' | 'pharmacy'): Promise<CONFIRM_STATUS> {
         return this.instance.put(`api/${objectType}/${id}/accept`)
             .then(({ status }) => {
                 return status === 200
