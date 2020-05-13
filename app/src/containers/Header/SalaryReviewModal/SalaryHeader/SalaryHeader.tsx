@@ -119,7 +119,7 @@ class SalaryHeader extends Component<IProps> {
                     </Typography>
                 </Grid>
                 <Grid className={classes.mediumColumn}>
-                    <Typography className={classes.text} align='center' color='textSecondary'>
+                    <Typography className={classes.text}  align='center' color='textSecondary'>
                         Факт
                     </Typography>
                 </Grid>

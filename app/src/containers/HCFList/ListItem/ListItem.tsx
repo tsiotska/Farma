@@ -73,7 +73,8 @@ const styles = (theme: any) => createStyles({
         borderColor: theme.palette.primary.white,
         padding: '2px 0',
         margin: '0 4px',
-        minWidth: 95
+        minWidth: 95,
+        marginRight: 20
     },
     phoneText: {
         overflow: 'hidden',
@@ -202,13 +203,15 @@ class ListItem extends Component<IProps> {
                                 <Edit className={classes.icon}/>
                             </IconButton>
                     }
+                    { !unconfirmed &&
                     <DeleteButton
-                        unconfirmed={unconfirmed}
-                        type={generalType}
-                        className={classes.iconButton}
-                        onClick={this.deleteClickHandler}>
-                            <Delete className={classes.icon}/>
+                      unconfirmed={unconfirmed}
+                      type={generalType}
+                      className={classes.iconButton}
+                      onClick={this.deleteClickHandler}>
+                      <Delete className={classes.icon}/>
                     </DeleteButton>
+                    }
                 </Grid>
             </Grid>
         );

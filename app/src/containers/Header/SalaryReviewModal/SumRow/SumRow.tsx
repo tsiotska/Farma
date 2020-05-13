@@ -10,6 +10,9 @@ const styles = createStyles({
         backgroundColor: '#f5f7f7',
         paddingLeft: 12
     },
+    mediumColumn: {
+        width: 100
+    },
     wideColumn: {
         width: 200
     },
@@ -82,11 +85,14 @@ class SumRow extends Component<IProps> {
                 </Grid>
                 {
                     secondColumnValue !== undefined &&
-                    <Grid className={cx(classes.wideColumn)} container alignItems='center' justify='flex-start'>
+                   <>
+                     <Grid className={classes.mediumColumn} container alignItems='center' justify='center'>
                         <Typography>
                             { secondColumnValue || '-' }
                         </Typography>
                     </Grid>
+                     <Grid className={classes.mediumColumn} container/>
+                   </>
                 }
                 {
                     levels.map((x, i) => (

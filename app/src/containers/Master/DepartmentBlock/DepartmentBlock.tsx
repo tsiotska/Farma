@@ -68,6 +68,7 @@ class DepartmentBlock extends Component<IProps> {
                     InputLabelProps={{
                         shrink: true
                     }}
+                    required
                 />
             </Grid>
         );

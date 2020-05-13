@@ -246,15 +246,31 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
-        const { api, userStore: { previewUser } } = this.rootStore;
-        const condition = this.currentDepartmentId
+     loadUnconfirmedDoctors(): Promise<IDoctor[]> {
+        const {api, userStore: {previewUser}} = this.rootStore;
+        const condition = (this.currentDepartmentId
             && previewUser
-            && previewUser.id
-            && previewUser.position === USER_ROLE.MEDICAL_AGENT;
+            && previewUser.id)
+            && previewUser.position === USER_ROLE.MEDICAL_AGENT
+            || previewUser.position === USER_ROLE.FIELD_FORCE_MANAGER
+            || previewUser.position === USER_ROLE.REGIONAL_MANAGER;
         if (!condition) return;
+
+        let query = '';
+        switch (previewUser.position) {
+            case USER_ROLE.FIELD_FORCE_MANAGER:
+                query = 'ffm/agent/unconfirmed';
+                break;
+            case USER_ROLE.REGIONAL_MANAGER:
+                query = `rm/${previewUser.id}/agent/unconfirmed`;
+                break;
+            case USER_ROLE.MEDICAL_AGENT:
+                query = `mp/${previewUser.id}/agent?unconfirmed=1`;
+                break;
+        }
+
         return this.dispatchRequest(
-            api.getDoctors(this.currentDepartmentId, previewUser.id, true),
+            api.getUnconfirmedDoctors(this.currentDepartmentId, query),
             'loadUnconfirmedDoctors'
         );
     }
@@ -1551,7 +1567,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (!this.currentDepartmentId || !userId) return null;
 
         const queryParam = unconfirmed
-            ? `?unconfirmed=1`
+            ? `?unconfirmed`
             : '';
 
         switch (role) {

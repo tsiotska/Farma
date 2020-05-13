@@ -265,6 +265,7 @@ class FormContent extends Component<IProps> {
                             propName='name'
                             error={this.fieldsErrorStatuses.name}
                             fullWidth
+                            required
                         />
                         <FormRow
                             label='Дозування, мг'
@@ -281,6 +282,7 @@ class FormContent extends Component<IProps> {
                             propName='barcode'
                             error={this.fieldsErrorStatuses.barcode}
                             fullWidth
+                            required
                         />
                         <FormRow
                             label='Балл'
@@ -289,6 +291,7 @@ class FormContent extends Component<IProps> {
                             propName='mark'
                             error={this.fieldsErrorStatuses.mark}
                             fullWidth
+                            required
                         />
                     </Grid>
                    <Grid direction='column' xs container item>
@@ -299,6 +302,7 @@ class FormContent extends Component<IProps> {
                             propName='releaseForm'
                             error={this.fieldsErrorStatuses.releaseForm}
                             fullWidth
+                            required
                         />
                         <FormRow
                             label='Виробник'
@@ -307,6 +311,7 @@ class FormContent extends Component<IProps> {
                             propName='manufacturer'
                             error={this.fieldsErrorStatuses.manufacturer}
                             fullWidth
+                            required
                         />
                         <FormRow
                             label='Ціна, грн'
@@ -315,6 +320,7 @@ class FormContent extends Component<IProps> {
                             propName='price'
                             error={this.fieldsErrorStatuses.price}
                             fullWidth
+                            required
                         />
                         <FormRow
                             select
@@ -325,6 +331,7 @@ class FormContent extends Component<IProps> {
                             disabled={!departments || !departments.length}
                             error={this.fieldsErrorStatuses.department}
                             fullWidth
+                            required
                         >
                             {
                                 departments && departments.map(({ id, name }) => (
