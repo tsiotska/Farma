@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { FormControlLabel, Checkbox, createStyles, WithStyles, withStyles, Typography } from '@material-ui/core';
+import { FormControlLabel, Checkbox, createStyles, WithStyles, withStyles, Typography, IconButton } from '@material-ui/core';
 import { GROUP_BY } from '../../../containers/Sales/TableStat/TableStat';
+import { FilterList, Close } from '@material-ui/icons';
 
 const styles = createStyles({
     label: {
@@ -13,6 +14,16 @@ const styles = createStyles({
     },
     text: {
         fontFamily: 'Source Sans Pro SemiBold',
+        display: 'flex',
+        alignItems: 'center'
+    },
+    value: {
+        marginLeft: 3,
+        marginRight: 8
+    },
+    iconButton: {
+        padding: 5,
+        borderRadius: 2
     }
 });
 
@@ -78,7 +89,18 @@ class HeaderCell extends Component<IProps> {
                 }
                 label={
                     <Typography className={classes.text} color='textSecondary'>
-                        {value}
+                        <span className={classes.value}>{value}</span>
+                        {
+                            value === 'Аптеки' &&
+                            <>
+                                <IconButton className={classes.iconButton}>
+                                    <FilterList fontSize='small' />
+                                </IconButton>
+                                <IconButton className={classes.iconButton}>
+                                    <Close fontSize='small' />
+                                </IconButton>
+                            </>
+                        }
                     </Typography>
                 }
             />

@@ -348,7 +348,7 @@ class TableRow extends Component<IProps> {
                             <Typography variant='body2'>
                                 { name }
                             </Typography>
-                            { !agentInfo && typeof position === 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
+                            { !agentInfo && typeof position !== 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
                         </Grid>
                 </TableCell>
                 { medsContent }
