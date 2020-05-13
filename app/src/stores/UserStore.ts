@@ -214,11 +214,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
         let id: number = null;
         if  (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
             id = this.previewUser.id;
-            console.log('user: ', toJS(this.previewUser));
         } else {
             const mp = this.bonusUsers.find(({ position }) => position === USER_ROLE.MEDICAL_AGENT);
             id = mp ? mp.id : null;
-            console.log('user: ', toJS(mp));
         }
 
         if (!bonus || id === null || currentDepartmentId === null) return;

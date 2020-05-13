@@ -25,6 +25,7 @@ import TotalRow from '../TotalRow';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import AddDocsModal from '../AddDocsModal';
 import { Close } from '@material-ui/icons';
+import { ADD_DOC_MODAL } from '../../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     fixedTable: {
@@ -40,12 +41,23 @@ const styles = (theme: any) => createStyles({
         marginBottom: 12
     },
     submitButton: {
-        marginLeft: 'auto'
     },
     cancelChanges: {
         borderRadius: 2,
         padding: 8,
         marginLeft: 8
+    },
+    addDocButton: {
+        marginLeft: 'auto',
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
+        marginRight: 12,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
     }
 });
 
@@ -69,6 +81,7 @@ interface IProps extends WithStyles<typeof styles> {
     updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
     addBonusUser?: (user: IUserLikeObject) => void;
     removeBonusUser?: (user: IUserLikeObject) => void;
+    openModal?: (modalName: string) => void;
 }
 
 export interface IUserInfo {
@@ -95,6 +108,9 @@ export interface IUserInfo {
             addBonusUser,
             removeBonusUser,
             bonusUsers
+        },
+        uiStore: {
+            openModal
         }
     }
 }) => ({
@@ -110,7 +126,8 @@ export interface IUserInfo {
     updateBonus,
     addBonusUser,
     removeBonusUser,
-    bonusUsers
+    bonusUsers,
+    openModal
 }))
 @observer
 class Table extends Component<IProps> {
@@ -209,8 +226,10 @@ class Table extends Component<IProps> {
 
     updateBonus = () => {
         const { updateBonus, previewBonus } = this.props;
-        updateBonus(previewBonus, false);
+        updateBonus(previewBonus, true);
     }
+
+    openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     refHandler = (el: any) => {
         if (!el) return;
@@ -286,14 +305,14 @@ class Table extends Component<IProps> {
             isLoading,
             isNested,
             previewBonus,
-            parentUser: { position },
+            parentUser,
             changedMarks,
             clearChangedMarks,
             bonusUsers
         } = this.props;
-
+        const { position } = parentUser;
         const lastIndex = this.agentsInfo.length - 1;
-
+        console.log('parent: ', toJS(parentUser));
         return (
             <>
             { this.agentsLoaded === false && <LinearProgress className={classes.progress} /> }
@@ -308,6 +327,12 @@ class Table extends Component<IProps> {
                     {
                         this.showButtons &&
                         <>
+                            <Button
+                                disabled={!previewBonus}
+                                className={classes.addDocButton}
+                                onClick={this.openAddDocModal}>
+                                Додати лікаря
+                            </Button>
                             <Button
                                 onClick={this.updateBonus}
                                 className={classes.submitButton}
@@ -385,13 +410,14 @@ class Table extends Component<IProps> {
                 </TableContainer>
             }
             {
-                isNested === false &&
+                position === USER_ROLE.MEDICAL_AGENT &&
                 <AddDocsModal
                     previewBonus={previewBonus}
                     docs={
-                        role === USER_ROLE.MEDICAL_AGENT
-                            ? (this.agents as IDoctor[])
-                            : []
+                        this.agents as IDoctor[]
+                        // role === USER_ROLE.MEDICAL_AGENT
+                        //     ? (this.agents as IDoctor[])
+                        //     : []
                     }
                 />
             }
