@@ -10,7 +10,7 @@ import {
     Typography,
     Paper
 } from '@material-ui/core';
-import { KeyboardArrowDown } from '@material-ui/icons';
+import { KeyboardArrowDown, Close } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { computed, toJS, observable } from 'mobx';
@@ -105,6 +105,14 @@ const styles = (theme: any) => createStyles({
     lastGridItem: {
         paddingRight: 8
     },
+    closeIcon: {
+        color: 'white',
+        background: theme.palette.primary.level.red,
+        borderRadius: '50%',
+        width: 14,
+        height: 14,
+        marginLeft: 'auto'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -277,7 +285,7 @@ class TableRow extends Component<IProps> {
             meds,
             tooltips,
         } = this.props;
-        const { LPUName, name, id: agentId } = agent;
+        const { LPUName, name, id: agentId, address, city, position } = (agent as any);
 
         const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 
@@ -317,7 +325,12 @@ class TableRow extends Component<IProps> {
                         padding='none'
                         style={{ width: this.columnWidth }}
                         className={classes.cell}>
-                            { LPUName }
+                            <Typography variant='body2'>
+                                { LPUName }
+                            </Typography>
+                            <Typography variant='body2' color='textSecondary'>
+                                { !!city && `${city} , `  }{ address }
+                            </Typography>
                     </TableCell>
                 }
                 <TableCell
@@ -332,7 +345,10 @@ class TableRow extends Component<IProps> {
                                     className={cx(classes.expandIcon, { rotate: expanded === true })}
                                     fontSize='small' />
                             }
-                            { name }
+                            <Typography variant='body2'>
+                                { name }
+                            </Typography>
+                            { !agentInfo && typeof position === 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
                         </Grid>
                 </TableCell>
                 { medsContent }
