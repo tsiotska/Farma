@@ -24,9 +24,9 @@ const styles = (theme: any) => createStyles({
     root: {
         marginBottom: 1,
         minHeight: 48,
-        padding: '5px 0',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
+        padding: '5px 0',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
             : theme.palette.primary.white,

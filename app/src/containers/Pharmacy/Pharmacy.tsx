@@ -39,7 +39,7 @@ const styles = (theme: any) => createStyles({
         textAlign: 'center'
     },
     unconfirmedList: {
-        marginBottom: 20
+        marginBottom: 20,
     },
     unconfirmedText: {
         fontFamily: 'Source Sans Pro SemiBold',

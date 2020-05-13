@@ -39,11 +39,10 @@ const styles = (theme: any) => createStyles({
         textAlign: 'center'
     },
     unconfirmedList: {
-        marginBottom: 20
+        marginBottom: 20,
     },
     unconfirmedText: {
         fontFamily: 'Source Sans Pro SemiBold',
-        paddingBottom: 18
     },
     addButton: {
         color: theme.palette.primary.green.main,

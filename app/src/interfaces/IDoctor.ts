@@ -16,4 +16,5 @@ export interface IDoctor {
 
     address?: string;
     city?: string;
+    mp_user: number;
 }

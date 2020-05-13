@@ -125,6 +125,7 @@ class Doctors extends Component<IProps> {
             ? doctors.findIndex(({ id }) => id === previewDoctorId)
             : -1;
     }
+
     deleteHandler = (doc: IDoctor) => async (confirmed: boolean) => {
         const { openDelPopper, removeDoctor } = this.props;
         openDelPopper(null);
