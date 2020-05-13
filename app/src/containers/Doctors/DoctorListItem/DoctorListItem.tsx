@@ -93,6 +93,7 @@ const styles = (theme: any) => createStyles({
         height: 36,
         padding: '0 8px',
         marginLeft: 'auto',
+        marginRight: 20,
         minWidth: 100
     },
     infoIcon: {
@@ -264,13 +265,14 @@ class DoctorListItem extends Component<IProps> {
                             </IconButton>
                           </>
                     }
+                    {!unconfirmed &&
                     <IconButton onClick={this.deleteClickHandler}>
-                        <Delete
-                            className={classes.removeIcon}
-                            fontSize='small'
-                        />
-
+                      <Delete
+                        className={classes.removeIcon}
+                        fontSize='small'
+                      />
                     </IconButton>
+                    }
                 </Grid>
             </Grid>
         );
