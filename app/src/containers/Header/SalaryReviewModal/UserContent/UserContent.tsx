@@ -36,18 +36,20 @@ const styles = (theme: any) => createStyles({
         color: 'white'
     },
     divideContainer: {
-      //  position: 'absolute',
         display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
         flexWrap: 'nowrap',
-        alignItems: 'center'
+        width: '100%'
     },
     divideContainer_line: {
-        width: '100%',
+        width: '18%',
         height: 1,
         backgroundColor:  theme.palette.primary.level.green
     },
     divideContainer_label: {
-        color: theme.palette.primary.level.green
+        color: theme.palette.primary.level.green,
+        whiteSpace: 'nowrap'
     }
 });
 
@@ -246,8 +248,6 @@ class UserContent extends Component<IProps> {
             isAdmin
         } = this.props;
 
-        console.log(toJS(currentDepartmentMeds));
-
         return (
             <>
                 {
@@ -266,21 +266,19 @@ class UserContent extends Component<IProps> {
                 }
 
                 <SumRow
-                    children={
-                        <Grid className={classes.divideContainer} container>
-                        <Grid className={classes.divideContainer_line}/>
-                        <Grid className={classes.divideContainer_label}>План в грошах</Grid>
-                        <Grid className={classes.divideContainer_line}/>
-                    </Grid>
-                    }
                     title='План в грошах'
                     levels={this.levels}
                     userLevel={this.userLevel}
                     values={this.plannedCosts}
                     userColors={this.userColors}
                     secondColumnValue={this.userMoneyDeficit}
-                    // emptyPlaceholder=''
-                />
+                >
+                    <Grid className={classes.divideContainer} container>
+                        <Grid className={classes.divideContainer_line}/>
+                        <Grid className={classes.divideContainer_label}>План в грошах</Grid>
+                        <Grid className={classes.divideContainer_line}/>
+                    </Grid>
+                </SumRow>
                 <SumRow
                     title='Зарплата по рейтингу'
                     levels={this.levels}
