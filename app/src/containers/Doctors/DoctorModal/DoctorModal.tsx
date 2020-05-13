@@ -363,7 +363,7 @@ class DoctorModal extends Component<IProps> {
                         {
                             isLoading
                             ? <LoadingMask size={20} />
-                            : 'Додати лікаря'
+                            : 'Зберегти зміни'
                         }
                 </Button>
             </Dialog>

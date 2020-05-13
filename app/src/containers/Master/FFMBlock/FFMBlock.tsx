@@ -74,6 +74,7 @@ class FFMBlock extends Component<IProps> {
                         InputLabelProps={{
                             shrink: true
                         }}
+                        required
                     />
                     <TextField
                         value={card}
@@ -103,6 +104,7 @@ class FFMBlock extends Component<IProps> {
                         InputLabelProps={{
                             shrink: true
                         }}
+                        required
                     />
                 </Grid>
                 <Grid direction='column' xs container item>
@@ -145,6 +147,7 @@ class FFMBlock extends Component<IProps> {
                         InputLabelProps={{
                             shrink: true
                         }}
+                        required
                     />
                 </Grid>
             </Grid>
