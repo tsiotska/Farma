@@ -1,6 +1,6 @@
 import { IValuesMap, objectArrayNormalizer } from './normalizer';
 import { IMedicine } from './../../interfaces/IMedicine';
-import { getRandomColor } from '../getRandomColor';
+import { ColorGenerator } from '../getRandomColor';
 
 const defaultMedicine: IMedicine = {
     id: null,
@@ -35,7 +35,7 @@ export const medsNormalizer = ({ data }: any) => objectArrayNormalizer(
     {
         requiredProps: [ 'id', 'name' ],
         objectNormalizer: (dataObject: any, defaultValue: IMedicine, namesMap: IValuesMap) => {
-            const normalizedObject: IMedicine = { ...defaultValue, color: getRandomColor() };
+            const normalizedObject: IMedicine = { ...defaultValue, color: ColorGenerator.getColor() };
 
             for (const prop in dataObject) {
                 const propName = namesMap[prop];

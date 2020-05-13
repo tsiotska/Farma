@@ -44,6 +44,16 @@ const styles = (theme: any) => createStyles({
     unconfirmedText: {
         fontFamily: 'Source Sans Pro SemiBold',
         paddingBottom: 18
+    },
+    addButton: {
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
     }
 });
 
@@ -243,7 +253,7 @@ class Pharmacy extends Component<IProps> {
                     <Typography variant='h5'>
                         Аптеки
                     </Typography>
-                    <Button onClick={this.addPharmacyClickHandler}>
+                    <Button className={classes.addButton} onClick={this.addPharmacyClickHandler}>
                         Додати Аптеку
                     </Button>
                 </Grid>

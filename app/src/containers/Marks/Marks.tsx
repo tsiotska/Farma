@@ -40,7 +40,20 @@ const styles = (theme: any) => createStyles({
     paper: {
         padding: 20
     },
-    addDocButton: {}
+    iconButton: {
+        borderRadius: 2,
+        minHeight: 64
+    },
+    addDocButton: {
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {

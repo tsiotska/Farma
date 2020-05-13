@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, Typography, Input, Button } from '@material-ui/core';
+import {
+    createStyles,
+    withStyles,
+    WithStyles,
+    Grid,
+    Typography,
+    Input,
+    Button
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
-import { toJS, computed, observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
@@ -21,7 +29,8 @@ const styles = createStyles({
         width: 45,
         border: '1px solid #aaa',
         borderRadius: 2,
-        margin: '0 10px'
+        margin: '0 10px',
+        background: 'white'
     },
     submitButton: {
         margin: '20px auto 20px 0 '

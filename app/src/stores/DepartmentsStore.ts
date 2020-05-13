@@ -1,4 +1,3 @@
-import { IUserLikeObject } from './DepartmentsStore';
 import { observable, action, reaction, toJS, computed, when, transaction } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
@@ -455,7 +454,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async addLpu(data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
-        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -981,13 +979,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 ? data.map((x): [number, ILocation] => ([x.id, x]))
                 : [];
 
-        const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
         const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
         const loadOblastiPromise = api.getOblasti().then(getMapped);
+        const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
 
-        this.cities = new Map(await loadCitiesPromise);
         this.regions = new Map(await loadRegionsPromise);
         this.oblasti = new Map(await loadOblastiPromise);
+        this.cities = new Map(await loadCitiesPromise);
     }
 
     @action.bound

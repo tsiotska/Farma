@@ -26,10 +26,13 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     addButton: {
-        backgroundColor: '#868698',
-        color: theme.palette.primary.main,
+        color: theme.palette.primary.green.main,
+        borderColor: theme.palette.primary.green.main,
+        backgroundColor: 'white',
+        border: '1px solid',
+        minWidth: 150,
         '&:hover': {
-            backgroundColor: '#717186',
+            backgroundColor: '#f3f3f3',
         }
     },
     header: {

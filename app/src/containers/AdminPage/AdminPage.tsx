@@ -20,6 +20,9 @@ const styles = (theme: any) => createStyles({
         fontSize: theme.typography.pxToRem(16),
         marginBottom: 12,
         textTransform: 'capitalize'
+    },
+    medStat: {
+        margin: '0 12px'
     }
 });
 
@@ -72,6 +75,12 @@ class AdminPage extends Component<IProps> {
     }
 
     @computed
+    get medStatClasses() {
+        const { classes } = this.props;
+        return { root: classes.medStat };
+    }
+
+    @computed
     get medsList(): any {
         const { meds, chartSalesStat, departments, classes } = this.props;
         const res: any[] = [];
@@ -84,6 +93,7 @@ class AdminPage extends Component<IProps> {
 
             res.push(
                 <MedsStatistic
+                    classes={this.medStatClasses}
                     key={department}
                     prepend={prepend}
                     departmentId={department}
@@ -119,7 +129,7 @@ class AdminPage extends Component<IProps> {
                         meds={this.meds}
                         header={<Header />}
                     />
-                    <Grid container>
+                    <Grid justify='center' container>
                         { this.medsList }
                     </Grid>
                 </Grid>
