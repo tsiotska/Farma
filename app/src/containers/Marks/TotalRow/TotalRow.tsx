@@ -21,11 +21,6 @@ const styles = (theme: any) => createStyles({
     },
     firstColumn: {
         width: 284
-        // width: ({ position, showLpu }: any) => position === 'fixed'
-        // ? showLpu
-        //     ? 284 / 2
-        //     : 284
-        // : 'auto',
     },
     column: {
         width: 70,
@@ -54,55 +49,30 @@ interface IProps extends WithStyles<typeof styles> {
     agents: IAgentInfo[];
     position: 'initial' | 'fixed';
     showLpu: boolean;
+    flattenMedsInfo: IMark[];
+    summedTotal: IMarkFraction;
+    summedPacks: IMarkFraction;
 
-    changedMarks?: Map<number, Map<number, IMark>>;
     meds?: IMedicine[];
-    setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
-    clearPreviewBonusTotal?: () => void;
+
 }
 
 @inject(({
     appState: {
-        userStore: {
-            setPreviewBonusTotal,
-            clearPreviewBonusTotal,
-            changedMarks
-        },
         departmentsStore: {
             currentDepartmentMeds: meds
         }
     }
 }) => ({
     meds,
-    changedMarks,
-    setPreviewBonusTotal,
-    clearPreviewBonusTotal
 }))
 @observer
 class TotalRow extends Component<IProps> {
     reactionDisposer: any;
 
     @computed
-    get flattenMedsInfo(): IMark[] {
-        const { agents, changedMarks } = this.props;
-        return agents.reduce((acc, curr) => {
-            const { marks, id } = curr;
-            const changedAgentMarks = changedMarks.get(id);
-
-            if (!changedAgentMarks) {
-                return [...acc, ...marks.values()];
-            }
-
-            const filteredAgentValues = [...marks.values()]
-                .filter(x => changedAgentMarks.has(x.drugId) === false);
-
-            return [...acc, ...changedAgentMarks.values(), ...filteredAgentValues];
-        }, []);
-    }
-
-    @computed
     get summedMeds(): {[key: number]: IMarkFraction} {
-        return this.flattenMedsInfo.reduce((acc, curr) => {
+        return this.props.flattenMedsInfo.reduce((acc, curr) => {
             const { drugId, deposit, mark, payments } = curr;
 
             if (drugId in acc) {
@@ -120,32 +90,6 @@ class TotalRow extends Component<IProps> {
     }
 
     @computed
-    get summedPacks(): IMarkFraction {
-        return this.flattenMedsInfo.reduce((acc, curr) => {
-            const { deposit, payments } = curr;
-            acc.payments += payments;
-            acc.deposit += deposit;
-            return acc;
-        }, {
-            payments: 0,
-            deposit: 0
-        });
-    }
-
-    @computed
-    get summedTotal(): IMarkFraction {
-        return this.flattenMedsInfo.reduce((acc, curr) => {
-            const { deposit, payments, mark } = curr;
-            acc.payments += payments * mark;
-            acc.deposit += deposit * mark;
-            return acc;
-        }, {
-            payments: 0,
-            deposit: 0
-        });
-    }
-
-    @computed
     get summedBonuses(): IMarkFraction {
         return this.props.agents.reduce((acc, curr) => {
             const { lastDeposit, lastPayment } = curr;
@@ -160,24 +104,15 @@ class TotalRow extends Component<IProps> {
         });
     }
 
-    componentDidMount() {
-        const { setPreviewBonusTotal } = this.props;
-        this.reactionDisposer = reaction(
-            () => ([ this.summedPacks, this.summedTotal ]),
-            ([ summedPacks, summedTotal ]: [ IMarkFraction, IMarkFraction ]) => {
-                setPreviewBonusTotal(summedPacks, summedTotal);
-            },
-            { fireImmediately: true }
-        );
-    }
-
-    componentWillUnmount() {
-        if (this.reactionDisposer) this.reactionDisposer();
-        this.props.clearPreviewBonusTotal();
-    }
-
     render() {
-        const {classes, meds, position, showLpu} = this.props;
+        const {
+            classes,
+            meds,
+            position,
+            showLpu,
+            summedTotal,
+            summedPacks
+        } = this.props;
 
         const colSpan = position === 'fixed'
         ? 1
@@ -234,11 +169,11 @@ class TotalRow extends Component<IProps> {
                         direction='column'
                         container>
                         <span>
-                            { this.summedPacks.payments }
+                            { summedPacks.payments }
                         </span>
                         <Divider className={classes.divider} />
                         <span>
-                            { this.summedPacks.deposit }
+                            { summedPacks.deposit }
                         </span>
                     </Grid>
                 </TableCell>
@@ -264,19 +199,19 @@ class TotalRow extends Component<IProps> {
                     align='right'
                     padding='none'>
                     <Grid container justify='flex-end'>
-                            <Grid
-                                className={classes.gridItem}
-                                alignItems='center'
-                                direction='column'
-                                container>
-                                <span>
-                                    { this.summedTotal.payments }
-                                </span>
-                                <Divider className={classes.divider} />
-                                <span>
-                                    { this.summedTotal.deposit }
-                                </span>
-                            </Grid>
+                        <Grid
+                            className={classes.gridItem}
+                            alignItems='center'
+                            direction='column'
+                            container>
+                            <span>
+                                { summedTotal.payments }
+                            </span>
+                            <Divider className={classes.divider} />
+                            <span>
+                                { summedTotal.deposit }
+                            </span>
+                        </Grid>
                     </Grid>
                 </TableCell>
             </TableRow>

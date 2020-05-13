@@ -6,12 +6,6 @@ import {
     TableBody,
     Table as MuiTable,
     Paper,
-    Collapse,
-    LinearProgress,
-    Typography,
-    Button,
-    Grid,
-    IconButton
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -26,6 +20,8 @@ import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import AddDocsModal from '../AddDocsModal';
 import { Close } from '@material-ui/icons';
 import { ADD_DOC_MODAL } from '../../../constants/Modals';
+import TableSubheader from '../TableSubheader';
+import { IMarkFraction } from '../../../stores/UserStore';
 
 const styles = (theme: any) => createStyles({
     fixedTable: {
@@ -33,31 +29,6 @@ const styles = (theme: any) => createStyles({
         tableLayout: 'fixed',
         padding: '0 20px',
         bottom: 0,
-    },
-    emptyText: {
-        marginBottom: 12
-    },
-    progress: {
-        marginBottom: 12
-    },
-    submitButton: {
-    },
-    cancelChanges: {
-        borderRadius: 2,
-        padding: 8,
-        marginLeft: 8
-    },
-    addDocButton: {
-        marginLeft: 'auto',
-        color: theme.palette.primary.green.main,
-        borderColor: theme.palette.primary.green.main,
-        backgroundColor: 'white',
-        border: '1px solid',
-        minWidth: 150,
-        marginRight: 12,
-        '&:hover': {
-            backgroundColor: '#f3f3f3',
-        }
     }
 });
 
@@ -82,6 +53,8 @@ interface IProps extends WithStyles<typeof styles> {
     addBonusUser?: (user: IUserLikeObject) => void;
     removeBonusUser?: (user: IUserLikeObject) => void;
     openModal?: (modalName: string) => void;
+    setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
+    clearPreviewBonusTotal?: () => void;
 }
 
 export interface IUserInfo {
@@ -107,7 +80,9 @@ export interface IUserInfo {
             updateBonus,
             addBonusUser,
             removeBonusUser,
-            bonusUsers
+            bonusUsers,
+            setPreviewBonusTotal,
+            clearPreviewBonusTotal
         },
         uiStore: {
             openModal
@@ -127,7 +102,9 @@ export interface IUserInfo {
     addBonusUser,
     removeBonusUser,
     bonusUsers,
-    openModal
+    openModal,
+    setPreviewBonusTotal,
+    clearPreviewBonusTotal
 }))
 @observer
 class Table extends Component<IProps> {
@@ -190,15 +167,6 @@ class Table extends Component<IProps> {
         );
     }
 
-    get isEmpty(): boolean {
-        return this.agentsLoaded && !this.preparedAgents.length;
-    }
-
-    get showButtons(): boolean {
-        const { isNested, parentUser: { position }} = this.props;
-        return isNested && position === USER_ROLE.MEDICAL_AGENT && !this.isEmpty;
-    }
-
     get preparedAgents(): IUserInfo[] {
         const { parentUser: { position } } = this.props;
         if (position === USER_ROLE.MEDICAL_AGENT) {
@@ -210,12 +178,60 @@ class Table extends Component<IProps> {
         return this.agents.slice(0, 50);
     }
 
+    get isEmpty(): boolean {
+        return this.agentsLoaded && !this.preparedAgents.length;
+    }
+
     @computed
     get fixedTableStyles(): any {
         return {
             width: this.tableWidth,
             left: this.leftOffset,
         };
+    }
+
+    @computed
+    get flattenMedsInfo(): IMark[] {
+        const { changedMarks } = this.props;
+        return this.agentsInfo.reduce((acc, curr) => {
+            const { marks, id } = curr;
+            const changedAgentMarks = changedMarks.get(id);
+
+            if (!changedAgentMarks) {
+                return [...acc, ...marks.values()];
+            }
+
+            const filteredAgentValues = [...marks.values()]
+                .filter(x => changedAgentMarks.has(x.drugId) === false);
+
+            return [...acc, ...changedAgentMarks.values(), ...filteredAgentValues];
+        }, []);
+    }
+
+    @computed
+    get summedTotal(): IMarkFraction {
+        return this.flattenMedsInfo.reduce((acc, curr) => {
+            const { deposit, payments, mark } = curr;
+            acc.payments += payments * mark;
+            acc.deposit += deposit * mark;
+            return acc;
+        }, {
+            payments: 0,
+            deposit: 0
+        });
+    }
+
+    @computed
+    get summedPacks(): IMarkFraction {
+        return this.flattenMedsInfo.reduce((acc, curr) => {
+            const { deposit, payments } = curr;
+            acc.payments += payments;
+            acc.deposit += deposit;
+            return acc;
+        }, {
+            payments: 0,
+            deposit: 0
+        });
     }
 
     expandChangeHandler = (user: IUserLikeObject, isExpanded: boolean) => {
@@ -242,6 +258,8 @@ class Table extends Component<IProps> {
             : 'initial';
     }
 
+    totalReactionDisposer: any;
+
     async componentDidMount() {
         const {
             loadConfirmedDoctors,
@@ -250,7 +268,7 @@ class Table extends Component<IProps> {
             currentDepartmentId,
             isNested,
             loadBonuses,
-            loadBonusesData,
+            loadBonusesData
         } = this.props;
 
         this.initializationTimeout = window.setTimeout(async () => {
@@ -260,20 +278,34 @@ class Table extends Component<IProps> {
             }
 
             await when(() => this.props.isLoading === false);
+
             const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
                 ? await loadConfirmedDoctors(parentUser)
                 : await getLocationsAgents(currentDepartmentId, parentUser);
+
             this.agents = newAgents || [];
             this.agentsLoaded = true;
             this.reactionDisposer = reaction(
                 () => this.props.role,
                 () => { this.agents = []; }
             );
+            if (isNested === false) {
+                this.totalReactionDisposer = reaction(
+                    () => ([ this.summedPacks, this.summedTotal ]),
+                    ([summedPacks, summedTotal]) => this.props.setPreviewBonusTotal(
+                        summedPacks,
+                        summedTotal
+                    ),
+                    { fireImmediately: true }
+                );
+            }
         }, 500);
     }
 
     componentWillUnmount() {
         if (this.reactionDisposer) this.reactionDisposer();
+        if (this.totalReactionDisposer) this.totalReactionDisposer();
+
         const {
             removeBonusUser,
             clearChangedMarks,
@@ -281,8 +313,14 @@ class Table extends Component<IProps> {
             previewBonus,
             updateBonus,
             role,
-            changedMarks
+            changedMarks,
+            isNested,
+            clearPreviewBonusTotal
         } = this.props;
+
+        if (isNested === false) {
+            clearPreviewBonusTotal();
+        }
 
         const condition = role === USER_ROLE.MEDICAL_AGENT
             && (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
@@ -301,63 +339,23 @@ class Table extends Component<IProps> {
     render() {
         const {
             classes,
-            role,
-            isLoading,
             isNested,
             previewBonus,
             parentUser,
-            changedMarks,
-            clearChangedMarks,
             bonusUsers
         } = this.props;
         const { position } = parentUser;
         const lastIndex = this.agentsInfo.length - 1;
-        console.log('parent: ', toJS(parentUser));
+
         return (
             <>
-            { this.agentsLoaded === false && <LinearProgress className={classes.progress} /> }
-            {
-                isNested &&
-                <>
-                <Grid container className={classes.emptyText} alignItems='center'>
-                    <Typography>
-                        { position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
-                        { position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
-                    </Typography>
-                    {
-                        this.showButtons &&
-                        <>
-                            <Button
-                                disabled={!previewBonus}
-                                className={classes.addDocButton}
-                                onClick={this.openAddDocModal}>
-                                Додати лікаря
-                            </Button>
-                            <Button
-                                onClick={this.updateBonus}
-                                className={classes.submitButton}
-                                variant='contained'
-                                disabled={!changedMarks.size}
-                                color='primary'>
-                                    Зберегти зміни
-                            </Button>
-                            <IconButton
-                                disabled={!changedMarks.size}
-                                onClick={clearChangedMarks}
-                                className={classes.cancelChanges}>
-                                <Close fontSize='small' />
-                            </IconButton>
-                        </>
-                    }
-                </Grid>
-                {
-                    this.isEmpty &&
-                    <Typography variant='body2' className={classes.emptyText}>
-                        Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
-                    </Typography>
-                }
-                </>
-            }
+            <TableSubheader
+                isNested={isNested}
+                hasAgents={!!this.agents.length}
+                position={position}
+                agentsLoaded={this.agentsLoaded}
+                previewBonus={previewBonus}
+            />
             <TableContainer>
                 <MuiTable padding='none'>
                     <TableBody>
@@ -387,6 +385,9 @@ class Table extends Component<IProps> {
                                 agents={this.agentsInfo}
                                 position={this.totalRowPosition}
                                 showLpu={this.userIsMedicalAgent}
+                                flattenMedsInfo={this.flattenMedsInfo}
+                                summedTotal={this.summedTotal}
+                                summedPacks={this.summedPacks}
                             />
                         }
                     </TableBody>
@@ -404,6 +405,9 @@ class Table extends Component<IProps> {
                                 position={this.totalRowPosition}
                                 agents={this.agentsInfo}
                                 showLpu={this.userIsMedicalAgent}
+                                flattenMedsInfo={this.flattenMedsInfo}
+                                summedTotal={this.summedTotal}
+                                summedPacks={this.summedPacks}
                             />
                         </TableBody>
                     </MuiTable>
@@ -413,12 +417,7 @@ class Table extends Component<IProps> {
                 position === USER_ROLE.MEDICAL_AGENT &&
                 <AddDocsModal
                     previewBonus={previewBonus}
-                    docs={
-                        this.agents as IDoctor[]
-                        // role === USER_ROLE.MEDICAL_AGENT
-                        //     ? (this.agents as IDoctor[])
-                        //     : []
-                    }
+                    docs={this.agents as IDoctor[]}
                 />
             }
             </>
