@@ -99,7 +99,6 @@ const styles = (theme: any) => createStyles({
         background: '#DEE6EA'
     },
     span: {
-        maxWidth: 35,
         minWidth: 25,
         textAlign: 'center'
     },

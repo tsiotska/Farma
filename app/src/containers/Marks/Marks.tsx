@@ -204,10 +204,10 @@ class Marks extends Component<IProps> {
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
                         <TransferBlock parentUser={previewUser} previewBonus={this.previewBonus} />
-                        {/* <TransferBlock updateBonuses={updateBonuses} /> */}
                         {
                             role === USER_ROLE.MEDICAL_AGENT &&
                             <Button
+                                disabled={!this.previewBonus}
                                 className={classes.addDocButton}
                                 onClick={this.openAddDocModal}>
                                 Додати лікаря
