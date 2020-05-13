@@ -24,7 +24,6 @@ import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';
 import ExcelLoadPopper from './ExcelLoadPoppper';
 import { ADD_DOC_MODAL, ADD_BONUS_MODAL } from '../../constants/Modals';
-import AddDocsModal from './AddDocsModal';
 import AddBonusModal from './AddBonusModal';
 import MonthPicker from './MonthPicker';
 import { IUser } from '../../interfaces';

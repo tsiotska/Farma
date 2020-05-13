@@ -154,7 +154,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    addDocsToBonus(docs: IDoctor[]) {
+    addDocsToBonus(docs: IDoctor[], targetBonus: IBonusInfo) {
         const preparedDocs: IAgentInfo[] = docs.map(({ id, deposit }) => ({
             id,
             deposit,
@@ -162,11 +162,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             lastDeposit: 0,
             marks: new Map(),
         }));
-        const targetRole = USER_ROLE.MEDICAL_AGENT;
-        const targetBonuses = this.bonuses[targetRole];
-        const targetBonus = targetBonuses
-            ? targetBonuses.find(x => x.month = this.previewBonusMonth)
-            : null;
+
         if (targetBonus) {
             targetBonus.agents.push(...preparedDocs);
         }

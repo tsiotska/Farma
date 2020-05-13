@@ -67,7 +67,7 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     loadSpecialties?: () => void;
     loadLPUs?: () => void;
-    addDocsToBonus?: (docs: IDoctor[]) => void;
+    addDocsToBonus?: (docs: IDoctor[], previewBonus: IBonusInfo) => void;
 }
 
 @inject(({
@@ -160,7 +160,8 @@ class AddDocsModal extends Component<IProps> {
     }
 
     submitHandler = () => {
-        this.props.addDocsToBonus(this.selectedDocs);
+        const { addDocsToBonus, previewBonus } = this.props;
+        addDocsToBonus(this.selectedDocs, previewBonus);
         this.selectedDocs = [];
     }
 
@@ -170,8 +171,6 @@ class AddDocsModal extends Component<IProps> {
             openedModal,
             loadSpecialties,
             loadLPUs,
-            // loadConfirmedDoctors,
-            // previewUser
         } = this.props;
         const becomeOpen = prevModal !== ADD_DOC_MODAL && openedModal === ADD_DOC_MODAL;
         const becomeClosed = prevModal === ADD_DOC_MODAL && openedModal !== ADD_DOC_MODAL;
@@ -183,15 +182,8 @@ class AddDocsModal extends Component<IProps> {
         } else if (becomeOpen) {
             await loadSpecialties();
             await loadLPUs();
-            // const newDocs = await loadConfirmedDoctors(previewUser);
-            // this.docs = newDocs || [];
-            // this.docsLoaded = true;
         }
     }
-
-    // componentWillUnmount() {
-    //     this.props.clearDoctors();
-    // }
 
     render() {
         const {
