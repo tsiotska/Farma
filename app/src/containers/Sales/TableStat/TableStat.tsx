@@ -15,9 +15,6 @@ import { ILPU } from '../../../interfaces/ILPU';
 interface IProps {
     role?: USER_ROLE;
     previewUser?: IUser;
-    getAsyncStatus?: (key: string) => IAsyncStatus;
-    loadLocaleSalesStat?: () => void;
-    loadAgentSalesStat?: () => void;
     sortedLocationSalesStat?: ISalesStat[];
     sortedAgentsSalesStat?: ISalesStat[];
     locations?: Map<number, ILocation>;
@@ -26,6 +23,10 @@ interface IProps {
     ignoredLocations?: Set<number>;
     ignoredAgents?: Set<number>;
     regions?: Map<number, ILocation>;
+
+    getAsyncStatus?: (key: string) => IAsyncStatus;
+    loadLocaleSalesStat?: () => void;
+    loadAgentSalesStat?: () => void;
     loadAgentsSalesExcel?: () => void;
     loadLocationsExcel?: () => void;
 }

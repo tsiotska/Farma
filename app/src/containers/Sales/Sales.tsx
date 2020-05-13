@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles';
 import Plot from '../Plot';
 import TableStat from './TableStat';
 import { IMedsSalesStat } from '../../interfaces/ISalesStat';
-import { reaction, observable, action, computed } from 'mobx';
+import { reaction, observable, action, computed, toJS } from 'mobx';
 import { USER_ROLE } from '../../constants/Roles';
 import DateRangeButton from '../../components/DateRangeButton';
 import { IMedicine } from '../../interfaces/IMedicine';
@@ -84,7 +84,7 @@ class Sales extends Component<IProps> {
     get medsMap(): Map<number, IMedicine> {
         const { chartSalesStat, currentDepartmentMeds } = this.props;
         const ids = (chartSalesStat || []).map(({ medId }) => medId);
-        const meds = currentDepartmentMeds.filter(({ id }) => ids.includes(id));
+        const meds = currentDepartmentMeds.filter(({ id, deleted }) => ids.includes(id));
         const mapped: Array<[number, IMedicine]> = meds.map(medicine => ([ medicine.id, medicine]));
         return new Map(mapped);
     }

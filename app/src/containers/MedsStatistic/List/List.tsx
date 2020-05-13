@@ -49,6 +49,7 @@ class List extends Component<IProps> {
             container>
                 {
                     meds.map(medicine => (
+                        medicine.deleted !== true &&
                         <ListItem
                             key={medicine.id}
                             stat={(chartSalesStat || []).find(({ medId }) => medId === medicine.id)}

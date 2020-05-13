@@ -236,7 +236,6 @@ class Plot extends Component<IProps> {
                             maintainAspectRatio: false,
                             tooltips: {
                                 mode: 'x',
-                                // xAlign: 'left',
                                 position: 'nearest',
                                 callbacks: {
                                     title: this.titleRenderer,

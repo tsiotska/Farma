@@ -98,12 +98,18 @@ class Header extends Component<IProps> {
     }
 
     getContent = () => {
-        const { classes, medsArray, shouldCalculateHeight, ignoredMeds } = this.props;
+        const {
+            classes,
+            medsArray,
+            shouldCalculateHeight,
+            ignoredMeds
+        } = this.props;
+
         return medsArray.map((medicine, i) => (
             <TableCell
                 key={medicine.id}
                 className={cx(classes.thCell, {
-                    displayNone: ignoredMeds.includes(i),
+                    displayNone: ignoredMeds.includes(i) || medicine.deleted === true,
                     alignBottom: true,
                 })}>
                 <Grid container>

@@ -55,11 +55,17 @@ class TableRow extends Component<IProps> {
     get data(): number[] {
         const { meds, data } = this.props;
 
-        return meds.map(({ id }) => (
+        return meds.filter(({ deleted }) => deleted !== true).map(({ id }) => (
             id in data
-            ? data[id]
-            : null
+                ? data[id]
+                : null
         ));
+
+        // return meds.map(({ id }) => (
+            // id in data
+            //     ? data[id]
+            //     : null
+        // ));
     }
 
     render() {
