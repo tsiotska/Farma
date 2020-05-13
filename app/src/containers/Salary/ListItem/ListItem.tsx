@@ -90,7 +90,8 @@ const styles = (theme: any) => createStyles({
     text: {
         fontSize: '14px',
         fontFamily: 'Source Sans Pro',
-        color: theme.palette.primary.gray.mainLight
+        color: theme.palette.primary.gray.mainLight,
+        whiteSpace: 'initial'
     },
     emptyPlaceholder: {
         marginTop: 10
@@ -107,6 +108,7 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     agentInfo?: any;
     expandedAgentsInfo?: any;
+    isInfoPopperOpen?: boolean;
 }
 
 @inject(({
@@ -114,11 +116,15 @@ interface IProps extends WithStyles<typeof styles> {
         departmentsStore: {
             getAsyncStatus,
             locationsAgents
+        },
+        uiStore: {
+            isInfoPopperOpen
         }
     }
 }) => ({
     getAsyncStatus,
-    locationsAgents
+    locationsAgents,
+    isInfoPopperOpen
 }))
 @observer
 class ListItem extends Component<IProps> {
@@ -129,7 +135,8 @@ class ListItem extends Component<IProps> {
     }
 
     expandChangeHandler = async (e: any, expanded: boolean) => {
-        const { onExpand, userSalary } = this.props;
+        const { onExpand, userSalary, isInfoPopperOpen } = this.props;
+        if (isInfoPopperOpen) return;
         if (onExpand) onExpand(userSalary, e, expanded);
     }
 

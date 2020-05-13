@@ -47,7 +47,6 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class LocationTextCell extends Component<IProps> {
-
     get location(): string {
         const { label, role } = this.props;
         if (label) {
@@ -68,7 +67,6 @@ class LocationTextCell extends Component<IProps> {
 
     render() {
         const { label, classes, isIgnored } = this.props;
-        console.log('label: ', toJS(label));
         return (
             <FormControlLabel
                 className={classes.label}

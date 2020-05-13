@@ -169,7 +169,6 @@ class TableRow extends Component<IProps> {
     @computed
     get nestLevel(): number {
         const { role, agent } = this.props;
-        // console.log('agent pos: ', agent.position, USER_ROLE[agent.position]);
         const userRole = typeof agent.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : agent.position;
@@ -279,7 +278,6 @@ class TableRow extends Component<IProps> {
             tooltips,
         } = this.props;
         const { LPUName, name, id: agentId } = agent;
-        // console.log('deposit: ', toJS(agent))
 
         const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 

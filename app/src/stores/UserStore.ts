@@ -263,7 +263,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
             deposit: this.previewBonusTotal.marks.deposit,
             payments: this.previewBonusTotal.marks.payments
         };
-        console.log('data: ', data);
 
         await this.dispatchRequest(
             api.updateBonusesData(
@@ -331,7 +330,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const newMark = { ...initialMark, [propName]: value };
 
         if (this.changedMarks.has(agentInfo.id)) {
-            console.log(toJS(initialMark), toJS(newMark));
             const target = this.changedMarks.get(agentInfo.id);
             target.set(medId, newMark);
         } else {
@@ -417,7 +415,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
             'loadBonuses'
         );
         this.bonuses[user.position] = userBonuses || [];
-        console.log('loaded: ', userBonuses);
         if (!userBonuses || !userBonuses.length) return;
 
         const targetBonuses = this.bonuses[this.role] || [];
@@ -429,7 +426,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 : null;
             this.setPreviewBonusMonth(newMonth);
         }
-        console.log('bonuses: ', toJS(this.bonuses));
     }
 
     @action.bound
@@ -633,9 +629,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
             this.userSalary = new Map(levels);
             this.userSales = sales;
         }
-        console.log('res');
-        console.log(toJS(this.userSalary));
-        console.log(toJS(this.userSales));
     }
 
     @action.bound
@@ -851,7 +844,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             message,
             deposit: +deposit
         };
-        console.log(deposit, message, preparedData);
+
         return this.dispatchRequest(
             api.postDeposit(
                 currentDepartmentId,

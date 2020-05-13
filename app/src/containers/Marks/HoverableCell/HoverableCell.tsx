@@ -63,10 +63,6 @@ class HoverableCell extends Component<IProps> {
                 ? agentMarks.get(medId)
                 : null;
             if (res) return res;
-            // console.log('agent marks: ', toJS(agentMarks));
-            // if (agentMarks) {
-            //     return agentMarks.get(medId);
-            // }
         }
 
         return agentInfo && agentInfo.marks

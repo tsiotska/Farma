@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core';
 import Icon from '../../components/InfoIcon';
 import { computed, observable } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 const styles = (theme: any) => createStyles({
     root: {},
     infoIcon: {
@@ -19,19 +19,39 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-   children: any;
+    children: any;
+    setInfoPopper?: (val: boolean) => void;
+    isInfoPopperOpen?: boolean;
 }
 
+@inject(({
+    appState: {
+        uiStore: {
+            setInfoPopper,
+            isInfoPopperOpen
+        }
+    }
+}) => ({
+    setInfoPopper,
+    isInfoPopperOpen
+}))
 @observer
 class InfoWindow extends Component<IProps> {
     @observable anchorEl: any = null;
 
     handleClick = (event: React.FormEvent<EventTarget>): void => {
         event.stopPropagation();
-        this.anchorEl = this.anchorEl ? null : event.currentTarget;
+        if (this.anchorEl) {
+            this.props.setInfoPopper(false);
+            this.anchorEl = null;
+        } else {
+            this.props.setInfoPopper(true);
+            this.anchorEl = event.currentTarget;
+        }
     }
 
-    closeInfo = (): void => {
+    closeInfo = (e: any): void => {
+        this.props.setInfoPopper(false);
         this.anchorEl = null;
     }
 
@@ -44,6 +64,7 @@ class InfoWindow extends Component<IProps> {
     get id() {
         return this.anchorEl ? 'simple-popper' : undefined;
     }
+
     render() {
         const { classes, children } = this.props;
 

@@ -129,7 +129,6 @@ class FormContent extends Component<IProps> {
     }
 
     submitHandler = () => {
-        console.log('form values: ', toJS(this.formValues));
         if (this.isSubmitAllowed) this.props.submitHandler(this.formValues);
     }
 

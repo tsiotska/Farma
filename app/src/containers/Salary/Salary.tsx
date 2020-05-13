@@ -128,7 +128,12 @@ class Salary extends Component<IProps> {
         return (
             <Grid container direction='column'>
                 <Header
-                    lastSalary={salaries && salaries.length > 0 && salaries[0].date}
+                    // lastSalary={salaries && salaries.length > 0 && salaries[0].date}
+                    lastSalary={
+                        (salaries && salaries.length && 'date' in salaries[0])
+                            ? salaries[0].date as Date
+                            : null
+                    }
                     year={this.year}
                     month={this.month}
                     changeMonth={this.changeMonth}

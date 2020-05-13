@@ -37,7 +37,7 @@ class TableRow extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' alignItems='center' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_USER)} checked={permissions.includes(PERMISSIONS.EDIT_USER)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_SALARY)} checked={permissions.includes(PERMISSIONS.EDIT_SALARY)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_DRUG)} checked={permissions.includes(PERMISSIONS.EDIT_DRUG)} size='small' color='default' />
@@ -46,14 +46,14 @@ class TableRow extends Component<IProps> {
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.EDIT_AGENT)} checked={permissions.includes(PERMISSIONS.EDIT_AGENT)} size='small' color='default' />
                 </Grid>
 
-                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' alignItems='center' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_DRUG)} checked={permissions.includes(PERMISSIONS.ADD_DRUG)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_HCF)} checked={permissions.includes(PERMISSIONS.ADD_HCF)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_PHARMACY)} checked={permissions.includes(PERMISSIONS.ADD_PHARMACY)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.ADD_AGENT)} checked={permissions.includes(PERMISSIONS.ADD_AGENT)} size='small' color='default' />
                 </Grid>
 
-                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' wrap='nowrap' item container>
+                <Grid direction='column' className={cx(classes.complexHeader)} justify='space-around' alignItems='center' wrap='nowrap' item container>
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_DRUG)} checked={permissions.includes(PERMISSIONS.DELETE_DRUG)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_HCF)} checked={permissions.includes(PERMISSIONS.DELETE_HCF)} size='small' color='default' />
                     <Checkbox onChange={this.changeHandler(PERMISSIONS.DELETE_PHARMACY)} checked={permissions.includes(PERMISSIONS.DELETE_PHARMACY)} size='small' color='default' />

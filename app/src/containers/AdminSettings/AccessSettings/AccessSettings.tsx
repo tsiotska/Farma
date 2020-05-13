@@ -143,7 +143,7 @@ class AccessSettings extends Component<IProps> {
                             <TableRow onChange={this.changeHandler(USER_ROLE.MEDICAL_AGENT)} title='МП'
                                       permissions={this.permissions.get(USER_ROLE.MEDICAL_AGENT)}/>
                         </> :
-                            <Typography>Відсутні права налаштування</Typography>
+                            <Typography>Дані відсутні</Typography>
                     }
                 </Grid>
                 <Button

@@ -43,9 +43,15 @@ export class UIStore implements IUIStore {
         anchorEl: null,
         callback: null
     };
+    @observable isInfoPopperOpen: boolean = false;
 
     @observable LpuSortSettings: ISortBy = null;
     @observable LpuFilterSettings: IFilterBy = null;
+
+    @action.bound
+    setInfoPopper(val: boolean) {
+        this.isInfoPopperOpen = val;
+    }
 
     @action.bound
     openDelPopper(settings: IDeletePopoverSettings) {

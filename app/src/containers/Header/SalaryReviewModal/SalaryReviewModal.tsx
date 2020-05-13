@@ -97,7 +97,7 @@ class SalaryReviewModal extends Component<IProps> {
     makeRequest = async () => {
         const { user, loadUserSalaryInfo } = this.props;
         this.isSalesLoading = true;
-        await loadUserSalaryInfo(user, this.year, this.month);
+        await loadUserSalaryInfo(user, this.year, this.month + 1);
         this.isSalesLoading = false;
     }
 
@@ -158,18 +158,17 @@ class SalaryReviewModal extends Component<IProps> {
                 </Grid>
 
                 <Grid className={classes.titleContainer}>
-                <Typography className={classes.headerText} variant='h5'>
-                    Заробітня плата
-                </Typography>
-
+                    <Typography className={classes.headerText} variant='h5'>
+                        Заробітня плата
+                    </Typography>
                     <Grid>
-                    <DateSelectPopper
-                        year={this.year}
-                        month={this.month}
-                        makeRequest={this.makeRequest}
-                        changeMonth={this.monthChangeHandler}
-                        changeYear={this.yearChangeHandler}
-                    />
+                        <DateSelectPopper
+                            year={this.year}
+                            month={this.month}
+                            makeRequest={this.makeRequest}
+                            changeMonth={this.monthChangeHandler}
+                            changeYear={this.yearChangeHandler}
+                        />
                     </Grid>
                 </Grid>
                 <SalaryHeader levelsCount={this.levelsCount}/>

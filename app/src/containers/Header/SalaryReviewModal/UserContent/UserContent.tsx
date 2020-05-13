@@ -251,8 +251,6 @@ class UserContent extends Component<IProps> {
             isAdmin
         } = this.props;
 
-        console.log(toJS(currentDepartmentMeds));
-
         return (
             <>
                 {
