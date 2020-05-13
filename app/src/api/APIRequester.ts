@@ -42,6 +42,7 @@ import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer'
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 import { ISearchResult } from '../interfaces/ISearchResult';
 import { searchNormalizer } from '../helpers/normalizers/searchNormalizer';
+import {toJS} from 'mobx';
 
 export interface ICachedPromise<T> {
     promise: Promise<T>;
@@ -384,12 +385,14 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    getDoctors(departmentId: number, mpId: number, unconfirmed?: boolean): Promise<IDoctor[]> {
-        const query = unconfirmed
-            ? '?unconfirmed=1'
-            : '';
+    getUnconfirmedDoctors(departmentId: number, query: string): Promise<IDoctor[]> {
+        return this.instance.get(`/api/branch/${departmentId}/${query}`)
+            .then(doctorsNormalizer)
+            .catch(this.defaultErrorHandler(null));
+    }
 
-        return this.instance.get(`/api/branch/${departmentId}/mp/${mpId}/agent${query}`)
+    getDoctors(departmentId: number, userId: number): Promise<IDoctor[]> {
+        return this.instance.get(`/api/branch/${departmentId}/mp/${userId}/agent`)
             .then(doctorsNormalizer)
             .catch(this.defaultErrorHandler(null));
     }

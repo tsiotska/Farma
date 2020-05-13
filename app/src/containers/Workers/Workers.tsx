@@ -205,6 +205,7 @@ class Workers extends Component<IProps> {
     }
 
     componentDidMount() {
+        console.log('Workers..')
         const { resetWorkers, history: { location: { search } } } = this.props;
         const queryParams = parse(search);
 

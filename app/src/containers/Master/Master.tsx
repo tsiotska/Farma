@@ -177,7 +177,6 @@ export class Master extends Component<IProps, null> {
         } = this.props;
 
         const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
-        console.log('previewUser: ', toJS(previewUser));
         if (matchDepartmentPath) {
             const urlDepId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
                 ? +((matchDepartmentPath.params as any).departmentId)
