@@ -208,7 +208,7 @@ class DoctorModal extends Component<IProps> {
         } = initialDoc;
 
         this.formValues = {
-            name: name || this.initialFormValues.name,
+            name: name.split(/\s+/).map(word => word[0].toUpperCase() + word.substring(1)).join(' ') || this.initialFormValues.name,
             lpu: this.initialFormValues.lpu,
             specialty: this.initialFormValues.specialty,
             mobilePhone: mobilePhone || this.initialFormValues.mobilePhone,
