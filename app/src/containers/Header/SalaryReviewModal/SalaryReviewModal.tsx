@@ -25,6 +25,7 @@ import Snackbar from '../../../components/Snackbar';
 import DateSelect from '../../../components/DateSelect';
 import { Add, ArrowLeft, ArrowRight } from '@material-ui/icons';
 import DateSelectPopper from '../../Salary/DateSelectPopper';
+import LoadingMask from '../../../components/LoadingMask';
 
 const styles = createStyles({
     header: {
@@ -158,10 +159,9 @@ class SalaryReviewModal extends Component<IProps> {
                 </Grid>
 
                 <Grid className={classes.titleContainer}>
-                    <Typography className={classes.headerText} variant='h5'>
-                        Заробітня плата
-                    </Typography>
-                    <Grid>
+                        <Typography className={classes.headerText} variant='h5'>
+                            Заробітня плата
+                        </Typography>
                         <DateSelectPopper
                             year={this.year}
                             month={this.month}
@@ -169,7 +169,10 @@ class SalaryReviewModal extends Component<IProps> {
                             changeMonth={this.monthChangeHandler}
                             changeYear={this.yearChangeHandler}
                         />
-                    </Grid>
+                        {
+                            this.isSalesLoading &&
+                            <LoadingMask size={20} />
+                        }
                 </Grid>
                 <SalaryHeader levelsCount={this.levelsCount}/>
                 <UserContent

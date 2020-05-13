@@ -149,9 +149,10 @@ class Marks extends Component<IProps> {
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
-    componentDidMount() {
-        const { loadBonuses } = this.props;
-        loadBonuses(this.props.previewUser);
+    async componentDidMount() {
+        const { loadBonuses, loadBonusesData } = this.props;
+        await loadBonuses(this.props.previewUser);
+        await loadBonusesData(this.props.previewUser);
         this.reactionDisposer = reaction(
             () => this.props.previewUser,
             (user: IUserLikeObject) => {
@@ -161,7 +162,7 @@ class Marks extends Component<IProps> {
         this.monthReaction = reaction(
             () => this.props.previewBonusMonth,
             () => {
-                const { loadBonusesData, previewUser } = this.props;
+                const { previewUser } = this.props;
                 loadBonusesData(previewUser);
             }
         );

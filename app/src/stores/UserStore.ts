@@ -431,7 +431,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadBonusesData(user: IUserLikeObject) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-
         if (!currentDepartmentId || !this.previewUser) return;
 
         const initialBonus = this.bonuses[user.position]
@@ -445,6 +444,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ),
             'loadBonusesData'
         );
+
         const targetBonus = this.bonuses[user.position]
             && this.bonuses[user.position].find(({ month }) => month === this.previewBonusMonth);
 

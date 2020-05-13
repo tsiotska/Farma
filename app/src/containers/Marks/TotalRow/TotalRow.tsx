@@ -85,7 +85,6 @@ class TotalRow extends Component<IProps> {
     @computed
     get flattenMedsInfo(): IMark[] {
         const { agents, changedMarks } = this.props;
-        console.log('agents: ', toJS(agents));
         return agents.reduce((acc, curr) => {
             const { marks, id } = curr;
             const changedAgentMarks = changedMarks.get(id);
