@@ -39,7 +39,7 @@ class SummaryRow extends Component<IProps> {
         );
     }
 
-    calculateTotal = (data: number[]) => data.reduce((a, b) => a + b, 0);
+    calculateTotal = (data: number[]) => data.reduce((a, b) => a + b, 0).toFixed(this.props.mantisLength);
 
     render() {
         const { mantisLength, ignoredMeds, meds } = this.props;

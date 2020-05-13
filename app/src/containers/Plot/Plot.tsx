@@ -215,8 +215,8 @@ class Plot extends Component<IProps> {
         const initialLabel = tooltips[0].label;
         const monthNumber = +initialLabel;
         const actualMonthNumber = monthNumber === 0
-        ? 11
-        : monthNumber - 1;
+            ? 11
+            : monthNumber - 1;
         return uaMonthsNames[actualMonthNumber] || initialLabel;
     }
 
@@ -234,9 +234,13 @@ class Plot extends Component<IProps> {
                         legend={{ display: false }}
                         options={{
                             maintainAspectRatio: false,
-                            tooltips: { callbacks: {
-                                title: this.titleRenderer
-                            } },
+                            tooltips: {
+                                mode: 'x',
+                                xAlign: 'left',
+                                callbacks: {
+                                    title: this.titleRenderer,
+                                }
+                            },
                         }}
                       />
                 }

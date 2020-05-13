@@ -120,7 +120,7 @@ interface ISettings {
 @observer
 class DrugsTable extends Component<IProps> {
     readonly modePressets: Record<STAT_DISPLAY_MODE, ISettings> = {
-        [STAT_DISPLAY_MODE.CURRENCY]: { mantisLength: 2, propName: 'money' },
+        [STAT_DISPLAY_MODE.CURRENCY]: { mantisLength: 0, propName: 'money' },
         [STAT_DISPLAY_MODE.PACK]: { mantisLength: 0, propName: 'amount' }
     };
     ref: any = React.createRef();

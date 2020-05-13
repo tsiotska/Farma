@@ -78,12 +78,8 @@ class ListItem extends Component<IProps> {
         ? 'money'
         : 'amount';
 
-        const mantisLength = displayMode === STAT_DISPLAY_MODE.CURRENCY
-        ? 2
-        : 0;
-
         return stat
-        ? stat[propName].toFixed(mantisLength)
+        ? stat[propName].toFixed(0)
         : '-';
     }
 
