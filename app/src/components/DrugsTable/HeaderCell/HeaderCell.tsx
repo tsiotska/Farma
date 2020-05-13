@@ -3,6 +3,8 @@ import { observer, inject } from 'mobx-react';
 import { FormControlLabel, Checkbox, createStyles, WithStyles, withStyles, Typography, IconButton } from '@material-ui/core';
 import { GROUP_BY } from '../../../containers/Sales/TableStat/TableStat';
 import { FilterList, Close } from '@material-ui/icons';
+import FilterPopper from '../FilterPopper';
+import { observable } from 'mobx';
 
 const styles = createStyles({
     label: {
@@ -54,6 +56,8 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class HeaderCell extends Component<IProps> {
+    @observable anchor: any = null;
+
     get isChecked(): boolean {
         const { groupBy, isAnyAgentIgnored, isAnyLocationIgnored } = this.props;
 
@@ -70,6 +74,14 @@ class HeaderCell extends Component<IProps> {
         : toggleAllIgnoredLocations;
 
         action();
+    }
+
+    openFilter = ({ currentTarget }: any) => {
+        this.anchor = currentTarget;
+    }
+
+    closeHandler = () => {
+        this.anchor = null;
     }
 
     render() {
@@ -93,7 +105,7 @@ class HeaderCell extends Component<IProps> {
                         {
                             value === 'Аптеки' &&
                             <>
-                                <IconButton className={classes.iconButton}>
+                                <IconButton onClick={this.openFilter} className={classes.iconButton}>
                                     <FilterList fontSize='small' />
                                 </IconButton>
                                 <IconButton className={classes.iconButton}>
@@ -101,6 +113,10 @@ class HeaderCell extends Component<IProps> {
                                 </IconButton>
                             </>
                         }
+                        <FilterPopper
+                            anchor={this.anchor}
+                            onClose={this.closeHandler}
+                        />
                     </Typography>
                 }
             />

@@ -18,8 +18,8 @@ interface IProps {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     loadLocaleSalesStat?: () => void;
     loadAgentSalesStat?: () => void;
-    locationSalesStat?: ISalesStat[];
-    agentSalesStat?: ISalesStat[];
+    sortedLocationSalesStat?: ISalesStat[];
+    sortedAgentsSalesStat?: ISalesStat[];
     locations?: Map<number, ILocation>;
     locationsAgents?: Map<number, IUserCommonInfo>;
     pharmaciesMap?: Map<number, ILPU>;
@@ -43,8 +43,8 @@ export enum GROUP_BY {
         },
         salesStore: {
             getAsyncStatus,
-            locationSalesStat,
-            agentSalesStat,
+            sortedLocationSalesStat,
+            sortedAgentsSalesStat,
             ignoredLocations,
             ignoredAgents,
             loadLocaleSalesStat,
@@ -63,8 +63,8 @@ export enum GROUP_BY {
     role,
     previewUser,
     getAsyncStatus,
-    locationSalesStat,
-    agentSalesStat,
+    sortedLocationSalesStat,
+    sortedAgentsSalesStat,
     locations,
     regions,
     locationsAgents,
@@ -122,8 +122,8 @@ class TableStat extends Component<IProps> {
     get locationsLabels(): Map<number, ILocation | ILPU> {
         const { role, locations, pharmaciesMap } = this.props;
         return role === USER_ROLE.MEDICAL_AGENT
-        ? pharmaciesMap
-        : locations;
+            ? pharmaciesMap
+            : locations;
     }
 
     getTitle(): string {
@@ -162,8 +162,8 @@ class TableStat extends Component<IProps> {
 
     render() {
         const {
-            agentSalesStat,
-            locationSalesStat,
+            sortedAgentsSalesStat,
+            sortedLocationSalesStat,
             locationsAgents,
             ignoredAgents,
             ignoredLocations,
@@ -178,7 +178,7 @@ class TableStat extends Component<IProps> {
                     <DrugsTable
                         excelClickHandler={loadAgentsSalesExcel}
                         isLoading={this.isLoading}
-                        salesStat={agentSalesStat}
+                        salesStat={sortedAgentsSalesStat}
                         labelData={locationsAgents}
                         onRetry={this.retryClickHandler}
                         ignoredItems={ignoredAgents}
@@ -194,7 +194,7 @@ class TableStat extends Component<IProps> {
                 <DrugsTable
                     excelClickHandler={loadLocationsExcel}
                     isLoading={this.isLoading}
-                    salesStat={locationSalesStat}
+                    salesStat={sortedLocationSalesStat}
                     labelData={this.locationsLabels}
                     onRetry={this.retryClickHandler}
                     ignoredItems={ignoredLocations}

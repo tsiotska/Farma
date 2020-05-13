@@ -40,5 +40,13 @@ export const lpuNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(
     data,
     defaultLPU,
     lpuValuesMap,
-    { requiredProps: [ 'id', 'name' ]}
+    {
+        requiredProps: [ 'id', 'name' ],
+        valueNormalizers: {
+            name: (value: string) => value ? value.toLowerCase() : null,
+            city: (value: string) => value ? value.toLowerCase() : null,
+            address: (value: string) => value ? value.toLowerCase() : null,
+            oblast: (value: string) => value ? value.toLowerCase() : null,
+        }
+    }
 );

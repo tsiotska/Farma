@@ -30,6 +30,6 @@ export default class RootStore implements IRootStore {
         this.departmentsStore = new DepartmentsStore(this);
         this.userStore = new UserStore(this);
         this.salesStore = new SalesStore(this);
-        this.uiStore = new UIStore();
+        this.uiStore = new UIStore(this);
     }
 }

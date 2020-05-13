@@ -215,9 +215,15 @@ export default class UserStore extends AsyncStore implements IUserStore {
     async updateBonus(bonus: IBonusInfo, sale: boolean) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
-        const id = this.previewUser
-            ? this.previewUser.id
-            : null;
+        let id: number = null;
+        if  (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
+            id = this.previewUser.id;
+            console.log('user: ', toJS(this.previewUser));
+        } else {
+            const mp = this.bonusUsers.find(({ position }) => position === USER_ROLE.MEDICAL_AGENT);
+            id = mp ? mp.id : null;
+            console.log('user: ', toJS(mp));
+        }
 
         if (!bonus || id === null || currentDepartmentId === null) return;
 
@@ -269,7 +275,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 currentDepartmentId,
                 id,
                 this.bonusesYear,
-                month,
+                month + 1,
                 data,
                 sale
             ),
@@ -281,7 +287,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
             await this.loadBonuses(user);
             await this.loadBonusesData(user);
         }
-
+        await this.loadBonuses(this.previewUser);
+        await this.loadBonusesData(this.previewUser);
     }
 
     @computed

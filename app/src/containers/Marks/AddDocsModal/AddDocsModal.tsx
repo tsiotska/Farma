@@ -101,8 +101,6 @@ class AddDocsModal extends Component<IProps> {
     @observable selectedPharmacy: string = '';
     @observable selectedDocs: IDoctor[] = [];
     @observable searchName: string = '';
-    // @observable docs: IDoctor[] = [];
-    // @observable docsLoaded: boolean = false;
 
     @computed
     get docsToPick(): IDoctor[] {

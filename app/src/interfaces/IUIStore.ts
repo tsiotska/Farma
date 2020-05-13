@@ -1,4 +1,4 @@
-import { ISortBy, IFilterBy } from '../stores/UIStore';
+import { ISortBy, IFilterBy, ISalesPharmacyFilter } from '../stores/UIStore';
 
 export interface IUIStore {
     salesHeaderHeight: number;
@@ -7,4 +7,5 @@ export interface IUIStore {
     LpuSortSettings: ISortBy;
     LpuFilterSettings: IFilterBy;
     modalPayload: any;
+    salesPharmacyFilter: ISalesPharmacyFilter;
 }

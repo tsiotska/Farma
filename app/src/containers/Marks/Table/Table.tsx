@@ -209,7 +209,7 @@ class Table extends Component<IProps> {
 
     updateBonus = () => {
         const { updateBonus, previewBonus } = this.props;
-        updateBonus(previewBonus, true);
+        updateBonus(previewBonus, false);
     }
 
     refHandler = (el: any) => {
@@ -261,10 +261,12 @@ class Table extends Component<IProps> {
             parentUser,
             previewBonus,
             updateBonus,
+            role,
             changedMarks
         } = this.props;
 
-        const condition = (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
+        const condition = role === USER_ROLE.MEDICAL_AGENT
+            && (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
             && !this.isEmpty
             && changedMarks.size;
 

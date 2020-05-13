@@ -7,7 +7,9 @@ import Header from './Header';
 import { ILPU } from '../../interfaces/ILPU';
 
 const styles = (theme: any) => createStyles({
-    root: {},
+    root: {
+        textTransform: 'capitalize'
+    },
     pagination: {
         margin: '16px 0 60px auto'
     }

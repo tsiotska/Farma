@@ -1,7 +1,8 @@
+import { IRootStore } from './../interfaces/IRootStore';
 import { INotification } from './../interfaces/iNotification';
 import { SNACKBAR_TYPE } from './../constants/Snackbars';
 import { IUIStore } from '../interfaces/IUIStore';
-import { observable, action } from 'mobx';
+import { observable, action, toJS } from 'mobx';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 
 export enum SORT_ORDER {
@@ -24,12 +25,19 @@ export interface IDeletePopoverSettings {
     callback: (confirm: boolean) => void;
 }
 
+export interface ISalesPharmacyFilter {
+    order: SORT_ORDER;
+    ignoredLpus: Set<number>;
+    map?: number[];
+}
+
 export interface INotificationSnackbar {
     type: SNACKBAR_TYPE;
     message: string;
 }
 
 export class UIStore implements IUIStore {
+    rootStore: IRootStore;
     @observable notificationSnackbar: INotificationSnackbar = {
         type: SNACKBAR_TYPE.SUCCESS,
         message: ''
@@ -47,6 +55,30 @@ export class UIStore implements IUIStore {
 
     @observable LpuSortSettings: ISortBy = null;
     @observable LpuFilterSettings: IFilterBy = null;
+
+    @observable salesPharmacyFilter: ISalesPharmacyFilter = {
+        order: null,
+        ignoredLpus: new Set(),
+        map: []
+    };
+
+    constructor(rootStore: IRootStore) {
+        this.rootStore = rootStore;
+    }
+
+    @action.bound
+    setPharmacyFilters(value: ISalesPharmacyFilter) {
+        const { salesStore: { setIgnoredLocations }} = this.rootStore;
+
+        if (value !== null) {
+            const { ignoredLpus } = value;
+            setIgnoredLocations(ignoredLpus);
+        }
+
+        this.salesPharmacyFilter = value === null
+            ? { order: SORT_ORDER.ASCENDING, ignoredLpus: new Set(), map: [] }
+            : { ...value, ignoredLpus: new Set() };
+    }
 
     @action.bound
     setInfoPopper(val: boolean) {

@@ -79,6 +79,69 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         return new Map(data);
     }
 
+    // @computed
+    // get sortedLocationSalesStat(): ISalesStat[] {
+    //     // const {
+    //     //     userStore: { role },
+    //     //     uiStore: { salesPharmacyFilter: { map }}
+    //     // } = this.rootStore;
+
+    //     // if (role !== USER_ROLE.MEDICAL_AGENT || !map || !this.locationSalesStat) {
+    //     //     return this.locationSalesStat;
+    //     // }
+
+    //     // return this.locationSalesStat.sort((a, b) => {
+    //     //     const aIndx = map.indexOf(a.id);
+    //     //     const bIndx = map.indexOf(b.id);
+    //     //     return aIndx - bIndx;
+    //     // });
+    //     return this.locationSalesStat;
+    // }
+
+    @computed
+    get sortedLocationSalesStat(): ISalesStat[] {
+        const {
+            userStore: { role },
+            uiStore: { salesPharmacyFilter: { map }}
+        } = this.rootStore;
+
+        const sameStatusSortCallback = (role !== USER_ROLE.MEDICAL_AGENT || !map || !this.locationSalesStat)
+        ? () => 0
+        : (a: ISalesStat, b: ISalesStat) => {
+            const aIndx = map.indexOf(a.id);
+            const bIndx = map.indexOf(b.id);
+            return aIndx - bIndx;
+        };
+
+        const callback = (a: ISalesStat, b: ISalesStat) => {
+            const isLeftIgnored = this.ignoredLocations.has(a.id);
+            const isRightIgnored = this.ignoredLocations.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return sameStatusSortCallback(a, b);
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        };
+
+        return this.locationSalesStat
+            ? this.locationSalesStat.slice().sort(callback)
+            : this.locationSalesStat;
+    }
+
+    @computed
+    get sortedAgentsSalesStat(): ISalesStat[] {
+        const callback = (a: ISalesStat, b: ISalesStat) => {
+            const isLeftIgnored = this.ignoredAgents.has(a.id);
+            const isRightIgnored = this.ignoredAgents.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return 0;
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        };
+        return this.agentSalesStat
+            ? this.agentSalesStat.slice().sort(callback)
+            : this.agentSalesStat;
+    }
+
     @computed
     get agentsTargetProperty(): AgentTargetProperty {
         const { departmentsStore: { locationsAgents } } = this.rootStore;
@@ -142,6 +205,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     }
 
     @action.bound
+    setIgnoredLocations(numbers: Set<number>) {
+        this.ignoredLocations = new Set(numbers.values());
+    }
+
+    @action.bound
     toggleIgnoredLocation = (locationId: number) => {
         const { departmentsStore: { locationsAgents }} = this.rootStore;
 
@@ -159,8 +227,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             const { id, [this.agentsTargetProperty]: location} = agent;
             if (location === locationId) callback.call(this.ignoredAgents, id);
         });
-        this.sortAgentsSales();
-        this.sortLocationsSales();
+        // this.sortAgentsSales();
+        // this.sortLocationsSales();
     }
 
     @action.bound
@@ -187,34 +255,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 this.ignoredLocations.add(targetLocation);
             }
         }
-        this.sortAgentsSales();
-        this.sortLocationsSales();
-    }
-
-    @action.bound
-    sortAgentsSales() {
-        if (this.ignoredAgents.size === 0) return;
-        this.agentSalesStat = this.agentSalesStat.slice().sort((a, b) => {
-            const isLeftIgnored = this.ignoredAgents.has(a.id);
-            const isRightIgnored = this.ignoredAgents.has(b.id);
-            if (isLeftIgnored === isRightIgnored) return 0;
-            return isLeftIgnored === true
-                ? 1
-                : -1;
-        });
-    }
-
-    @action.bound
-    sortLocationsSales() {
-        if (this.ignoredLocations.size === 0) return;
-        this.locationSalesStat = this.locationSalesStat.slice().sort((a, b) => {
-            const isLeftIgnored = this.ignoredLocations.has(a.id);
-            const isRightIgnored = this.ignoredLocations.has(b.id);
-            if (isLeftIgnored === isRightIgnored) return 0;
-            return isLeftIgnored === true
-                ? 1
-                : -1;
-        });
+        // this.sortAgentsSales();
+        // this.sortLocationsSales();
     }
 
     @action.bound

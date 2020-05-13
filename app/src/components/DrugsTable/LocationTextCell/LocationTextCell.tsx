@@ -16,7 +16,8 @@ import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = createStyles({
     label: {
-        margin: 0
+        margin: 0,
+        textTransform: 'capitalize'
     },
     checkbox: {
         padding: 0,
