@@ -12,7 +12,15 @@ const styles = createStyles({
     },
     complexHeader: {
         backgroundColor: '#fafcfe',
+        marginTop: 40
+    },
+    cell: {
         borderBottom: '1px solid #E4EDF7',
+        height: 40
+    },
+    title_bold: {
+        fontWeight: 600,
+        color: '#808080'
     },
     complexHeader_icon: {
         marginLeft: 10
@@ -40,48 +48,86 @@ class TableHeader extends Component<IProps> {
 
         return (
             <Grid direction='column' wrap='nowrap' container>
-                <Grid xs item/>
-                <Grid xs className={classes.complexHeader} alignItems='center' justify='center' item container>
-                    <Typography align='center' variant='body2'>
-                        Звіт
+
+                <Grid className={cx(classes.complexHeader)} >
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                    <Typography className={classes.title_bold} color='textSecondary' variant='body1'>
+                        Перегляд
                     </Typography>
-                </Grid>
-                <Grid className={classes.complexHeader} alignItems='center' justify='flex-start' item container>
-                    <IconButton className={classes.complexHeader_icon}>
-                        <Settings width={22} height={22}/>
-                    </IconButton>
-                    <Grid direction='column' className={classes.headersWrapper} wrap='nowrap' justify='space-around'>
-                        <Typography variant='body2'>Працівники</Typography>
-                        <Typography variant='body2'>ЗП</Typography>
-                        <Typography variant='body2'>Препарати</Typography>
-                        <Typography variant='body2'>ЛПУ</Typography>
-                        <Typography variant='body2'>Аптеки</Typography>
-                        <Typography variant='body2'>Лікарі</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
+                            Звіт
+                        </Typography>
                     </Grid>
                 </Grid>
-                <Grid className={classes.complexHeader} alignItems='center' justify='flex-start' item container>
-                    <IconButton className={classes.complexHeader_icon}>
-                    <AddCircleOutlineIcon />
-                    </IconButton>
-                    <Grid direction='column' className={classes.headersWrapper} wrap='nowrap' justify='space-around'>
-                        <Typography variant='body2'>Препарати</Typography>
-                        <Typography variant='body2'>ЛПУ</Typography>
-                        <Typography variant='body2'>Аптеки</Typography>
-                        <Typography variant='body2'>Лікарі</Typography>
+
+                <Grid className={cx(classes.complexHeader)} >
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
+                            Редагування
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Працівники</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>ЗП</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Препарати</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>ЛПУ</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Аптеки</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Лікарі</Typography>
                     </Grid>
                 </Grid>
-                <Grid className={classes.complexHeader} alignItems='center' justify='flex-start' item container>
-                    <IconButton className={classes.complexHeader_icon}>
-                        <DeleteOutlinedIcon />
-                    </IconButton>
-                    <Grid direction='column' className={classes.headersWrapper} wrap='nowrap' justify='space-around'>
-                        <Typography variant='body2'>Препарати</Typography>
-                        <Typography variant='body2'>ЛПУ</Typography>
-                        <Typography variant='body2'>Аптеки</Typography>
-                        <Typography variant='body2'>Лікарі</Typography>
+
+                <Grid className={cx(classes.complexHeader)} >
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
+                            Додавання
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Препарати</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>ЛПУ</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Аптеки</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Лікарі</Typography>
                     </Grid>
                 </Grid>
-            </Grid>
+
+                <Grid className={cx(classes.complexHeader)} >
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
+                            Видалення
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Препарати</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>ЛПУ</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Аптеки</Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>Лікарі</Typography>
+                    </Grid>
+                    </Grid>
+                </Grid>
         );
     }
 }
