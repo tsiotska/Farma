@@ -7,7 +7,9 @@ import { KeyboardArrowDown } from '@material-ui/icons';
 import { IUser } from '../../../interfaces';
 import UserShortInfo from '../../../components/UserShortInfo';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import { computed } from 'mobx';
+import {computed, observable, toJS} from 'mobx';
+import InfoWindow from '../../../components/InfoWindow';
+import SalaryInfoWindowForm from '../SalaryInfoWindowForm';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -100,9 +102,11 @@ interface IProps extends WithStyles<typeof styles> {
     isExpanded: boolean;
     userSalary: IUserSalary;
     position: 'РМ' | 'МП';
-    locationsAgents: Map<number, IUser>;
+    locationsAgents?: Map<number, IUser>;
     onExpand?: (userSalary: IUserSalary, e: any, expanded: boolean) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    agentInfo?: any;
+    expandedAgentsInfo?: any;
 }
 
 @inject(({
@@ -118,12 +122,13 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class ListItem extends Component<IProps> {
+
     @computed
     get isLoading(): boolean {
         return this.props.getAsyncStatus('loadSubSalaries').loading;
     }
 
-    expandChangeHandler = (e: any, expanded: boolean) => {
+    expandChangeHandler = async (e: any, expanded: boolean) => {
         const { onExpand, userSalary } = this.props;
         if (onExpand) onExpand(userSalary, e, expanded);
     }
@@ -146,6 +151,8 @@ class ListItem extends Component<IProps> {
                 total,
                 subSalaries,
             },
+            agentInfo,
+            expandedAgentsInfo
         } = this.props;
 
         return (
@@ -168,7 +175,7 @@ class ListItem extends Component<IProps> {
                         root: classes.summaryRoot,
                         expandIcon: classes.expandIcon
                     }}>
-                        <Grid className={classes.contantCol} wrap='nowrap' container item>
+                        <Grid className={classes.contantCol} wrap='nowrap' alignItems='center' container item>
                             <UserShortInfo
                                 user={locationsAgents.get(id)}
                                 classes={{
@@ -179,7 +186,19 @@ class ListItem extends Component<IProps> {
                                 }}
                                 disableClick
                                 hideLevel
+                                hidePosition
                             />
+                            {
+                                agentInfo &&
+                                <InfoWindow>
+                                  <SalaryInfoWindowForm
+                                    region={agentInfo.region}
+                                    mobilePhone={agentInfo.mobilePhone}
+                                    workPhone={agentInfo.workPhone}
+                                    card={agentInfo.card}
+                                  />
+                                </InfoWindow>
+                            }
                         </Grid>
                         <Grid xs justify='center' alignItems='center' container item>
                             { position }
@@ -218,9 +237,14 @@ class ListItem extends Component<IProps> {
                             (subSalaries && subSalaries.length)
                             ? subSalaries.map(x => (
                                 <ListItem
+                                    agentInfo={
+                                        expandedAgentsInfo
+                                            // tslint:disable-next-line:no-shadowed-variable
+                                            ? expandedAgentsInfo.find(({ id }: { id: number }) => id === x.id)
+                                            : null
+                                    }
                                     key={x.id}
                                     classes={classes}
-                                    locationsAgents={locationsAgents}
                                     expandable={false}
                                     isExpanded={false}
                                     userSalary={x}

@@ -1,10 +1,8 @@
 import { IDoctor } from './../interfaces/IDoctor';
 import { IBonusInfo, IAgentInfo, IMark } from './../interfaces/IBonusInfo';
 import { computed, action, observable, toJS, runInAction } from 'mobx';
-
 import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
-
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
@@ -65,7 +63,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @computed
     get userPermissions(): PERMISSIONS[] {
-        const { departmentsStore: { positions }} = this.rootStore;
+        const { departmentsStore: { positions } } = this.rootStore;
 
         if (!this.user || !positions) return [];
 
@@ -619,14 +617,14 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async loadUserSalaryInfo({ id }: IUser) {
+    async loadUserSalaryInfo({ id }: IUser, year: number, month: number) {
         const requestName = 'loadUserSalaryInfo';
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-
+        const time = `?year=${year}&month=${month}`;
         if (!currentDepartmentId || !id) return;
 
         const res = await this.dispatchRequest(
-            api.getUserSalary(currentDepartmentId, id),
+            api.getUserSalary(currentDepartmentId, id, time),
             requestName
         );
 
@@ -635,6 +633,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
             this.userSalary = new Map(levels);
             this.userSales = sales;
         }
+        console.log('res');
+        console.log(toJS(this.userSalary));
+        console.log(toJS(this.userSales));
     }
 
     @action.bound

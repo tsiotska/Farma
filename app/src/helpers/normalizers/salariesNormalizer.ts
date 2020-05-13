@@ -12,7 +12,8 @@ const defaultUserSalary: IUserSalary = {
     money: null,
     total: null,
     position: null,
-    subSalaries: null
+    subSalaries: null,
+    date: null
 };
 
 const namesMap: IValuesMap = {
@@ -25,6 +26,7 @@ const namesMap: IValuesMap = {
     fact_money: 'money',
     total: 'total',
     position: 'position',
+    date: 'date'
 };
 
 export const salariesNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(

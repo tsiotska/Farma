@@ -5,12 +5,14 @@ import {
     Grid,
     Button,
     IconButton,
-    Typography
+    Typography,
+    Popover
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { Delete, Edit } from '@material-ui/icons';
 import cx from 'classnames';
+
 import { IDoctor } from '../../../interfaces/IDoctor';
 import { observable, toJS } from 'mobx';
 import LoadingMask from '../../../components/LoadingMask';
@@ -92,6 +94,9 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px',
         marginLeft: 'auto',
         minWidth: 100
+    },
+    infoIcon: {
+        alignSelf: 'center'
     },
     deposit: {
         width: '100%',
@@ -185,6 +190,7 @@ class DoctorListItem extends Component<IProps> {
                 workPhone,
                 deposit,
                 card,
+                address
             }
         } = this.props;
 
@@ -200,6 +206,9 @@ class DoctorListItem extends Component<IProps> {
                 <Grid xs container item>
                     <Typography variant='body2' className={classes.text}>
                         { LPUName || '-' }
+                    </Typography>
+                    <Typography color='textSecondary'>
+                        { address }
                     </Typography>
                 </Grid>
                 <Grid xs container item>
@@ -229,7 +238,6 @@ class DoctorListItem extends Component<IProps> {
                         { card || '-'}
                     </Typography>
                 </Grid>
-
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
                     {
                         unconfirmed
@@ -261,6 +269,7 @@ class DoctorListItem extends Component<IProps> {
                             className={classes.removeIcon}
                             fontSize='small'
                         />
+
                     </IconButton>
                 </Grid>
             </Grid>

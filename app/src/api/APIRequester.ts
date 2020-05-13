@@ -330,8 +330,9 @@ export class APIRequester {
             });
     }
 
-    getUserSalary(departmentId: number, userId: number): Promise<any> {
-        return this.instance.get(`/api/branch/${departmentId}/salary/${userId}`)
+    getUserSalary(departmentId: number, userId: number, time: string): Promise<any> {
+        // time validation missed
+        return this.instance.get(`/api/branch/${departmentId}/salary/${userId}${time}`)
             .then(salaryNormalizer)
             .catch(this.defaultErrorHandler());
     }
@@ -615,6 +616,31 @@ export class APIRequester {
     getMPs(depId: number, rmId: number): Promise<IUser[]> {
         return this.instance.get(`/api/branch/${depId}/rm/${rmId}/worker`)
             .then(multipleUserNormalizer)
+            .catch(this.defaultErrorHandler());
+    }
+
+    getRmAgentsInfo(departmentId: number): Promise<any> {
+        return this.instance.get(`/api/branch/${departmentId}/ffm/worker`)
+            .then(({ data: { data }}) => {
+                return  data.map(({bank_card, mobile_phone, work_phone, region, id}: any) => ({
+                card: bank_card,
+                mobilePhone: mobile_phone,
+                workPhone: work_phone,
+                region, id
+            }));
+        }).catch(this.defaultErrorHandler());
+    }
+
+    getMpAgentsInfo(departmentId: number, userId: number): Promise<any> {
+        return this.instance.get(`/api/branch/${departmentId}/rm/${userId}/worker`)
+            .then(({ data: { data }}) => {
+                return data.map(({bank_card, mobile_phone, work_phone, region, id}: any) => ({
+                    card: bank_card,
+                    mobilePhone: mobile_phone,
+                    workPhone: work_phone,
+                    region, id
+                }));
+            })
             .catch(this.defaultErrorHandler());
     }
 }

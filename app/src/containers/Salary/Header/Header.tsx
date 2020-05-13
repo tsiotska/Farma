@@ -14,8 +14,12 @@ import { observable } from 'mobx';
 import ExcelIcon from '../../../components/ExcelIcon';
 import LoadingMask from '../../../components/LoadingMask';
 import DateSelectPopper from '../DateSelectPopper';
+import {IUserSalary} from '../../../interfaces/IUserSalary';
 
 const styles = (theme: any) => createStyles({
+    header: {
+      paddingLeft: 10
+    },
     iconButton: {
         marginLeft: 'auto'
     },
@@ -28,7 +32,11 @@ const styles = (theme: any) => createStyles({
         height: 42
     },
     title: {
+        whiteSpace: 'nowrap',
         color: '#555555'
+    },
+    lastDateContainer: {
+        marginLeft: 20
     }
 });
 
@@ -40,6 +48,7 @@ interface IProps extends WithStyles<typeof styles> {
     changeMonth: (value: number) => void;
     calculateSalaries?: (year: number, month: number) => void;
     loadSalariesExcel?: (year: number, month: number) => void;
+    lastSalary?: Date;
 }
 
 @inject(({
@@ -76,22 +85,28 @@ class Header extends Component<IProps> {
             changeYear,
             month,
             changeMonth,
-            showCalculateButton
+            showCalculateButton,
+            lastSalary
         } = this.props;
 
         return (
-            <Grid alignItems='center' container>
+            <Grid className={classes.header}wrap='nowrap' alignItems='center' container>
+                <Grid item>
                 <Typography variant='h5' className={classes.title}>
                     Заробітня плата
                 </Typography>
+                </Grid>
+                <Grid item>
                 <DateSelectPopper
                     year={year}
                     month={month}
                     changeMonth={changeMonth}
                     changeYear={changeYear}
                 />
+                </Grid>
                 {
                     showCalculateButton &&
+                        <Grid item>
                     <Button
                         disabled={this.isSalaryCalculating}
                         onClick={this.calculateClickHandler}
@@ -102,6 +117,18 @@ class Header extends Component<IProps> {
                                 : 'Розрахувати зарплату'
                             }
                     </Button>
+                        </Grid>
+                }
+                {
+                    lastSalary &&
+                    <Grid className={classes.lastDateContainer} item container direction='column'>
+                        <Typography color='textSecondary'>
+                            Розраховано
+                        </Typography>
+                        <Typography>
+                            {lastSalary}
+                        </Typography>
+                    </Grid>
                 }
                 <IconButton onClick={this.excelClickHandler} className={classes.iconButton}>
                     <ExcelIcon />

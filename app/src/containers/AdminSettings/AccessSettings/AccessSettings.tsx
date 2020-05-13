@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, Button } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Grid, Button, Typography } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import TableHeader from './TableHeader';
 import { IPosition } from '../../../interfaces/IPosition';
@@ -27,14 +27,14 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            positions,
-            updatePermissions,
-            getAsyncStatus
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     positions,
+                     updatePermissions,
+                     getAsyncStatus
+                 }
+             }
+         }) => ({
     positions,
     updatePermissions,
     getAsyncStatus
@@ -68,7 +68,7 @@ class AccessSettings extends Component<IProps> {
         return this.props.getAsyncStatus('updatePermissions').loading;
     }
 
-    changeHandler = (role: USER_ROLE) => ({ target: { checked }}: any, value: PERMISSIONS) => {
+    changeHandler = (role: USER_ROLE) => ({ target: { checked } }: any, value: PERMISSIONS) => {
         const permissions = [...this.permissions.get(role)];
 
         if (checked && permissions.includes(value) === false) {
@@ -125,44 +125,51 @@ class AccessSettings extends Component<IProps> {
 
         return (
             <Grid direction='column' container>
-                <TableHeader />
-                {
-                    this.permissions.size &&
-                    <>
-                        <TableRow onChange={this.changeHandler(USER_ROLE.SUPER_ADMIN)} title='Супер адмін' permissions={this.permissions.get(USER_ROLE.SUPER_ADMIN)} />
-                        <TableRow onChange={this.changeHandler(USER_ROLE.ADMIN)} title='Адмін' permissions={this.permissions.get(USER_ROLE.ADMIN)} />
-                        <TableRow onChange={this.changeHandler(USER_ROLE.PRODUCT_MANAGER)} title='Продукт Менеджер' permissions={this.permissions.get(USER_ROLE.PRODUCT_MANAGER)} />
-                        <TableRow onChange={this.changeHandler(USER_ROLE.FIELD_FORCE_MANAGER)} title='ФФМ' permissions={this.permissions.get(USER_ROLE.FIELD_FORCE_MANAGER)} />
-                        <TableRow onChange={this.changeHandler(USER_ROLE.REGIONAL_MANAGER)} title='РМ' permissions={this.permissions.get(USER_ROLE.REGIONAL_MANAGER)} />
-                        <TableRow onChange={this.changeHandler(USER_ROLE.MEDICAL_AGENT)} title='МП' permissions={this.permissions.get(USER_ROLE.MEDICAL_AGENT)} />
-                        <Button
-                            onClick={this.submitHandler}
-                            variant='contained'
-                            color='primary'
-                            className={classes.submitButton}
-                            disabled={this.isUnchanged}>
-                                {
-                                    this.isRequestProccessing
-                                    ? <LoadingMask size={20} />
-                                    : 'Зберегти'
-                                }
-                        </Button>
-                        <Snackbar
-                            open={this.showSnackbar}
-                            onClose={this.snackbarCloseHandler}
-                            type={this.snackbarType}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                            autoHideDuration={6000}
-                            message={
-                                this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                                    ? 'Доступи користувачів оновленно'
-                                    : 'Під час оновлення доступів трапилась помилка'
-                            }
-                        />
-                    </>
-
-                }
-
+                <Grid direction='row' wrap='nowrap' container>
+                    <TableHeader/>
+                    {
+                        this.permissions.size ?
+                        <>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.SUPER_ADMIN)} title='Супер адмін'
+                                      permissions={this.permissions.get(USER_ROLE.SUPER_ADMIN)}/>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.ADMIN)} title='Адмін'
+                                      permissions={this.permissions.get(USER_ROLE.ADMIN)}/>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.PRODUCT_MANAGER)} title='Продукт Менеджер'
+                                      permissions={this.permissions.get(USER_ROLE.PRODUCT_MANAGER)}/>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.FIELD_FORCE_MANAGER)} title='ФФМ'
+                                      permissions={this.permissions.get(USER_ROLE.FIELD_FORCE_MANAGER)}/>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.REGIONAL_MANAGER)} title='РМ'
+                                      permissions={this.permissions.get(USER_ROLE.REGIONAL_MANAGER)}/>
+                            <TableRow onChange={this.changeHandler(USER_ROLE.MEDICAL_AGENT)} title='МП'
+                                      permissions={this.permissions.get(USER_ROLE.MEDICAL_AGENT)}/>
+                        </> :
+                            <Typography>Відсутні права налаштування</Typography>
+                    }
+                </Grid>
+                <Button
+                    onClick={this.submitHandler}
+                    variant='contained'
+                    color='primary'
+                    className={classes.submitButton}
+                    disabled={this.isUnchanged}>
+                    {
+                        this.isRequestProccessing
+                            ? <LoadingMask size={20}/>
+                            : 'Зберегти'
+                    }
+                </Button>
+                <Snackbar
+                    open={this.showSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    autoHideDuration={6000}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Доступи користувачів оновленно'
+                            : 'Під час оновлення доступів трапилась помилка'
+                    }
+                />
             </Grid>
         );
     }

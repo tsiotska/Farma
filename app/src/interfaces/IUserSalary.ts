@@ -10,4 +10,5 @@ export interface IUserSalary {
     total: number;
     position: USER_ROLE;
     subSalaries: IUserSalary[];
+    date: Date;
 }

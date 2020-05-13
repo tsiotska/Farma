@@ -3,12 +3,11 @@ import { createStyles, WithStyles, Grid, LinearProgress, Typography } from '@mat
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
-import { observable, computed } from 'mobx';
+import { observable, computed, toJS } from 'mobx';
 import ListHeader from './ListHeader';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
 import ListItem from './ListItem';
-import { IUser } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({});
 
@@ -22,6 +21,8 @@ interface IProps extends WithStyles<typeof styles> {
     expandedSalary?: IUserSalary;
     loadSubLocationAgents?: () => void;
     clearLocationsAgents?: () => void;
+    loadRmAgentsInfo?: () => void;
+    loadMpAgentsInfo?: (userId: number) => void;
 }
 
 @inject(({
@@ -35,7 +36,9 @@ interface IProps extends WithStyles<typeof styles> {
             setExpandedSalary,
             expandedSalary,
             loadSubLocationAgents,
-            clearLocationsAgents
+            clearLocationsAgents,
+            loadRmAgentsInfo,
+            loadMpAgentsInfo
         }
     }
 }) => ({
@@ -47,7 +50,9 @@ interface IProps extends WithStyles<typeof styles> {
     setExpandedSalary,
     expandedSalary,
     loadSubLocationAgents,
-    clearLocationsAgents
+    clearLocationsAgents,
+    loadRmAgentsInfo,
+    loadMpAgentsInfo
 }))
 @observer
 class Salary extends Component<IProps> {
@@ -56,6 +61,9 @@ class Salary extends Component<IProps> {
 
     @observable year: number = this.currentYear;
     @observable month: number = this.currentMonth;
+
+    @observable rmAgentsInfo: any;
+    @observable mpAgentsInfo: any;
 
     @computed
     get isLoading(): boolean {
@@ -89,8 +97,8 @@ class Salary extends Component<IProps> {
         loadSalaries(this.year, this.month + 1);
     }
 
-    expandHandler = (userSalary: IUserSalary, e: any, expanded: boolean) => {
-        const { setExpandedSalary } = this.props;
+   expandHandler = async (userSalary: IUserSalary, e: any, expanded: boolean) => {
+        const { setExpandedSalary, loadMpAgentsInfo } = this.props;
         setExpandedSalary(
             expanded
             ? userSalary
@@ -98,13 +106,15 @@ class Salary extends Component<IProps> {
             this.year,
             this.month
         );
+        this.mpAgentsInfo = await loadMpAgentsInfo(userSalary.id);
     }
 
     async componentDidMount() {
-        const { loadSalaries, loadLocationsAgents, loadSubLocationAgents } = this.props;
+        const { loadSalaries, loadLocationsAgents, loadSubLocationAgents, loadRmAgentsInfo } = this.props;
         loadSalaries(this.year, this.month + 1);
         await loadLocationsAgents();
         loadSubLocationAgents();
+        this.rmAgentsInfo = await loadRmAgentsInfo();
     }
 
     componentWillUnmount() {
@@ -115,10 +125,10 @@ class Salary extends Component<IProps> {
 
     render() {
         const { salaries, expandedSalary } = this.props;
-
         return (
             <Grid container direction='column'>
                 <Header
+                    lastSalary={salaries && salaries.length > 0 && salaries[0].date}
                     year={this.year}
                     month={this.month}
                     changeMonth={this.changeMonth}
@@ -132,6 +142,12 @@ class Salary extends Component<IProps> {
                     ? salaries.length
                         ? salaries.map(x => (
                             <ListItem
+                                agentInfo={
+                                    this.rmAgentsInfo
+                                        ? this.rmAgentsInfo.find(({ id }: { id: number }) => id === x.id)
+                                        : null
+                                }
+                                expandedAgentsInfo={this.mpAgentsInfo && this.mpAgentsInfo}
                                 key={x.id}
                                 expandable={true}
                                 isExpanded={x === expandedSalary}

@@ -16,6 +16,9 @@ const styles = (theme: any) => createStyles({
     wideColumn: {
         width: 200
     },
+    mediumColumn: {
+        width: 100
+    },
     cell: {
         border: '2px solid transparent'
     },
@@ -52,12 +55,13 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class SalaryRow extends Component<IProps> {
     readonly borderColors: any;
+
     constructor(props: IProps) {
         super(props);
         const { levels, classes: { red, orangered, yellow, limeGreen, green } } = props;
         this.borderColors = levels.length === 5
-        ? [ red, orangered, yellow, limeGreen, green ]
-        : [ red, yellow, green ];
+            ? [red, orangered, yellow, limeGreen, green]
+            : [red, yellow, green];
     }
 
     @computed
@@ -74,7 +78,7 @@ class SalaryRow extends Component<IProps> {
                 ? medInfo.bonus
                 : null;
 
-            return ([ amount, bonus ] as [number, number]);
+            return ([amount, bonus] as [number, number]);
         });
     }
 
@@ -95,8 +99,8 @@ class SalaryRow extends Component<IProps> {
     get userValue(): number {
         const { userSales, medicine: { id } } = this.props;
         const item = userSales
-        ? userSales[id]
-        : null;
+            ? userSales[id]
+            : null;
         return item
             ? item.amount
             : null;
@@ -157,44 +161,46 @@ class SalaryRow extends Component<IProps> {
             <Grid className={classes.root} wrap='nowrap' container>
                 <Grid className={cx(classes.wideColumn, classes.withOffset)} alignItems='center' container>
                     <Typography>
-                        { name }
+                        {name}
                     </Typography>
                 </Grid>
-                <Grid className={classes.wideColumn} justify='center' alignItems='center' container>
+                <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
                     <Typography align='center'>
-                        { this.deficit }
+                        {this.userValue || 0}
+                    </Typography>
+                </Grid>
+                <Grid className={classes.mediumColumn} justify='center' alignItems='center' container>
+                    <Typography align='center'>
+                        {this.deficit}
                     </Typography>
                 </Grid>
                 {
                     levels.map(i => (
                             <Grid
                                 key={i}
-                                className={
-                                    cx(
-                                        classes.withOffset,
-                                        classes.cell,
-                                        {
-                                            [userColors[i - 1]]: i === userLevel,
-                                            [this.borderColors[i - 1]]: i === this.valueLevel
-                                        }
-                                    )
+                                className={cx(classes.withOffset, classes.cell,
+                                    {
+                                        [userColors[i - 1]]: i === userLevel,
+                                        [this.borderColors[i - 1]]: i === this.valueLevel
+                                    }
+                                )
                                 }
                                 alignItems='center'
                                 justify='center'
                                 container
                                 item
                                 xs>
-                                    {
-                                        editable
+                                {
+                                    editable
                                         ? <EditableCell
                                             level={i}
                                             medId={id}
                                             values={this.editableLevelValues[i - 1]}
-                                            />
+                                        />
                                         : <Typography align='center'>
-                                                { this.levelValues[i - 1] }
-                                          </Typography>
-                                    }
+                                            {this.levelValues[i - 1]}
+                                        </Typography>
+                                }
                             </Grid>
                         )
                     )

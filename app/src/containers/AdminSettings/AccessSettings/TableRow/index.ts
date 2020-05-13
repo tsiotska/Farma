@@ -1,2 +1,2 @@
-import TableRow from './TableRow';
-export default TableRow;
+import TableRowRefactor from './TableRow';
+export default TableRowRefactor;

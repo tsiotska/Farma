@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, withStyles, Button } from '@material-ui/core';
+import { createStyles, WithStyles, withStyles, Button, Grid } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import SalaryHeader from '../SalaryHeader';
@@ -34,6 +34,20 @@ const styles = (theme: any) => createStyles({
         marginTop: 16,
         backgroundColor: '#3796f6',
         color: 'white'
+    },
+    divideContainer: {
+      //  position: 'absolute',
+        display: 'flex',
+        flexWrap: 'nowrap',
+        alignItems: 'center'
+    },
+    divideContainer_line: {
+        width: '100%',
+        height: 1,
+        backgroundColor:  theme.palette.primary.level.green
+    },
+    divideContainer_label: {
+        color: theme.palette.primary.level.green
     }
 });
 
@@ -237,10 +251,13 @@ class UserContent extends Component<IProps> {
             isAdmin
         } = this.props;
 
+        console.log(toJS(currentDepartmentMeds));
+
         return (
             <>
                 {
-                    currentDepartmentMeds.filter(({ deleted }) => deleted === false).map(medicine => (
+                    currentDepartmentMeds.map(medicine => (
+                        !medicine.deleted &&
                         <SalaryRow
                             key={medicine.id}
                             userSales={userSales}
@@ -253,7 +270,15 @@ class UserContent extends Component<IProps> {
                         />
                     ))
                 }
+
                 <SumRow
+                    children={
+                        <Grid className={classes.divideContainer} container>
+                        <Grid className={classes.divideContainer_line}/>
+                        <Grid className={classes.divideContainer_label}>План в грошах</Grid>
+                        <Grid className={classes.divideContainer_line}/>
+                    </Grid>
+                    }
                     title='План в грошах'
                     levels={this.levels}
                     userLevel={this.userLevel}

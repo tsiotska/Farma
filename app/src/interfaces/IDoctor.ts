@@ -13,4 +13,5 @@ export interface IDoctor {
     created: Date;
     confirmed: boolean;
     deposit: number;
+    address: 'string';
 }
