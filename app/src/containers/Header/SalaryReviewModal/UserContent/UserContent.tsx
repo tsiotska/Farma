@@ -7,7 +7,7 @@ import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
 import { IUser } from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
-import { computed, toJS } from 'mobx';
+import { computed, toJS, reaction, observable } from 'mobx';
 import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
 import TotalRow from '../TotalRow';
 import { IAsyncStatus } from '../../../../stores/AsyncStore';
@@ -93,6 +93,7 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class UserContent extends Component<IProps> {
     readonly colors: any;
+    @observable userLevel: number = 1;
 
     constructor(props: IProps) {
         super(props);
@@ -108,14 +109,14 @@ class UserContent extends Component<IProps> {
         return this.props.getAsyncStatus('updateSalary').loading;
     }
 
-    @computed
-    get userLevel(): number {
-        const { user } = this.props;
-        console.log('userleevel: ', user && user.level);
-        return user
-            ? user.level
-            : 0;
-    }
+    // @computed
+    // get userLevel(): number {
+    //     const { user } = this.props;
+    //     console.log('userleevel: ', user && user.level);
+    //     return user
+    //         ? user.level
+    //         : 0;
+    // }
 
     @computed
     get userColors(): string[] {
@@ -159,9 +160,10 @@ class UserContent extends Component<IProps> {
     @computed
     get userMoneyDeficit(): number {
         const { userSales } = this.props;
-
+        console.log('user sales: ', toJS(userSales));
         if (!userSales) return 0;
-        const value = Object.values(userSales).reduce((total, { money }) => total + (money || 0), 0);
+        const value = Object.values(userSales)
+            .reduce((total, { money }) => total + (money || 0), 0);
         return Math.floor(value);
     }
 
@@ -242,7 +244,26 @@ class UserContent extends Component<IProps> {
         if (isValid) changeUserSalary(level, propName, casted);
     }
 
+    levelReactionDisposer: any;
+
+    componentDidMount() {
+        this.levelReactionDisposer = reaction(
+            () => [this.userMoneyDeficit, ...this.plannedCosts],
+            (values: number[]) => {
+                const currentUserValue = values[0];
+                let newUserLevel: number = 0;
+                for (let i = 1, q = values.length; i < q; i++) {
+                    if (currentUserValue >= values[i]) {
+                        newUserLevel = i + 1;
+                    }
+                }
+                this.userLevel = newUserLevel || 1;
+            }
+        );
+    }
+
     componentWillUnmount() {
+        if (this.levelReactionDisposer) this.levelReactionDisposer();
         this.props.clearUserSalaryInfo();
     }
 
@@ -255,7 +276,7 @@ class UserContent extends Component<IProps> {
             onSubmit,
             isAdmin
         } = this.props;
-
+        console.log('planened costs: ', toJS(this.plannedCosts), this.userMoneyDeficit);
         return (
             <>
                 {
