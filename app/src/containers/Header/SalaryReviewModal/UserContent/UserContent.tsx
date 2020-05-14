@@ -141,7 +141,6 @@ class UserContent extends Component<IProps> {
     @computed
     get userMoneyDeficit(): number {
         const { userSales } = this.props;
-        console.log('user sales: ', toJS(userSales));
         if (!userSales) return 0;
         const value = Object.values(userSales)
             .reduce((total, { money }) => total + (money || 0), 0);
@@ -257,7 +256,6 @@ class UserContent extends Component<IProps> {
             onSubmit,
             isAdmin
         } = this.props;
-        console.log('planened costs: ', toJS(this.plannedCosts), this.userMoneyDeficit);
         return (
             <>
                 {

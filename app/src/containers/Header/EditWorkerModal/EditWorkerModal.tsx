@@ -96,7 +96,7 @@ class EditWorkerModal extends Component<IProps> {
     }
 
     render() {
-        const { showLocationsBlock } = this.props;
+        const { showLocationsBlock,  } = this.props;
 
         return (
             <>

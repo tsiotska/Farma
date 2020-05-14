@@ -154,11 +154,7 @@ class TableSubheader extends Component<IProps> {
         const { position } = parentUser;
 
         if (!isNested) return null;
-        console.log(
-            previewBonus
-            ? toJS(previewBonus.sales)
-            : null
-        );
+
         return (
             <>
             <Grid container className={classes.container} alignItems='center'>

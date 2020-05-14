@@ -23,6 +23,8 @@ import CreditCardOutlinedIcon from '@material-ui/icons/CreditCardOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import InfoWindow from '../../components/InfoWindow';
+import { EDIT_WORKER_MODAL } from '../../constants/Modals';
+import { IPosition } from '../../interfaces/IPosition';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -93,23 +95,31 @@ interface IProps extends WithStyles<typeof styles> {
     scaleIndex: number;
     cities?: Map<number, ILocation>;
     regions?: Map<number, ILocation>;
+    positions?: Map<number, IPosition>;
     historyGoTo?: (userId: number) => void;
+    openModal?: (modalName: string, payload: any) => void;
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     cities,
-                     regions
-                 },
-                 userStore: {
-                     historyGoTo
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            positions,
+            cities,
+            regions
+        },
+        userStore: {
+            historyGoTo
+        },
+        uiStore: {
+            openModal
+        }
+    }
+}) => ({
     historyGoTo,
+    positions,
     cities,
-    regions
+    regions,
+    openModal
 }))
 @observer
 class ProfilePreview extends Component<IProps> {
@@ -185,6 +195,14 @@ class ProfilePreview extends Component<IProps> {
         historyGoTo(id);
     }
 
+    editClickHandler = () => {
+        const { user, openModal, positions } = this.props;
+        openModal(EDIT_WORKER_MODAL, {
+            initialWorker: user,
+            positions: [positions.get(USER_ROLE.FIELD_FORCE_MANAGER)]
+        });
+    }
+
     mouseOverHandler = () => {
         this.isHovered = true;
     }
@@ -200,6 +218,7 @@ class ProfilePreview extends Component<IProps> {
     render() {
         const { classes, user } = this.props;
         const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
+        console.log('agent: ', toJS(user));
 
         return (
             <div
@@ -386,7 +405,7 @@ class ProfilePreview extends Component<IProps> {
                           justify='center'
                           container
                           item>
-                        <IconButton>
+                        <IconButton onClick={this.editClickHandler}>
                             <EditOutlinedIcon/>
                         </IconButton>
                         <IconButton>

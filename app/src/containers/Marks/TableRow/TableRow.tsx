@@ -352,9 +352,7 @@ class TableRow extends Component<IProps> {
                 );
                 })
             : <TableCell />;
-        if (typeof position === 'string') {
-            console.log('agent: ', toJS(agent));
-        }
+
         return (
             <>
             <MuiTableRow ref={itemRef} className={classes.root}>
