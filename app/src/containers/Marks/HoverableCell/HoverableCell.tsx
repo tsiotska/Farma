@@ -15,7 +15,9 @@ const styles = {
     cell: {},
     tooltip: {},
     divider: {},
-    input: {}
+    input: {
+        fontSize: 14
+    }
 };
 
 interface IProps extends WithStyles<typeof styles> {
@@ -93,8 +95,8 @@ class HoverableCell extends Component<IProps> {
     }
 
     dispatchChange = (propName: 'payments' | 'deposit', value: number) => {
-        const { onChange, agentInfo, medId } = this.props;
-        if (Number.isNaN(value) || value < 0) return;
+        const { onChange, agentInfo, medId, tooltip } = this.props;
+        if (Number.isNaN(value) || value < 0 || !tooltip) return;
         onChange(
             propName,
             agentInfo,
@@ -109,7 +111,7 @@ class HoverableCell extends Component<IProps> {
     depositChangeHandler = ({ target: { value }}: any) => this.dispatchChange('deposit', +value);
 
     render() {
-        const { classes, tooltip, editable, agentInfo } = this.props;
+        const { classes, tooltip, editable } = this.props;
 
         return (
             <TableCell className={classes.cell}>

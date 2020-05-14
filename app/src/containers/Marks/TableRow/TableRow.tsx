@@ -125,7 +125,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     agentInfo: IAgentInfo;
     showLpu: boolean;
-    tooltips: { [key: number]: string };
+    tooltips: { [key: number]: number };
     agent: IUserInfo & IUserLikeObject;
     isNested: boolean;
     allowEdit: boolean;
@@ -172,6 +172,18 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableRow extends Component<IProps> {
     readonly paddingLeft: number = 10;
+    readonly cellClasses: any = {};
+
+    constructor(props: IProps) {
+        super(props);
+        const { classes } = this.props;
+        this.cellClasses = {
+            cell: classes.cell,
+            tooltip: classes.tooltip,
+            divider: classes.divider,
+            input: classes.input
+        };
+    }
 
     @computed
     get agentMarks(): Map<number, IMark> {
@@ -293,6 +305,7 @@ class TableRow extends Component<IProps> {
             agentInfo,
             meds,
             tooltips,
+            allowEdit
         } = this.props;
         const { LPUName, name, id: agentId, address, city, position } = (agent as any);
 
@@ -306,23 +319,25 @@ class TableRow extends Component<IProps> {
             : '-';
 
         const medsContent = meds.length
-            ? meds.map(({ id }) => (
-                <HoverableCell
-                    key={id}
-                    agentInfo={agentInfo}
-                    agentId={agentId}
-                    onChange={this.cellValueChangeHandler}
-                    editable={this.isEditable}
-                    medId={id}
-                    tooltip={tooltips[id] || ''}
-                    classes={{
-                        cell: classes.cell,
-                        tooltip: classes.tooltip,
-                        divider: classes.divider,
-                        input: classes.input
-                    }}
-                />
-              ))
+            ? meds.map(({ id }) => {
+                const tooltip = tooltips[id];
+                return (
+                    <HoverableCell
+                        key={id}
+                        medId={id}
+                        agentInfo={agentInfo}
+                        agentId={agentId}
+                        onChange={this.cellValueChangeHandler}
+                        editable={this.isEditable}
+                        classes={this.cellClasses}
+                        tooltip={
+                            (!!tooltip || tooltip === 0)
+                                ? `${tooltip}`
+                                : ''
+                        }
+                    />
+                );
+                })
             : <TableCell />;
 
         return (

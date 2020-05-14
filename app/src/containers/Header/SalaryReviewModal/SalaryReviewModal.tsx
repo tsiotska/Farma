@@ -5,9 +5,6 @@ import {
     WithStyles,
     Grid,
     Typography,
-    Popover,
-    SnackbarOrigin,
-    IconButton
 } from '@material-ui/core';
 import { observer, inject, } from 'mobx-react';
 import Dialog from '../../../components/Dialog';
@@ -22,8 +19,6 @@ import { USER_ROLE } from '../../../constants/Roles';
 import SalaryHeader from './SalaryHeader';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
-import DateSelect from '../../../components/DateSelect';
-import { Add, ArrowLeft, ArrowRight } from '@material-ui/icons';
 import DateSelectPopper from '../../Salary/DateSelectPopper';
 import LoadingMask from '../../../components/LoadingMask';
 
@@ -58,19 +53,19 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 userStore: {
-                     loadUserSalaryInfo,
-                     userSalary,
-                     submitSalaryChanges
-                 },
-                 uiStore: {
-                     modalPayload: user,
-                     openedModal,
-                     openModal
-                 }
-             }
-         }) => ({
+    appState: {
+        userStore: {
+            loadUserSalaryInfo,
+            userSalary,
+            submitSalaryChanges
+        },
+        uiStore: {
+            modalPayload: user,
+            openedModal,
+            openModal
+        }
+    }
+}) => ({
     loadUserSalaryInfo,
     userSalary,
     openedModal,
@@ -157,22 +152,21 @@ class SalaryReviewModal extends Component<IProps> {
                         <UserShortInfo user={user} disableClick disableText/>
                     </Grid>
                 </Grid>
-
                 <Grid className={classes.titleContainer}>
-                        <Typography className={classes.headerText} variant='h5'>
-                            Заробітня плата
-                        </Typography>
-                        <DateSelectPopper
-                            year={this.year}
-                            month={this.month}
-                            makeRequest={this.makeRequest}
-                            changeMonth={this.monthChangeHandler}
-                            changeYear={this.yearChangeHandler}
-                        />
-                        {
-                            this.isSalesLoading &&
-                            <LoadingMask size={20} />
-                        }
+                    <Typography className={classes.headerText} variant='h5'>
+                        Заробітня плата
+                    </Typography>
+                    <DateSelectPopper
+                        year={this.year}
+                        month={this.month}
+                        makeRequest={this.makeRequest}
+                        changeMonth={this.monthChangeHandler}
+                        changeYear={this.yearChangeHandler}
+                    />
+                    {
+                        this.isSalesLoading &&
+                        <LoadingMask size={20} />
+                    }
                 </Grid>
                 <SalaryHeader levelsCount={this.levelsCount}/>
                 <UserContent

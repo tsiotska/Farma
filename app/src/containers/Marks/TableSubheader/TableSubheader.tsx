@@ -203,13 +203,16 @@ class TableSubheader extends Component<IProps> {
                     </Typography>
                 }
             </Grid>
-            <TableHeader
-                showLpu={this.userIsMedicalAgent}
-                previewBonus={previewBonus}
-                hideName
-                isNested
-                parentUser={parentUser}
-            />
+            {
+                agentsLoaded && this.isEmpty === false &&
+                <TableHeader
+                    showLpu={this.userIsMedicalAgent}
+                    previewBonus={previewBonus}
+                    hideName
+                    isNested
+                    parentUser={parentUser}
+                />
+            }
             </>
         );
     }

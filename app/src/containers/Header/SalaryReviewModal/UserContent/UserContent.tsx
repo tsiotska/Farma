@@ -111,7 +111,10 @@ class UserContent extends Component<IProps> {
     @computed
     get userLevel(): number {
         const { user } = this.props;
-        return user ? user.level : 0;
+        console.log('userleevel: ', user && user.level);
+        return user
+            ? user.level
+            : 0;
     }
 
     @computed
@@ -143,15 +146,15 @@ class UserContent extends Component<IProps> {
         });
     }
 
-    @computed
-    get totalUserSoldAmount(): number {
-        const { userSales, currentDepartmentMeds } = this.props;
-        if (!userSales) return 0;
-        return currentDepartmentMeds.reduce(
-            (total, { id }) => total + (id in userSales ? (userSales[id].money || 0) : 0),
-            0
-        );
-    }
+    // @computed
+    // get totalUserSoldAmount(): number {
+    //     const { userSales, currentDepartmentMeds } = this.props;
+    //     if (!userSales) return 0;
+    //     return currentDepartmentMeds.reduce(
+    //         (total, { id }) => total + (id in userSales ? (userSales[id].money || 0) : 0),
+    //         0
+    //     );
+    // }
 
     @computed
     get userMoneyDeficit(): number {
