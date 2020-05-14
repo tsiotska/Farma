@@ -45,6 +45,7 @@ import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 import { ISearchResult } from '../interfaces/ISearchResult';
 import { searchNormalizer } from '../helpers/normalizers/searchNormalizer';
 import {toJS} from 'mobx';
+import { periodSalesNormalizer, IPeriodSalesStat } from '../helpers/normalizers/periodSalesNormalizer';
 
 export interface ICachedPromise<T> {
     promise: Promise<T>;
@@ -247,15 +248,10 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    getMedsSalesStat(url: string): ICachedPromise<IMedsSalesStat[]> {
-        const cache = this.cacheStore.getCachedData(url, medsStatNormalizer);
-        const promise = this.instance.get(url)
-            .then(({ data, request: { response } }) => {
-                this.cacheStore.setCachedData(url, response);
-                return medsStatNormalizer(data);
-            })
+    getMedsSalesStat(url: string): Promise<IMedsSalesStat[]> {
+        return this.instance.get(url)
+            .then(({ data }) => medsStatNormalizer(data))
             .catch(this.defaultErrorHandler());
-        return { cache, promise };
     }
 
     restoreMedicine(depId: number, medId: number) {
@@ -264,15 +260,17 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    getSalesStat(url: string): ICachedPromise<ISalesStat[]> {
-        const cache = this.cacheStore.getCachedData(url, salesStatNormalizer);
-        const promise = this.instance.get(url)
-            .then(({ data, request: { response } }) => {
-                this.cacheStore.setCachedData(url, response);
-                return salesStatNormalizer(data);
+    async getSalesStat(url: string): Promise<IPeriodSalesStat[]> {
+        // return this.instance.get(url)
+        const res = await this.instance.get(url)
+            .then((x) => {
+                const n = periodSalesNormalizer(x);
+                console.log('nqwer: ', n);
+                return n;
             })
             .catch(this.defaultErrorHandler());
-        return { cache, promise };
+        console.log('from api: ', res);
+        return res;
     }
 
     getWorkers(url: string): Promise<IWorker[]> {

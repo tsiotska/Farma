@@ -52,6 +52,7 @@ export enum GROUP_BY {
             loadAgentSalesStat,
             pharmaciesMap,
             locations,
+
             loadAgentsSalesExcel,
             loadLocationsExcel
         },
@@ -161,7 +162,7 @@ class TableStat extends Component<IProps> {
         if (getAsyncStatus('loadLocaleSalesStat').error) loadLocaleSalesStat();
     }
 
-    render() {
+    render(): any {
         const {
             sortedAgentsSalesStat,
             sortedLocationSalesStat,

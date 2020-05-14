@@ -1043,7 +1043,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
 
         if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
-        if (position === USER_ROLE.REGIONAL_MANAGER) return api.getMPs(depId, id);
+        if (position === USER_ROLE.REGIONAL_MANAGER) return api.getMPs(depId, USER_ROLE.MEDICAL_AGENT);
         return null;
     }
 
@@ -1058,8 +1058,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         let loadPositionsId: USER_ROLE;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) loadPositionsId = USER_ROLE.REGIONAL_MANAGER;
         if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
-        if (!depId || !role) return;
-
+        if (!depId || !role || !loadPositionsId) return;
+        console.log('load: ', loadPositionsId);
         this.setLoading(requestName);
         const res = await  api.getAgents(depId, loadPositionsId);
 

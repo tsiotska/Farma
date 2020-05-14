@@ -218,7 +218,6 @@ class ProfilePreview extends Component<IProps> {
     render() {
         const { classes, user } = this.props;
         const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
-        console.log('agent: ', toJS(user));
 
         return (
             <div

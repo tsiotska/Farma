@@ -1,3 +1,4 @@
+import { IMedSalesInfo } from './../interfaces/ISalesStat';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
@@ -15,6 +16,7 @@ import { USER_ROLE } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
 import { ILocation } from '../interfaces/ILocation';
+import { IPeriodSalesStat, IMedSales } from '../helpers/normalizers/periodSalesNormalizer';
 
 export enum STAT_DISPLAY_MODE {
     PACK,
@@ -35,11 +37,111 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     // data for chart
     @observable chartSalesStat: IMedsSalesStat[] = null;
     // data for drugsTable
-    @observable locationSalesStat: ISalesStat[] = null;
+    // @observable locationSalesStat: ISalesStat[] = null;
     @observable ignoredLocations: Set<number> = new Set();
     // data for drugsTable
-    @observable agentSalesStat: ISalesStat[] = null;
+    // @observable agentSalesStat: ISalesStat[] = null;
     @observable ignoredAgents: Set<number> = new Set();
+
+    @observable agentsSales: IPeriodSalesStat[] = null;
+    @observable locationsSales: IPeriodSalesStat[] = null;
+
+    @computed
+    get sortedLocationSalesStat(): ISalesStat[] {
+        if (!this.locationsSales) return null;
+
+        const {
+            userStore: { role },
+            uiStore: { salesPharmacyFilter: { map }}
+        } = this.rootStore;
+
+        const summedUp: ISalesStat[] = this.locationsSales.map(({ id, sales }) => {
+            const summedSales = Object.values(sales).reduce(
+                (acc, salesItems) => {
+                    salesItems.forEach(({ medId, amount, money }: IMedSales) => {
+                        if (acc[medId]) {
+                            acc[medId].amount += amount;
+                            acc[medId].money += money;
+                        } else {
+                            acc[medId] = { medId, amount, money };
+                        }
+                    });
+
+                    return acc;
+                }
+            , {});
+
+            return {
+                id,
+                stat: [...Object.values(summedSales)] as IMedSalesInfo[]
+            };
+        });
+
+        const condition = role !== USER_ROLE.MEDICAL_AGENT
+            || !map
+            || !this.locationsSales;
+
+        const sameStatusSortCallback = condition
+            ? () => 0
+            : (a: ISalesStat, b: ISalesStat) => {
+                const aIndx = map.indexOf(a.id);
+                const bIndx = map.indexOf(b.id);
+                return aIndx - bIndx;
+            };
+
+        const callback = (a: ISalesStat, b: ISalesStat) => {
+            const isLeftIgnored = this.ignoredLocations.has(a.id);
+            const isRightIgnored = this.ignoredLocations.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return sameStatusSortCallback(a, b);
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        };
+
+        return summedUp
+            ? summedUp.sort(callback)
+            : summedUp;
+    }
+
+    @computed
+    get sortedAgentsSalesStat(): ISalesStat[] {
+        if (!this.agentsSales) return null;
+
+        const summedUp: ISalesStat[] = this.agentsSales.map(({ id, sales }) => {
+            const summedSales = Object.values(sales).reduce(
+                (acc, salesItems) => {
+                    salesItems.forEach(({ medId, amount, money }: IMedSales) => {
+                        if (acc[medId]) {
+                            acc[medId].amount += amount;
+                            acc[medId].money += money;
+                        } else {
+                            acc[medId] = { medId, amount, money };
+                        }
+                    });
+
+                    return acc;
+                }
+            , {});
+
+            return {
+                id,
+                stat: [...Object.values(summedSales)] as IMedSalesInfo[]
+            };
+        });
+
+        const sortCallback = (a: ISalesStat, b: ISalesStat) => {
+            const isLeftIgnored = this.ignoredAgents.has(a.id);
+            const isRightIgnored = this.ignoredAgents.has(b.id);
+            if (isLeftIgnored === isRightIgnored) return 0;
+            return isLeftIgnored === true
+                ? 1
+                : -1;
+        };
+
+        return summedUp
+            ? summedUp.sort(sortCallback)
+            : summedUp;
+    }
 
     constructor(rootStore: IRootStore) {
         super();
@@ -64,13 +166,13 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             userStore: { role }
         } = this.rootStore;
 
-        const statExist = Array.isArray(this.locationSalesStat);
+        const statExist = Array.isArray(this.locationsSales);
         const shouldReturnData = role === USER_ROLE.MEDICAL_AGENT;
 
         let data: Array<[number, ILPU]> = [];
 
         if (statExist && shouldReturnData && pharmacies) {
-            const ids = this.locationSalesStat.map(({ id }) => id);
+            const ids = this.locationsSales.map(({ id }) => id);
             data = pharmacies
                 .filter(({ id }) => ids.includes(id))
                 .map(x => ([ x.id, x ]));
@@ -79,49 +181,53 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         return new Map(data);
     }
 
-    @computed
-    get sortedLocationSalesStat(): ISalesStat[] {
-        const {
-            userStore: { role },
-            uiStore: { salesPharmacyFilter: { map }}
-        } = this.rootStore;
+    // @computed
+    // get sortedLocationSalesStat(): ISalesStat[] {
+    //     const {
+    //         userStore: { role },
+    //         uiStore: { salesPharmacyFilter: { map }}
+    //     } = this.rootStore;
 
-        const sameStatusSortCallback = (role !== USER_ROLE.MEDICAL_AGENT || !map || !this.locationSalesStat)
-        ? () => 0
-        : (a: ISalesStat, b: ISalesStat) => {
-            const aIndx = map.indexOf(a.id);
-            const bIndx = map.indexOf(b.id);
-            return aIndx - bIndx;
-        };
+        // const condition = role !== USER_ROLE.MEDICAL_AGENT
+        //     || !map
+        //     || !this.locationsSalesStat;
 
-        const callback = (a: ISalesStat, b: ISalesStat) => {
-            const isLeftIgnored = this.ignoredLocations.has(a.id);
-            const isRightIgnored = this.ignoredLocations.has(b.id);
-            if (isLeftIgnored === isRightIgnored) return sameStatusSortCallback(a, b);
-            return isLeftIgnored === true
-                ? 1
-                : -1;
-        };
+        // const sameStatusSortCallback = condition
+        //     ? () => 0
+        //     : (a: ISalesStat, b: ISalesStat) => {
+        //         const aIndx = map.indexOf(a.id);
+        //         const bIndx = map.indexOf(b.id);
+        //         return aIndx - bIndx;
+        //     };
 
-        return this.locationSalesStat
-            ? this.locationSalesStat.slice().sort(callback)
-            : this.locationSalesStat;
-    }
+        // const callback = (a: ISalesStat, b: ISalesStat) => {
+        //     const isLeftIgnored = this.ignoredLocations.has(a.id);
+        //     const isRightIgnored = this.ignoredLocations.has(b.id);
+        //     if (isLeftIgnored === isRightIgnored) return sameStatusSortCallback(a, b);
+        //     return isLeftIgnored === true
+        //         ? 1
+        //         : -1;
+        // };
 
-    @computed
-    get sortedAgentsSalesStat(): ISalesStat[] {
-        const callback = (a: ISalesStat, b: ISalesStat) => {
-            const isLeftIgnored = this.ignoredAgents.has(a.id);
-            const isRightIgnored = this.ignoredAgents.has(b.id);
-            if (isLeftIgnored === isRightIgnored) return 0;
-            return isLeftIgnored === true
-                ? 1
-                : -1;
-        };
-        return this.agentSalesStat
-            ? this.agentSalesStat.slice().sort(callback)
-            : this.agentSalesStat;
-    }
+    //     return this.locationSalesStat
+    //         ? this.locationSalesStat.slice().sort(callback)
+    //         : this.locationSalesStat;
+    // }
+
+    // @computed
+    // get sortedAgentsSalesStat(): ISalesStat[] {
+        // const callback = (a: ISalesStat, b: ISalesStat) => {
+        //     const isLeftIgnored = this.ignoredAgents.has(a.id);
+        //     const isRightIgnored = this.ignoredAgents.has(b.id);
+        //     if (isLeftIgnored === isRightIgnored) return 0;
+        //     return isLeftIgnored === true
+        //         ? 1
+        //         : -1;
+        // };
+    //     return this.agentSalesStat
+    //         ? this.agentSalesStat.slice().sort(callback)
+    //         : this.agentSalesStat;
+    // }
 
     @computed
     get agentsTargetProperty(): AgentTargetProperty {
@@ -152,8 +258,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         if (withReset) {
             this.chartSalesStat = null;
-            this.locationSalesStat = null;
-            this.agentSalesStat = null;
+            // this.locationSalesStat = null;
+            // this.agentSalesStat = null;
+            this.agentsSales = null;
+            this.locationsSales = null;
         }
 
         this.ignoredAgents.clear();
@@ -180,8 +288,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         this.displayMode = STAT_DISPLAY_MODE.PACK;
         this.chartSalesStat = null;
-        this.locationSalesStat = null;
-        this.agentSalesStat = null;
+        this.agentsSales = null;
+        this.locationsSales = null;
+        // this.locationSalesStat = null;
+        // this.agentSalesStat = null;
         this.ignoredMeds = new Set();
     }
 
@@ -314,10 +424,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (!url) return;
 
         this.setLoading(requestName);
-        const { cache, promise } = api.getMedsSalesStat(url);
-        if (cache) this.chartSalesStat = cache;
-
-        const res = await promise;
+        const res = await api.getMedsSalesStat(url);
         // if fetched data is not relevant, there is another api call to fetch actual data, so there is no need to process this api call result
         const testUrl = this.getMedsStatUrl(this.rootStore.departmentsStore.currentDepartmentId);
         if (url !== testUrl) return;
@@ -343,18 +450,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (id === null || !url) return;
 
         this.setLoading(requestName);
-        const { cache, promise } = api.getSalesStat(url);
-        if (cache) this.locationSalesStat = cache;
-
-        const res = await promise;
-
+        const res = await api.getSalesStat(url);
         if (id !== this.rootStore.departmentsStore.currentDepartmentId) return;
 
-        this.locationSalesStat = res;
+        this.locationsSales = res;
 
         const callback = res
-        ? this.setSuccess
-        : this.setError;
+            ? this.setSuccess
+            : this.setError;
         callback(requestName);
     }
 
@@ -367,14 +470,15 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         if (id === null || !url) return;
 
-        this.setLoading(requestName);
-        const { cache, promise } = await api.getSalesStat(url);
-        if (cache) this.agentSalesStat = cache;
+        // this.setLoading(requestName);
+        // const { cache, promise } = await api.getSalesStat(url);
+        // if (cache) this.agentSalesStat = cache;
+        // const res = await promise;
 
-        const res = await promise;
+        const res = await api.getSalesStat(url);
 
         if (id !== this.rootStore.departmentsStore.currentDepartmentId) return;
-        this.agentSalesStat = res;
+        this.agentsSales = res;
 
         const callback = res
         ? this.setSuccess
@@ -411,9 +515,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     private getAgentStatUrl(departmentId: number, excel?: boolean) {
         const { userStore: { role, previewUser }} = this.rootStore;
 
+        let group_by: string = 'year';
+        if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
+        else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
+
         const params: any = {
             from: format(this.dateFrom, this.apiDateMask),
             to: format(this.dateTo, this.apiDateMask),
+            group_by
         };
 
         if (excel) params.excel = 1;
@@ -436,9 +545,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     private getLocationStatUrl(departmentId: number, excel?: boolean): string {
         const { userStore: { role, previewUser }} = this.rootStore;
 
+        let group_by: string = 'year';
+        if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
+        else if (differenceInCalendarMonths(this.dateTo, this.dateFrom) <= 12) group_by = 'month';
+
         const params: any = {
             from: format(this.dateFrom, this.apiDateMask),
             to: format(this.dateTo, this.apiDateMask),
+            group_by
         };
 
         if (excel) params.excel = 1;
