@@ -6,7 +6,8 @@ import {
     Typography,
     Divider,
     Hidden,
-    Paper
+    Paper,
+    IconButton
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -16,6 +17,12 @@ import { IUser } from '../../interfaces';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
 import UserShortInfo from '../UserShortInfo';
+import PhoneOutlinedIcon from '@material-ui/icons/PhoneOutlined';
+import MailOutlineOutlinedIcon from '@material-ui/icons/MailOutlineOutlined';
+import CreditCardOutlinedIcon from '@material-ui/icons/CreditCardOutlined';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
+import InfoWindow from '../../components/InfoWindow';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -74,6 +81,9 @@ const styles = (theme: any) => createStyles({
     depositMinus: {
         fontFamily: 'Source Sans Pro SemiBold',
         color: '#E25353',
+    },
+    windowContent: {
+        padding: 10
     }
 });
 
@@ -87,16 +97,16 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            cities,
-            regions
-        },
-        userStore: {
-            historyGoTo
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     cities,
+                     regions
+                 },
+                 userStore: {
+                     historyGoTo
+                 }
+             }
+         }) => ({
     historyGoTo,
     cities,
     regions
@@ -214,20 +224,20 @@ class ProfilePreview extends Component<IProps> {
                         wrap='nowrap'
                         container
                         item>
-                            <UserShortInfo
-                                classes={{
-                                    textContainer: classes.profileTextContainer,
-                                    credentials: classes.text,
-                                    position: classes.text,
-                                }}
-                                user={user} />
+                        <UserShortInfo
+                            classes={{
+                                textContainer: classes.profileTextContainer,
+                                credentials: classes.text,
+                                position: classes.text,
+                            }}
+                            user={user}/>
                     </Grid>
 
                     {
                         this.userRole !== USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
                             <Hidden xsDown>
-                                <Divider flexItem orientation='vertical' />
+                                <Divider flexItem orientation='vertical'/>
                             </Hidden>
                             <Grid
                                 className={cx(classes.gridContainer, classes.textContainer)}
@@ -235,35 +245,35 @@ class ProfilePreview extends Component<IProps> {
                                 container
                                 zeroMinWidth
                                 item>
-                                    {
-                                        this.userRole === USER_ROLE.REGIONAL_MANAGER &&
-                                        <>
-                                            <Typography className={classes.text}>
-                                                Регіон
-                                            </Typography>
-                                            <Typography className={classes.text}>
-                                                { this.region }
-                                            </Typography>
-                                        </>
-                                    }
-                                    {
-                                        this.userRole === USER_ROLE.MEDICAL_AGENT &&
-                                        <>
-                                            <Typography className={classes.text}>
-                                                { this.region }
-                                            </Typography>
-                                            <Typography className={classes.text}>
-                                                { this.city }
-                                            </Typography>
-                                        </>
-                                    }
+                                {
+                                    this.userRole === USER_ROLE.REGIONAL_MANAGER &&
+                                    <>
+                                        <Typography className={classes.text}>
+                                            Регіон
+                                        </Typography>
+                                        <Typography className={classes.text}>
+                                            {this.region}
+                                        </Typography>
+                                    </>
+                                }
+                                {
+                                    this.userRole === USER_ROLE.MEDICAL_AGENT &&
+                                    <>
+                                        <Typography className={classes.text}>
+                                            {this.region}
+                                        </Typography>
+                                        <Typography className={classes.text}>
+                                            {this.city}
+                                        </Typography>
+                                    </>
+                                }
 
                             </Grid>
                         </>
                     }
 
                     <Hidden xsDown>
-                        <Divider flexItem orientation='vertical' />
+                        <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
                     <Grid
@@ -272,16 +282,16 @@ class ProfilePreview extends Component<IProps> {
                         container
                         zeroMinWidth
                         item>
-                            <Typography className={classes.text}>
-                                Лікарів
-                            </Typography>
-                            <Typography className={classes.text}>
-                                { doctorsCount === null ? '-' : doctorsCount }
-                            </Typography>
+                        <Typography className={classes.text}>
+                            Лікарів
+                        </Typography>
+                        <Typography className={classes.text}>
+                            {doctorsCount === null ? '-' : doctorsCount}
+                        </Typography>
                     </Grid>
 
                     <Hidden smDown>
-                        <Divider flexItem orientation='vertical' />
+                        <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
                     <Grid
@@ -289,16 +299,16 @@ class ProfilePreview extends Component<IProps> {
                         direction='column'
                         container
                         item>
-                            <Typography className={classes.text}>
-                                ЛПУ
-                            </Typography>
-                            <Typography className={classes.text}>
-                                { lpuCount === null ? '-' : lpuCount }
-                            </Typography>
+                        <Typography className={classes.text}>
+                            ЛПУ
+                        </Typography>
+                        <Typography className={classes.text}>
+                            {lpuCount === null ? '-' : lpuCount}
+                        </Typography>
                     </Grid>
 
                     <Hidden smDown>
-                        <Divider flexItem orientation='vertical' />
+                        <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
                     <Grid
@@ -306,18 +316,18 @@ class ProfilePreview extends Component<IProps> {
                         direction='column'
                         container
                         item>
-                            <Typography className={classes.text}>
-                                Аптеки
-                            </Typography>
-                            <Typography className={classes.text}>
-                                { pharmacyCount === null ? '-' : pharmacyCount }
-                            </Typography>
+                        <Typography className={classes.text}>
+                            Аптеки
+                        </Typography>
+                        <Typography className={classes.text}>
+                            {pharmacyCount === null ? '-' : pharmacyCount}
+                        </Typography>
                     </Grid>
                     {
                         this.userRole === USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
                             <Hidden smDown>
-                                <Divider flexItem orientation='vertical' />
+                                <Divider flexItem orientation='vertical'/>
                             </Hidden>
                             <Grid
                                 className={cx(classes.gridContainer, classes.textContainer)}
@@ -325,18 +335,65 @@ class ProfilePreview extends Component<IProps> {
                                 direction='column'
                                 container
                                 item>
-                                    <Typography className={classes.text}>
-                                        Депозити
-                                    </Typography>
-                                    <Typography className={cx(classes.text, classes.depositPlus)}>
-                                        { depositPlus || 0 }
-                                    </Typography>
-                                    <Typography className={cx(classes.text, classes.depositMinus)}>
-                                        { depositMinus || 0}
-                                    </Typography>
+                                <Typography className={classes.text}>
+                                    Депозити
+                                </Typography>
+                                <Typography className={cx(classes.text, classes.depositPlus)}>
+                                    {depositPlus || 0}
+                                </Typography>
+                                <Typography className={cx(classes.text, classes.depositMinus)}>
+                                    {depositMinus || 0}
+                                </Typography>
                             </Grid>
                         </>
                     }
+
+                    <Hidden smDown>
+                        <Divider flexItem orientation='vertical'/>
+                    </Hidden>
+
+                    <Grid className={cx(classes.gridContainer, classes.textContainer)}
+                          direction='column'
+                          container
+                          item>
+                        <InfoWindow icon={<PhoneOutlinedIcon/>}>
+                            <Grid className={classes.windowContent} direction='column' container>
+                                <Typography> Телефон </Typography>
+                                <Typography> {'+380983785423'} </Typography>
+                            </Grid>
+                        </InfoWindow>
+
+                        <InfoWindow icon={<MailOutlineOutlinedIcon/>}>
+                            <Grid className={classes.windowContent} direction='column' container>
+                                <Typography> Поштова скринька </Typography>
+                                <Typography> {'email'} </Typography>
+                            </Grid>
+                        </InfoWindow>
+
+                        <InfoWindow icon={<CreditCardOutlinedIcon/>}>
+                            <Grid className={classes.windowContent} direction='column' container>
+                                <Typography>  Банківська картка </Typography>
+                                <Typography> {'card'} </Typography>
+                            </Grid>
+                        </InfoWindow>
+                    </Grid>
+
+                    <Hidden smDown>
+                        <Divider flexItem orientation='vertical'/>
+                    </Hidden>
+                    <Grid className={cx(classes.gridContainer, classes.textContainer)}
+                          direction='column'
+                          justify='center'
+                          container
+                          item>
+                        <IconButton>
+                            <EditOutlinedIcon/>
+                        </IconButton>
+                        <IconButton>
+                            <BlockOutlinedIcon/>
+                        </IconButton>
+                    </Grid>
+
                 </Grid>
             </div>
         );

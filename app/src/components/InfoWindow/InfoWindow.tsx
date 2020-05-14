@@ -9,6 +9,7 @@ import {
 import Icon from '../../components/InfoIcon';
 import { computed, observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
+
 const styles = (theme: any) => createStyles({
     root: {},
     icon: {},
@@ -19,6 +20,7 @@ interface IProps extends WithStyles<typeof styles> {
     children: any;
     setInfoPopper?: (val: boolean) => void;
     isInfoPopperOpen?: boolean;
+    icon?: JSX.Element;
 }
 
 @inject(({
@@ -63,12 +65,12 @@ class InfoWindow extends Component<IProps> {
     }
 
     render() {
-        const { classes, children } = this.props;
+        const { classes, children, icon } = this.props;
 
         return (
             <>
                 <IconButton className={classes.button} onClick={this.handleClick}>
-                    <Icon className={classes.icon} aria-describedby={this.id} />
+                    <Icon icon={icon} className={classes.icon} aria-describedby={this.id} />
                 </IconButton>
                 <Popover onClose={this.closeInfo} id={this.id} open={this.open} anchorEl={this.anchorEl}
                          anchorOrigin={{

@@ -6,7 +6,7 @@ import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 
 const styles = (theme: any) => createStyles({
     root: {
-        padding: '10px'
+        padding: 10
     },
     field: {
         '&:not(:first-child)': { marginTop: '15px' }
