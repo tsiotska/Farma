@@ -21,6 +21,8 @@ import HoverableCell from '../HoverableCell';
 import Table, { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
+import InfoWindow from '../../../components/InfoWindow';
+import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -307,7 +309,18 @@ class TableRow extends Component<IProps> {
             tooltips,
             allowEdit
         } = this.props;
-        const { LPUName, name, id: agentId, address, city, position } = (agent as any);
+        const {
+            LPUName,
+            name,
+            id: agentId,
+            address,
+            city,
+            position,
+            specialty,
+            mobilePhone,
+            workPhone,
+            card
+        } = (agent as any);
 
         const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 
@@ -339,7 +352,9 @@ class TableRow extends Component<IProps> {
                 );
                 })
             : <TableCell />;
-
+        if (typeof position === 'string') {
+            console.log('agent: ', toJS(agent));
+        }
         return (
             <>
             <MuiTableRow ref={itemRef} className={classes.root}>
@@ -373,9 +388,17 @@ class TableRow extends Component<IProps> {
                                 { name }
                             </Typography>
                             {
-                                !agentInfo && typeof position !== 'string' &&
-                                <Close fontSize='small' className={classes.closeIcon} />
+                                agentInfo && typeof position === 'string' &&
+                                <InfoWindow>
+                                    <AgentInfoWindowForm
+                                      specialty={specialty}
+                                      mobilePhone={mobilePhone}
+                                      workPhone={workPhone}
+                                      card={card}
+                                    />
+                                </InfoWindow>
                             }
+                            { !agentInfo && typeof position !== 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
                         </Grid>
                 </TableCell>
                 { medsContent }
