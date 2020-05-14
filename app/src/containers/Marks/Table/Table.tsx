@@ -366,7 +366,7 @@ class Table extends Component<IProps> {
                 summedTotal={this.summedTotal}
                 isNested={isNested}
                 agents={this.preparedAgents}
-                position={position}
+                parentUser={parentUser}
                 agentsLoaded={this.agentsLoaded}
                 previewBonus={previewBonus}
             />

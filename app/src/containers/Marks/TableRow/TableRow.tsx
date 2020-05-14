@@ -90,7 +90,6 @@ const styles = (theme: any) => createStyles({
         '&.nest': {
             paddingLeft: 16
         }
-        // paddingLeft: this.nestLevel ? 16 : 0
     },
     subheader: {
         marginBottom: 12
@@ -183,15 +182,6 @@ class TableRow extends Component<IProps> {
     }
 
     @computed
-    get nestLevel(): number {
-        const { role, agent } = this.props;
-        const userRole = typeof agent.position === 'string'
-            ? USER_ROLE.MEDICAL_AGENT + 1
-            : agent.position;
-        return userRole - role;
-    }
-
-    @computed
     get userChangedMarks(): Map<number, IMark> {
         const { changedMarks, agent: { id } } = this.props;
         return changedMarks.get(id) || new Map();
@@ -245,6 +235,15 @@ class TableRow extends Component<IProps> {
         return bonuses[agent.position]
             ? bonuses[agent.position].find(({ month }) => month === previewBonusMonth)
             : null;
+    }
+
+    @computed
+    get nestLevel(): number {
+        const { role, agent } = this.props;
+        const userRole = typeof agent.position === 'string'
+            ? USER_ROLE.MEDICAL_AGENT + 1
+            : agent.position;
+        return userRole - role;
     }
 
     @computed
@@ -339,7 +338,7 @@ class TableRow extends Component<IProps> {
                                 { LPUName }
                             </Typography>
                             <Typography variant='body2' color='textSecondary'>
-                                { !!city && `${city} , `  }{ address }
+                                { !!city && `${city} , ` }{ address }
                             </Typography>
                     </TableCell>
                 }
@@ -358,7 +357,10 @@ class TableRow extends Component<IProps> {
                             <Typography variant='body2'>
                                 { name }
                             </Typography>
-                            { !agentInfo && typeof position !== 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
+                            {
+                                !agentInfo && typeof position !== 'string' &&
+                                <Close fontSize='small' className={classes.closeIcon} />
+                            }
                         </Grid>
                 </TableCell>
                 { medsContent }

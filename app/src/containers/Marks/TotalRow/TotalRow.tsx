@@ -42,8 +42,8 @@ const styles = (theme: any) => createStyles({
         width: '50%'
     },
     gridItem: {
-        width: 'auto'
-    }
+        width: '50%'
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {

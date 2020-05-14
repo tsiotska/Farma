@@ -16,6 +16,9 @@ import { computed } from 'mobx';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 import { IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
+import { IUserInfo } from '../Table/Table';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -67,7 +70,11 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     showLpu: boolean;
     previewBonus: IBonusInfo;
+    hideName?: boolean;
+    parentUser: IUserInfo & IUserLikeObject;
+    isNested: boolean;
 
+    role?: USER_ROLE;
     totalSold?: { [key: number]: number };
     meds?: IMedicine[];
 }
@@ -78,15 +85,29 @@ interface IProps extends WithStyles<typeof styles> {
             currentDepartmentMeds: meds
         },
         userStore: {
-            totalSold
+            totalSold,
+            role
         }
     }
 }) => ({
     meds,
+    role,
     totalSold
 }))
 @observer
 class TableHeader extends Component<IProps> {
+    get nestLevel(): number {
+        const { role, parentUser, isNested } = this.props;
+        const userRole = typeof parentUser.position === 'string'
+            ? USER_ROLE.MEDICAL_AGENT + 1
+            : parentUser.position;
+        return (userRole - role) + (isNested ? 1 : 0);
+    }
+
+    get columnWidth(): number {
+        return 150 - this.nestLevel * 16 / 2;
+    }
+
     get sales(): Map<number, IDrugSale> {
         const { previewBonus } = this.props;
         return previewBonus
@@ -100,7 +121,8 @@ class TableHeader extends Component<IProps> {
             meds,
             showLpu,
             totalSold,
-            previewBonus
+            previewBonus,
+            hideName
         } = this.props;
 
         return (
@@ -112,12 +134,14 @@ class TableHeader extends Component<IProps> {
                                 showLpu &&
                                 <TableCell
                                     padding='none'
+                                    style={{ width: this.columnWidth }}
                                     className={cx(classes.cell, classes.wideColumn)}>
                                     ЛПУ
                                 </TableCell>
                             }
                             <TableCell
                                 padding='none'
+                                style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
                                 className={cx(classes.cell, {
                                     [classes.doubleWidthColumn]: !showLpu,
                                     [classes.wideColumn]: showLpu,
@@ -137,21 +161,24 @@ class TableHeader extends Component<IProps> {
                                             <Grid
                                                 direction='column'
                                                 container>
-                                                <Typography className={classes.medItem}>
-                                                    { x.name }
-                                                </Typography>
-                                                {
-                                                    !!previewBonus &&
-                                                    <Typography variant='subtitle1' className={classes.salesStat}>
-                                                        <span className={classes.span}>
-                                                            { totalSold[x.id] || 0 }
-                                                        </span>
-                                                        <span>/</span>
-                                                        <span className={classes.span}>
-                                                            { saleInfo ? saleInfo.amount : 0 }
-                                                        </span>
-                                                    </Typography>
-                                                }
+                                                    {
+                                                        !hideName &&
+                                                        <Typography className={classes.medItem}>
+                                                            { x.name }
+                                                        </Typography>
+                                                    }
+                                                    {
+                                                        !!previewBonus &&
+                                                        <Typography variant='subtitle1' className={classes.salesStat}>
+                                                            <span className={classes.span}>
+                                                                { totalSold[x.id] || 0 }
+                                                            </span>
+                                                            <span>/</span>
+                                                            <span className={classes.span}>
+                                                                { saleInfo ? saleInfo.amount : 0 }
+                                                            </span>
+                                                        </Typography>
+                                                    }
                                             </Grid>
                                         </TableCell>
                                     );

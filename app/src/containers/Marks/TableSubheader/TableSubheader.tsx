@@ -20,6 +20,7 @@ import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { IUserInfo } from '../Table/Table';
 import { toJS } from 'mobx';
+import TableHeader from '../TableHeader';
 
 const styles = (theme: any) => createStyles({
     emptyText: {
@@ -72,7 +73,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     isNested: boolean;
-    position: USER_ROLE;
+    parentUser: IUserInfo & IUserLikeObject;
     agentsLoaded: boolean;
     previewBonus: IBonusInfo;
     agents: IUserInfo[];
@@ -107,7 +108,7 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableSubheader extends Component<IProps> {
     get userIsMedicalAgent(): boolean {
-        const { position } = this.props;
+        const { parentUser: { position } } = this.props;
         return position === USER_ROLE.MEDICAL_AGENT;
     }
 
@@ -143,13 +144,14 @@ class TableSubheader extends Component<IProps> {
         const {
             isNested,
             classes,
-            position,
+            parentUser,
             clearChangedMarks,
             agentsLoaded,
             previewBonus,
             changedMarks,
             agents,
         } = this.props;
+        const { position } = parentUser;
 
         if (!isNested) return null;
         console.log(
@@ -158,6 +160,7 @@ class TableSubheader extends Component<IProps> {
             : null
         );
         return (
+            <>
             <Grid container className={classes.container} alignItems='center'>
                 <Typography>
                     { position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
@@ -200,6 +203,14 @@ class TableSubheader extends Component<IProps> {
                     </Typography>
                 }
             </Grid>
+            <TableHeader
+                showLpu={this.userIsMedicalAgent}
+                previewBonus={previewBonus}
+                hideName
+                isNested
+                parentUser={parentUser}
+            />
+            </>
         );
     }
 }
