@@ -193,8 +193,7 @@ class Table extends Component<IProps> {
     @computed
     get flattenMedsInfo(): IMark[] {
         const { changedMarks } = this.props;
-        return this.agentsInfo.reduce((acc, curr) => {
-            const { marks, id } = curr;
+        return this.agentsInfo.reduce((acc, { marks, id }) => {
             const changedAgentMarks = changedMarks.get(id);
 
             if (!changedAgentMarks) {
@@ -204,7 +203,11 @@ class Table extends Component<IProps> {
             const filteredAgentValues = [...marks.values()]
                 .filter(x => changedAgentMarks.has(x.drugId) === false);
 
-            return [...acc, ...changedAgentMarks.values(), ...filteredAgentValues];
+            return [
+                ...acc,
+                ...changedAgentMarks.values(),
+                ...filteredAgentValues
+            ];
         }, []);
     }
 
@@ -279,15 +282,25 @@ class Table extends Component<IProps> {
 
             await when(() => this.props.isLoading === false);
 
-            const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
-                ? await loadConfirmedDoctors(parentUser)
-                : await getLocationsAgents(currentDepartmentId, parentUser);
+            // const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
+            //     ? await loadConfirmedDoctors(parentUser)
+            //     : await getLocationsAgents(currentDepartmentId, parentUser);
 
-            this.agents = newAgents || [];
-            this.agentsLoaded = true;
+            // this.agents = newAgents || [];
+            // this.agentsLoaded = true;
             this.reactionDisposer = reaction(
                 () => this.props.role,
-                () => { this.agents = []; }
+                async () => {
+                    this.agentsLoaded = false;
+                    this.agents = [];
+                    const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
+                        ? await loadConfirmedDoctors(parentUser)
+                        : await getLocationsAgents(currentDepartmentId, parentUser);
+                    this.agents = newAgents || [];
+                    this.agentsLoaded = true;
+                }, {
+                    fireImmediately: true
+                }
             );
             if (isNested === false) {
                 this.totalReactionDisposer = reaction(
@@ -352,7 +365,7 @@ class Table extends Component<IProps> {
             <TableSubheader
                 summedTotal={this.summedTotal}
                 isNested={isNested}
-                agents={this.agentsInfo}
+                agents={this.preparedAgents}
                 position={position}
                 agentsLoaded={this.agentsLoaded}
                 previewBonus={previewBonus}
@@ -370,7 +383,11 @@ class Table extends Component<IProps> {
                                     showLpu={this.userIsMedicalAgent}
                                     tooltips={this.tooltips}
                                     expanded={bonusUsers.some(({ id }) => id === x.id)}
-                                    allowEdit={previewBonus ? !previewBonus.status : false}
+                                    allowEdit={
+                                        previewBonus
+                                            ? !previewBonus.status
+                                            : false
+                                    }
                                     expandHandler={this.expandHandler}
                                     itemRef={
                                         i === lastIndex

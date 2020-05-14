@@ -246,7 +246,9 @@ class TableRow extends Component<IProps> {
 
     get isEditable(): boolean {
         const { agent: { position }, allowEdit } = this.props;
-        return typeof position === 'string' && allowEdit === true;
+
+        const isEditable =  typeof position === 'string' && allowEdit === true;
+        return isEditable;
     }
 
     get isExpandable(): boolean {

@@ -154,8 +154,9 @@ class Marks extends Component<IProps> {
         await loadBonusesData(this.props.previewUser);
         this.reactionDisposer = reaction(
             () => this.props.previewUser,
-            (user: IUserLikeObject) => {
-                loadBonuses(user);
+            async (user: IUserLikeObject) => {
+                await loadBonuses(user);
+                loadBonusesData(user);
             }
         );
         this.monthReaction = reaction(

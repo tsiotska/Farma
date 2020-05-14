@@ -138,8 +138,9 @@ class TransferBlock extends Component<IProps> {
         const { previewBonus } = this.props;
         const current = (this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit);
         const settingsValue = this.bonuses
-            ? this.bonuses[0]
+            ? this.bonuses[1]
             : 100;
+        console.log('total: ', current, settingsValue);
         return previewBonus
             ? current >= settingsValue
             : true;

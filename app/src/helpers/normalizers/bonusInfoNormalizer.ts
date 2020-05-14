@@ -66,7 +66,8 @@ export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayN
     {
         requiredProps: ['month', 'payments', 'deposit' ],
         valueNormalizers: {
-            status: (value: number) => !!value,
+            // status: (value: number) => !!value,
+            status: () => false,
             month: (value: number) => value - 1 >= 0 ? value - 1 : 0
         }
     }

@@ -243,26 +243,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
                     drugId,
                     mark,
                     payments
-                }) => {
-                    return {
-                        agent: agentId,
-                        deposit: deposit,
-                        drug: drugId,
-                        drug_mark: mark,
-                        payments: payments,
-                    };
-                }
+                }) => ({
+                    agent: agentId,
+                    deposit: deposit,
+                    drug: drugId,
+                    drug_mark: mark,
+                    payments: payments,
+                })
             );
+
             return [...acc, ...preparedMarks];
         }, []);
 
         if (!marks.length) return;
-
-        const data: any = {
-            marks,
-            deposit: this.previewBonusTotal.marks.deposit,
-            payments: this.previewBonusTotal.marks.payments
-        };
 
         await this.dispatchRequest(
             api.updateBonusesData(
@@ -270,18 +263,22 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 id,
                 this.bonusesYear,
                 month + 1,
-                data,
+                marks,
                 sale
             ),
             'updateBonuses'
         );
         this.changedMarks = new Map();
 
-        for (const user of this.bonusUsers.reverse()) {
-            await this.loadBonuses(user);
+        const sorted = this.bonusUsers.slice().sort((a, b) => {
+            return b.position - a.position;
+        });
+
+        for (const user of sorted) {
+            await this.loadBonuses(user, false);
             await this.loadBonusesData(user);
         }
-        await this.loadBonuses(this.previewUser);
+        await this.loadBonuses(this.previewUser, false);
         await this.loadBonusesData(this.previewUser);
     }
 
@@ -410,8 +407,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async loadBonuses(user: IUserLikeObject) {
-        this.bonuses[user.position] = [];
+    async loadBonuses(user: IUserLikeObject, clear: boolean = true) {
+        if (clear === true) this.bonuses[user.position] = [];
         const userBonuses = await this.dispatchRequest(
             this.loadSpecifiedUserBonuses(user),
             'loadBonuses'
