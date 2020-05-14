@@ -17,17 +17,28 @@ interface IProps extends WithStyles<typeof styles> {
     mobilePhone?: string;
     workPhone?: string;
     card?: string;
+    specialty?: string;
 }
 
 @observer
-class SalaryInfoWindowForm extends Component<IProps> {
+class AgentInfoWindowForm extends Component<IProps> {
 
     render() {
-        const { classes, workPhone, mobilePhone, region, card } = this.props;
+        const { classes, specialty, workPhone, mobilePhone, region, card } = this.props;
 
         return (
             <Card className={classes.root}>
                 <CardContent>
+                    { specialty &&
+                    <Grid className={classes.column}>
+                        <Typography color='textSecondary'>
+                            Спеціальність
+                        </Typography>
+                        <Typography>
+                            {specialty}
+                        </Typography>
+                    </Grid>
+                    }
                     { workPhone &&
                         <Grid className={classes.column}>
                             <Typography color='textSecondary'>
@@ -74,4 +85,4 @@ class SalaryInfoWindowForm extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(SalaryInfoWindowForm);
+export default withStyles(styles)(AgentInfoWindowForm);

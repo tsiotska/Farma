@@ -21,6 +21,8 @@ import HoverableCell from '../HoverableCell';
 import Table, { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
+import InfoWindow from '../../../components/InfoWindow';
+import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -348,6 +350,17 @@ class TableRow extends Component<IProps> {
                             <Typography variant='body2'>
                                 { name }
                             </Typography>
+                            {
+                                agentInfo && typeof position === 'string' &&
+                                <InfoWindow>
+                                    <AgentInfoWindowForm
+                                      specialty={'Хірург'}
+                                      mobilePhone={'0989555067'}
+                                      workPhone={'0679595097'}
+                                      card={'5168 7422 2491 3149'}
+                                    />
+                                </InfoWindow>
+                            }
                             { !agentInfo && typeof position !== 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
                         </Grid>
                 </TableCell>

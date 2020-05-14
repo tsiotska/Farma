@@ -9,7 +9,7 @@ import UserShortInfo from '../../../components/UserShortInfo';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import {computed, observable, toJS} from 'mobx';
 import InfoWindow from '../../../components/InfoWindow';
-import SalaryInfoWindowForm from '../SalaryInfoWindowForm';
+import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -198,7 +198,7 @@ class ListItem extends Component<IProps> {
                             {
                                 agentInfo &&
                                 <InfoWindow>
-                                  <SalaryInfoWindowForm
+                                  <AgentInfoWindowForm
                                     region={agentInfo.region}
                                     mobilePhone={agentInfo.mobilePhone}
                                     workPhone={agentInfo.workPhone}
