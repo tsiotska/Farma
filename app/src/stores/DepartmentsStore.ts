@@ -268,8 +268,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 query = `mp/${previewUser.id}/agent?unconfirmed=1`;
                 break;
         }
-        return await this.dispatchRequest(api.getUnconfirmedDoctors(this.currentDepartmentId, query),
-            'loadUnconfirmedDoctors');
+
+        return await this.dispatchRequest(
+            api.getUnconfirmedDoctors(this.currentDepartmentId, query),
+            'loadUnconfirmedDoctors'
+        );
     }
 
     @action.bound
@@ -1569,7 +1572,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (!this.currentDepartmentId || !userId) return null;
 
         const queryParam = unconfirmed
-            ? `?unconfirmed`
+            ? `?unconfirmed=1`
             : '';
 
         switch (role) {
