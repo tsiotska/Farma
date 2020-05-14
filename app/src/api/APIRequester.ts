@@ -201,6 +201,16 @@ export class APIRequester {
             .catch(this.defaultErrorHandler());
     }
 
+    editDepartment(depId: number, formData: FormData): Promise<IDepartment> {
+        return this.instance.put(`api/branch/${depId}`)
+            .then(({ data: { data: { id, name, image } }}) => ({
+                id,
+                name,
+                image
+            }))
+            .catch(this.defaultErrorHandler());
+    }
+
     addLpu(postData: any): Promise<ILPU> {
         return this.instance.post('/api/hcf', postData)
             .then(({ data: { data } }) => lpuNormalizer({ data: [data] }))

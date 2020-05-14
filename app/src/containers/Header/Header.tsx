@@ -24,6 +24,8 @@ import EditWorkerModal from './EditWorkerModal';
 import Search from './Search';
 import { IDeletePopoverSettings } from '../../stores/UIStore';
 import DeletePopover from '../../components/DeletePopover';
+import EditDepartmentModal from './EditDeparmentModal';
+import { EDIT_DEPARTMENT_MODAL } from '../../constants/Modals';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -53,6 +55,7 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     currentDepartment?: IDepartment;
     isAdmin?: boolean;
+    openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
 }
 
@@ -65,12 +68,14 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
             isAdmin
         },
         uiStore: {
-            openDelPopper
+            openDelPopper,
+            openModal
         }
     }
 }) => ({
     currentDepartment,
     openDelPopper,
+    openModal,
     isAdmin
 }))
 @observer
@@ -106,6 +111,11 @@ export class Header extends Component<IProps, {}> {
         if (!!matchPath(pathname, ADMIN_ROUTE)) return 'Адмін панель';
         if (!!matchPath(pathname, NOTIFICATIONS_ROUTE)) return 'Сповіщення';
         return null;
+    }
+
+    editClickHandler = () => {
+        const { openModal, currentDepartment } = this.props;
+        openModal(EDIT_DEPARTMENT_MODAL, currentDepartment);
     }
 
     settingsClickHandler = () => this.props.history.push(SETTINGS_ROUTE);
@@ -157,7 +167,9 @@ export class Header extends Component<IProps, {}> {
                                 }
                                 {
                                     this.isDepartmentRoute && <>
-                                        <IconButton className={cx(classes.iconButton, classes.settingsButton)}>
+                                        <IconButton
+                                            onClick={this.editClickHandler}
+                                            className={cx(classes.iconButton, classes.settingsButton)}>
                                             <EditOutlined fontSize='small' />
                                         </IconButton>
                                         <IconButton onClick={this.deleteClickHandler} className={cx(classes.iconButton)}>
@@ -170,7 +182,8 @@ export class Header extends Component<IProps, {}> {
                 </AppBar>
                 <SalaryReviewModal />
                 <AddWorkerModal showLocationsBlock={!this.isSettingsRoute} />
-                <EditWorkerModal  showLocationsBlock={!this.isSettingsRoute} />
+                <EditWorkerModal showLocationsBlock={!this.isSettingsRoute} />
+                <EditDepartmentModal />
                 <DeletePopover
                     name='deleteDepartment'
                     anchorOrigin={{
