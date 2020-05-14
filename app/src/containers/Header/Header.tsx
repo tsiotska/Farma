@@ -3,17 +3,27 @@ import { observer, inject } from 'mobx-react';
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { AppBar, Typography, IconButton, Grid } from '@material-ui/core';
+import { computed } from 'mobx';
+import { ArrowBack, EditOutlined, DeleteOutlined } from '@material-ui/icons';
+import { matchPath, RouteComponentProps } from 'react-router-dom';
+import cx from 'classnames';
+
 import { IDepartment } from '../../interfaces/IDepartment';
 import SalaryReviewModal from './SalaryReviewModal';
-import { ADMIN_ROUTE, SETTINGS_ROUTE, SETTINGS_ROUTES, DEPARTMENT_ROUTE, NOTIFICATIONS_ROUTE } from '../../constants/Router';
-import { matchPath, RouteComponentProps } from 'react-router-dom';
+import {
+    ADMIN_ROUTE,
+    SETTINGS_ROUTE,
+    SETTINGS_ROUTES,
+    DEPARTMENT_ROUTE,
+    NOTIFICATIONS_ROUTE
+} from '../../constants/Router';
 import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
-import { computed } from 'mobx';
-import { ArrowBack } from '@material-ui/icons';
-import cx from 'classnames';
+
 import AddWorkerModal from './AddWorkerModal';
 import EditWorkerModal from './EditWorkerModal';
 import Search from './Search';
+import { IDeletePopoverSettings } from '../../stores/UIStore';
+import DeletePopover from '../../components/DeletePopover';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -26,7 +36,6 @@ const styles = (theme: any) => createStyles({
     },
     settingsButton: {
         marginLeft: 'auto',
-        padding: 6
     },
     title: {
         display: 'flex',
@@ -35,12 +44,16 @@ const styles = (theme: any) => createStyles({
     backButton: {
         marginRight: 5,
         borderRadius: 2
+    },
+    iconButton: {
+        padding: 6
     }
 });
 
 interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     currentDepartment?: IDepartment;
     isAdmin?: boolean;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
 }
 
 @inject(({
@@ -50,24 +63,26 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
         },
         userStore: {
             isAdmin
+        },
+        uiStore: {
+            openDelPopper
         }
     }
 }) => ({
     currentDepartment,
+    openDelPopper,
     isAdmin
 }))
 @observer
 export class Header extends Component<IProps, {}> {
-    @computed
     get departmentName(): string {
         const { currentDepartment } = this.props;
         return currentDepartment
-        ? currentDepartment.name
-        : null;
+            ? currentDepartment.name
+            : null;
     }
 
-    @computed
-    get showSettingsBtn(): boolean {
+    get isAdminRoute(): boolean {
         const { history: { location: {pathname}} } = this.props;
         return !!matchPath(pathname, {
             path: ADMIN_ROUTE,
@@ -75,17 +90,19 @@ export class Header extends Component<IProps, {}> {
         });
     }
 
-    @computed
     get isSettingsRoute(): boolean {
-        // get showBackButton(): boolean {
         const { history: { location: { pathname }}} = this.props;
         return SETTINGS_ROUTES.some(route => !!matchPath(pathname, route));
     }
 
-    @computed
+    get isDepartmentRoute(): boolean {
+        const { history: { location: { pathname }}} = this.props;
+        return !!matchPath(pathname, DEPARTMENT_ROUTE);
+    }
+
     get title(): string {
         const { history: { location: { pathname }}} = this.props;
-        if (!!matchPath(pathname, DEPARTMENT_ROUTE)) return this.departmentName;
+        if (this.isDepartmentRoute) return this.departmentName;
         if (!!matchPath(pathname, ADMIN_ROUTE)) return 'Адмін панель';
         if (!!matchPath(pathname, NOTIFICATIONS_ROUTE)) return 'Сповіщення';
         return null;
@@ -94,6 +111,17 @@ export class Header extends Component<IProps, {}> {
     settingsClickHandler = () => this.props.history.push(SETTINGS_ROUTE);
 
     backClickHandler = () => this.props.history.push(ADMIN_ROUTE);
+
+    deleteConfirmHandler = (confirmed: boolean) => {
+        console.log('should delete: ', confirmed);
+        this.props.openDelPopper(null);
+    }
+
+    deleteClickHandler = ({ currentTarget }: any) => this.props.openDelPopper({
+        anchorEl: currentTarget,
+        callback: this.deleteConfirmHandler,
+        name: 'deleteDepartment'
+    })
 
     render() {
         const { classes } = this.props;
@@ -122,10 +150,20 @@ export class Header extends Component<IProps, {}> {
                             </Grid>
                             <Grid xs container item>
                                 {
-                                    this.showSettingsBtn &&
-                                    <IconButton onClick={this.settingsClickHandler} className={classes.settingsButton}>
+                                    this.isAdminRoute &&
+                                    <IconButton onClick={this.settingsClickHandler} className={cx(classes.iconButton, classes.settingsButton)}>
                                         <Settings width={22} height={22} />
                                     </IconButton>
+                                }
+                                {
+                                    this.isDepartmentRoute && <>
+                                        <IconButton className={cx(classes.iconButton, classes.settingsButton)}>
+                                            <EditOutlined fontSize='small' />
+                                        </IconButton>
+                                        <IconButton onClick={this.deleteClickHandler} className={cx(classes.iconButton)}>
+                                            <DeleteOutlined fontSize='small' />
+                                        </IconButton>
+                                    </>
                                 }
                             </Grid>
                     </Grid>
@@ -133,6 +171,17 @@ export class Header extends Component<IProps, {}> {
                 <SalaryReviewModal />
                 <AddWorkerModal showLocationsBlock={!this.isSettingsRoute} />
                 <EditWorkerModal  showLocationsBlock={!this.isSettingsRoute} />
+                <DeletePopover
+                    name='deleteDepartment'
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
             </>
         );
     }

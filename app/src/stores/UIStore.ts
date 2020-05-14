@@ -21,6 +21,7 @@ export interface IFilterBy {
 }
 
 export interface IDeletePopoverSettings {
+    name: string;
     anchorEl: Element;
     callback: (confirm: boolean) => void;
 }
@@ -49,7 +50,8 @@ export class UIStore implements IUIStore {
     @observable currentPage: number = 0;
     @observable delPopoverSettings: IDeletePopoverSettings = {
         anchorEl: null,
-        callback: null
+        callback: null,
+        name: ''
     };
     @observable isInfoPopperOpen: boolean = false;
 
@@ -88,7 +90,7 @@ export class UIStore implements IUIStore {
     @action.bound
     openDelPopper(settings: IDeletePopoverSettings) {
         this.delPopoverSettings = settings === null
-            ? { anchorEl: null, callback: null }
+            ? { anchorEl: null, callback: null, name: '' }
             : { ...settings };
     }
 

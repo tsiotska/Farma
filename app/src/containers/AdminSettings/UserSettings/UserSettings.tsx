@@ -110,7 +110,7 @@ class UserSettings extends Component<IProps> {
                     variant='outlined'>
                     Додати користувача
                 </Button>
-                <DeletePopover />
+                <DeletePopover name='userSettingsDelete' />
                 <Snackbar
                     open={this.showSnackbar}
                     type={this.snackbarType}

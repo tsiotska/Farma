@@ -73,7 +73,8 @@ class PharmaciesList extends Component<IProps> {
 
     deleteClickHandler = (lpu: ILPU, anchorEl: Element) => this.props.openDelPopper({
             anchorEl,
-            callback: this.delCallback(lpu)
+            callback: this.delCallback(lpu),
+            name: 'deletePharmacy'
         })
 
     render() {

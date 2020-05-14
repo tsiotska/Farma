@@ -265,6 +265,7 @@ class Doctors extends Component<IProps> {
                 <CreateDoctorModal />
                 <EditDoctorModal />
                 <DeletePopover
+                    name='deleteDoc'
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'right',

@@ -211,7 +211,8 @@ class WorkerListItem extends Component<IProps> {
         const { currentTarget } = e;
         this.props.openDelPopper({
             anchorEl: currentTarget,
-            callback: this.delClickCallback
+            callback: this.delClickCallback,
+            name: 'deleteWorker'
         });
     }
 

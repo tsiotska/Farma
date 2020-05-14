@@ -159,7 +159,8 @@ class DoctorListItem extends Component<IProps> {
         const { openDelPopper, deleteHandler, doctor } = this.props;
         openDelPopper({
             anchorEl: currentTarget,
-            callback: deleteHandler(doctor)
+            callback: deleteHandler(doctor),
+            name: 'deleteDoc'
         });
     }
 

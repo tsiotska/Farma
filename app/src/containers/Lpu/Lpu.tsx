@@ -294,6 +294,7 @@ class Lpu extends Component<IProps> {
                 <AddLpu types={this.types} />
                 <EditLpu types={this.types} />
                 <DeletePopover
+                    name='lpuDelete'
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'right',

@@ -305,6 +305,7 @@ class Pharmacy extends Component<IProps> {
                 <AddPharmacy types={this.types} />
                 <EditPharmacy types={this.types} />
                 <DeletePopover
+                    name='pharmacyDelete'
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'right',

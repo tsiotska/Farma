@@ -111,7 +111,8 @@ class ListItem extends Component<IProps> {
         const { openDelPopper, deleteHandler, medicine: { id } } = this.props;
         openDelPopper({
             anchorEl: currentTarget,
-            callback: deleteHandler(id)
+            callback: deleteHandler(id),
+            name: 'deleteMedicine'
         });
     }
 

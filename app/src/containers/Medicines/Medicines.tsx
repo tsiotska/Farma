@@ -110,6 +110,7 @@ class Medicines extends Component<IProps> {
                 <EditMedsModal />
                 <AddMedsModal />
                 <DeletePopover
+                    name='medicineDelete'
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'right',

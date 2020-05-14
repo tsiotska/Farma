@@ -29,6 +29,7 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles>, Pick<PopoverProps,  'anchorOrigin' | 'transformOrigin'> {
+    name: string;
     delPopoverSettings?: IDeletePopoverSettings;
 }
 
@@ -44,6 +45,21 @@ interface IProps extends WithStyles<typeof styles>, Pick<PopoverProps,  'anchorO
 @observer
 class DeletePopover extends Component<IProps> {
     @observable disabledConfirm: boolean = true;
+
+    get anchor(): Element {
+        const {
+            name: givenName,
+            delPopoverSettings: {
+                anchorEl,
+                callback,
+                name
+        }} = this.props;
+        const namesIsEqual = givenName === name;
+        return namesIsEqual
+            ? anchorEl
+            : null;
+    }
+
     confirmClickHandler = () => {
         const { delPopoverSettings: { callback } } = this.props;
         if (callback) callback(true);
@@ -79,8 +95,8 @@ class DeletePopover extends Component<IProps> {
 
         return (
             <Popover
-                open={delPopoverSettings ? !!delPopoverSettings.anchorEl : false}
-                anchorEl={delPopoverSettings ? delPopoverSettings.anchorEl : null}
+                open={!!this.anchor}
+                anchorEl={this.anchor}
                 anchorOrigin={anchorOrigin}
                 transformOrigin={transformOrigin}
                 elevation={20}
@@ -88,8 +104,8 @@ class DeletePopover extends Component<IProps> {
                     <Tooltip
                         title={
                             this.disabledConfirm
-                            ? ''
-                            : 'Видалити'
+                                ? ''
+                                : 'Видалити'
                         }
                         placement='top'
                         enterDelay={250}
