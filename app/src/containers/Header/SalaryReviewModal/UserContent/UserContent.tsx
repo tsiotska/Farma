@@ -109,15 +109,6 @@ class UserContent extends Component<IProps> {
         return this.props.getAsyncStatus('updateSalary').loading;
     }
 
-    // @computed
-    // get userLevel(): number {
-    //     const { user } = this.props;
-    //     console.log('userleevel: ', user && user.level);
-    //     return user
-    //         ? user.level
-    //         : 0;
-    // }
-
     @computed
     get userColors(): string[] {
         const { levelsCount } = this.props;
@@ -146,16 +137,6 @@ class UserContent extends Component<IProps> {
             return Math.floor(plannedCost);
         });
     }
-
-    // @computed
-    // get totalUserSoldAmount(): number {
-    //     const { userSales, currentDepartmentMeds } = this.props;
-    //     if (!userSales) return 0;
-    //     return currentDepartmentMeds.reduce(
-    //         (total, { id }) => total + (id in userSales ? (userSales[id].money || 0) : 0),
-    //         0
-    //     );
-    // }
 
     @computed
     get userMoneyDeficit(): number {
@@ -254,7 +235,7 @@ class UserContent extends Component<IProps> {
                 let newUserLevel: number = 0;
                 for (let i = 1, q = values.length; i < q; i++) {
                     if (currentUserValue >= values[i]) {
-                        newUserLevel = i + 1;
+                        newUserLevel = i;
                     }
                 }
                 this.userLevel = newUserLevel || 1;
