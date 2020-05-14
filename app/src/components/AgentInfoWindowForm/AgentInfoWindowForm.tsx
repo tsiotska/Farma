@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Card, CardContent, createStyles, Grid, Typography, WithStyles } from '@material-ui/core';
+import { Card, CardContent, createStyles, Grid, IconButton, Typography, WithStyles } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 
 const styles = (theme: any) => createStyles({
     root: {
         padding: '10px'
     },
-    column: {
+    field: {
         '&:not(:first-child)': { marginTop: '15px' }
     }
 });
@@ -29,8 +30,8 @@ class AgentInfoWindowForm extends Component<IProps> {
         return (
             <Card className={classes.root}>
                 <CardContent>
-                    { specialty &&
-                    <Grid className={classes.column}>
+                    {specialty &&
+                    <Grid container direction='column' className={classes.field}>
                         <Typography color='textSecondary'>
                             Спеціальність
                         </Typography>
@@ -39,38 +40,39 @@ class AgentInfoWindowForm extends Component<IProps> {
                         </Typography>
                     </Grid>
                     }
-                    { workPhone &&
-                        <Grid className={classes.column}>
-                            <Typography color='textSecondary'>
-                                Робочий телефон
-                            </Typography>
-                            <Typography>
-                                {workPhone}
-                            </Typography>
-                        </Grid>
-                    }
-                    { mobilePhone &&
-                        <Grid className={classes.column}>
-                            <Typography color='textSecondary'>
-                                Мобільний телефон
-                            </Typography>
-                            <Typography>
-                                {mobilePhone}
-                            </Typography>
-                        </Grid>
-                    }
-                    {region &&
-                    <Grid className={classes.column}>
-                      <Typography color='textSecondary'>
-                        Регіон
-                      </Typography>
-                      <Typography>
-                          {region && region.name}
-                      </Typography>
+                    {workPhone &&
+                    <Grid container direction='column' className={classes.field}>
+                        <Typography color='textSecondary'>
+                            Робочий телефон
+                        </Typography>
+                        <Typography>
+                            {workPhone}
+                        </Typography>
                     </Grid>
                     }
-                    { card &&
-                        <Grid className={classes.column}>
+                    {mobilePhone &&
+                    <Grid container direction='column' className={classes.field}>
+                        <Typography color='textSecondary'>
+                            Мобільний телефон
+                        </Typography>
+                        <Typography>
+                            {mobilePhone}
+                        </Typography>
+                    </Grid>
+                    }
+                    {region &&
+                    <Grid container direction='column' className={classes.field}>
+                        <Typography color='textSecondary'>
+                            Регіон
+                        </Typography>
+                        <Typography>
+                            {region && region.name}
+                        </Typography>
+                    </Grid>
+                    }
+                    {card &&
+                    <Grid container wrap='nowrap' className={classes.field}>
+                        <Grid container direction='column'>
                             <Typography color='textSecondary'>
                                 Банківська картка
                             </Typography>
@@ -78,6 +80,12 @@ class AgentInfoWindowForm extends Component<IProps> {
                                 {card}
                             </Typography>
                         </Grid>
+                        <Grid>
+                            <IconButton>
+                                <FileCopyOutlinedIcon/>
+                            </IconButton>
+                        </Grid>
+                    </Grid>
                     }
                 </CardContent>
             </Card>
