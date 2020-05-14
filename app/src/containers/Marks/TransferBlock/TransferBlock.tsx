@@ -140,7 +140,6 @@ class TransferBlock extends Component<IProps> {
         const settingsValue = this.bonuses
             ? this.bonuses[1]
             : 100;
-        console.log('total: ', current, settingsValue);
         return previewBonus
             ? current >= settingsValue
             : true;

@@ -25,7 +25,8 @@ const styles = (theme: any) => createStyles({
     column: {
         width: 70,
         '&:last-of-type': {
-            paddingRight: 5
+            paddingRight: 8,
+            width: 85
         }
     },
     cell: {

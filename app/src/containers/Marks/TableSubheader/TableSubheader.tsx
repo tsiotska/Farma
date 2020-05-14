@@ -19,6 +19,7 @@ import { IMarkFraction } from '../../../stores/UserStore';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { IUserInfo } from '../Table/Table';
+import { toJS } from 'mobx';
 
 const styles = (theme: any) => createStyles({
     emptyText: {
@@ -126,7 +127,6 @@ class TableSubheader extends Component<IProps> {
             ? salarySettings.payments
             : 0;
         const settingsPayments = (1 - initValue) * 100;
-        console.log('total: ', current, settingsPayments);
         return settingsPayments >= 0 && settingsPayments <= 100
             ? current >= settingsPayments
             : false;
@@ -148,11 +148,15 @@ class TableSubheader extends Component<IProps> {
             agentsLoaded,
             previewBonus,
             changedMarks,
-            agents
+            agents,
         } = this.props;
 
         if (!isNested) return null;
-
+        console.log(
+            previewBonus
+            ? toJS(previewBonus.sales)
+            : null
+        );
         return (
             <Grid container className={classes.container} alignItems='center'>
                 <Typography>

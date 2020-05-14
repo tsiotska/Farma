@@ -226,7 +226,7 @@ class Marks extends Component<IProps> {
                             </Button>
                         }
                     </Grid>
-                    <TableHeader previewBonus={this.previewBonus} showLpu={this.showLpuColumn} />
+                    <TableHeader totalSold={{}} previewBonus={this.previewBonus} showLpu={this.showLpuColumn} />
                     {
                         !!this.previewBonus &&
                         <Table

@@ -27,7 +27,10 @@ const styles = (theme: any) => createStyles({
         textTransform: 'capitalize'
     },
     column: {
-        width: 70
+        width: 70,
+        '&:last-of-type': {
+            width: 85
+        }
     },
     cell: {
         verticalAlign: 'middle',
@@ -58,8 +61,8 @@ const styles = (theme: any) => createStyles({
     },
     paymentsContainer: {
         border: '1px  solid black',
-        width: 'auto',
-        minWidth: 30
+        minWidth: 30,
+        width: '100%'
     },
     tooltip: {
         border: '1px solid #27A7DD',
@@ -96,14 +99,19 @@ const styles = (theme: any) => createStyles({
         marginTop: 'auto',
         borderTop: '1px solid #0000001f',
         padding: '1px 5px 0 5px',
-        background: '#DEE6EA'
+        background: '#DEE6EA',
+        width: '100%'
     },
     span: {
         minWidth: 25,
-        textAlign: 'center'
+        textAlign: 'center',
+        maxWidth: 38,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
     lastGridItem: {
-        paddingRight: 8
+        paddingRight: 8,
+        maxWidth: 85
     },
     closeIcon: {
         color: 'white',

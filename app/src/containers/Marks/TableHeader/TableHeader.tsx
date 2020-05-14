@@ -25,7 +25,10 @@ const styles = (theme: any) => createStyles({
         width: 284 / 2
     },
     column: {
-        width: 70
+        width: 70,
+        '&:last-of-type': {
+            width: 85
+        }
     },
     table: {
         tableLayout: 'fixed'
@@ -46,7 +49,7 @@ const styles = (theme: any) => createStyles({
         border: 'none',
         paddingBottom: '5px !important',
         '&:last-of-type': {
-            paddingRight: 5
+            paddingRight: 8
         }
     },
     span: {
