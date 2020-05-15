@@ -171,39 +171,42 @@ export default class UserStore extends AsyncStore implements IUserStore {
     async createBonus(year: number, month: number): Promise<boolean> {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
-        // const userId = this.previewUser
-        //     ? this.previewUser.id
-        //     : null;
+        const userId = this.previewUser
+            ? this.previewUser.id
+            : null;
 
-        // if (!userId || !currentDepartmentId) return false;
+        if (!userId || !currentDepartmentId) return false;
 
-        // const isCreated = await api.updateBonusesData(
-        //     currentDepartmentId,
-        //     userId,
-        //     year,
-        //     month + 1,
-        //     {}
-        // );
+        const isCreated = await api.updateBonusesData(
+            currentDepartmentId,
+            userId,
+            year,
+            month + 1,
+            {},
+            true
+        );
 
-        // if (isCreated) {
-        //     const newBonusInfo: IBonusInfo = {
-        //         month: month,
-        //         payments: null,
-        //         deposit: null,
-        //         status: false,
-        //         sales: new Map(),
-        //         agents: [],
-        //     };
+        if (isCreated) {
+            // const newBonusInfo: IBonusInfo = {
+            //     month: month,
+            //     payments: null,
+            //     deposit: null,
+            //     status: false,
+            //     sales: new Map(),
+            //     agents: [],
+            // };
 
-        //     if (this.bonuses) this.bonuses.push(newBonusInfo);
-        //     else this.bonuses = [newBonusInfo];
+            await this.loadBonuses(this.previewUser, true);
+            await this.loadBonusesData(this.previewUser);
 
-        //     this.setPreviewBonus(newBonusInfo);
-        //     this.setBonusesYear(year, false, true);
-        // }
+            // if (this.bonuses) this.bonuses.push(newBonusInfo);
+            // else this.bonuses = [newBonusInfo];
 
-        // return isCreated;
-        return false;
+            // this.setPreviewBonus(newBonusInfo);
+            // this.setBonusesYear(year, false, true);
+        }
+
+        return isCreated;
     }
 
     @action.bound

@@ -75,6 +75,7 @@ class MontPicker extends Component<IProps> {
 
     render() {
         const {
+            role,
             classes,
             bonuses,
             isLoading,
@@ -90,12 +91,15 @@ class MontPicker extends Component<IProps> {
                     className={classes.iconButton}>
                     <ArrowLeft fontSize='small' />
                 </IconButton>
-                <IconButton
-                    onClick={this.createBonus}
-                    disabled={isLoading}
-                    className={classes.iconButton}>
-                    <Add fontSize='small' />
-                </IconButton>
+                {
+                    role === USER_ROLE.MEDICAL_AGENT &&
+                    <IconButton
+                        onClick={this.createBonus}
+                        disabled={isLoading}
+                        className={classes.iconButton}>
+                            <Add fontSize='small' />
+                    </IconButton>
+                }
                 {
                     bonuses && bonuses.map(bonusInfo => (
                         <TabItem
