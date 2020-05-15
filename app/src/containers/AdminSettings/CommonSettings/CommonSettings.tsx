@@ -15,9 +15,12 @@ import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
 import LoadingMask from '../../../components/LoadingMask';
+import { USER_ROLE } from '../../../constants/Roles';
+import RoleLevels from './RoleLevels';
 
 const styles = createStyles({
-    row: {
+    root: {},
+    formBlock: {
         margin: '10px auto 10px 0',
         padding: '16px 8px',
         backgroundColor: '#f5f9fc',
@@ -34,6 +37,10 @@ const styles = createStyles({
     },
     submitButton: {
         margin: '20px auto 20px 0 '
+    },
+    title_bold: {
+        fontWeight: 600,
+        color: '#808080'
     }
 });
 
@@ -44,14 +51,14 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            salarySettings,
-            submitCommonSettingsChanges,
-            getAsyncStatus
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     salarySettings,
+                     submitCommonSettingsChanges,
+                     getAsyncStatus
+                 }
+             }
+         }) => ({
     salarySettings,
     submitCommonSettingsChanges,
     getAsyncStatus
@@ -98,21 +105,21 @@ class CommonSettings extends Component<IProps> {
 
     inputFocusHandler = ({ target }: any) => target.select();
 
-    kpiChangeHandler = ({ target: { value }}: any) => {
+    kpiChangeHandler = ({ target: { value } }: any) => {
         const newValue = +value;
         const isInvalid = Number.isNaN(newValue) || newValue < 0;
         if (isInvalid) return;
         this.changedValues.kpi = newValue;
     }
 
-    bonusChangeHandler = ({ target: { value }}: any) => {
+    bonusChangeHandler = ({ target: { value } }: any) => {
         const newValue = +value / 100;
         const isInvalid = Number.isNaN(newValue) || newValue > 1;
         if (isInvalid) return;
         this.changedValues.payments = newValue;
     }
 
-    bonusRestChangeHandler = ({ target: { value }}: any) => {
+    bonusRestChangeHandler = ({ target: { value } }: any) => {
         const newValue = +value / 100;
         const isInvalid = Number.isNaN(newValue) || newValue > 1;
         if (isInvalid) return;
@@ -137,60 +144,82 @@ class CommonSettings extends Component<IProps> {
         const { classes } = this.props;
 
         return (
-            <Grid direction='column' container>
-                <Grid className={classes.row} alignItems='center' container>
+            <Grid className={classes.root} direction='column' container>
+
+                <Typography className={classes.title_bold}>
+                    Бонуси
+                </Typography>
+
+                <Grid className={classes.formBlock} direction='column' container>
                     <Typography>
-                        Розподіл балів, %
+                        Рівень зарахування бонусів
                     </Typography>
-                    <Input
-                        value={
-                            this.bonuses
-                            ? this.bonuses[0].toFixed(0)
-                            : ''
-                        }
-                        classes={{ input: classes.input }}
-                        onFocus={this.inputFocusHandler}
-                        disabled={this.bonuses === null}
-                        onChange={this.bonusChangeHandler}
-                        disableUnderline />
-                    <Typography>на</Typography>
-                    <Input
-                        value={
-                            this.bonuses
-                            ? this.bonuses[1].toFixed(0)
-                            : ''
-                        }
-                        classes={{ input: classes.input }}
-                        onFocus={this.inputFocusHandler}
-                        disabled={this.bonuses === null}
-                        onChange={this.bonusRestChangeHandler}
-                        disableUnderline />
+
+                    <RoleLevels role={USER_ROLE.REGIONAL_MANAGER}/>
+                    <RoleLevels role={USER_ROLE.MEDICAL_AGENT}/>
                 </Grid>
-                <Grid className={classes.row} alignItems='center' container>
+
+                <Grid className={classes.formBlock} alignItems='center' container>
                     <Typography>
                         Ліміт товарів для нарахування бонусів
                     </Typography>
                     <Input
                         value={
                             this.changedValues.kpi === null
-                            ? this.initialKpi
-                            : this.changedValues.kpi
+                                ? this.initialKpi
+                                : this.changedValues.kpi
                         }
                         classes={{ input: classes.input }}
                         onChange={this.kpiChangeHandler}
-                        disableUnderline />
+                        disableUnderline/>
                 </Grid>
+
+                <Typography className={classes.title_bold} variant='body1'>
+                    Бали
+                </Typography>
+
+                <Grid className={classes.formBlock} alignItems='center' container>
+                    <Typography>
+                        Розподіл балів, %
+                    </Typography>
+
+                    <Input
+                        value={
+                            this.bonuses
+                                ? this.bonuses[0].toFixed(0)
+                                : ''
+                        }
+                        classes={{ input: classes.input }}
+                        onFocus={this.inputFocusHandler}
+                        disabled={this.bonuses === null}
+                        onChange={this.bonusChangeHandler}
+                        disableUnderline/>
+                    <Typography>на</Typography>
+                    <Input
+                        value={
+                            this.bonuses
+                                ? this.bonuses[1].toFixed(0)
+                                : ''
+                        }
+                        classes={{ input: classes.input }}
+                        onFocus={this.inputFocusHandler}
+                        disabled={this.bonuses === null}
+                        onChange={this.bonusRestChangeHandler}
+                        disableUnderline/>
+                </Grid>
+
                 <Button
                     onClick={this.submitHandler}
                     className={classes.submitButton}
                     variant='contained'
                     color='primary'>
-                        {
-                            this.isRequestProccessing
-                                ? <LoadingMask size={20} />
-                                : 'Зберегти'
-                        }
+                    {
+                        this.isRequestProccessing
+                            ? <LoadingMask size={20}/>
+                            : 'Зберегти'
+                    }
                 </Button>
+
                 <Snackbar
                     open={this.showSnackbar}
                     onClose={this.snackbarCloseHandler}

@@ -40,17 +40,14 @@ class TableHeader extends Component<IProps> {
             <Grid direction='column' wrap='nowrap' container>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography className={classes.title_bold}
-                                    color='textSecondary' variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} color='textSecondary' variant='body1'>
                             Перегляд
                         </Typography>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center'
                           container item>
-                        <Typography className={classes.title_bold}
-                                    variant='body1'>
+                        <Typography className={classes.title_bold} variant='body1'>
                             Звіт
                         </Typography>
                     </Grid>
@@ -59,126 +56,93 @@ class TableHeader extends Component<IProps> {
                 <Grid className={cx(classes.complexHeader)}>
                     <Grid className={cx(classes.cell)} justify='center'
                           container item>
-                        <Typography className={classes.title_bold}
-                                    variant='body1'>
+                        <Typography className={classes.title_bold} variant='body1'>
                             Редагування
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Працівники
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             ЗП
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Препарати
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             ЛПУ
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Аптеки
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Лікарі
                         </Typography>
                     </Grid>
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography className={classes.title_bold}
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
                             Додавання
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Препарати
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             ЛПУ
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Аптеки
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Лікарі
                         </Typography>
                     </Grid>
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography className={classes.title_bold}
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography className={classes.title_bold} variant='body1'>
                             Видалення
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Препарати
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             ЛПУ
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Аптеки
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
-                        <Typography color='textSecondary'
-                                    variant='body1'>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Лікарі
                         </Typography>
                     </Grid>
