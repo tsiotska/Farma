@@ -218,8 +218,6 @@ class ProfilePreview extends Component<IProps> {
 
     componentDidMount() {
         this.applyOffset = true;
-        console.log('USERDATA');
-        console.log(toJS(this.props.previewUser));
     }
 
     copyInfo = (data: any) => {

@@ -5,6 +5,7 @@ import { GROUP_BY } from '../../../containers/Sales/TableStat/TableStat';
 import { FilterList, Close } from '@material-ui/icons';
 import FilterPopper from '../FilterPopper';
 import { observable } from 'mobx';
+import { ISalesPharmacyFilter } from '../../../stores/UIStore';
 
 const styles = createStyles({
     label: {
@@ -33,10 +34,12 @@ interface IProps extends WithStyles<typeof styles> {
     value: string;
     groupBy: GROUP_BY;
 
-    toggleAllIgnoredLocations?: () => void;
-    toggleAllIgnoredAgents?: () => void;
     isAnyAgentIgnored?: boolean;
     isAnyLocationIgnored?: boolean;
+
+    toggleAllIgnoredLocations?: () => void;
+    toggleAllIgnoredAgents?: () => void;
+    setPharmacyFilters?: (value: ISalesPharmacyFilter) => void;
 }
 
 @inject(({
@@ -45,14 +48,18 @@ interface IProps extends WithStyles<typeof styles> {
             toggleAllIgnoredLocations,
             toggleAllIgnoredAgents,
             isAnyAgentIgnored,
-            isAnyLocationIgnored
+            isAnyLocationIgnored,
+        },
+        uiStore: {
+            setPharmacyFilters
         }
     }
 }) => ({
     toggleAllIgnoredLocations,
     toggleAllIgnoredAgents,
     isAnyAgentIgnored,
-    isAnyLocationIgnored
+    isAnyLocationIgnored,
+    setPharmacyFilters
 }))
 @observer
 class HeaderCell extends Component<IProps> {
@@ -70,11 +77,13 @@ class HeaderCell extends Component<IProps> {
         const { groupBy, toggleAllIgnoredAgents, toggleAllIgnoredLocations } = this.props;
 
         const action = groupBy === GROUP_BY.AGENT
-        ? toggleAllIgnoredAgents
-        : toggleAllIgnoredLocations;
+            ? toggleAllIgnoredAgents
+            : toggleAllIgnoredLocations;
 
         action();
     }
+
+    clearFilters = () => this.props.setPharmacyFilters(null);
 
     openFilter = ({ currentTarget }: any) => {
         this.anchor = currentTarget;
@@ -108,7 +117,7 @@ class HeaderCell extends Component<IProps> {
                                 <IconButton onClick={this.openFilter} className={classes.iconButton}>
                                     <FilterList fontSize='small' />
                                 </IconButton>
-                                <IconButton className={classes.iconButton}>
+                                <IconButton onClick={this.clearFilters} className={classes.iconButton}>
                                     <Close fontSize='small' />
                                 </IconButton>
                             </>

@@ -55,7 +55,6 @@ class DeletePopover extends Component<IProps> {
                 name
         }} = this.props;
         const namesIsEqual = givenName === name;
-        console.log('name: ', name, givenName, anchorEl);
         return namesIsEqual
             ? anchorEl
             : null;

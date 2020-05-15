@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles';
 import { ISalesPharmacyFilter, SORT_ORDER } from '../../../stores/UIStore';
 import cx from 'classnames';
 import { ILPU } from '../../../interfaces/ILPU';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import SuggestListItem from '../SuggestListItem';
 import debounce from 'lodash/debounce';
 
@@ -177,7 +177,7 @@ class FilterPopper extends Component<IProps> {
         const { anchor, salesPharmacyFilter, ignoredLocations } = this.props;
 
         if (!prevAnchor && !!anchor) {
-            const { ignoredLpus, order } = salesPharmacyFilter;
+            const { order } = salesPharmacyFilter;
             const newIgnoredLpus = new Set(ignoredLocations.values());
             this.filters = { order, ignoredLpus: newIgnoredLpus };
         } else if (!!prevAnchor && !anchor) {

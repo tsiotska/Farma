@@ -123,7 +123,6 @@ export class Header extends Component<IProps, {}> {
     backClickHandler = () => this.props.history.push(ADMIN_ROUTE);
 
     deleteConfirmHandler = (confirmed: boolean) => {
-        console.log('should delete: ', confirmed);
         this.props.openDelPopper(null);
     }
 

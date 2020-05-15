@@ -71,14 +71,15 @@ export class UIStore implements IUIStore {
     @action.bound
     setPharmacyFilters(value: ISalesPharmacyFilter) {
         const { salesStore: { setIgnoredLocations }} = this.rootStore;
-
         if (value !== null) {
             const { ignoredLpus } = value;
             setIgnoredLocations(ignoredLpus);
+        } else {
+            setIgnoredLocations(new Set());
         }
 
         this.salesPharmacyFilter = value === null
-            ? { order: SORT_ORDER.ASCENDING, ignoredLpus: new Set(), map: [] }
+            ? { order: null, ignoredLpus: new Set(), map: [] }
             : { ...value, ignoredLpus: new Set() };
     }
 

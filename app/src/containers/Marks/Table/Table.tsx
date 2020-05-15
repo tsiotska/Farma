@@ -281,12 +281,6 @@ class Table extends Component<IProps> {
 
             await when(() => this.props.isLoading === false);
 
-            // const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
-            //     ? await loadConfirmedDoctors(parentUser)
-            //     : await getLocationsAgents(currentDepartmentId, parentUser);
-
-            // this.agents = newAgents || [];
-            // this.agentsLoaded = true;
             this.reactionDisposer = reaction(
                 () => this.props.role,
                 async () => {

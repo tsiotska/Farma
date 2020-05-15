@@ -51,8 +51,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             ? this.chartSalesStat.slice()
             : [];
 
-        if (!this.ignoredLocations.size || !this.ignoredAgents.size) return chartData;
-
+        if (!this.ignoredLocations.size && !this.ignoredAgents.size) return chartData;
         const sourceValues = this.ignoredLocations.size
             ? [...this.ignoredLocations.values()]
             : [...this.ignoredAgents.values()];
@@ -81,10 +80,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             return acc;
         }, {});
 
-        console.log('igsn: ', toJS(itemsToIgnore));
-
         const res = chartData.map(({ periods, amount, money, medId, kpd }) =>  {
-            // console.log('before: ', JSON.stringify(periods));
             let newMoney = money;
             let newAmount = amount;
 
@@ -112,8 +108,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 return { ...newPeriod };
             });
 
-            // console.log('after: ', JSON.stringify(newPeriods));
-
             return {
                 medId,
                 kpd,
@@ -122,9 +116,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 periods: newPeriods
             };
         });
-
-        // console.log("initial: ", toJS(this.chartSalesStat));
-        // console.log('res: ', toJS(res));
 
         return res;
     }
@@ -241,69 +232,17 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             data = pharmacies
                 .filter(({ id }) => ids.includes(id))
                 .map(x => ([ x.id, x ]));
+
         }
 
         return new Map(data);
     }
-
-    // @computed
-    // get sortedLocationSalesStat(): ISalesStat[] {
-    //     const {
-    //         userStore: { role },
-    //         uiStore: { salesPharmacyFilter: { map }}
-    //     } = this.rootStore;
-
-        // const condition = role !== USER_ROLE.MEDICAL_AGENT
-        //     || !map
-        //     || !this.locationsSalesStat;
-
-        // const sameStatusSortCallback = condition
-        //     ? () => 0
-        //     : (a: ISalesStat, b: ISalesStat) => {
-        //         const aIndx = map.indexOf(a.id);
-        //         const bIndx = map.indexOf(b.id);
-        //         return aIndx - bIndx;
-        //     };
-
-        // const callback = (a: ISalesStat, b: ISalesStat) => {
-        //     const isLeftIgnored = this.ignoredLocations.has(a.id);
-        //     const isRightIgnored = this.ignoredLocations.has(b.id);
-        //     if (isLeftIgnored === isRightIgnored) return sameStatusSortCallback(a, b);
-        //     return isLeftIgnored === true
-        //         ? 1
-        //         : -1;
-        // };
-
-    //     return this.locationSalesStat
-    //         ? this.locationSalesStat.slice().sort(callback)
-    //         : this.locationSalesStat;
-    // }
-
-    // @computed
-    // get sortedAgentsSalesStat(): ISalesStat[] {
-        // const callback = (a: ISalesStat, b: ISalesStat) => {
-        //     const isLeftIgnored = this.ignoredAgents.has(a.id);
-        //     const isRightIgnored = this.ignoredAgents.has(b.id);
-        //     if (isLeftIgnored === isRightIgnored) return 0;
-        //     return isLeftIgnored === true
-        //         ? 1
-        //         : -1;
-        // };
-    //     return this.agentSalesStat
-    //         ? this.agentSalesStat.slice().sort(callback)
-    //         : this.agentSalesStat;
-    // }
 
     @computed
     get agentsTargetProperty(): AgentTargetProperty {
         const { userStore: { role }, departmentsStore: { locationsAgents } } = this.rootStore;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) return 'region';
         if (role === USER_ROLE.REGIONAL_MANAGER) return 'city';
-        // for (const [, agent] of locationsAgents) {
-        //     const { city, region } = agent;
-        //     if (region !== null) return 'region';
-        //     if (city !== null) return 'city';
-        // }
         return null;
     }
 
@@ -397,8 +336,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         } else {
             this.ignoredAgents.add(id);
 
-            console.log('agent: ', id, targetLocation, toJS(targetAgent));
-
             if (!Number.isInteger(targetLocation)) return;
 
             const agentsWithSameLocation: number[] = [];
@@ -407,7 +344,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 if (location === targetLocation) agentsWithSameLocation.push(agentId);
             }
 
-            // console.log('locations to toggle: ', )
             if (agentsWithSameLocation.every(agentId => this.ignoredAgents.has(agentId))) {
                 this.ignoredLocations.add(targetLocation);
             }
@@ -416,14 +352,18 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleAllIgnoredLocations() {
-        const { departmentsStore: { locationsAgents }} = this.rootStore;
+        const { userStore: { role }, departmentsStore: { locationsAgents }} = this.rootStore;
 
         if (this.ignoredLocations.size) {
             this.ignoredLocations.clear();
             this.ignoredAgents.clear();
         } else {
-            this.ignoredLocations = new Set([...this.locations.keys()]);
-            this.ignoredAgents = new Set([...locationsAgents.keys()]);
+            if (role === USER_ROLE.MEDICAL_AGENT) {
+                this.ignoredLocations = new Set([...this.pharmaciesMap.keys()]);
+            } else {
+                this.ignoredLocations = new Set([...this.locations.keys()]);
+                this.ignoredAgents = new Set([...locationsAgents.keys()]);
+            }
         }
     }
 
@@ -495,7 +435,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const testUrl = this.getMedsStatUrl(this.rootStore.departmentsStore.currentDepartmentId);
         if (url !== testUrl) return;
 
-        console.log('chart stat: ', res);
         this.chartSalesStat = res;
 
         // if fetched data is relevant we process it
@@ -519,7 +458,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.setLoading(requestName);
         const res = await api.getSalesStat(url);
         if (id !== this.rootStore.departmentsStore.currentDepartmentId) return;
-        console.log('locale sales: ', res);
         this.locationsSales = res;
 
         const callback = res
@@ -536,11 +474,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const id = currentDepartmentId;
 
         if (id === null || !url) return;
-
-        // this.setLoading(requestName);
-        // const { cache, promise } = await api.getSalesStat(url);
-        // if (cache) this.agentSalesStat = cache;
-        // const res = await promise;
 
         const res = await api.getSalesStat(url);
 
