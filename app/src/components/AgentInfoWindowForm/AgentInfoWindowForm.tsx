@@ -3,6 +3,7 @@ import { Card, CardContent, createStyles, Grid, IconButton, Typography, WithStyl
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import copy from 'clipboard-copy';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -23,6 +24,10 @@ interface IProps extends WithStyles<typeof styles> {
 
 @observer
 class AgentInfoWindowForm extends Component<IProps> {
+
+    copyCardNumber = () => {
+        copy(this.props.card);
+    }
 
     render() {
         const { classes, specialty, workPhone, mobilePhone, region, card } = this.props;
@@ -81,7 +86,7 @@ class AgentInfoWindowForm extends Component<IProps> {
                             </Typography>
                         </Grid>
                         <Grid>
-                            <IconButton>
+                            <IconButton onClick={this.copyCardNumber}>
                                 <FileCopyOutlinedIcon/>
                             </IconButton>
                         </Grid>
