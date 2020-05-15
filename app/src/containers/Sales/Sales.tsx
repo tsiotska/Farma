@@ -48,7 +48,7 @@ interface IProps extends WithStyles<typeof styles> {
 @inject(({
     appState: {
         salesStore: {
-            chartSalesStat,
+            computedChartSales: chartSalesStat,
             loadAllStat,
             loadSalesExcel
         },
@@ -149,7 +149,12 @@ class Sales extends Component<IProps> {
                         chartSalesStat={chartSalesStat}
                     />
                     <MedsStatistic
-                        prepend={<SalesModeSwitch title='Одиниці виміру: ' loadExcelHandler={loadSalesExcel} />}
+                        prepend={
+                            <SalesModeSwitch
+                                title='Одиниці виміру: '
+                                loadExcelHandler={loadSalesExcel}
+                            />
+                        }
                         departmentId={currentDepartmentId}
                         meds={currentDepartmentMeds}
                         chartSalesStat={chartSalesStat}

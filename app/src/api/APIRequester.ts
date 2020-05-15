@@ -261,16 +261,9 @@ export class APIRequester {
     }
 
     async getSalesStat(url: string): Promise<IPeriodSalesStat[]> {
-        // return this.instance.get(url)
-        const res = await this.instance.get(url)
-            .then((x) => {
-                const n = periodSalesNormalizer(x);
-                console.log('nqwer: ', n);
-                return n;
-            })
+        return await this.instance.get(url)
+            .then(periodSalesNormalizer)
             .catch(this.defaultErrorHandler());
-        console.log('from api: ', res);
-        return res;
     }
 
     getWorkers(url: string): Promise<IWorker[]> {

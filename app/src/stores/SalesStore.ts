@@ -1,4 +1,3 @@
-import { IMedSalesInfo } from './../interfaces/ISalesStat';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { ISalesStore } from './../interfaces/ISalesStore';
@@ -11,7 +10,7 @@ import {
     subMonths
 } from 'date-fns';
 import { stringify } from 'query-string';
-import { IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
+import { IMedSalesInfo, IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
 import { USER_ROLE } from '../constants/Roles';
 import { IUserCommonInfo } from '../interfaces/IUser';
 import { ILPU } from '../interfaces/ILPU';
@@ -47,6 +46,90 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable locationsSales: IPeriodSalesStat[] = null;
 
     @computed
+    get computedChartSales(): IMedsSalesStat[] {
+        const chartData = this.chartSalesStat
+            ? this.chartSalesStat.slice()
+            : [];
+
+        if (!this.ignoredLocations.size || !this.ignoredAgents.size) return chartData;
+
+        const sourceValues = this.ignoredLocations.size
+            ? [...this.ignoredLocations.values()]
+            : [...this.ignoredAgents.values()];
+
+        const source = this.ignoredLocations.size
+            ? this.locationsSales
+            : this.agentsSales;
+
+        const itemsToIgnore = sourceValues.reduce((acc, x) => {
+            const item = source.find(({ id }) => id === x);
+            if (item && item.sales) {
+                Object.entries(item.sales).forEach(([key, list]) => {
+                    if (!acc[key]) acc[key] = {};
+
+                    list.forEach(({ medId, amount, money }) => {
+                        if (acc[key][medId]) {
+                            acc[key][medId].amount += amount;
+                            acc[key][medId].money += money;
+                        } else {
+                            acc[key][medId] = { amount, money };
+                        }
+                    });
+
+                });
+            }
+            return acc;
+        }, {});
+
+        console.log('igsn: ', toJS(itemsToIgnore));
+
+        const res = chartData.map(({ periods, amount, money, medId, kpd }) =>  {
+            // console.log('before: ', JSON.stringify(periods));
+            let newMoney = money;
+            let newAmount = amount;
+
+            let targetProp = '';
+            if ('month' in periods[0]) targetProp = 'month';
+            if ('year' in periods[0]) targetProp = 'year';
+            if ('day' in periods[0]) targetProp = 'day';
+
+            const newPeriods = periods.map(period => {
+                const newPeriod = { ...period };
+
+                Object.entries(itemsToIgnore).forEach(([ stringKey, medsObj ]) => {
+                    const key = (+stringKey.split('.')[0]) - 1;
+
+                    const target = medsObj[medId];
+                    if (!target || key !== period[targetProp]) return;
+
+                    newMoney -= target.money;
+                    newAmount -= target.amount;
+
+                    newPeriod.money -= target.money;
+                    newPeriod.amount -= target.amount;
+                });
+
+                return { ...newPeriod };
+            });
+
+            // console.log('after: ', JSON.stringify(newPeriods));
+
+            return {
+                medId,
+                kpd,
+                money: newMoney,
+                amount: newAmount,
+                periods: newPeriods
+            };
+        });
+
+        // console.log("initial: ", toJS(this.chartSalesStat));
+        // console.log('res: ', toJS(res));
+
+        return res;
+    }
+
+    @computed
     get sortedLocationSalesStat(): ISalesStat[] {
         if (!this.locationsSales) return null;
 
@@ -54,28 +137,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             userStore: { role },
             uiStore: { salesPharmacyFilter: { map }}
         } = this.rootStore;
-
-        const summedUp: ISalesStat[] = this.locationsSales.map(({ id, sales }) => {
-            const summedSales = Object.values(sales).reduce(
-                (acc, salesItems) => {
-                    salesItems.forEach(({ medId, amount, money }: IMedSales) => {
-                        if (acc[medId]) {
-                            acc[medId].amount += amount;
-                            acc[medId].money += money;
-                        } else {
-                            acc[medId] = { medId, amount, money };
-                        }
-                    });
-
-                    return acc;
-                }
-            , {});
-
-            return {
-                id,
-                stat: [...Object.values(summedSales)] as IMedSalesInfo[]
-            };
-        });
 
         const condition = role !== USER_ROLE.MEDICAL_AGENT
             || !map
@@ -98,36 +159,38 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 : -1;
         };
 
+        const summedUp: ISalesStat[] = this.locationsSales.map(this.periodSalesReducer);
+
         return summedUp
             ? summedUp.sort(callback)
             : summedUp;
     }
 
+    periodSalesReducer = ({ id, sales }: IPeriodSalesStat) => {
+        const summedSales = Object.values(sales).reduce(
+            (acc, salesItems) => {
+                salesItems.forEach(({ medId, amount, money }: IMedSales) => {
+                    if (acc[medId]) {
+                        acc[medId].amount += amount;
+                        acc[medId].money += money;
+                    } else {
+                        acc[medId] = { medId, amount, money };
+                    }
+                });
+
+                return acc;
+            }
+        , {});
+
+        return {
+            id,
+            stat: [...Object.values(summedSales)] as IMedSalesInfo[]
+        };
+    }
+
     @computed
     get sortedAgentsSalesStat(): ISalesStat[] {
         if (!this.agentsSales) return null;
-
-        const summedUp: ISalesStat[] = this.agentsSales.map(({ id, sales }) => {
-            const summedSales = Object.values(sales).reduce(
-                (acc, salesItems) => {
-                    salesItems.forEach(({ medId, amount, money }: IMedSales) => {
-                        if (acc[medId]) {
-                            acc[medId].amount += amount;
-                            acc[medId].money += money;
-                        } else {
-                            acc[medId] = { medId, amount, money };
-                        }
-                    });
-
-                    return acc;
-                }
-            , {});
-
-            return {
-                id,
-                stat: [...Object.values(summedSales)] as IMedSalesInfo[]
-            };
-        });
 
         const sortCallback = (a: ISalesStat, b: ISalesStat) => {
             const isLeftIgnored = this.ignoredAgents.has(a.id);
@@ -137,6 +200,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 ? 1
                 : -1;
         };
+
+        const summedUp: ISalesStat[] = this.agentsSales.map(this.periodSalesReducer);
 
         return summedUp
             ? summedUp.sort(sortCallback)
@@ -231,12 +296,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @computed
     get agentsTargetProperty(): AgentTargetProperty {
-        const { departmentsStore: { locationsAgents } } = this.rootStore;
-        for (const [, agent] of locationsAgents) {
-            const { city, region } = agent;
-            if (region !== null) return 'region';
-            if (city !== null) return 'city';
-        }
+        const { userStore: { role }, departmentsStore: { locationsAgents } } = this.rootStore;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) return 'region';
+        if (role === USER_ROLE.REGIONAL_MANAGER) return 'city';
+        // for (const [, agent] of locationsAgents) {
+        //     const { city, region } = agent;
+        //     if (region !== null) return 'region';
+        //     if (city !== null) return 'city';
+        // }
         return null;
     }
 
@@ -258,8 +325,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         if (withReset) {
             this.chartSalesStat = null;
-            // this.locationSalesStat = null;
-            // this.agentSalesStat = null;
             this.agentsSales = null;
             this.locationsSales = null;
         }
@@ -332,6 +397,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         } else {
             this.ignoredAgents.add(id);
 
+            console.log('agent: ', id, targetLocation, toJS(targetAgent));
+
             if (!Number.isInteger(targetLocation)) return;
 
             const agentsWithSameLocation: number[] = [];
@@ -340,12 +407,11 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 if (location === targetLocation) agentsWithSameLocation.push(agentId);
             }
 
+            // console.log('locations to toggle: ', )
             if (agentsWithSameLocation.every(agentId => this.ignoredAgents.has(agentId))) {
                 this.ignoredLocations.add(targetLocation);
             }
         }
-        // this.sortAgentsSales();
-        // this.sortLocationsSales();
     }
 
     @action.bound
@@ -429,6 +495,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const testUrl = this.getMedsStatUrl(this.rootStore.departmentsStore.currentDepartmentId);
         if (url !== testUrl) return;
 
+        console.log('chart stat: ', res);
         this.chartSalesStat = res;
 
         // if fetched data is relevant we process it
@@ -452,7 +519,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.setLoading(requestName);
         const res = await api.getSalesStat(url);
         if (id !== this.rootStore.departmentsStore.currentDepartmentId) return;
-
+        console.log('locale sales: ', res);
         this.locationsSales = res;
 
         const callback = res
