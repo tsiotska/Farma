@@ -112,7 +112,7 @@ class ListItem extends Component<IProps> {
         openDelPopper({
             anchorEl: currentTarget,
             callback: deleteHandler(id),
-            name: 'deleteMedicine'
+            name: 'medicineDelete'
         });
     }
 
