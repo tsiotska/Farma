@@ -393,7 +393,7 @@ class ProfilePreview extends Component<IProps> {
                                     <Typography> {previewUser.mobilePhone} </Typography>
                                 </Grid>
                                 <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                    <IconButton onClick={() => this.copyInfo(previewUser.mobilePhone)}>
                                         <FileCopyOutlinedIcon/>
                                     </IconButton>
                                 </Grid>
@@ -412,7 +412,7 @@ class ProfilePreview extends Component<IProps> {
                                         <Typography> {previewUser.email} </Typography>
                                     </Grid>
                                     <Grid container alignItems='center' item>
-                                        <IconButton onClick={() => this.copyInfo('card')}>
+                                        <IconButton onClick={() => this.copyInfo(previewUser.email)}>
                                             <FileCopyOutlinedIcon/>
                                         </IconButton>
                                     </Grid>
@@ -430,7 +430,7 @@ class ProfilePreview extends Component<IProps> {
                                     <Typography> {previewUser.bankCard} </Typography>
                                 </Grid>
                                 <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                    <IconButton onClick={() => this.copyInfo(previewUser.bankCard)}>
                                         <FileCopyOutlinedIcon/>
                                     </IconButton>
                                 </Grid>
