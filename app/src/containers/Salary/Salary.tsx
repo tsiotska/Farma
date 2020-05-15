@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, LinearProgress, Typography } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
+import { createStyles, Grid, LinearProgress, Typography, WithStyles } from '@material-ui/core';
+import { inject, observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import Header from './Header';
-import { observable, computed, toJS } from 'mobx';
+import { computed, observable } from 'mobx';
 import ListHeader from './ListHeader';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
@@ -72,11 +72,9 @@ class Salary extends Component<IProps> {
 
     @computed
     get showCalculateButton(): boolean {
-        const { salaries, getAsyncStatus } = this.props;
+        const { getAsyncStatus } = this.props;
         const { success, error } = getAsyncStatus('loadSalaries');
-        const isLoaded = success || error;
-        const salariesIsEmpty = !salaries || !salaries.length;
-        return isLoaded && salariesIsEmpty;
+        return success || error;
     }
 
     changeYear = (value: number) => {
