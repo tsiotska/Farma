@@ -18,7 +18,6 @@ import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IUserLikeObject } from './DepartmentsStore';
-import { IUserInfo } from '../containers/Marks/Table/Table';
 
 export interface IMarkFraction {
     payments: number;

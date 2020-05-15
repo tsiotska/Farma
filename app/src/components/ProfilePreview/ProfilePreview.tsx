@@ -25,6 +25,8 @@ import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import InfoWindow from '../../components/InfoWindow';
 import { EDIT_WORKER_MODAL } from '../../constants/Modals';
 import { IPosition } from '../../interfaces/IPosition';
+import copy from 'clipboard-copy';
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -98,6 +100,7 @@ interface IProps extends WithStyles<typeof styles> {
     positions?: Map<number, IPosition>;
     historyGoTo?: (userId: number) => void;
     openModal?: (modalName: string, payload: any) => void;
+    previewUser?: IUser;
 }
 
 @inject(({
@@ -108,7 +111,8 @@ interface IProps extends WithStyles<typeof styles> {
             regions
         },
         userStore: {
-            historyGoTo
+            historyGoTo,
+            previewUser
         },
         uiStore: {
             openModal
@@ -119,7 +123,8 @@ interface IProps extends WithStyles<typeof styles> {
     positions,
     cities,
     regions,
-    openModal
+    openModal,
+    previewUser
 }))
 @observer
 class ProfilePreview extends Component<IProps> {
@@ -213,10 +218,16 @@ class ProfilePreview extends Component<IProps> {
 
     componentDidMount() {
         this.applyOffset = true;
+        console.log('USERDATA');
+        console.log(toJS(this.props.previewUser));
+    }
+
+    copyInfo = (data: any) => {
+        copy(data);
     }
 
     render() {
-        const { classes, user } = this.props;
+        const { classes, user, previewUser } = this.props;
         const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
 
         return (
@@ -375,24 +386,59 @@ class ProfilePreview extends Component<IProps> {
                           container
                           item>
                         <InfoWindow icon={<PhoneOutlinedIcon/>}>
-                            <Grid className={classes.windowContent} direction='column' container>
-                                <Typography> Телефон </Typography>
-                                <Typography> {'+380983785423'} </Typography>
+                            {previewUser.mobilePhone ?
+                            <Grid className={classes.windowContent} wrap='nowrap' container>
+                                <Grid direction='column' item container>
+                                    <Typography> Телефон </Typography>
+                                    <Typography> {previewUser.mobilePhone} </Typography>
+                                </Grid>
+                                <Grid container alignItems='center' item>
+                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                        <FileCopyOutlinedIcon/>
+                                    </IconButton>
+                                </Grid>
                             </Grid>
+                            :
+                            <Grid className={classes.windowContent} container>
+                                Дані відсутні
+                            </Grid>}
                         </InfoWindow>
 
                         <InfoWindow icon={<MailOutlineOutlinedIcon/>}>
-                            <Grid className={classes.windowContent} direction='column' container>
-                                <Typography> Поштова скринька </Typography>
-                                <Typography> {'email'} </Typography>
-                            </Grid>
+                            {previewUser.email ?
+                                <Grid className={classes.windowContent} wrap='nowrap' container>
+                                    <Grid direction='column' container>
+                                        <Typography> Поштова скринька </Typography>
+                                        <Typography> {previewUser.email} </Typography>
+                                    </Grid>
+                                    <Grid container alignItems='center' item>
+                                        <IconButton onClick={() => this.copyInfo('card')}>
+                                            <FileCopyOutlinedIcon/>
+                                        </IconButton>
+                                    </Grid>
+                                </Grid> :
+                                <Grid className={classes.windowContent} container>
+                                    Дані відсутні
+                                </Grid>}
                         </InfoWindow>
 
                         <InfoWindow icon={<CreditCardOutlinedIcon/>}>
-                            <Grid className={classes.windowContent} direction='column' container>
-                                <Typography>  Банківська картка </Typography>
-                                <Typography> {'card'} </Typography>
+                            {previewUser.bankCard ?
+                            <Grid className={classes.windowContent} wrap='nowrap' container>
+                                <Grid direction='column' container>
+                                    <Typography> Банківська картка </Typography>
+                                    <Typography> {previewUser.bankCard} </Typography>
+                                </Grid>
+                                <Grid container alignItems='center' item>
+                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                        <FileCopyOutlinedIcon/>
+                                    </IconButton>
+                                </Grid>
                             </Grid>
+                            :
+                            <Grid className={classes.windowContent} container>
+                                Дані відсутні
+                            </Grid>}
                         </InfoWindow>
                     </Grid>
 

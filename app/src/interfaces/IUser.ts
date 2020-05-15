@@ -11,6 +11,9 @@ export interface IUserCommonInfo {
     avatar: string;
     region?: number;
     city?: number;
+    bankCard?: string;
+    mobilePhone?: string;
+    email?: string;
 }
 
 export interface IUser extends IUserCommonInfo {

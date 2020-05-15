@@ -203,7 +203,7 @@ export class APIRequester {
     }
 
     editDepartment(depId: number, formData: FormData): Promise<IDepartment> {
-        return this.instance.put(`api/branch/${depId}`)
+        return this.instance.put(`api/branch/${depId}`, formData)
             .then(({ data: { data: { id, name, image } }}) => ({
                 id,
                 name,
