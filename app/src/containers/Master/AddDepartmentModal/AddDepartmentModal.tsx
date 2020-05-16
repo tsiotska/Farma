@@ -189,6 +189,7 @@ class AddDepartmentModal extends Component<IProps> {
                 type: SNACKBAR_TYPE.SUCCESS,
                 text: 'Відділення і ФФМ успішно створені'
             };
+            this.closeHandler();
         } else {
             const text: string = !isDepartmentCreated
             ? 'Неможливо створити відділення'

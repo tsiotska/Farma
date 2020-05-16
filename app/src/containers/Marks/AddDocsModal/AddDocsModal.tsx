@@ -163,6 +163,7 @@ class AddDocsModal extends Component<IProps> {
         const { addDocsToBonus, previewBonus } = this.props;
         addDocsToBonus(this.selectedDocs, previewBonus);
         this.selectedDocs = [];
+        this.closeHandler();
     }
 
     async componentDidUpdate(props: IProps) {
