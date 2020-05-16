@@ -207,7 +207,7 @@ export class APIRequester {
             .then(({ data: { data: { id, name, image } }}) => ({
                 id,
                 name,
-                image
+                image: image || null
             }))
             .catch(this.defaultErrorHandler());
     }

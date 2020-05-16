@@ -780,9 +780,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editDepartment(image: File | string, name: string) {
         const depToEdit = this.currentDepartment;
         const { api } = this.rootStore;
+
         const formData = new FormData();
         formData.set('json', JSON.stringify({ name }));
         if (typeof image !== 'string') formData.set('image', image || '');
+
         const editedDep = await api.editDepartment(this.currentDepartmentId, formData);
 
         if (editedDep) {
