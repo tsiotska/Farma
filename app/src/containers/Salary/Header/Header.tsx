@@ -41,7 +41,6 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    showCalculateButton: boolean;
     year: number;
     month: number;
     changeYear: (value: number) => void;
@@ -85,7 +84,6 @@ class Header extends Component<IProps> {
             changeYear,
             month,
             changeMonth,
-            showCalculateButton,
             lastSalary
         } = this.props;
 
@@ -104,21 +102,18 @@ class Header extends Component<IProps> {
                     changeYear={changeYear}
                 />
                 </Grid>
-                {
-                    showCalculateButton &&
-                        <Grid item>
-                    <Button
-                        disabled={this.isSalaryCalculating}
-                        onClick={this.calculateClickHandler}
-                        className={classes.countSalaryButton}>
-                            {
-                                this.isSalaryCalculating
-                                ? <LoadingMask size={20} />
-                                : 'Розрахувати зарплату'
-                            }
-                    </Button>
-                        </Grid>
-                }
+                    <Grid item>
+                        <Button
+                            disabled={this.isSalaryCalculating}
+                            onClick={this.calculateClickHandler}
+                            className={classes.countSalaryButton}>
+                                {
+                                    this.isSalaryCalculating
+                                    ? <LoadingMask size={20} />
+                                    : 'Розрахувати зарплату'
+                                }
+                        </Button>
+                    </Grid>
                 {
                     lastSalary &&
                     <Grid className={classes.lastDateContainer} item container direction='column'>

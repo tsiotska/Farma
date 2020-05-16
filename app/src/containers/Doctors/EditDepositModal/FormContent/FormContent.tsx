@@ -1,6 +1,13 @@
 import {
-    createStyles, withStyles, WithStyles,
-    Grid, InputBase, InputLabel, Button, Typography, FormControl
+    createStyles,
+    withStyles,
+    WithStyles,
+    Grid,
+    InputBase,
+    InputLabel,
+    Button,
+    Typography,
+    FormControl
 } from '@material-ui/core';
 import LoadingMask from '../../../../components/LoadingMask';
 import { inject, observer } from 'mobx-react';
@@ -59,8 +66,6 @@ const styles = (theme: any) => createStyles({
             }
     },
     submitButton: {
-        // height: 40,
-        // margin: '8px 0 0 auto',
         width: '100%',
         padding: '4px 16px',
     },
@@ -97,10 +102,9 @@ class FormContent extends Component<IProps> {
         message: false
     };
 
-    @computed
     get isSubmitAllowed(): boolean {
         const valuesExist = Object.values(this.formValues).every(x => !!x);
-        const valuesIsValid = Object.values(this.fieldsErrorStatuses).every(x => !!x);
+        const valuesIsValid = Object.values(this.fieldsErrorStatuses).every(x => !x);
         return valuesExist && valuesIsValid;
     }
 
@@ -137,6 +141,7 @@ class FormContent extends Component<IProps> {
 
     render() {
         const { classes, isLoading, deposits, doctor } = this.props;
+
         return (
             <>
                 {

@@ -70,14 +70,14 @@ class Salary extends Component<IProps> {
         return this.props.getAsyncStatus('loadSalaries').loading;
     }
 
-    @computed
-    get showCalculateButton(): boolean {
-        const { salaries, getAsyncStatus } = this.props;
-        const { success, error } = getAsyncStatus('loadSalaries');
-        const isLoaded = success || error;
-        const salariesIsEmpty = !salaries || !salaries.length;
-        return isLoaded && salariesIsEmpty;
-    }
+    // @computed
+    // get showCalculateButton(): boolean {
+    //     const { salaries, getAsyncStatus } = this.props;
+    //     const { success, error } = getAsyncStatus('loadSalaries');
+    //     const isLoaded = success || error;
+    //     const salariesIsEmpty = !salaries || !salaries.length;
+    //     return isLoaded && salariesIsEmpty;
+    // }
 
     changeYear = (value: number) => {
         const { loadSalaries } = this.props;
@@ -138,7 +138,7 @@ class Salary extends Component<IProps> {
                     month={this.month}
                     changeMonth={this.changeMonth}
                     changeYear={this.changeYear}
-                    showCalculateButton={this.showCalculateButton}
+                    // showCalculateButton={this.showCalculateButton}
                 />
                 <ListHeader />
                 { this.isLoading && <LinearProgress />}
