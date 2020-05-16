@@ -289,6 +289,7 @@ class Table extends Component<IProps> {
                     const newAgents = parentUser.position === USER_ROLE.MEDICAL_AGENT
                         ? await loadConfirmedDoctors(parentUser)
                         : await getLocationsAgents(currentDepartmentId, parentUser);
+                    console.log('new agents: ', newAgents);
                     this.agents = newAgents || [];
                     this.agentsLoaded = true;
                 }, {

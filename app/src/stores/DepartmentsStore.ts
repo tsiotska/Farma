@@ -1045,7 +1045,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     getLocationsAgents = (depId: number, { id, position }: IUserLikeObject): Promise<IUser[]> => {
         const { api } = this.rootStore;
 
-        if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
+        // if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
+        if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getRmAgentsInfo(depId);
         if (position === USER_ROLE.REGIONAL_MANAGER) return api.getMPs(depId, id);
         return null;
     }
