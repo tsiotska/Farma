@@ -20,6 +20,9 @@ import EditLpu from './EditLpu';
 import DeletePopover from '../../components/DeletePopover';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 import Snackbar from '../../components/Snackbar';
+import { withRestriction } from '../../components/hoc/withRestriction';
+import { PERMISSIONS } from '../../constants/Permissions';
+import { IWithRestriction } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -56,7 +59,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     loadLPUs?: () => void;
     LPUs?: ILPU[];
     unconfirmedLPUs?: ILPU[];
@@ -103,6 +106,7 @@ interface IProps extends WithStyles<typeof styles> {
     acceptLpu,
     loadTypes
 }))
+@withRestriction([ PERMISSIONS.ADD_HCF ])
 @observer
 class Lpu extends Component<IProps> {
     autorunDisposer: any;
@@ -219,6 +223,7 @@ class Lpu extends Component<IProps> {
         const {
             classes,
             LPUs,
+            isAllowed,
             currentPage,
             itemsPerPage,
             setCurrentPage,
@@ -250,9 +255,14 @@ class Lpu extends Component<IProps> {
                     <Typography variant='h5'>
                         ЛПУ
                     </Typography>
-                    <Button className={classes.addButton} onClick={this.openAddLpuModal}>
-                        Додати ЛПУ
-                    </Button>
+                    {
+                        isAllowed &&
+                        <Button
+                            className={classes.addButton}
+                            onClick={this.openAddLpuModal}>
+                            Додати ЛПУ
+                        </Button>
+                    }
                 </Grid>
                 {
                     !!this.preparedLPUs.length &&

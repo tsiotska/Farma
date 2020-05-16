@@ -17,6 +17,9 @@ import DeletePopover from '../../../components/DeletePopover';
 import { observable } from 'mobx';
 import Snackbar from '../../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
+import { withRestriction } from '../../../components/hoc/withRestriction';
+import { IWithRestriction } from '../../../interfaces';
+import { PERMISSIONS } from '../../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -28,7 +31,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     workers?: IWorker[];
     loadAdminWorkers?: () => void;
     positions?: Map<number, IPosition>;
@@ -52,6 +55,7 @@ interface IProps extends WithStyles<typeof styles> {
     positions,
     openModal
 }))
+@withRestriction([ PERMISSIONS.ADD_USER ])
 @observer
 class UserSettings extends Component<IProps> {
     @observable showSnackbar: boolean = false;
@@ -88,7 +92,7 @@ class UserSettings extends Component<IProps> {
     }
 
     render() {
-        const { classes, workers, positions } = this.props;
+        const { classes, workers, positions, isAllowed } = this.props;
 
         return (
             <Grid direction='column' container>
@@ -104,12 +108,15 @@ class UserSettings extends Component<IProps> {
                         />
                     ))
                 }
-                <Button
-                    onClick={this.openAddWorkerModal}
-                    className={classes.submitButton}
-                    variant='outlined'>
-                    Додати користувача
-                </Button>
+                {
+                    isAllowed &&
+                    <Button
+                        onClick={this.openAddWorkerModal}
+                        className={classes.submitButton}
+                        variant='outlined'>
+                        Додати користувача
+                    </Button>
+                }
                 <DeletePopover name='deleteWorker' />
                 <Snackbar
                     open={this.showSnackbar}

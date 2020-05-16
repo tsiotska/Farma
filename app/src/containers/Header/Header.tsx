@@ -26,6 +26,8 @@ import { IDeletePopoverSettings } from '../../stores/UIStore';
 import DeletePopover from '../../components/DeletePopover';
 import EditDepartmentModal from './EditDeparmentModal';
 import { EDIT_DEPARTMENT_MODAL } from '../../constants/Modals';
+import EditBranchButton from './EditBranchButton';
+import RemoveBranchButton from './RemoveBranchButton';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -166,14 +168,14 @@ export class Header extends Component<IProps, {}> {
                                 }
                                 {
                                     this.isDepartmentRoute && <>
-                                        <IconButton
+                                        <EditBranchButton
                                             onClick={this.editClickHandler}
-                                            className={cx(classes.iconButton, classes.settingsButton)}>
-                                            <EditOutlined fontSize='small' />
-                                        </IconButton>
-                                        <IconButton onClick={this.deleteClickHandler} className={cx(classes.iconButton)}>
-                                            <DeleteOutlined fontSize='small' />
-                                        </IconButton>
+                                            className={cx(classes.iconButton, classes.settingsButton)}
+                                        />
+                                        <RemoveBranchButton
+                                            onClick={this.deleteClickHandler}
+                                            className={cx(classes.iconButton)}
+                                        />
                                     </>
                                 }
                             </Grid>

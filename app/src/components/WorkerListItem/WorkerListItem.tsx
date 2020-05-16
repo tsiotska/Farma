@@ -30,6 +30,10 @@ import Config from '../../../Config';
 import { IDeletePopoverSettings } from '../../stores/UIStore';
 import Snackbar from '../Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import { IWithRestriction } from '../../interfaces';
+import { withRestriction } from '../hoc/withRestriction';
+import { PERMISSIONS } from '../../constants/Permissions';
+import DeleteButton from './DeleteButton';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -108,7 +112,7 @@ const styles = (theme: any) => createStyles({
     cardCell: {},
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     worker: IWorker;
     fired: boolean;
     editClickHandler: (worker: IWorker) => void;
@@ -143,6 +147,7 @@ interface IProps extends WithStyles<typeof styles> {
     openDelPopper,
     removeWorker
 }))
+@withRestriction([ PERMISSIONS.EDIT_USER ])
 @observer
 class WorkerListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
@@ -248,7 +253,9 @@ class WorkerListItem extends Component<IProps> {
             expandable,
             expandChangeHandler,
             isExpanded,
+            isAllowed,
             worker: {
+                id,
                 image,
                 name,
                 hired,
@@ -350,13 +357,20 @@ class WorkerListItem extends Component<IProps> {
                             <>
                                 {
                                     isVacancy === false &&
-                                    <IconButton onClick={this.removeClickHandler} className={classes.iconButton}>
-                                        <NotInterested fontSize='small' />
+                                    <DeleteButton
+                                        workerId={id}
+                                        className={classes.iconButton}
+                                        onClick={this.removeClickHandler}
+                                    />
+                                }
+                                {
+                                    isAllowed &&
+                                    <IconButton
+                                        onClick={this.editClickHandler}
+                                        className={classes.iconButton}>
+                                        <Edit fontSize='small' />
                                     </IconButton>
                                 }
-                                <IconButton onClick={this.editClickHandler} className={classes.iconButton}>
-                                    <Edit fontSize='small' />
-                                </IconButton>
                             </>
                         }
                     </Grid>

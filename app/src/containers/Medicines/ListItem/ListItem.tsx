@@ -18,6 +18,7 @@ import RestoreButton from '../RestoreButton';
 import cx from 'classnames';
 import { MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import RemoveButton from '../RemoveButton';
 
 const styles = (theme: any) => createStyles({
     wrapper: {
@@ -194,9 +195,7 @@ class ListItem extends Component<IProps> {
                                 <Edit fontSize='small' />
                             </IconButton>
                         }
-                        <IconButton onClick={this.removeClickHandler}>
-                            <Delete fontSize='small' />
-                        </IconButton>
+                        <RemoveButton onClick={this.removeClickHandler} />
                     </>
                 }
 

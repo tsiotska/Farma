@@ -20,6 +20,9 @@ import { ADD_WORKER_MODAL } from '../../constants/Modals';
 import DeletePopover from '../../components/DeletePopover';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 import Snackbar from '../../components/Snackbar';
+import { IWithRestriction } from '../../interfaces';
+import { withRestriction } from '../../components/hoc/withRestriction';
+import { PERMISSIONS } from '../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -55,7 +58,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     currentDepartment?: IDepartment;
     resetWorkers?: () => void;
     loadWorkers?: () => void;
@@ -111,6 +114,7 @@ type TabValue = 'all' | 'fired';
     pureAgentConfirm,
     openModal,
 }))
+@withRestriction([ PERMISSIONS.ADD_USER ])
 @withRouter
 @observer
 class Workers extends Component<IProps> {
@@ -222,6 +226,7 @@ class Workers extends Component<IProps> {
             workers,
             firedWorkers,
             positions,
+            isAllowed,
             role
         } = this.props;
 
@@ -246,7 +251,7 @@ class Workers extends Component<IProps> {
                         <Tab className={classes.tab} value='fired' label='Звільнені працівники' />
                     </Tabs>
                     {
-                        this.tab === 'all' &&
+                        (this.tab === 'all' && isAllowed) &&
                         <Button
                             onClick={this.addWorkerClickHandler}
                             className={classes.addWorkerButton}>

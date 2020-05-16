@@ -14,7 +14,7 @@ export enum PERMISSIONS {
     ADD_DRUG = 'ADD_DRUG',
     EDIT_DRUG = 'EDIT_DRUG',
     DELETE_DRUG = 'DELETE_DRUG',
-
+    //
     ADD_USER = 'ADD_USER',
     EDIT_USER = 'EDIT_USER',
     FIRED_USER = 'FIRED_USER',
@@ -22,7 +22,7 @@ export enum PERMISSIONS {
     ADD_AGENT = 'ADD_AGENT',
     EDIT_AGENT = 'EDIT_AGENT',
     DELETE_AGENT = 'DELETE_AGENT',
-
+    //
     EDIT_SALARY = 'EDIT_SALARY',
     SEE_REPORT = 'SEE_REPORT',
 }

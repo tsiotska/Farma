@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, IconButton } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { Delete } from '@material-ui/icons';
+import { Edit } from '@material-ui/icons';
 import { PERMISSIONS } from '../../../constants/Permissions';
 import { IUser } from '../../../interfaces';
-import { USER_ROLE } from '../../../constants/Roles';
 
 interface IProps {
+    onClick: () => void;
     className: string;
-    onClick: (e: any) => void;
+    iconClassName: string;
     type: 'hcf' | 'pharmacy';
     unconfirmed: boolean;
     userPermissions?: PERMISSIONS[];
@@ -28,10 +27,10 @@ interface IProps {
     user
 }))
 @observer
-class DeleteButton extends Component<IProps> {
+class EditButton extends Component<IProps> {
     readonly mapPermissions: Partial<Record<'hcf' | 'pharmacy', PERMISSIONS>> = {
-        'hcf': PERMISSIONS.DELETE_HCF,
-        'pharmacy': PERMISSIONS.DELETE_PHARMACY
+        'hcf': PERMISSIONS.EDIT_HCF,
+        'pharmacy': PERMISSIONS.EDIT_PHARMACY
     };
 
     get isAllowed(): boolean {
@@ -53,18 +52,20 @@ class DeleteButton extends Component<IProps> {
     }
 
     render() {
-        const { onClick, className, children } = this.props;
-
-        if (!this.isAllowed) return null;
+        const {
+            onClick,
+            className,
+            iconClassName,
+        } = this.props;
 
         return (
             <IconButton
                 onClick={onClick}
                 className={className}>
-                    { children }
+                <Edit className={iconClassName}/>
             </IconButton>
         );
     }
 }
 
-export default DeleteButton;
+export default EditButton;

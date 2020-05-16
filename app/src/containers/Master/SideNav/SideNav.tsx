@@ -8,7 +8,7 @@ import { withRouter, matchPath } from 'react-router-dom';
 import { NotificationsNoneOutlined, HomeOutlined, Add } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import Config from '../../../../Config';
-import { IUser } from '../../../interfaces';
+import { IUser, IWithRestriction } from '../../../interfaces';
 import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../../../constants/Roles';
 import { toJS, computed } from 'mobx';
 import SideNavButton from '../SideNavButton';
@@ -17,6 +17,8 @@ import { ADD_DEPARTMENT_MODAL } from '../../../constants/Modals';
 import DateRangeModal from '../../Sales/DateRangeModal';
 import HomeIcon from '-!react-svg-loader!../../../../assets/icons/home.svg';
 import logOutIcon from '../../../../assets/icons/logout.png';
+import { withRestriction } from '../../../components/hoc/withRestriction';
+import { PERMISSIONS } from '../../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -73,7 +75,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     user?: IUser;
     isAdmin?: boolean;
     history?: History;
@@ -120,6 +122,7 @@ interface IProps extends WithStyles<typeof styles> {
     notificationsCount
 }))
 @withRouter
+@withRestriction([ PERMISSIONS.ADD_BRANCH ])
 @observer
 class SideNav extends Component<IProps> {
     @computed
@@ -196,7 +199,13 @@ class SideNav extends Component<IProps> {
     }
 
     render() {
-        const { classes, logout, isAdmin, notificationsCount } = this.props;
+        const {
+            classes,
+            logout,
+            isAdmin,
+            notificationsCount,
+            isAllowed
+        } = this.props;
 
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
@@ -211,8 +220,6 @@ class SideNav extends Component<IProps> {
                         disabled={false}
                         tooltip='home'>
                             <HomeIcon />
-                            {/* <HomeIcon width={36} height={36} /> */}
-                            {/* <HomeOutlined className={classes.iconSm} fontSize='small' /> */}
                     </SideNavButton>
                 }
                 {
@@ -231,7 +238,7 @@ class SideNav extends Component<IProps> {
                     ))
                 }
                 {
-                    isAdmin &&
+                    isAllowed &&
                     <SideNavButton clickHandler={this.addDepartmentClickHandler} className={classes.iconWrapper}>
                         <Add className={classes.iconSm} fontSize='small' />
                     </SideNavButton>

@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { IMedicine } from '../../../../interfaces/IMedicine';
 import SalaryHeader from '../SalaryHeader';
 import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
-import { IUser } from '../../../../interfaces';
+import { IUser, IWithRestriction } from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
 import { computed, toJS, reaction, observable } from 'mobx';
@@ -12,6 +12,8 @@ import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
 import TotalRow from '../TotalRow';
 import { IAsyncStatus } from '../../../../stores/AsyncStore';
 import LoadingMask from '../../../../components/LoadingMask';
+import { withRestriction } from '../../../../components/hoc/withRestriction';
+import { PERMISSIONS } from '../../../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -53,13 +55,12 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     currentDepartmentMeds?: IMedicine[];
     user: IUser;
     salary: Map<number, ISalaryInfo>;
     levelsCount: number;
     userSales?: IUserSales;
-    isAdmin?: boolean;
     changeUserSalary?: (level: number, propName: keyof Omit<ISalaryInfo, 'meds'>, value: number) => void;
     salarySettings?: ISalarySettings;
     onSubmit?: () => void;
@@ -75,7 +76,6 @@ interface IProps extends WithStyles<typeof styles> {
         userStore: {
             changeUserSalary,
             userSales,
-            isAdmin,
             salarySettings,
             clearUserSalaryInfo,
             getAsyncStatus
@@ -85,11 +85,11 @@ interface IProps extends WithStyles<typeof styles> {
     changeUserSalary,
     currentDepartmentMeds,
     userSales,
-    isAdmin,
     salarySettings,
     clearUserSalaryInfo,
     getAsyncStatus
 }))
+@withRestriction([ PERMISSIONS.EDIT_SALARY ])
 @observer
 class UserContent extends Component<IProps> {
     readonly colors: any;
@@ -254,7 +254,7 @@ class UserContent extends Component<IProps> {
             salary,
             userSales,
             onSubmit,
-            isAdmin
+            isAllowed
         } = this.props;
         return (
             <>
@@ -268,7 +268,7 @@ class UserContent extends Component<IProps> {
                             userLevel={this.userLevel}
                             medicine={medicine}
                             salary={salary}
-                            editable={isAdmin}
+                            editable={isAllowed}
                         />
                     ))
                 }
@@ -293,7 +293,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.ratingSalary}
                     userColors={this.userColors}
-                    changeHandler={isAdmin && this.changeHandler('salary')}
+                    changeHandler={isAllowed && this.changeHandler('salary')}
                     emptyPlaceholder=''
                 />
                 <SumRow
@@ -302,7 +302,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.extraCosts}
                     userColors={this.userColors}
-                    changeHandler={isAdmin && this.changeHandler('extraCosts')}
+                    changeHandler={isAllowed && this.changeHandler('extraCosts')}
                     emptyPlaceholder=''
                 />
                 <SumRow
@@ -311,7 +311,7 @@ class UserContent extends Component<IProps> {
                     userLevel={this.userLevel}
                     values={this.KPIs}
                     userColors={this.userColors}
-                    changeHandler={isAdmin && this.changeHandler('kpi')}
+                    changeHandler={isAllowed && this.changeHandler('kpi')}
                     emptyPlaceholder=''
                 />
                 <SumRow
@@ -331,7 +331,7 @@ class UserContent extends Component<IProps> {
                     colors={this.userColors}
                 />
                 {
-                    isAdmin &&
+                    isAllowed &&
                     <Button
                         className={classes.submitButton}
                         variant='contained'

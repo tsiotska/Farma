@@ -20,6 +20,10 @@ import CommitBadge from '../../../components/CommitBadge';
 import { EDIT_DEPOSIT_MODAL } from '../../../constants/Modals';
 import { EDIT_DOC_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import DeleteDocButton from '../DeleteDocButton';
+import { PERMISSIONS } from '../../../constants/Permissions';
+import { IWithRestriction } from '../../../interfaces';
+import { withRestriction } from '../../../components/hoc/withRestriction';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -108,7 +112,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     doctor: IDoctor;
     deleteHandler: (doc: IDoctor) => (confirm: boolean) => void;
     unconfirmed?: boolean;
@@ -132,6 +136,7 @@ interface IProps extends WithStyles<typeof styles> {
     openDelPopper,
     openModal
 }))
+@withRestriction([ PERMISSIONS.EDIT_AGENT ])
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
@@ -181,6 +186,7 @@ class DoctorListItem extends Component<IProps> {
             showBadges,
             classes,
             rootRef,
+            isAllowed,
             highlight,
             doctor: {
                 FFMCommit,
@@ -242,7 +248,7 @@ class DoctorListItem extends Component<IProps> {
                 </Grid>
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
                     {
-                        unconfirmed
+                        (unconfirmed && isAllowed)
                             ? <Button
                                 disabled={this.isLoadingConfirmation}
                                 onClick={this.confirmClickHandler}
@@ -261,18 +267,20 @@ class DoctorListItem extends Component<IProps> {
                                 className={cx(classes.deposit, classes.text)}>
                                 { deposit || 0 }
                             </Typography>
-                            <IconButton onClick={this.editClickHandler}>
-                                <Edit className={classes.editIcon} fontSize='small' />
-                            </IconButton>
+                            {
+                                isAllowed &&
+                                <IconButton onClick={this.editClickHandler}>
+                                    <Edit className={classes.editIcon} fontSize='small' />
+                                </IconButton>
+                            }
                           </>
                     }
-                    {!unconfirmed &&
-                    <IconButton onClick={this.deleteClickHandler}>
-                      <Delete
-                        className={classes.removeIcon}
-                        fontSize='small'
-                      />
-                    </IconButton>
+                    {
+                        !unconfirmed &&
+                        <DeleteDocButton
+                            onClick={this.deleteClickHandler}
+                            className={classes.removeIcon}
+                        />
                     }
                 </Grid>
             </Grid>

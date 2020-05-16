@@ -27,6 +27,8 @@ import { EDIT_WORKER_MODAL } from '../../constants/Modals';
 import { IPosition } from '../../interfaces/IPosition';
 import copy from 'clipboard-copy';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import EditButton from './EditButton';
+import DeleteButton from './DeleteButton';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -204,8 +206,12 @@ class ProfilePreview extends Component<IProps> {
         const { user, openModal, positions } = this.props;
         openModal(EDIT_WORKER_MODAL, {
             initialWorker: user,
-            positions: [positions.get(USER_ROLE.FIELD_FORCE_MANAGER)]
+            positions: [positions.get(user.position)]
         });
+    }
+
+    removeUserClickHandler = () => {
+        console.log('should remove user');
     }
 
     mouseOverHandler = () => {
@@ -226,7 +232,14 @@ class ProfilePreview extends Component<IProps> {
 
     render() {
         const { classes, user, previewUser } = this.props;
-        const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
+        const {
+            doctorsCount,
+            pharmacyCount,
+            depositMinus,
+            depositPlus,
+            lpuCount,
+            id
+        } = user;
 
         return (
             <div
@@ -448,14 +461,14 @@ class ProfilePreview extends Component<IProps> {
                           justify='center'
                           container
                           item>
-                        <IconButton onClick={this.editClickHandler}>
-                            <EditOutlinedIcon/>
-                        </IconButton>
-                        <IconButton>
-                            <BlockOutlinedIcon/>
-                        </IconButton>
+                            <EditButton
+                                onClick={this.editClickHandler}
+                            />
+                            <DeleteButton
+                                onClick={this.removeUserClickHandler}
+                                id={id}
+                            />
                     </Grid>
-
                 </Grid>
             </div>
         );
