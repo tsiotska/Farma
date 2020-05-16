@@ -90,7 +90,7 @@ class Header extends Component<IProps> {
         } = this.props;
 
         return (
-            <Grid className={classes.header}wrap='nowrap' alignItems='center' container>
+            <Grid className={classes.header} wrap='nowrap' alignItems='center' container>
                 <Grid item>
                 <Typography variant='h5' className={classes.title}>
                     Заробітня плата

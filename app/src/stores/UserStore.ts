@@ -104,7 +104,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @computed
-    get totalSold(): {[key: number]: number} {
+    get totalSold(): { [key: number]: number } {
         const bonuses = this.bonuses[this.role];
         const actual: IBonusInfo = bonuses
             ? bonuses.find(({ month }) => month === this.previewBonusMonth)
@@ -120,8 +120,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) {
-        const { api, departmentsStore: { currentDepartmentId  } } = this.rootStore;
+    loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date, loadPack: boolean) {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         const userId = this.previewUser
             ? this.previewUser.id
@@ -144,12 +144,12 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const dateFromString = format(dateFrom, `yyyy-'${monthFrom}'-dd`);
         const dateToString = format(dateTo, `yyyy-'${monthTo}'-dd`);
 
-        const url = urls[this.role]
+        let url = urls[this.role]
             ? `${urls[this.role][mode]}?from=${dateFromString}&to=${dateToString}`
             : null;
-
+        url += loadPack ? '?pack=1' : null;
         if (userId === null || !url) return;
-
+        console.log(url);
         api.getExcel(url);
     }
 
@@ -215,7 +215,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         let id: number = null;
-        if  (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
+        if (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
             id = this.previewUser.id;
         } else {
             const mp = this.bonusUsers.find(({ position }) => position === USER_ROLE.MEDICAL_AGENT);
@@ -242,11 +242,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
             }
 
             const preparedMarks = [...mergedMarks.values()].map(({
-                    deposit,
-                    drugId,
-                    mark,
-                    payments
-                }) => ({
+                                                                     deposit,
+                                                                     drugId,
+                                                                     mark,
+                                                                     payments
+                                                                 }) => ({
                     agent: agentId,
                     deposit: deposit,
                     drug: drugId,
@@ -334,7 +334,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             const target = this.changedMarks.get(agentInfo.id);
             target.set(medId, newMark);
         } else {
-            this.changedMarks.set(agentInfo.id, new Map([[ medId, newMark ]]));
+            this.changedMarks.set(agentInfo.id, new Map([[medId, newMark]]));
         }
     }
 
@@ -379,7 +379,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     async loadSpecifiedUserBonuses(user: IUserLikeObject) {
-        const { api, departmentsStore: { currentDepartmentId }} = this.rootStore;
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
         return api.getBonusInfo(
             currentDepartmentId,
             this.bonusesYear,
