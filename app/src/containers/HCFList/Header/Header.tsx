@@ -72,6 +72,7 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Область
                         <IconButton
+                            disabled
                             onClick={this.buttonClickHandler('oblast')}
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />

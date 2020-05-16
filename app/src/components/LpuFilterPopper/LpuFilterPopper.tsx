@@ -6,12 +6,16 @@ import {
     Grid,
     Button,
     Divider,
-    Input
+    Input,
+    Typography,
+    List
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { SORT_ORDER, ISortBy } from '../../stores/UIStore';
+import { ILPU } from '../../interfaces/ILPU';
+import SuggestItem from './SuggestItem';
 
 const styles = (theme: any) => createStyles({
     input: {
@@ -30,7 +34,9 @@ const styles = (theme: any) => createStyles({
         '&.active': {
             border: '1px solid #aaa'
         }
-    }
+    },
+    list: {},
+    listItem: {}
 });
 
 export type SortableProps = 'name' | 'region' | 'oblast' | 'city';
@@ -39,8 +45,10 @@ interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;
     propName: SortableProps;
     onClose: () => void;
+
     sortLpuBy?: (propName: SortableProps, order: SORT_ORDER) => void;
     LpuSortSettings?: ISortBy;
+    sortedLpus?: ILPU[];
 }
 
 @inject(({
@@ -48,10 +56,14 @@ interface IProps extends WithStyles<typeof styles> {
         uiStore: {
             sortLpuBy,
             LpuSortSettings
+        },
+        departmentsStore: {
+            sortedLpus
         }
     }
 }) => ({
     sortLpuBy,
+    sortedLpus,
     LpuSortSettings
 }))
 @observer
@@ -70,6 +82,13 @@ class LpuFilterPopper extends Component<IProps> {
             : null;
     }
 
+    get suggestions(): ILPU[] {
+        const { sortedLpus } = this.props;
+        return sortedLpus
+            ? sortedLpus.slice(0, 50)
+            : null;
+    }
+
     sortAtoZ = () => {
         const { sortLpuBy, propName, onClose } = this.props;
         sortLpuBy(propName, SORT_ORDER.ASCENDING);
@@ -80,6 +99,10 @@ class LpuFilterPopper extends Component<IProps> {
         const { sortLpuBy, propName, onClose } = this.props;
         sortLpuBy(propName, SORT_ORDER.DESCENDING);
         onClose();
+    }
+
+    lpuClickHandler = (lpu: ILPU) => {
+        console.log('click');
     }
 
     render() {
@@ -109,8 +132,29 @@ class LpuFilterPopper extends Component<IProps> {
                             onClick={this.sortZtoA}>
                                 Сортувати від Я до А
                             </Button>
-                        {/* <Divider className={classes.divider} />
-                        <Input className={classes.input} disableUnderline /> */}
+                        <Divider className={classes.divider} />
+                        <Input className={classes.input} disableUnderline />
+                        <List className={classes.list}>
+                            {
+                                this.suggestions
+                                    ? this.suggestions.length
+                                        ? this.suggestions.map(x => (
+                                            <SuggestItem
+                                                lpu={x}
+                                                title='name'
+                                                checked={false}
+                                                onClick={this.lpuClickHandler}
+                                                className={classes.listItem}
+                                            />
+                                          ))
+                                        : <Typography>
+                                            Відповідні дані відсутні
+                                          </Typography>
+                                    : <Typography>
+                                        Дані відсутні
+                                    </Typography>
+                            }
+                        </List>
                     </Grid>
             </Popover>
         );
