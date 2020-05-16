@@ -99,7 +99,9 @@ class FormContent extends Component<IProps> {
 
     @computed
     get isSubmitAllowed(): boolean {
-        return true;
+        const valuesExist = Object.values(this.formValues).every(x => !!x);
+        const valuesIsValid = Object.values(this.fieldsErrorStatuses).every(x => !!x);
+        return valuesExist && valuesIsValid;
     }
 
     get userRole(): USER_ROLE {
@@ -111,10 +113,11 @@ class FormContent extends Component<IProps> {
 
     validate = (propName: keyof IDepositFormValue, value: string) => {
         if (propName === 'deposit') {
+            const casted = +value;
             const isValid = !!value
                 && numberValidator(value)
-                && +value
-                && +value >= 1;
+                && casted
+                && (casted >= 1 || casted <= -1);
             this.fieldsErrorStatuses[propName] = !isValid;
         } else {
             const trimmed = value.replace(/ /g, '');
@@ -173,8 +176,7 @@ class FormContent extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    // this.allowedRoles.includes(this.userRole) &&
-                    true &&
+                    this.allowedRoles.includes(this.userRole) &&
                     <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
                         <Grid xs container item>
                             <FormRow

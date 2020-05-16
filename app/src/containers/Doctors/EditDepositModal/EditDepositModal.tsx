@@ -81,8 +81,9 @@ class EditDepositModal extends Component<IProps> {
     }
 
     submitHandler = async (data: IDepositFormValue) => {
-        const { insertDeposit, modalPayload: { id } } = this.props;
+        const { loadDepositHistory, insertDeposit, modalPayload: { id } } = this.props;
         const isInserted = await insertDeposit(id, data);
+        if (isInserted) this.deposits = await loadDepositHistory();
         this.isSnackbarOpen = true;
         this.snackbarType = isInserted
             ? SNACKBAR_TYPE.SUCCESS
