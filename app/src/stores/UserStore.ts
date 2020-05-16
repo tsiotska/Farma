@@ -184,7 +184,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             year,
             month + 1,
             {},
-            true
+            false
         );
 
         if (isCreated) {
