@@ -436,20 +436,20 @@ export class APIRequester {
 
     editWorker(data: FormData, workerId: number, departmentId: number): Promise<{
         edited: boolean;
-        avatar: string;
+        image: string;
     }> {
         const url = departmentId
             ? `/api/branch/${departmentId}/worker/${workerId}`
             : `/api/worker/${workerId}`;
 
         return this.instance.put(url, data)
-            .then(({ data: { data: { avatar } } }: any) => ({
+            .then(({ data: { data: { image } } }: any) => ({
                 edited: true,
-                avatar: avatar || null
+                image: image || null
             }))
             .catch(this.defaultErrorHandler({
                 edited: false,
-                avatar: null
+                image: null
             }));
     }
 

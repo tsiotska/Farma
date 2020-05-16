@@ -1,7 +1,7 @@
 export interface IWorker {
     id: number;
     name: string;
-    avatar: string;
+    image: string;
 
     position: number;
 

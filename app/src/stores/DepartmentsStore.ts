@@ -1303,7 +1303,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async createWorker(values: IWorkerModalValues, avatar: File, departmentId?: number): Promise<boolean> {
+    async createWorker(values: IWorkerModalValues, image: File, departmentId?: number): Promise<boolean> {
         const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
@@ -1319,7 +1319,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (avatar) formData.set('image', avatar);
+        if (image) formData.set('image', image);
         const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
@@ -1361,7 +1361,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const formData = new FormData();
 
-        const initialAvatar = initialWorker.avatar;
+        const initialAvatar = initialWorker.image;
 
         if (initialAvatar !== newAvatar) {
             const isAvatarRemoved = typeof initialAvatar === 'string' && newAvatar === null;
@@ -1393,14 +1393,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             {}
         );
         formData.append('json', JSON.stringify(payload));
-        const { edited, avatar } = await this.dispatchRequest(
+        const { edited, image } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
             'editWorker'
         );
 
         if (edited) {
             if (newAvatar) {
-                initialWorker.avatar = avatar;
+                initialWorker.image = image;
             }
 
             const invertedNames = invert(namesMap);

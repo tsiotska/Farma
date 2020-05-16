@@ -37,7 +37,7 @@ const defaultUserNotification: IUserNotification = {
     workPhone: null,
     mobilePhone: null,
     card: null,
-    avatar: null,
+    image: null,
     created: null,
     confirmed: null
 };
@@ -50,7 +50,7 @@ const userNotificationValuesMap: IValuesMap = {
     work_phone: 'workPhone',
     mobile_phone: 'mobilePhone',
     bank_card: 'card',
-    avatar: 'avatar',
+    image: 'image',
     created: 'created',
     confirmed: 'confirmed'
 };

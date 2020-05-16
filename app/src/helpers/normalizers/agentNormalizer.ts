@@ -4,7 +4,7 @@ import { IValuesMap, objectArrayNormalizer } from './normalizer';
 const defaultAgentInfo: IUserCommonInfo = {
     id: null,
     name: null,
-    avatar: null,
+    image: null,
     region: null,
     city: null,
 };
@@ -12,7 +12,7 @@ const defaultAgentInfo: IUserCommonInfo = {
 const namesMap: IValuesMap = {
     id: 'id',
     full_name: 'name',
-    avatar: 'avatar',
+    image: 'image',
     region: 'region',
     city: 'city'
 };
@@ -21,5 +21,5 @@ export const agentNormalizer = ({ data: { data }}: any) => objectArrayNormalizer
     data,
     defaultAgentInfo,
     namesMap,
-    { requiredProps: [ 'id', 'full_name', 'avatar' ] }
+    { requiredProps: [ 'id', 'full_name', 'image' ] }
 );

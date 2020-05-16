@@ -226,14 +226,14 @@ class WorkerListItem extends Component<IProps> {
         const {
             historyPushUser,
             disableClick,
-            worker : { id, name, avatar, position }
+            worker : { id, name, image, position }
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
         historyPushUser({
             id,
             name,
-            avatar,
+            image,
             region: null,
             city: null
         }, position);
@@ -249,7 +249,7 @@ class WorkerListItem extends Component<IProps> {
             expandChangeHandler,
             isExpanded,
             worker: {
-                avatar,
+                image,
                 name,
                 hired,
                 email,
@@ -301,7 +301,7 @@ class WorkerListItem extends Component<IProps> {
                             src={
                                 isVacancy
                                     ? vacancyIcon
-                                    : `${Config.ASSETS_URL}/${avatar}`
+                                    : `${Config.ASSETS_URL}/${image}`
                             }
                             loadPlaceholder={<PermIdentity className={classes.placeholderImage} fontSize='small' />}
                         />

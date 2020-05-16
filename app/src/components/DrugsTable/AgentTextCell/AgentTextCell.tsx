@@ -60,10 +60,10 @@ class AgentTextCell extends Component<IProps> {
         : '-';
     }
 
-    get avatar(): string {
+    get image(): string {
         const { label } = this.props;
         return label
-        ? label.avatar
+        ? label.image
         : null;
     }
 
@@ -97,9 +97,9 @@ class AgentTextCell extends Component<IProps> {
                 label={
                     <Typography onClick={this.onClick} className={classes.text} variant='body2'>
                         {
-                            this.avatar &&
+                            this.image &&
                             <ImageLoader
-                                src={`${Config.ASSETS_URL}/${this.avatar}`}
+                                src={`${Config.ASSETS_URL}/${this.image}`}
                                 className={classes.image}
                             />
                         }

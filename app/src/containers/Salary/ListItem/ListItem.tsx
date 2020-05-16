@@ -78,7 +78,7 @@ const styles = (theme: any) => createStyles({
         width: 300 - 32
     },
     icon: {
-        display: ({ user }: any) => user && user.avatar ? 'block' : 'none',
+        display: ({ user }: any) => user && user.image ? 'block' : 'none',
         width: 40,
         height: 40,
     },

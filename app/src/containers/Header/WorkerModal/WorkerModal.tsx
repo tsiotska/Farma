@@ -167,7 +167,7 @@ class WorkerModal extends Component<IProps> {
         : this.allProps.some(x => !!this.formValues[x]);
 
         const imageChanged = initialWorker
-            ? this.image !== initialWorker.avatar
+            ? this.image !== initialWorker.image
             : !!this.image;
 
         return valuesChanged || imageChanged;
@@ -323,7 +323,7 @@ class WorkerModal extends Component<IProps> {
                 card,
                 position,
                 email,
-                avatar
+                image
         }} = this.props;
 
         this.formValues = {
@@ -339,7 +339,7 @@ class WorkerModal extends Component<IProps> {
             region: this.defaultValues.region,
         };
 
-        if (avatar) this.image = avatar;
+        if (image) this.image = image;
 
         if (!showLocationsBlock) return;
 
