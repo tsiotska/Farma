@@ -77,6 +77,7 @@ export interface IFormValues {
 }))
 @observer
 class FormContent extends Component<IProps> {
+    readonly optionalValues: Array<keyof IFormValues> = ['dosage'];
     @observable initialValue: IFormValues = {
         name: '',
         releaseForm: '',
@@ -99,13 +100,6 @@ class FormContent extends Component<IProps> {
         barcode: false,
         department: false
     };
-
-    @computed
-    get isValuesChanged(): boolean {
-        const { file } = this.props;
-        const isImageChanged = !!file && typeof file === 'object';
-        return !isEqual(this.formValues, this.initialValue) || isImageChanged;
-    }
 
     lengthValidator: Validator;
     barcodeLengthValidator: Validator;
@@ -148,8 +142,18 @@ class FormContent extends Component<IProps> {
     }
 
     @computed
+    get isValuesChanged(): boolean {
+        const { file } = this.props;
+        const isImageChanged = !!file && typeof file === 'object';
+        return !isEqual(this.formValues, this.initialValue) || isImageChanged;
+    }
+
+    @computed
     get isSubmitAllowed(): boolean {
-        const allValuesExist = Object.keys(this.fieldsErrorStatuses).length === Object.keys(this.formValues).length;
+        const allValuesExist = Object.entries(this.formValues).every(([ propName, value]) => this.optionalValues.includes((propName as keyof IFormValues))
+            ? true
+            : !!value
+        );
         const allValuesValid = Object.values(this.fieldsErrorStatuses).every(x => x === false);
         const imageAdded = !!this.props.file;
         return allValuesExist && allValuesValid && imageAdded && this.isValuesChanged;
@@ -268,6 +272,7 @@ class FormContent extends Component<IProps> {
                             required
                         />
                         <FormRow
+                            required
                             label='Дозування, мг'
                             values={this.formValues}
                             onChange={this.changeHandler}

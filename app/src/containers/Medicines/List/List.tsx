@@ -71,7 +71,7 @@ class List extends Component<IProps> {
                 message={
                     this.snackbarType === SNACKBAR_TYPE.SUCCESS
                         ? 'Медикамент успішно видалена'
-                        : 'Видалити медикасент не вдалося'
+                        : 'Видалити медикамент не вдалося'
                 }
             />
             <Grid direction='column' container>
