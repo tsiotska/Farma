@@ -27,14 +27,14 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     positions,
-                     updatePermissions,
-                     getAsyncStatus
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            positions,
+            updatePermissions,
+            getAsyncStatus
+        }
+    }
+}) => ({
     positions,
     updatePermissions,
     getAsyncStatus
@@ -68,7 +68,7 @@ class AccessSettings extends Component<IProps> {
         return this.props.getAsyncStatus('updatePermissions').loading;
     }
 
-    changeHandler = (role: USER_ROLE) => ({ target: { checked } }: any, value: PERMISSIONS) => {
+    changeHandler = ({ target: { checked } }: any, role: USER_ROLE, value: PERMISSIONS) => {
         const permissions = [...this.permissions.get(role)];
 
         if (checked && permissions.includes(value) === false) {
@@ -128,22 +128,46 @@ class AccessSettings extends Component<IProps> {
                 <Grid direction='row' wrap='nowrap' container>
                     <TableHeader/>
                     {
-                        this.permissions.size ?
-                        <>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.SUPER_ADMIN)} title='Супер адмін'
-                                      permissions={this.permissions.get(USER_ROLE.SUPER_ADMIN)}/>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.ADMIN)} title='Адмін'
-                                      permissions={this.permissions.get(USER_ROLE.ADMIN)}/>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.PRODUCT_MANAGER)} title='Продукт Менеджер'
-                                      permissions={this.permissions.get(USER_ROLE.PRODUCT_MANAGER)}/>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.FIELD_FORCE_MANAGER)} title='ФФМ'
-                                      permissions={this.permissions.get(USER_ROLE.FIELD_FORCE_MANAGER)}/>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.REGIONAL_MANAGER)} title='РМ'
-                                      permissions={this.permissions.get(USER_ROLE.REGIONAL_MANAGER)}/>
-                            <TableRow onChange={this.changeHandler(USER_ROLE.MEDICAL_AGENT)} title='МП'
-                                      permissions={this.permissions.get(USER_ROLE.MEDICAL_AGENT)}/>
-                        </> :
-                            <Typography>Дані відсутні</Typography>
+                        this.permissions.size
+                        ? <>
+                            <TableRow
+                                title='Супер адмін'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                                targetRole={USER_ROLE.SUPER_ADMIN}
+                            />
+                            <TableRow
+                                title='Адмін'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                                targetRole={USER_ROLE.ADMIN}
+                            />
+                            <TableRow
+                                title='Продукт Менеджер'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                                targetRole={USER_ROLE.PRODUCT_MANAGER}
+                            />
+                            <TableRow
+                                title='ФФМ'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                            targetRole={USER_ROLE.FIELD_FORCE_MANAGER}
+                            />
+                            <TableRow
+                                title='РМ'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                                targetRole={USER_ROLE.REGIONAL_MANAGER}
+                            />
+                            <TableRow
+                                title='МП'
+                                onChange={this.changeHandler}
+                                permissions={this.permissions}
+                                targetRole={USER_ROLE.MEDICAL_AGENT}
+                            />
+                          </>
+                        : <Typography>Дані відсутні</Typography>
                     }
                 </Grid>
                 <Button

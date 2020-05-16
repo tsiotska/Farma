@@ -786,16 +786,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (typeof image !== 'string') formData.set('image', image || '');
 
         const editedDep = await api.editDepartment(this.currentDepartmentId, formData);
+        const index = this.departments.indexOf(depToEdit);
 
-        if (editedDep) {
-            const idx = this.departments.indexOf(depToEdit);
-            if (idx !== -1) {
-                const { ffm } = depToEdit;
-                this.departments[idx] = { ffm, ...editedDep};
-            }
-        }
+        if (!editedDep || index === -1) return false;
 
-        return !!editedDep;
+        const isImageChanged = formData.has('image') && !!editedDep.image;
+        const isNameChanged = name !== depToEdit.name && editedDep.name;
+
+        if (isImageChanged) this.departments[index].image = editedDep.image;
+        if (isNameChanged) this.departments[index].name = editedDep.name;
+
+        return true;
     }
 
     @action.bound

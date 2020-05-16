@@ -20,7 +20,8 @@ const styles = createStyles({
     },
     cell: {
         borderBottom: '1px solid #E4EDF7',
-        height: 40
+        height: 40,
+        alignItems: 'center'
     },
     title_bold: {
         fontWeight: 600,
@@ -58,6 +59,11 @@ class TableHeader extends Component<IProps> {
                           container item>
                         <Typography className={classes.title_bold} variant='body1'>
                             Редагування
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
+                            Віділення
                         </Typography>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
@@ -100,6 +106,16 @@ class TableHeader extends Component<IProps> {
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
+                            Віділення
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
+                            Працівники
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
                             Препарати
                         </Typography>
                     </Grid>
@@ -124,6 +140,16 @@ class TableHeader extends Component<IProps> {
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Typography className={classes.title_bold} variant='body1'>
                             Видалення
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
+                            Віділення
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Typography color='textSecondary' variant='body1'>
+                            Працівники
                         </Typography>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>

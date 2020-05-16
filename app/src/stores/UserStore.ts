@@ -67,6 +67,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (!this.user || !positions) return [];
 
         const userPosition = positions.get(this.user.position);
+        console.log('user permissions: ', toJS(userPosition));
         return userPosition
             ? userPosition.permissions
             : [];
