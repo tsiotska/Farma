@@ -30,8 +30,8 @@ import { ICacheStore } from '../interfaces/ICacheStore';
 import { CacheStore } from '../stores/CacheStore';
 import Config from '../../Config';
 import { USER_ROLE } from '../constants/Roles';
-import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
+import { salaryNormalizer } from '../helpers/normalizers/salaryNormalizer';
 import { notificationsNormalizer } from '../helpers/normalizers/notificationsNormalizer';
 import { INotification } from '../interfaces/iNotification';
 import { IDoctor } from '../interfaces/IDoctor';
@@ -44,8 +44,9 @@ import { specialtyNormalizer } from '../helpers/normalizers/specialtyNormalizer'
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 import { ISearchResult } from '../interfaces/ISearchResult';
 import { searchNormalizer } from '../helpers/normalizers/searchNormalizer';
-import {toJS} from 'mobx';
+import { toJS } from 'mobx';
 import { periodSalesNormalizer, IPeriodSalesStat } from '../helpers/normalizers/periodSalesNormalizer';
+import { IValuesMap } from '../helpers/normalizers/normalizer';
 
 export interface ICachedPromise<T> {
     promise: Promise<T>;
@@ -204,7 +205,7 @@ export class APIRequester {
 
     editDepartment(depId: number, formData: FormData): Promise<IDepartment> {
         return this.instance.put(`api/branch/${depId}`, formData)
-            .then(({ data: { data: { id, name, image } }}) => ({
+            .then(({ data: { data: { id, name, image } } }) => ({
                 id,
                 name,
                 image
@@ -274,16 +275,16 @@ export class APIRequester {
 
     getOblasti(): Promise<ILocation[]> {
         return this.instance.get('/api/oblast')
-        .then(({ data: { data } }) => (
-            Array.isArray(data)
-            ? data.map(
-                (name: string, i: number) => ({
-                    id: i + 1,
-                    name
-                }))
-            : []
-        ))
-        .catch(this.defaultErrorHandler([]));
+            .then(({ data: { data } }) => (
+                Array.isArray(data)
+                    ? data.map(
+                    (name: string, i: number) => ({
+                        id: i + 1,
+                        name
+                    }))
+                    : []
+            ))
+            .catch(this.defaultErrorHandler([]));
     }
 
     getLocations(url: string): Promise<ILocation[]> {
@@ -341,9 +342,11 @@ export class APIRequester {
 
     getSalarySettings(): Promise<ISalarySettings> {
         return this.instance.get('/api/settings')
-            .then(({ data: { data: { default_amount_kpi, payments } } }) => ({
+            .then(({ data: { data: { default_amount_kpi, payments, rm_level, mp_level } } }) => ({
                 kpi: default_amount_kpi || null,
-                payments: payments || null
+                payments: payments || null,
+                rmLevel: rm_level || null,
+                mpLevel: mp_level || null
             }))
             .catch(this.defaultErrorHandler());
     }
@@ -360,12 +363,20 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    updateCommonSettings({ kpi, payments }: ISalarySettings) {
-        const data: any = {};
-        if (kpi) data.default_amount_kpi = kpi;
-        if (payments) data.payments = payments;
-        if (isEqual(data, {})) return Promise.resolve(false);
-        return this.instance.put('/api/settings', data)
+    updateCommonSettings(data: ISalarySettings) {
+        const namesMap: IValuesMap = {
+            kpi: 'default_amount_kpi',
+            payments: 'payments',
+            mpLevel: 'mp_level',
+            rmLevel: 'rm_level'
+        };
+
+        const preparedData: any = Object.entries(data).reduce((acc, [ propName, value ]) => (
+            value === null ? acc : { ...acc, [namesMap[propName]]: value}
+        ), {});
+
+        if (isEqual(preparedData, {})) return Promise.resolve(false);
+        return this.instance.put('/api/settings', preparedData)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
@@ -635,20 +646,20 @@ export class APIRequester {
 
     getRmAgentsInfo(departmentId: number): Promise<any> {
         return this.instance.get(`/api/branch/${departmentId}/ffm/worker`)
-            .then(({ data: { data }}) => {
-                return  data.map(({bank_card, mobile_phone, work_phone, region, id}: any) => ({
-                card: bank_card,
-                mobilePhone: mobile_phone,
-                workPhone: work_phone,
-                region, id
-            }));
-        }).catch(this.defaultErrorHandler());
+            .then(({ data: { data } }) => {
+                return data.map(({ bank_card, mobile_phone, work_phone, region, id }: any) => ({
+                    card: bank_card,
+                    mobilePhone: mobile_phone,
+                    workPhone: work_phone,
+                    region, id
+                }));
+            }).catch(this.defaultErrorHandler());
     }
 
     getMpAgentsInfo(departmentId: number, userId: number): Promise<any> {
         return this.instance.get(`/api/branch/${departmentId}/rm/${userId}/worker`)
-            .then(({ data: { data }}) => {
-                return data.map(({bank_card, mobile_phone, work_phone, region, id}: any) => ({
+            .then(({ data: { data } }) => {
+                return data.map(({ bank_card, mobile_phone, work_phone, region, id }: any) => ({
                     card: bank_card,
                     mobilePhone: mobile_phone,
                     workPhone: work_phone,

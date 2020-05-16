@@ -39,6 +39,8 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     role: number;
+    initialLevel: string;
+    levelChangeHandler: (levelType: string, event: any) => void;
 }
 
 @observer
@@ -52,10 +54,12 @@ class RoleLevels extends Component<IProps> {
         this.levels = {
             [USER_ROLE.REGIONAL_MANAGER]: {
                 name: 'Регіональний менеджер',
+                levelType: 'rmLevel',
                 colors: { РМ1: red, РМ2: yellow, РМ3: green },
             },
             [USER_ROLE.MEDICAL_AGENT]: {
                 name: 'Медичний представник',
+                levelType: 'mpLevel',
                 colors: {
                     МП1: red, МП2: orangered,
                     МП3: yellow, МП4: limeGreen, МП5: green
@@ -64,12 +68,10 @@ class RoleLevels extends Component<IProps> {
         };
     }
 
-    componentDidMount() {
-        this.selectedLevel = Object.keys(this.roleLevels.colors)[0];
-    }
-
     handleChange = (event: any) => {
-        this.selectedLevel = event.target.value;
+        const {role, levelChangeHandler} = this.props;
+        const levelType =  this.levels[role].levelType;
+        levelChangeHandler(levelType, event);
     }
 
     get roleLevels() {
@@ -78,7 +80,7 @@ class RoleLevels extends Component<IProps> {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, initialLevel } = this.props;
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography color='textSecondary' variant='h6'>
@@ -89,11 +91,10 @@ class RoleLevels extends Component<IProps> {
                     {Object.entries(this.roleLevels.colors).map((level, i) => (
                          <Grid key={i} direction='column' item>
                             <Radio
-                                checked={this.selectedLevel === level[0]}
+                                checked={initialLevel === level[0]}
                                 onChange={this.handleChange}
                                 value={level[0]}
                                 name='roleLevel'
-                                // className={cx([level[1]])}
                                 color='default'
                             />
                             <div className={cx(classes.levelLine, level[1])}/>

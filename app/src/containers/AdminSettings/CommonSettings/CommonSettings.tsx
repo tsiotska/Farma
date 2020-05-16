@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
-import {
-    createStyles,
-    withStyles,
-    WithStyles,
-    Grid,
-    Typography,
-    Input,
-    Button
-} from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
+import { Button, createStyles, Grid, Input, Typography, withStyles, WithStyles } from '@material-ui/core';
+import { inject, observer } from 'mobx-react';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 import { computed, observable } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
@@ -48,6 +40,7 @@ interface IProps extends WithStyles<typeof styles> {
     salarySettings?: ISalarySettings;
     submitCommonSettingsChanges?: (settings: ISalarySettings) => Promise<boolean>;
     getAsyncStatus?: (key: string) => IAsyncStatus;
+    loadUserSalarySettings?: () => void;
 }
 
 @inject(({
@@ -55,13 +48,15 @@ interface IProps extends WithStyles<typeof styles> {
                  userStore: {
                      salarySettings,
                      submitCommonSettingsChanges,
-                     getAsyncStatus
+                     getAsyncStatus,
+                     loadUserSalarySettings
                  }
              }
          }) => ({
     salarySettings,
     submitCommonSettingsChanges,
-    getAsyncStatus
+    getAsyncStatus,
+    loadUserSalarySettings
 }))
 @observer
 class CommonSettings extends Component<IProps> {
@@ -69,12 +64,25 @@ class CommonSettings extends Component<IProps> {
     @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
     @observable changedValues: ISalarySettings = {
         kpi: null,
-        payments: null
+        payments: null,
+        rmLevel: null,
+        mpLevel: null
     };
 
     @computed
     get isRequestProccessing(): boolean {
         return this.props.getAsyncStatus('submitCommonSettingsChanges').loading;
+    }
+
+    initialLevel = (levelType: string): number => {
+        const { salarySettings } = this.props;
+        return this.changedValues[levelType] === null
+            ? salarySettings[levelType] || 1
+            : this.changedValues[levelType];
+    }
+
+    levelChangeHandler = (levelType: string, event: any) => {
+        this.changedValues[levelType] = Number(event.target.value.match(/\d+/));
     }
 
     @computed
@@ -83,6 +91,13 @@ class CommonSettings extends Component<IProps> {
         return salarySettings
             ? salarySettings.kpi
             : 0;
+    }
+
+    kpiChangeHandler = ({ target: { value } }: any) => {
+        const newValue = +value;
+        const isInvalid = Number.isNaN(newValue) || newValue < 0;
+        if (isInvalid) return;
+        this.changedValues.kpi = newValue;
     }
 
     @computed
@@ -103,15 +118,6 @@ class CommonSettings extends Component<IProps> {
             : [100, 0];
     }
 
-    inputFocusHandler = ({ target }: any) => target.select();
-
-    kpiChangeHandler = ({ target: { value } }: any) => {
-        const newValue = +value;
-        const isInvalid = Number.isNaN(newValue) || newValue < 0;
-        if (isInvalid) return;
-        this.changedValues.kpi = newValue;
-    }
-
     bonusChangeHandler = ({ target: { value } }: any) => {
         const newValue = +value / 100;
         const isInvalid = Number.isNaN(newValue) || newValue > 1;
@@ -125,6 +131,8 @@ class CommonSettings extends Component<IProps> {
         if (isInvalid) return;
         this.changedValues.payments = 1 - newValue;
     }
+
+    inputFocusHandler = ({ target }: any) => target.select();
 
     submitHandler = async () => {
         if (this.isRequestProccessing) return;
@@ -142,7 +150,6 @@ class CommonSettings extends Component<IProps> {
 
     render() {
         const { classes } = this.props;
-
         return (
             <Grid className={classes.root} direction='column' container>
 
@@ -155,8 +162,12 @@ class CommonSettings extends Component<IProps> {
                         Рівень зарахування бонусів
                     </Typography>
 
-                    <RoleLevels role={USER_ROLE.REGIONAL_MANAGER}/>
-                    <RoleLevels role={USER_ROLE.MEDICAL_AGENT}/>
+                    <RoleLevels levelChangeHandler={this.levelChangeHandler}
+                                initialLevel={'РМ' + this.initialLevel('rmLevel')}
+                                role={USER_ROLE.REGIONAL_MANAGER}/>
+                    <RoleLevels levelChangeHandler={this.levelChangeHandler}
+                                initialLevel={'МП' + this.initialLevel('mpLevel')}
+                                role={USER_ROLE.MEDICAL_AGENT}/>
                 </Grid>
 
                 <Grid className={classes.formBlock} alignItems='center' container>

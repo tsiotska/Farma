@@ -524,9 +524,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     async loadUserSalarySettings() {
         const { api } = this.rootStore;
         this.salarySettings = await this.dispatchRequest(
-            api.getSalarySettings(),
-            null
+            api.getSalarySettings(), null
         );
+        console.log(toJS(this.salarySettings));
     }
 
     @action.bound
