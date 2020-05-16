@@ -274,7 +274,7 @@ class UserContent extends Component<IProps> {
                 }
 
                 <SumRow
-                    title='План в грошах'
+                    title='Факт в грошах'
                     levels={this.levels}
                     userLevel={this.userLevel}
                     values={this.plannedCosts}

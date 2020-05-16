@@ -1,3 +1,4 @@
+import { multiDepartmentRoles } from './../constants/Roles';
 import {action, computed, observable, reaction, transaction, when} from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
@@ -824,11 +825,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             manufacturer: 'manufacturer',
             price: 'price',
             barcode: 'barcode',
+            department: 'branch'
         };
+
+        const targetDep = this.departments.find(x => x.name === data.department);
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
                 const newKey = namesMap[key];
+
+                if (newKey === namesMap.department) {
+                    const depId = targetDep ? targetDep.id : this.currentDepartmentId;
+                    return { ...total, [newKey]: depId };
+                }
 
                 const converted = intValues.includes(key)
                     ? +value
@@ -845,15 +854,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         payload.set('json', JSON.stringify(preparedData));
         payload.set('image', image || '');
 
-        const department = +data.department || this.currentDepartmentId;
-
         const newMedicine = await this.dispatchRequest(
-            api.addMedicine(department, data),
+            api.addMedicine(targetDep.id, data),
             'addMedicine'
         );
 
         if (newMedicine) {
-            const targetMeds = this.meds.get(department);
+            const targetMeds = this.meds.get(targetDep.id);
             if (targetMeds) targetMeds.push(newMedicine);
         }
 
@@ -871,8 +878,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             manufacturer: 'manufacturer',
             price: 'price',
             barcode: 'barcode',
+            department: 'branch'
         };
         const { api } = this.rootStore;
+
+        let isDepChanged: boolean = false;
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
@@ -882,11 +892,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     ? +value
                     : value;
 
-                const isChanged = medicine[key] !== converted;
+                if (newKey === namesMap.department) {
+                    const targetDep = this.departments.find(x => x.name === value);
+                    if (targetDep) {
+                        isDepChanged = true;
+                        return { ...total, [newKey]: targetDep.id };
+                    }
+                } else {
+                    const isChanged = medicine[key] !== converted;
 
-                return (!!newKey && !!converted && isChanged)
-                    ? { ...total, [newKey]: converted }
-                    : total;
+                    return (!!newKey && !!converted && isChanged)
+                        ? { ...total, [newKey]: converted }
+                        : total;
+                }
             },
             {}
         );
@@ -916,6 +934,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     medicine[restoredPropName] = value;
                 }
             });
+
+            if (isDepChanged) {
+                const { userStore: { user: { position } }} = this.rootStore;
+                if (multiDepartmentRoles.includes(position)) await this.loadAllMeds(false);
+                else this.loadMeds(this.currentDepartmentId);
+            }
         }
 
         return isUpdated;
@@ -939,12 +963,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadAllMeds() {
+    async loadAllMeds(shouldReset: boolean = true) {
         const requestName = 'loadAllMeds';
 
         this.setLoading(requestName);
         for (const department of this.departments) {
-            this.meds.set(department.id, []);
+            if (shouldReset) this.meds.set(department.id, []);
             await this.loadMeds(department.id);
         }
 
