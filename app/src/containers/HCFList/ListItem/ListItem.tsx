@@ -211,7 +211,7 @@ class ListItem extends Component<IProps> {
                                 unconfirmed={unconfirmed}
                             />
                     }
-                    { !unconfirmed &&
+
                     <DeleteButton
                       unconfirmed={unconfirmed}
                       type={generalType}
@@ -219,7 +219,6 @@ class ListItem extends Component<IProps> {
                       onClick={this.deleteClickHandler}>
                       <Delete className={classes.icon}/>
                     </DeleteButton>
-                    }
                 </Grid>
             </Grid>
         );

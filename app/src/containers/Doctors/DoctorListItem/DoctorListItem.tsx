@@ -126,13 +126,13 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            openModal,
-            openDelPopper
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openModal,
+                     openDelPopper
+                 }
+             }
+         }) => ({
     openDelPopper,
     openModal
 }))
@@ -204,7 +204,7 @@ class DoctorListItem extends Component<IProps> {
 
         return (
             <Grid ref={rootRef} className={classes.root} alignItems='center' wrap='nowrap' container>
-                 {
+                {
                     unconfirmed && showBadges &&
                     <Grid className={classes.badgesContainer}>
                         <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
@@ -213,20 +213,20 @@ class DoctorListItem extends Component<IProps> {
                 }
                 <Grid xs container item>
                     <Typography variant='body2' className={classes.text}>
-                        { LPUName || '-' }
+                        {LPUName || '-'}
                     </Typography>
                     <Typography color='textSecondary'>
-                        { address }
+                        {address}
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2' className={cx(classes.text, { highlight: !!highlight })}>
-                        { name || '-' }
+                        {name || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' className={classes.text}>
-                        { specialty || '-'}
+                        {specialty || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={1} className={classes.column} container item>
@@ -243,7 +243,7 @@ class DoctorListItem extends Component<IProps> {
                 </Grid>
                 <Grid xs={1} className={classes.column} container item>
                     <Typography variant='body2' className={classes.text}>
-                        { card || '-'}
+                        {card || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
@@ -276,7 +276,6 @@ class DoctorListItem extends Component<IProps> {
                           </>
                     }
                     {
-                        !unconfirmed &&
                         <DeleteDocButton
                             onClick={this.deleteClickHandler}
                             className={classes.removeIcon}
