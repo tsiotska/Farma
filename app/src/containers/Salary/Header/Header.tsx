@@ -29,7 +29,8 @@ const styles = (theme: any) => createStyles({
         borderColor: theme.palette.primary.green.main,
         border: '1px solid',
         padding: '8px 12px',
-        height: 42
+        height: 42,
+        whiteSpace: 'nowrap'
     },
     title: {
         whiteSpace: 'nowrap',
