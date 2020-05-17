@@ -20,7 +20,9 @@ import { IDeposit } from '../../../../interfaces/IDeposit';
 import { IDoctor } from '../../../../interfaces/IDoctor';
 import { numberValidator, moneyValidator } from '../../../../helpers/validators';
 import { USER_ROLE } from '../../../../constants/Roles';
-import { IUser } from '../../../../interfaces';
+import { IUser, IWithRestriction } from '../../../../interfaces';
+import { PERMISSIONS } from '../../../../constants/Permissions';
+import { withRestriction } from '../../../../components/hoc/withRestriction';
 
 const styles = (theme: any) => createStyles({
     head: {
@@ -71,7 +73,7 @@ const styles = (theme: any) => createStyles({
     },
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     submitHandler: (data: any) => void;
     isLoading: boolean;
     deposits: IDeposit[];
@@ -88,9 +90,9 @@ interface IProps extends WithStyles<typeof styles> {
 }) => ({
     user
 }))
+@withRestriction([ PERMISSIONS.EDIT_AGENT ])
 @observer
 class FormContent extends Component<IProps> {
-    readonly allowedRoles: USER_ROLE[] = [USER_ROLE.ADMIN, USER_ROLE.FIELD_FORCE_MANAGER];
     readonly initialValue: IDepositFormValue = {
         deposit: '',
         message: '',
@@ -140,7 +142,13 @@ class FormContent extends Component<IProps> {
     }
 
     render() {
-        const { classes, isLoading, deposits, doctor } = this.props;
+        const {
+            classes,
+            isLoading,
+            deposits,
+            doctor,
+            isAllowed
+        } = this.props;
 
         return (
             <>
@@ -181,7 +189,7 @@ class FormContent extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    this.allowedRoles.includes(this.userRole) &&
+                    isAllowed &&
                     <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
                         <Grid xs container item>
                             <FormRow
