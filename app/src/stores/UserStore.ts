@@ -242,11 +242,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
             }
 
             const preparedMarks = [...mergedMarks.values()].map(({
-                                                                     deposit,
-                                                                     drugId,
-                                                                     mark,
-                                                                     payments
-                                                                 }) => ({
+                    deposit,
+                    drugId,
+                    mark,
+                    payments
+                }) => ({
                     agent: agentId,
                     deposit: deposit,
                     drug: drugId,

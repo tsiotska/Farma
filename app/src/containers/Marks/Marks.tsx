@@ -68,6 +68,7 @@ interface IProps extends WithStyles<typeof styles> {
     updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     loadBonusesData?: (user: IUserLikeObject) => void;
+    clearChangedMarks?: () => void;
 }
 
 @inject(({
@@ -83,7 +84,8 @@ interface IProps extends WithStyles<typeof styles> {
             // setPreviewBonus
             loadBonusesData,
             previewBonusMonth,
-            bonuses
+            bonuses,
+            clearChangedMarks
         },
         uiStore: {
             openModal
@@ -101,6 +103,7 @@ interface IProps extends WithStyles<typeof styles> {
     bonusesYear,
     updateBonuses,
     previewUser,
+    clearChangedMarks
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -162,7 +165,8 @@ class Marks extends Component<IProps> {
         this.monthReaction = reaction(
             () => this.props.previewBonusMonth,
             () => {
-                const { previewUser } = this.props;
+                const { previewUser, clearChangedMarks } = this.props;
+                clearChangedMarks();
                 loadBonusesData(previewUser);
             }
         );
