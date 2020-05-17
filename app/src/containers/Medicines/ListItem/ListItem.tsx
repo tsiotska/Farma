@@ -83,6 +83,11 @@ const styles = (theme: any) => createStyles({
         '&:hover': {
             backgroundColor: '#8d9eff'
         }
+    },
+    buttonsWrapper: {
+        display: 'flex',
+        alignItems: 'center',
+        width: 88
     }
 });
 
@@ -186,19 +191,20 @@ class ListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                {
-                    deleted === false &&
-                    <>
-                        {
-                            allowEdit &&
-                            <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
-                                <Edit fontSize='small' />
-                            </IconButton>
-                        }
-                        <RemoveButton onClick={this.removeClickHandler} />
-                    </>
-                }
-
+                <div className={classes.buttonsWrapper}>
+                    {
+                        deleted === false &&
+                        <>
+                            {
+                                allowEdit &&
+                                <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
+                                    <Edit fontSize='small' />
+                                </IconButton>
+                            }
+                            <RemoveButton onClick={this.removeClickHandler} />
+                        </>
+                    }
+                </div>
             </Grid>
             {
                 deleted === true && allowEdit === true &&
