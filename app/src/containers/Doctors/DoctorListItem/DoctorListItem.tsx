@@ -102,7 +102,7 @@ const styles = (theme: any) => createStyles({
     },
     deposit: {
         width: '100%',
-        color: '#647CFE',
+        color: '#647cfe',
         '&:hover': {
             cursor: 'pointer'
         }

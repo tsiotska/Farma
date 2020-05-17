@@ -261,7 +261,7 @@ class Pharmacy extends Component<IProps> {
                     {
                         isAllowed &&
                         <Button className={classes.addButton} onClick={this.addPharmacyClickHandler}>
-                            Додати Аптеку
+                            Додати аптеку
                         </Button>
                     }
                 </Grid>

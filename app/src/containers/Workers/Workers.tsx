@@ -47,6 +47,7 @@ const styles = (theme: any) => createStyles({
         marginRight: 6
     },
     addWorkerButton: {
+        marginLeft: 'auto',
         color: theme.palette.primary.green.main,
         borderColor: theme.palette.primary.green.main,
         backgroundColor: 'white',
@@ -256,7 +257,7 @@ class Workers extends Component<IProps> {
                         <Button
                             onClick={this.addWorkerClickHandler}
                             className={classes.addWorkerButton}>
-                            Додати Працівника
+                            Додати працівника
                         </Button>
                     }
                 </Grid>
