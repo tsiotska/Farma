@@ -172,7 +172,7 @@ class WorkerListItem extends Component<IProps> {
     @computed
     get date(): string {
         const {
-            worker: { hired, fired },
+            worker: { hired, fired, isVacancy, created },
             fired: isFired
         } = this.props;
 
@@ -180,10 +180,22 @@ class WorkerListItem extends Component<IProps> {
             ? '...'
             : '-';
 
+        if (isVacancy) {
+            const isDateValid = isValid(created);
+            const month = isDateValid
+                ? `${uaMonthsNames[created.getMonth()].slice(0, 3)} `
+                : '';
+            const formatted = isDateValid
+                ? lightFormat(created, `dd '${month}'yyyy`)
+                : '';
+            return formatted;
+        }
+
         const isHiredDateValid = isValid(hired);
         const monthOfHiring = isHiredDateValid
             ? `${uaMonthsNames[hired.getMonth()].slice(0, 3)} `
             : '';
+
         const from = isHiredDateValid
             ? lightFormat(hired, `dd '${monthOfHiring}'yyyy`)
             : emptyPlaceholder;
