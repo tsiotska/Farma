@@ -41,6 +41,9 @@ const styles = (theme: any) => createStyles({
     settingsButton: {
         marginLeft: 'auto',
     },
+    titleContainer: {
+        width: 'fit-content',
+    },
     title: {
         display: 'flex',
         alignItems: 'center'
@@ -62,19 +65,19 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartment
-        },
-        userStore: {
-            isAdmin
-        },
-        uiStore: {
-            openDelPopper,
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartment
+                 },
+                 userStore: {
+                     isAdmin
+                 },
+                 uiStore: {
+                     openDelPopper,
+                     openModal
+                 }
+             }
+         }) => ({
     currentDepartment,
     openDelPopper,
     openModal,
@@ -90,7 +93,7 @@ export class Header extends Component<IProps, {}> {
     }
 
     get isAdminRoute(): boolean {
-        const { history: { location: {pathname}} } = this.props;
+        const { history: { location: { pathname } } } = this.props;
         return !!matchPath(pathname, {
             path: ADMIN_ROUTE,
             exact: true
@@ -98,17 +101,17 @@ export class Header extends Component<IProps, {}> {
     }
 
     get isSettingsRoute(): boolean {
-        const { history: { location: { pathname }}} = this.props;
+        const { history: { location: { pathname } } } = this.props;
         return SETTINGS_ROUTES.some(route => !!matchPath(pathname, route));
     }
 
     get isDepartmentRoute(): boolean {
-        const { history: { location: { pathname }}} = this.props;
+        const { history: { location: { pathname } } } = this.props;
         return !!matchPath(pathname, DEPARTMENT_ROUTE);
     }
 
     get title(): string {
-        const { history: { location: { pathname }}} = this.props;
+        const { history: { location: { pathname } } } = this.props;
         if (this.isDepartmentRoute) return this.departmentName;
         if (!!matchPath(pathname, ADMIN_ROUTE)) return 'Адмін панель';
         if (!!matchPath(pathname, NOTIFICATIONS_ROUTE)) return 'Сповіщення';
@@ -144,47 +147,50 @@ export class Header extends Component<IProps, {}> {
                     color='primary'
                     position='relative'
                     className={classes.root}>
-                        <Grid container alignItems='center'>
-                            <Grid xs container item>
-                                <Typography className={classes.title} variant='h5'>
-                                    {
-                                        this.isSettingsRoute &&
-                                        <IconButton onClick={this.backClickHandler} className={cx(classes.backButton, classes.settingsButton)}>
-                                            <ArrowBack width={22} height={22} />
-                                        </IconButton>
-                                    }
-                                    { this.title }
-                                </Typography>
-                            </Grid>
-                            <Grid xs={8} item>
-                                <Search />
-                            </Grid>
-                            <Grid xs container item>
+                    <Grid container alignItems='center' spacing={1}>
+
+                        <Grid className={classes.titleContainer} container item>
+                            <Typography className={classes.title} variant='h5'>
                                 {
-                                    this.isAdminRoute &&
-                                    <IconButton onClick={this.settingsClickHandler} className={cx(classes.iconButton, classes.settingsButton)}>
-                                        <Settings width={22} height={22} />
+                                    this.isSettingsRoute &&
+                                    <IconButton onClick={this.backClickHandler}
+                                                className={cx(classes.backButton, classes.settingsButton)}>
+                                        <ArrowBack width={22} height={22}/>
                                     </IconButton>
                                 }
-                                {
-                                    this.isDepartmentRoute && <>
-                                        <EditBranchButton
-                                            onClick={this.editClickHandler}
-                                            className={cx(classes.iconButton, classes.settingsButton)}
-                                        />
-                                        <RemoveBranchButton
-                                            onClick={this.deleteClickHandler}
-                                            className={cx(classes.iconButton)}
-                                        />
-                                    </>
-                                }
+                                {this.title}
+                            </Typography>
+                        </Grid>
+                        {this.isDepartmentRoute &&
+                        <Grid xs={1}>
+                            <EditBranchButton
+                                onClick={this.editClickHandler}
+                                className={cx(classes.iconButton, classes.settingsButton)}
+                            />
+                            <RemoveBranchButton
+                                onClick={this.deleteClickHandler}
+                                className={cx(classes.iconButton)}
+                            />
+                        </Grid>
+                        }
+                        <Grid xs item>
+                            <Search/>
+                        </Grid>
+                        {
+                            this.isAdminRoute &&
+                            <Grid xs={1} container item>
+                                <IconButton onClick={this.settingsClickHandler}
+                                            className={cx(classes.iconButton, classes.settingsButton)}>
+                                    <Settings width={22} height={22}/>
+                                </IconButton>
                             </Grid>
+                        }
                     </Grid>
                 </AppBar>
-                <SalaryReviewModal />
-                <AddWorkerModal showLocationsBlock={!this.isSettingsRoute} />
-                <EditWorkerModal showLocationsBlock={!this.isSettingsRoute} />
-                <EditDepartmentModal />
+                <SalaryReviewModal/>
+                <AddWorkerModal showLocationsBlock={!this.isSettingsRoute}/>
+                <EditWorkerModal showLocationsBlock={!this.isSettingsRoute}/>
+                <EditDepartmentModal/>
                 <DeletePopover
                     name='deleteDepartment'
                     anchorOrigin={{

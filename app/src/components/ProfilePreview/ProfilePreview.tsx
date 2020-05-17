@@ -17,18 +17,17 @@ import { IUser } from '../../interfaces';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
 import UserShortInfo from '../UserShortInfo';
-import PhoneOutlinedIcon from '@material-ui/icons/PhoneOutlined';
 import MailOutlineOutlinedIcon from '@material-ui/icons/MailOutlineOutlined';
 import CreditCardOutlinedIcon from '@material-ui/icons/CreditCardOutlined';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import InfoWindow from '../../components/InfoWindow';
 import { EDIT_WORKER_MODAL } from '../../constants/Modals';
 import { IPosition } from '../../interfaces/IPosition';
 import copy from 'clipboard-copy';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
-import EditButton from './EditButton';
 import DeleteButton from './DeleteButton';
+
+import Phone from '-!react-svg-loader!../../../assets/icons/phone.svg';
+import Edit from '-!react-svg-loader!../../../assets/icons/edit.svg';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -413,7 +412,7 @@ class ProfilePreview extends Component<IProps> {
                           direction='column'
                           container
                           item>
-                        <InfoWindow icon={<PhoneOutlinedIcon/>}>
+                        <InfoWindow icon={<Phone/>}>
                             {previewUser.mobilePhone ?
                             <Grid className={classes.windowContent} wrap='nowrap' container>
                                 <Grid direction='column' item container>
@@ -481,10 +480,9 @@ class ProfilePreview extends Component<IProps> {
                                 justify='center'
                                 container
                                 item>
-                                    <EditButton
-                                        onClick={this.editClickHandler}
-                                        onMountCallback={this.extraButtonsOnMountCallback}
-                                    />
+                                <IconButton onClick={this.editClickHandler}>
+                                    <Edit/>
+                                </IconButton>
                                     <DeleteButton
                                         id={id}
                                         onClick={this.removeUserClickHandler}

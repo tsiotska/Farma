@@ -65,16 +65,16 @@ interface ISnackbarSettings {
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            openedModal,
-            openModal
-        },
-        departmentsStore: {
-            createDepartment
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openedModal,
+                     openModal
+                 },
+                 departmentsStore: {
+                     createDepartment
+                 }
+             }
+         }) => ({
     openedModal,
     openModal,
     createDepartment
@@ -87,7 +87,7 @@ class AddDepartmentModal extends Component<IProps> {
         name: ''
     };
 
-    readonly requiredFfmData: string[] = [ 'name', 'email', 'password' ];
+    readonly requiredFfmData: string[] = ['name', 'email', 'password'];
     readonly initialFfmData: IFFMData = {
         image: null,
         name: '',
@@ -105,8 +105,8 @@ class AddDepartmentModal extends Component<IProps> {
         card: (value: string) => value && (value.length === 13)
     };
 
-    @observable departmentData: IDepartmentData = {...this.initialDepartmentData};
-    @observable ffmData: IFFMData = {...this.initialFfmData};
+    @observable departmentData: IDepartmentData = { ...this.initialDepartmentData };
+    @observable ffmData: IFFMData = { ...this.initialFfmData };
 
     @observable invalidDepartmentFields: Set<keyof IDepartmentData> = new Set();
     @observable invalidFFMFields: Set<keyof IFFMData> = new Set();
@@ -136,7 +136,7 @@ class AddDepartmentModal extends Component<IProps> {
         }
     }
 
-    departmentNameChangeHandler = ({ target: { value }}: any) => {
+    departmentNameChangeHandler = ({ target: { value } }: any) => {
         this.departmentData.name = value;
     }
 
@@ -192,8 +192,8 @@ class AddDepartmentModal extends Component<IProps> {
             this.closeHandler();
         } else {
             const text: string = !isDepartmentCreated
-            ? 'Неможливо створити відділення'
-            : 'неможливо стоврити ФФМ`а';
+                ? 'Неможливо створити відділення'
+                : 'неможливо стоврити ФФМ`а';
 
             this.snackbarSettings = {
                 isOpen: true,
@@ -205,7 +205,7 @@ class AddDepartmentModal extends Component<IProps> {
 
     validate = (): boolean => {
         this.invalidFFMFields.clear();
-        Object.entries(this.ffmData).forEach(([ prop, value ]: [keyof IFFMData, any]) => {
+        Object.entries(this.ffmData).forEach(([prop, value]: [keyof IFFMData, any]) => {
             const validator = this.validators[prop] || this.defaultValueValidator;
             const isRequired = this.requiredFfmData.includes(prop);
             const isValid = isRequired
@@ -217,7 +217,7 @@ class AddDepartmentModal extends Component<IProps> {
         });
 
         this.invalidDepartmentFields.clear();
-        Object.entries(this.departmentData).forEach(([ prop, value ]: [keyof IDepartmentData, any]) => {
+        Object.entries(this.departmentData).forEach(([prop, value]: [keyof IDepartmentData, any]) => {
             const validator = this.validators[prop] || this.defaultValueValidator;
             const isRequired = this.requiredDepartmentProps.includes(prop);
             const isValid = isRequired
@@ -229,6 +229,12 @@ class AddDepartmentModal extends Component<IProps> {
         });
 
         return !this.invalidDepartmentFields.size && !this.invalidFFMFields.size;
+    }
+
+    get allowSubmit(): boolean {
+        return Object.entries(this.departmentData).every((value) =>
+            !value[1]) && Object.entries(this.ffmData).every((value) =>
+            !value[1]);
     }
 
     submitHandler = async () => {
@@ -260,8 +266,8 @@ class AddDepartmentModal extends Component<IProps> {
             && currentModal !== ADD_DEPARTMENT_MODAL;
 
         if (shouldClearValues) {
-            this.ffmData = {...this.initialFfmData};
-            this.departmentData = {...this.initialDepartmentData};
+            this.ffmData = { ...this.initialFfmData };
+            this.departmentData = { ...this.initialDepartmentData };
         }
     }
 
@@ -274,43 +280,44 @@ class AddDepartmentModal extends Component<IProps> {
                 open={openedModal === ADD_DEPARTMENT_MODAL}
                 onClose={this.closeHandler}
                 title='Додати відділення'>
-                    <DepartmentBlock
-                        values={this.departmentData}
-                        onNameChange={this.departmentNameChangeHandler}
-                        removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
-                        appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)}
-                        invalidFields={this.invalidDepartmentFields}
-                    />
-                    <Divider />
-                    <Typography variant='h5' className={classes.subtitle}>
-                        Створити ФФМ
-                    </Typography>
-                    <FFMBlock
-                        values={this.ffmData}
-                        changeHandler={this.fmmDataChangeHandler}
-                        appendFile={this.appendImage(TARGET_IMAGE.FFM)}
-                        removeIcon={this.removeImage(TARGET_IMAGE.FFM)}
-                        invalidFields={this.invalidFFMFields}
-                    />
-                    <Button
-                        onClick={this.submitHandler}
-                        variant='contained'
-                        className={classes.submitButton}>
-                        {
-                            this.isProccessing
-                            ? <LoadingMask size={20} />
+                <DepartmentBlock
+                    values={this.departmentData}
+                    onNameChange={this.departmentNameChangeHandler}
+                    removeIcon={this.removeImage(TARGET_IMAGE.DEPARTMENT)}
+                    appendFile={this.appendImage(TARGET_IMAGE.DEPARTMENT)}
+                    invalidFields={this.invalidDepartmentFields}
+                />
+                <Divider/>
+                <Typography variant='h5' className={classes.subtitle}>
+                    Створити ФФМ
+                </Typography>
+                <FFMBlock
+                    values={this.ffmData}
+                    changeHandler={this.fmmDataChangeHandler}
+                    appendFile={this.appendImage(TARGET_IMAGE.FFM)}
+                    removeIcon={this.removeImage(TARGET_IMAGE.FFM)}
+                    invalidFields={this.invalidFFMFields}
+                />
+                <Button
+                    disabled={this.allowSubmit}
+                    onClick={this.submitHandler}
+                    variant='contained'
+                    className={classes.submitButton}>
+                    {
+                        this.isProccessing
+                            ? <LoadingMask size={20}/>
                             : 'Зберегти'
-                        }
-                    </Button>
-                    <Snackbar
-                        open={this.snackbarSettings.isOpen}
-                        onClose={this.snackbarCloseHandler}
-                        type={this.snackbarSettings.type}
-                        message={this.snackbarSettings.text}
-                        autoHideDuration={6000}
-                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                        classes={{ root: classes.snackbar }}
-                    />
+                    }
+                </Button>
+                <Snackbar
+                    open={this.snackbarSettings.isOpen}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarSettings.type}
+                    message={this.snackbarSettings.text}
+                    autoHideDuration={6000}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    classes={{ root: classes.snackbar }}
+                />
             </Dialog>
         );
     }

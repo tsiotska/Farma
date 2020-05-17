@@ -148,6 +148,10 @@ class CommonSettings extends Component<IProps> {
         this.showSnackbar = false;
     }
 
+    get allowSubmit(): boolean {
+        return Object.entries(this.changedValues).every((value) => value[1] === null);
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -220,6 +224,8 @@ class CommonSettings extends Component<IProps> {
                 </Grid>
 
                 <Button
+                    // if we haven't changed at least one property
+                    disabled={this.allowSubmit}
                     onClick={this.submitHandler}
                     className={classes.submitButton}
                     variant='contained'

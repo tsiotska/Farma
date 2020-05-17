@@ -496,7 +496,7 @@ class WorkerModal extends Component<IProps> {
                                 </Typography>
                                 <FormRow
                                     required
-                                    label='email'
+                                    label='Email'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
                                     propName='email'

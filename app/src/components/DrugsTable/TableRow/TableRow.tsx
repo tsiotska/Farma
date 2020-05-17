@@ -13,7 +13,7 @@ const styles = (theme: any) => createStyles({
         }
     },
     cell: {
-        paddingRight: 5,
+        paddingRight: 20,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         height: 48,
