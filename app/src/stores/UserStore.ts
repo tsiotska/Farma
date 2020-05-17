@@ -67,7 +67,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (!this.user || !positions) return [];
 
         const userPosition = positions.get(this.user.position);
-        console.log('user permissions: ', toJS(userPosition));
+
         return userPosition
             ? userPosition.permissions
             : [];
@@ -411,12 +411,17 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     async loadBonuses(user: IUserLikeObject, clear: boolean = true) {
-        if (clear === true) this.bonuses[user.position] = [];
+        const userPosition = user
+            ? user.position
+            : null;
+        if (!userPosition) return;
+        if (clear === true) this.bonuses[userPosition] = [];
+
         const userBonuses = await this.dispatchRequest(
             this.loadSpecifiedUserBonuses(user),
             'loadBonuses'
         );
-        this.bonuses[user.position] = userBonuses || [];
+        this.bonuses[userPosition] = userBonuses || [];
         if (!userBonuses || !userBonuses.length) return;
 
         const targetBonuses = this.bonuses[this.role] || [];
@@ -527,10 +532,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async loadUserSalarySettings() {
         const { api } = this.rootStore;
-        this.salarySettings = await this.dispatchRequest(
-            api.getSalarySettings(), null
-        );
-        console.log(toJS(this.salarySettings));
+        this.salarySettings = await api.getSalarySettings();
     }
 
     @action.bound

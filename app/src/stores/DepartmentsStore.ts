@@ -157,6 +157,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map();
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+        this.pharmacyDemand = false;
         this.clearSalaries();
     }
 

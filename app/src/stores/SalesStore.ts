@@ -45,6 +45,65 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @observable agentsSales: IPeriodSalesStat[] = null;
     @observable locationsSales: IPeriodSalesStat[] = null;
 
+    constructor(rootStore: IRootStore) {
+        super();
+        this.rootStore = rootStore;
+        this.resetStore();
+    }
+
+    @computed
+    get isAnyAgentIgnored(): boolean {
+        return !!this.ignoredAgents.size;
+    }
+
+    @computed
+    get isAnyLocationIgnored(): boolean {
+        return !!this.ignoredLocations.size;
+    }
+
+    @computed
+    get pharmaciesMap(): Map<number, ILPU> {
+        const {
+            departmentsStore: { pharmacies },
+            userStore: { role }
+        } = this.rootStore;
+
+        const statExist = Array.isArray(this.locationsSales);
+        const shouldReturnData = role === USER_ROLE.MEDICAL_AGENT;
+
+        let data: Array<[number, ILPU]> = [];
+
+        if (statExist && shouldReturnData && pharmacies) {
+            const ids = this.locationsSales.map(({ id }) => id);
+            data = pharmacies
+                .filter(({ id }) => ids.includes(id))
+                .map(x => ([ x.id, x ]));
+
+        }
+
+        return new Map(data);
+    }
+
+    @computed
+    get agentsTargetProperty(): AgentTargetProperty {
+        const { userStore: { role }, departmentsStore: { locationsAgents } } = this.rootStore;
+        if (role === USER_ROLE.FIELD_FORCE_MANAGER) return 'region';
+        if (role === USER_ROLE.REGIONAL_MANAGER) return 'city';
+        return null;
+    }
+
+    @computed
+    get locations(): Map<number, ILocation> {
+        const {
+            userStore: { role },
+            departmentsStore: { cities, regions }
+        } = this.rootStore;
+
+        return role === USER_ROLE.FIELD_FORCE_MANAGER
+            ? regions
+            : cities;
+    }
+
     @computed
     get computedChartSales(): IMedsSalesStat[] {
         const chartData = this.chartSalesStat
@@ -199,65 +258,6 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             : summedUp;
     }
 
-    constructor(rootStore: IRootStore) {
-        super();
-        this.rootStore = rootStore;
-        this.resetStore();
-    }
-
-    @computed
-    get isAnyAgentIgnored(): boolean {
-        return !!this.ignoredAgents.size;
-    }
-
-    @computed
-    get isAnyLocationIgnored(): boolean {
-        return !!this.ignoredLocations.size;
-    }
-
-    @computed
-    get pharmaciesMap(): Map<number, ILPU> {
-        const {
-            departmentsStore: { pharmacies },
-            userStore: { role }
-        } = this.rootStore;
-
-        const statExist = Array.isArray(this.locationsSales);
-        const shouldReturnData = role === USER_ROLE.MEDICAL_AGENT;
-
-        let data: Array<[number, ILPU]> = [];
-
-        if (statExist && shouldReturnData && pharmacies) {
-            const ids = this.locationsSales.map(({ id }) => id);
-            data = pharmacies
-                .filter(({ id }) => ids.includes(id))
-                .map(x => ([ x.id, x ]));
-
-        }
-
-        return new Map(data);
-    }
-
-    @computed
-    get agentsTargetProperty(): AgentTargetProperty {
-        const { userStore: { role }, departmentsStore: { locationsAgents } } = this.rootStore;
-        if (role === USER_ROLE.FIELD_FORCE_MANAGER) return 'region';
-        if (role === USER_ROLE.REGIONAL_MANAGER) return 'city';
-        return null;
-    }
-
-    @computed
-    get locations(): Map<number, ILocation> {
-        const {
-            userStore: { role },
-            departmentsStore: { cities, regions }
-        } = this.rootStore;
-
-        return role === USER_ROLE.FIELD_FORCE_MANAGER
-            ? regions
-            : cities;
-    }
-
     @action.bound
     async loadAllStat(withReset: boolean = true) {
         const { userStore: { role }} = this.rootStore;
@@ -294,6 +294,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.chartSalesStat = null;
         this.agentsSales = null;
         this.locationsSales = null;
+
         // this.locationSalesStat = null;
         // this.agentSalesStat = null;
         this.ignoredMeds = new Set();

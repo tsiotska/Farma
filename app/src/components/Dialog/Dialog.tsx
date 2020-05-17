@@ -23,7 +23,9 @@ const styles = (theme: any) => createStyles({
             backgroundColor: 'transparent'
         }
     },
-    container: {}
+    container: {
+        textTransform: 'capitalize'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles>, Omit<DialogProps, 'classes' | 'title'> {

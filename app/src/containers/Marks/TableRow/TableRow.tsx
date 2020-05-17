@@ -267,8 +267,7 @@ class TableRow extends Component<IProps> {
 
     get isEditable(): boolean {
         const { agent: { position }, allowEdit } = this.props;
-
-        const isEditable =  typeof position === 'string' && allowEdit === true;
+        const isEditable = typeof position === 'string' && allowEdit === true;
         return isEditable;
     }
 
@@ -307,7 +306,6 @@ class TableRow extends Component<IProps> {
             agentInfo,
             meds,
             tooltips,
-            allowEdit
         } = this.props;
         const {
             LPUName,
