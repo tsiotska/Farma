@@ -9,7 +9,11 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { IUserSalary } from '../../interfaces/IUserSalary';
 import ListItem from './ListItem';
 
-const styles = (theme: any) => createStyles({});
+const styles = (theme: any) => createStyles({
+    root: {
+        padding: '0 20px'
+    }
+});
 
 interface IProps extends WithStyles<typeof styles> {
     loadSalaries?: (year: number, month: number) => Promise<void>;
@@ -115,9 +119,9 @@ class Salary extends Component<IProps> {
     }
 
     render() {
-        const { salaries, expandedSalary } = this.props;
+        const { salaries, expandedSalary, classes } = this.props;
         return (
-            <Grid container direction='column'>
+            <Grid className={classes.root} container direction='column'>
                 <Header
                     lastSalary={
                         (salaries && salaries.length && 'date' in salaries[0])
