@@ -17,7 +17,8 @@ const styles = (theme: any) => createStyles({
         width: 100
     },
     text: {
-        fontFamily: 'Source Sans Pro SemiBold'
+        fontFamily: 'Source Sans Pro SemiBold',
+        fontSize: 14
     },
     secondaryText: {
         width: '100%',

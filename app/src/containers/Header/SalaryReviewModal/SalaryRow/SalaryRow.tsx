@@ -50,6 +50,8 @@ interface IProps extends WithStyles<typeof styles> {
     salary: Map<number, ISalaryInfo>;
     userSales: IUserSales;
     editable?: boolean;
+    enableSubmitButton?: () => void;
+    disabledSubmit?: boolean;
 }
 
 @observer
@@ -154,7 +156,9 @@ class SalaryRow extends Component<IProps> {
             userLevel,
             levels,
             userColors,
-            editable
+            editable,
+            enableSubmitButton,
+            disabledSubmit
         } = this.props;
 
         return (
@@ -196,6 +200,8 @@ class SalaryRow extends Component<IProps> {
                                             level={i}
                                             medId={id}
                                             values={this.editableLevelValues[i - 1]}
+                                            disabledSubmit={disabledSubmit}
+                                            enableSubmitButton={enableSubmitButton}
                                         />
                                         : <Typography align='center'>
                                             {this.levelValues[i - 1]}
