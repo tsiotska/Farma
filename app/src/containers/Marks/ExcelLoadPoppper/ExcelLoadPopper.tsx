@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     createStyles,
     WithStyles,
-    Popper,
+    Popover,
     Grid,
     Paper,
 } from '@material-ui/core';
@@ -59,6 +59,7 @@ class ExcelLoadPopper extends Component<IProps> {
     @observable dateTo: Date = new Date();
     @observable mode: ViewMode = 'default';
     @observable activeMode: DataMode = 'payment';
+    @observable loadPack: boolean = false;
 
     constructor(props: IProps) {
         super(props);
@@ -66,11 +67,11 @@ class ExcelLoadPopper extends Component<IProps> {
         const prevMonth = this.dateTo.getMonth() - 1;
         this.dateFrom = new Date(
             prevMonth >= 0
-            ? this.dateTo.getFullYear()
-            : this.dateTo.getFullYear() - 1,
+                ? this.dateTo.getFullYear()
+                : this.dateTo.getFullYear() - 1,
             prevMonth >= 0
-            ? prevMonth
-            : 11
+                ? prevMonth
+                : 11
         );
     }
 
@@ -92,39 +93,48 @@ class ExcelLoadPopper extends Component<IProps> {
         this.activeMode = mode;
     }
 
+    loadPackHandler = () => {
+        this.loadPack = !this.loadPack;
+    }
+
     render() {
         const { classes, anchor, closeHandler } = this.props;
-
         return (
-            <Popper
-                placement='left'
+            <Popover
+                id='popoverExelData'
+                onClose={() => {
+                    closeHandler();
+                    this.setDefaultMode();
+                    }
+                }
                 open={!!anchor}
                 anchorEl={anchor}>
-                    <Grid
-                        className={classes.root}
-                        elevation={20}
-                        component={Paper}
-                        direction='column'
-                        container>
-                            {
-                                this.mode === 'datePick'
-                                ? <DatePickers
-                                    dateFrom={this.dateFrom}
-                                    dateTo={this.dateTo}
-                                    applyHandler={this.changeDates}
-                                    closeHandler={this.setDefaultMode}
-                                  />
-                                : <DefaultContent
-                                    onDateClick={this.setDateMode}
-                                    closeHandler={closeHandler}
-                                    from={this.dateFrom}
-                                    to={this.dateTo}
-                                    mode={this.activeMode}
-                                    modeChangeHandler={this.activeModeChangeHandler}
-                                />
-                            }
-                    </Grid>
-            </Popper>
+                <Grid
+                    className={classes.root}
+                    elevation={20}
+                    component={Paper}
+                    direction='column'
+                    container>
+                    {
+                        this.mode === 'datePick'
+                            ? <DatePickers
+                                dateFrom={this.dateFrom}
+                                dateTo={this.dateTo}
+                                applyHandler={this.changeDates}
+                                closeHandler={this.setDefaultMode}
+                            />
+                            : <DefaultContent
+                                onDateClick={this.setDateMode}
+                                from={this.dateFrom}
+                                to={this.dateTo}
+                                mode={this.activeMode}
+                                modeChangeHandler={this.activeModeChangeHandler}
+                                loadPack={this.loadPack}
+                                loadPackHandler={this.loadPackHandler}
+                            />
+                    }
+                </Grid>
+            </Popover>
         );
     }
 }

@@ -49,7 +49,7 @@ interface IProps extends WithStyles<typeof styles> {
     userSalary?: Map<number, ISalaryInfo>;
     openModal?: (modalName: string) => void;
     loadUserSalaryInfo?: (user: IUser, year: number, month: number) => void;
-    submitSalaryChanges?: () => boolean;
+    submitSalaryChanges?: (user: IUser) => boolean;
 }
 
 @inject(({
@@ -118,8 +118,8 @@ class SalaryReviewModal extends Component<IProps> {
     }
 
     submitHandler = async () => {
-        const { submitSalaryChanges } = this.props;
-        const updatedSuccessfully = await submitSalaryChanges();
+        const { submitSalaryChanges, user } = this.props;
+        const updatedSuccessfully = await submitSalaryChanges(user);
         this.snackbar = await updatedSuccessfully
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
