@@ -169,8 +169,8 @@ class Marks extends Component<IProps> {
     }
 
     componentWillUnmount() {
-        this.reactionDisposer();
-        this.monthReaction();
+        if (this.reactionDisposer) this.reactionDisposer();
+        if (this.monthReaction) this.monthReaction();
     }
 
     render() {

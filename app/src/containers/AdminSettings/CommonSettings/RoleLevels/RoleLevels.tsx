@@ -88,18 +88,20 @@ class RoleLevels extends Component<IProps> {
                 </Typography>
 
                 <Grid wrap='nowrap' spacing={1} container>
-                    {Object.entries(this.roleLevels.colors).map((level, i) => (
-                         <Grid key={i} direction='column' item>
-                            <Radio
-                                checked={initialLevel === level[0]}
-                                onChange={this.handleChange}
-                                value={level[0]}
-                                name='roleLevel'
-                                color='default'
-                            />
-                            <div className={cx(classes.levelLine, level[1])}/>
-                        </Grid>
-                        ))}
+                    {
+                        Object.entries(this.roleLevels.colors).map((level, i) => (
+                            <Grid key={i} direction='column' container item>
+                                <Radio
+                                    checked={initialLevel === level[0]}
+                                    onChange={this.handleChange}
+                                    value={level[0]}
+                                    name='roleLevel'
+                                    color='default'
+                                />
+                                <div className={cx(classes.levelLine, level[1])}/>
+                            </Grid>
+                        ))
+                    }
                 </Grid>
             </Grid>
         );

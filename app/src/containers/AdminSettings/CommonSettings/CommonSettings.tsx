@@ -44,15 +44,15 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 userStore: {
-                     salarySettings,
-                     submitCommonSettingsChanges,
-                     getAsyncStatus,
-                     loadUserSalarySettings
-                 }
-             }
-         }) => ({
+    appState: {
+        userStore: {
+            salarySettings,
+            submitCommonSettingsChanges,
+            getAsyncStatus,
+            loadUserSalarySettings
+        }
+    }
+}) => ({
     salarySettings,
     submitCommonSettingsChanges,
     getAsyncStatus,

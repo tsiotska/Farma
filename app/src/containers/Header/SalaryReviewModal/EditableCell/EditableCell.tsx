@@ -43,10 +43,13 @@ class EditableCell extends Component<IProps> {
             medId,
             changeMedSalary
         } = this.props;
+        console.log('value: ', value);
+
         const casted = +value;
         const isValid = value.length
             ? !Number.isNaN(casted)
             : true;
+        console.log('is valid: ', isValid);
         if (isValid) changeMedSalary(level, medId, 'amount', casted);
     }
 
@@ -56,9 +59,10 @@ class EditableCell extends Component<IProps> {
             medId,
             changeMedSalary
         } = this.props;
+        console.log('value: ', value);
         const casted = value.length
-        ? +value
-        : null;
+            ? +value
+            : null;
 
         const isValid = value.length
             ? Number.isNaN(casted) === false
