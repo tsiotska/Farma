@@ -55,6 +55,7 @@ class AddMedsModal extends Component<IProps> {
         this.snackbarType = medicineAdded
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (medicineAdded) this.closeHandler();
     }
 
     render() {

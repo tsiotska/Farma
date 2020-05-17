@@ -35,13 +35,18 @@ class DeleteButton extends Component<IProps> {
     };
 
     get isAllowed(): boolean {
-        const { type, userPermissions, user: { position }, unconfirmed } = this.props;
+        const {
+            type,
+            userPermissions,
+            user: { position },
+            unconfirmed
+        } = this.props;
 
-        const unconfirmedCheck = unconfirmed
-            ? [USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN].includes(position)
-            : true;
+        // const unconfirmedCheck = unconfirmed
+        //     ? [USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN].includes(position)
+        //     : true;
 
-        if (!unconfirmedCheck) return false;
+        // if (!unconfirmedCheck) return false;
 
         const targetPermission = this.mapPermissions[type];
         return userPermissions.includes(targetPermission);

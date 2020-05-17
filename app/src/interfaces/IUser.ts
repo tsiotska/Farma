@@ -8,7 +8,7 @@ export interface IUserCredentials {
 export interface IUserCommonInfo {
     id: number;
     name: string;
-    avatar: string;
+    image: string;
     region?: number;
     city?: number;
     bankCard?: string;

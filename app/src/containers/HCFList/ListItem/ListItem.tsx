@@ -18,6 +18,10 @@ import CommitBadge from '../../../components/CommitBadge';
 import LoadingMask from '../../../components/LoadingMask';
 import { observable, toJS } from 'mobx';
 import DeleteButton from '../DeleteButton';
+import { withRestriction } from '../../../components/hoc/withRestriction';
+import { PERMISSIONS } from '../../../constants/Permissions';
+import { IWithRestriction } from '../../../interfaces';
+import EditButton from '../EditButton';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -199,11 +203,15 @@ class ListItem extends Component<IProps> {
                                         : 'Підтвердити'
                                 }
                             </Button>
-                            : <IconButton onClick={this.onEditClick} className={classes.iconButton}>
-                                <Edit className={classes.icon}/>
-                            </IconButton>
+                            : <EditButton
+                                onClick={this.onEditClick}
+                                className={classes.iconButton}
+                                iconClassName={classes.icon}
+                                type={generalType}
+                                unconfirmed={unconfirmed}
+                            />
                     }
-                    { !unconfirmed &&
+
                     <DeleteButton
                       unconfirmed={unconfirmed}
                       type={generalType}
@@ -211,7 +219,6 @@ class ListItem extends Component<IProps> {
                       onClick={this.deleteClickHandler}>
                       <Delete className={classes.icon}/>
                     </DeleteButton>
-                    }
                 </Grid>
             </Grid>
         );

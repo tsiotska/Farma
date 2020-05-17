@@ -90,13 +90,9 @@ class LpuModal extends Component<IProps> {
     @computed
     get oblastListItems(): ILocation[] {
         const { oblasti } = this.props;
-        const res: any = [];
-
-        oblasti.forEach(x => {
-            res.push(x);
-        });
-
-        return res;
+        return oblasti
+            ? [...oblasti.values()]
+            : [];
     }
 
     @computed
@@ -184,7 +180,6 @@ class LpuModal extends Component<IProps> {
 
     initFromInitial = async () => {
         const { initialLpu } = this.props;
-
         if (!initialLpu) return;
 
         const {
@@ -207,14 +202,13 @@ class LpuModal extends Component<IProps> {
             phone2: phone2 || '',
         };
 
-        const targetOblast = this.oblastListItems.find(x => x.name === oblast);
-
+        const targetOblast = this.oblastListItems.find(x => x.name.toLowerCase() === oblast);
         if (!targetOblast) return;
 
         this.formValues.oblast = targetOblast;
         await this.loadSpecificCities(targetOblast.name);
 
-        this.formValues.city = this.cities.find(x => x.name === city) || null;
+        this.formValues.city = this.cities.find(x => x.name.toLowerCase() === city) || null;
     }
 
     componentDidUpdate(prevProps: IProps) {

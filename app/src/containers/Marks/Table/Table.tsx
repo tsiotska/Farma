@@ -346,6 +346,7 @@ class Table extends Component<IProps> {
         const {
             classes,
             isNested,
+            role,
             previewBonus,
             parentUser,
             bonusUsers
@@ -367,28 +368,27 @@ class Table extends Component<IProps> {
                 <MuiTable padding='none'>
                     <TableBody>
                         {
-                            this.preparedAgents.map((x, i) => (
-                                <TableRow
-                                    key={x.id}
-                                    agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
-                                    isNested={isNested}
-                                    agent={(x as IUserInfo & IUserLikeObject)}
-                                    showLpu={this.userIsMedicalAgent}
-                                    tooltips={this.tooltips}
-                                    expanded={bonusUsers.some(({ id }) => id === x.id)}
-                                    allowEdit={
-                                        previewBonus
-                                            ? !previewBonus.status
-                                            : false
-                                    }
-                                    expandHandler={this.expandHandler}
-                                    itemRef={
-                                        i === lastIndex
-                                            ? this.refHandler
-                                            : null
-                                    }
-                                />
-                            ))
+                            this.preparedAgents.map((x, i) => {
+                                const allowEdit = role === USER_ROLE.MEDICAL_AGENT
+                                    ? previewBonus
+                                        ? !previewBonus.status
+                                        : false
+                                    : true;
+                                return (
+                                    <TableRow
+                                        key={x.id}
+                                        agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
+                                        isNested={isNested}
+                                        agent={(x as IUserInfo & IUserLikeObject)}
+                                        showLpu={this.userIsMedicalAgent}
+                                        tooltips={this.tooltips}
+                                        expanded={bonusUsers.some(({ id }) => id === x.id)}
+                                        expandHandler={this.expandHandler}
+                                        allowEdit={allowEdit}
+                                        itemRef={i === lastIndex ? this.refHandler : null}
+                                    />
+                                );
+                            })
                         }
                         {
                             (this.showTotalRow && this.totalRowPosition === 'initial') &&

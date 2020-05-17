@@ -81,6 +81,7 @@ class AddWorkerModal extends Component<IProps> {
         this.snackbarType = workerCreated
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (workerCreated) this.closeHandler();
     }
 
     render() {

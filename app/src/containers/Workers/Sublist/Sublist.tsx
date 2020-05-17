@@ -106,9 +106,7 @@ class Sublist extends Component<IProps> {
                 editClickHandler={this.editClickHandler}
                 position={positions.get(x.position)}
                 userLocation={cities.get(x.city)}
-                classes={{
-                    avatar: classes.avatar
-                }}
+                classes={{ avatar: classes.avatar }}
             />
           ))
         : <Typography>

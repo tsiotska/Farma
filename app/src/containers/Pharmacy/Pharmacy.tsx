@@ -20,6 +20,9 @@ import EditPharmacy from './EditPharmacy';
 import DeletePopover from '../../components/DeletePopover';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import { PERMISSIONS } from '../../constants/Permissions';
+import { withRestriction } from '../../components/hoc/withRestriction';
+import { IWithRestriction } from '../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -57,7 +60,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     loadPharmacies?: (isNeeded: boolean) => void;
     loadUnconfirmedPharmacies?: () => void;
     pharmacies?: ILPU[];
@@ -105,6 +108,7 @@ interface IProps extends WithStyles<typeof styles> {
     acceptPharmacy,
     loadTypes
 }))
+@withRestriction([ PERMISSIONS.ADD_PHARMACY ])
 @observer
 class Pharmacy extends Component<IProps> {
     autorunDisposer: any;
@@ -222,7 +226,8 @@ class Pharmacy extends Component<IProps> {
             currentPage,
             itemsPerPage,
             setCurrentPage,
-            unconfirmedPharmacies
+            unconfirmedPharmacies,
+            isAllowed
         } = this.props;
 
         return (
@@ -253,9 +258,12 @@ class Pharmacy extends Component<IProps> {
                     <Typography variant='h5'>
                         Аптеки
                     </Typography>
-                    <Button className={classes.addButton} onClick={this.addPharmacyClickHandler}>
-                        Додати Аптеку
-                    </Button>
+                    {
+                        isAllowed &&
+                        <Button className={classes.addButton} onClick={this.addPharmacyClickHandler}>
+                            Додати Аптеку
+                        </Button>
+                    }
                 </Grid>
                 {
                     !!this.preparedPharmacies.length &&

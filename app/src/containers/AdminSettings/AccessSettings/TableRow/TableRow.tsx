@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     createStyles,
     WithStyles,
@@ -7,9 +7,10 @@ import {
     Typography,
     Checkbox
 } from '@material-ui/core';
-import {observer} from 'mobx-react';
+import { observer } from 'mobx-react';
 import cx from 'classnames';
-import {PERMISSIONS} from '../../../../constants/Permissions';
+import { PERMISSIONS } from '../../../../constants/Permissions';
+import { USER_ROLE } from '../../../../constants/Roles';
 
 const styles = createStyles({
     complexHeader: {
@@ -17,7 +18,8 @@ const styles = createStyles({
     },
     cell: {
         borderBottom: '1px solid #E4EDF7',
-        height: 40
+        height: 40,
+        whiteSpace: 'nowrap'
     },
     title_bold: {
         fontWeight: 600,
@@ -27,24 +29,33 @@ const styles = createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     title: string;
-    permissions: PERMISSIONS[];
-    onChange: (e: any, value: PERMISSIONS) => void;
+    permissions: Map<USER_ROLE, PERMISSIONS[]>;
+    onChange: (e: any, role: USER_ROLE, value: PERMISSIONS) => void;
+    targetRole: USER_ROLE;
+    // permissions: PERMISSIONS[];
+    // onChange: (e: any, value: PERMISSIONS) => void;
 }
 
 @observer
 class TableRow extends Component<IProps> {
-    changeHandler = (value: PERMISSIONS) => (e: any) => this.props.onChange(e, value);
+    get targetPermissions(): PERMISSIONS[] {
+        const { permissions, targetRole } = this.props;
+        return permissions.get(targetRole) || [];
+    }
+    changeHandler = (value: PERMISSIONS) => (e: any) => {
+        const { targetRole, onChange } = this.props;
+        onChange(e, targetRole, value);
+    }
 
     render() {
-        const {classes, title, permissions} = this.props;
+        const { classes, title, permissions } = this.props;
 
         return (
             <Grid direction='column' wrap='nowrap' container>
 
                 <Grid className={cx(classes.complexHeader)}>
                     <Grid className={cx(classes.cell)} justify='center' container item>
-                        <Typography className={classes.title_bold}
-                                    variant='body1'>
+                        <Typography className={classes.title_bold} variant='body1'>
                             {title}
                         </Typography>
                     </Grid>
@@ -52,7 +63,7 @@ class TableRow extends Component<IProps> {
                         <Typography variant='body1'>
                             <Checkbox
                                 onChange={this.changeHandler(PERMISSIONS.SEE_REPORT)}
-                                checked={permissions.includes(PERMISSIONS.SEE_REPORT)}
+                                checked={this.targetPermissions.includes(PERMISSIONS.SEE_REPORT)}
                                 size='small' color='default'/>
                         </Typography>
                     </Grid>
@@ -66,112 +77,132 @@ class TableRow extends Component<IProps> {
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
+                            onChange={this.changeHandler(PERMISSIONS.EDIT_BRANCH)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_BRANCH)}
+                            size='small' color='default'/>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_USER)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_USER)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_USER)}
                             size='small' color='default'/>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_SALARY)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_SALARY)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_SALARY)}
                             size='small' color='default'/>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_DRUG)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_DRUG)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_DRUG)}
                             size='small' color='default'/>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_HCF)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_HCF)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_HCF)}
                             size='small' color='default'/>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_PHARMACY)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_PHARMACY)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_PHARMACY)}
                             size='small' color='default'/>
                     </Grid>
                     <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.EDIT_AGENT)}
-                            checked={permissions.includes(PERMISSIONS.EDIT_AGENT)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.EDIT_AGENT)}
                             size='small' color='default'/>
                     </Grid>
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
                             {title}
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Checkbox
+                            onChange={this.changeHandler(PERMISSIONS.ADD_BRANCH)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_BRANCH)}
+                            size='small' color='default'/>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Checkbox
+                            onChange={this.changeHandler(PERMISSIONS.ADD_USER)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_USER)}
+                            size='small' color='default'/>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.ADD_DRUG)}
-                            checked={permissions.includes(PERMISSIONS.ADD_DRUG)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_DRUG)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.ADD_HCF)}
-                            checked={permissions.includes(PERMISSIONS.ADD_HCF)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_HCF)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.ADD_PHARMACY)}
-                            checked={permissions.includes(PERMISSIONS.ADD_PHARMACY)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_PHARMACY)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.ADD_AGENT)}
-                            checked={permissions.includes(PERMISSIONS.ADD_AGENT)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.ADD_AGENT)}
                             size='small' color='default'/>
                     </Grid>
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
                             {title}
                         </Typography>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Checkbox
+                            onChange={this.changeHandler(PERMISSIONS.DELETE_BRANCH)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.DELETE_BRANCH)}
+                            size='small' color='default'/>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
+                        <Checkbox
+                            onChange={this.changeHandler(PERMISSIONS.FIRED_USER)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.FIRED_USER)}
+                            size='small' color='default'/>
+                    </Grid>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.DELETE_DRUG)}
-                            checked={permissions.includes(PERMISSIONS.DELETE_DRUG)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.DELETE_DRUG)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.DELETE_HCF)}
-                            checked={permissions.includes(PERMISSIONS.DELETE_HCF)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.DELETE_HCF)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.DELETE_PHARMACY)}
-                            checked={permissions.includes(PERMISSIONS.DELETE_PHARMACY)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.DELETE_PHARMACY)}
                             size='small' color='default'/>
                     </Grid>
-                    <Grid className={cx(classes.cell)} justify='center'
-                          container item>
+                    <Grid className={cx(classes.cell)} justify='center' container item>
                         <Checkbox
                             onChange={this.changeHandler(PERMISSIONS.DELETE_AGENT)}
-                            checked={permissions.includes(PERMISSIONS.DELETE_AGENT)}
+                            checked={this.targetPermissions.includes(PERMISSIONS.DELETE_AGENT)}
                             size='small' color='default'/>
                     </Grid>
                 </Grid>

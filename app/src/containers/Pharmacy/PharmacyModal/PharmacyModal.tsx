@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Button, MenuItem } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { observable, computed, reaction, when } from 'mobx';
+import { observable, computed, reaction, when, toJS } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import { ILPU } from '../../../interfaces/ILPU';
 import Dialog from '../../../components/Dialog';
@@ -17,7 +17,8 @@ const styles = (theme: any) => createStyles({
         marginBottom: 10
     },
     menuItem: {
-        minHeight: 36
+        minHeight: 36,
+        textTransform: 'capitalize'
     }
 });
 
@@ -131,13 +132,9 @@ class PharmacyModal extends Component<IProps> {
     @computed
     get oblastListItems(): string[] {
         const { oblasti } = this.props;
-        const res: any = [];
-
-        oblasti.forEach(({ name }) => {
-            res.push(name);
-        });
-
-        return res;
+        return oblasti
+            ? [...oblasti.values()].map(({ name }) => name.toLowerCase())
+            : [];
     }
 
     submitHandler = () => {
@@ -216,17 +213,16 @@ class PharmacyModal extends Component<IProps> {
             phone2: phone2 || '',
         };
 
-        // if (oblast) await this.loadSpecificCities(oblast);
         if (city) {
             await when(() => !!this.cities.length);
-            const targetCity = this.cities.find(x => x.name === city);
+            const targetCity = this.cities.find(x => x.name.toLowerCase() === city);
             if (targetCity) this.formValues.city = this.formValues.city = targetCity;
         }
+
         if (lpuName) {
             await when(() => !!this.lpus.length);
-            const targetLpu = this.lpus.find(x => x.name === lpuName);
+            const targetLpu = this.lpus.find(x => x.name.toLowerCase() === lpuName);
             if (targetLpu) this.formValues.lpu = lpuName;
-
         }
     }
 
@@ -306,7 +302,10 @@ class PharmacyModal extends Component<IProps> {
                             error={this.errors.get('oblast')}>
                                 {
                                     this.oblastListItems.map(name => (
-                                        <MenuItem className={classes.menuItem} key={name} value={name}>
+                                        <MenuItem
+                                            className={classes.menuItem}
+                                            value={name}
+                                            key={name}>
                                             { name }
                                         </MenuItem>
                                     ))

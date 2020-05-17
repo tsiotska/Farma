@@ -66,8 +66,8 @@ class UserShortInfo extends Component<IProps> {
 
         if (!user) return {};
 
-        return user.avatar
-        ? { src: `${Config.ASSETS_URL}/${user.avatar}` }
+        return user.image
+        ? { src: `${Config.ASSETS_URL}/${user.image}` }
         : { children: this.userName[0] };
     }
 

@@ -18,6 +18,7 @@ import RestoreButton from '../RestoreButton';
 import cx from 'classnames';
 import { MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import RemoveButton from '../RemoveButton';
 
 const styles = (theme: any) => createStyles({
     wrapper: {
@@ -82,6 +83,11 @@ const styles = (theme: any) => createStyles({
         '&:hover': {
             backgroundColor: '#8d9eff'
         }
+    },
+    buttonsWrapper: {
+        display: 'flex',
+        alignItems: 'center',
+        width: 88
     }
 });
 
@@ -185,21 +191,20 @@ class ListItem extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                {
-                    deleted === false &&
-                    <>
-                        {
-                            allowEdit &&
-                            <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
-                                <Edit fontSize='small' />
-                            </IconButton>
-                        }
-                        <IconButton onClick={this.removeClickHandler}>
-                            <Delete fontSize='small' />
-                        </IconButton>
-                    </>
-                }
-
+                <div className={classes.buttonsWrapper}>
+                    {
+                        deleted === false &&
+                        <>
+                            {
+                                allowEdit &&
+                                <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
+                                    <Edit fontSize='small' />
+                                </IconButton>
+                            }
+                            <RemoveButton onClick={this.removeClickHandler} />
+                        </>
+                    }
+                </div>
             </Grid>
             {
                 deleted === true && allowEdit === true &&

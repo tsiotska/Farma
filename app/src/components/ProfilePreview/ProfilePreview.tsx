@@ -27,6 +27,8 @@ import { EDIT_WORKER_MODAL } from '../../constants/Modals';
 import { IPosition } from '../../interfaces/IPosition';
 import copy from 'clipboard-copy';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import EditButton from './EditButton';
+import DeleteButton from './DeleteButton';
 
 const styles = (theme: any) => createStyles({
     backface: {
@@ -70,13 +72,17 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px'
     },
     credsContainer: {
-        minWidth: 390
+        minWidth: 390,
+        [theme.breakpoints.down('sm')]: {
+            minWidth: 280,
+        }
     },
     profileTextContainer: {
         justifyContent: 'flex-start'
     },
     text: {
-        marginTop: 8
+        marginTop: 8,
+        wordBreak: 'break-word'
     },
     depositPlus: {
         fontFamily: 'Source Sans Pro SemiBold',
@@ -130,6 +136,10 @@ interface IProps extends WithStyles<typeof styles> {
 class ProfilePreview extends Component<IProps> {
     @observable applyOffset: boolean = false;
     @observable isHovered: boolean = false;
+    @observable extraButton: any = {
+        edit: true,
+        delete: true
+    };
 
     @computed
     get realizationPercent(): number {
@@ -194,6 +204,15 @@ class ProfilePreview extends Component<IProps> {
         return position;
     }
 
+    get hideExtraBlock(): boolean {
+        return this.extraButton.edit === false
+            && this.extraButton.delete === false;
+    }
+
+    extraButtonsOnMountCallback = (type: 'edit' | 'delete', isHidden: boolean) => {
+        this.extraButton[type] = !isHidden;
+    }
+
     clickHandler = () => {
         const { historyGoTo, scaleIndex, user: { id } } = this.props;
         if (scaleIndex === 0) return;
@@ -204,8 +223,12 @@ class ProfilePreview extends Component<IProps> {
         const { user, openModal, positions } = this.props;
         openModal(EDIT_WORKER_MODAL, {
             initialWorker: user,
-            positions: [positions.get(USER_ROLE.FIELD_FORCE_MANAGER)]
+            positions: [positions.get(user.position)]
         });
+    }
+
+    removeUserClickHandler = () => {
+        console.log('should remove user');
     }
 
     mouseOverHandler = () => {
@@ -226,7 +249,14 @@ class ProfilePreview extends Component<IProps> {
 
     render() {
         const { classes, user, previewUser } = this.props;
-        const { doctorsCount, pharmacyCount, depositMinus, depositPlus, lpuCount } = user;
+        const {
+            doctorsCount,
+            pharmacyCount,
+            depositMinus,
+            depositPlus,
+            lpuCount,
+            id
+        } = user;
 
         return (
             <div
@@ -317,7 +347,7 @@ class ProfilePreview extends Component<IProps> {
                         </Typography>
                     </Grid>
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -334,7 +364,7 @@ class ProfilePreview extends Component<IProps> {
                         </Typography>
                     </Grid>
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -353,7 +383,7 @@ class ProfilePreview extends Component<IProps> {
                     {
                         this.userRole === USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
-                            <Hidden smDown>
+                            <Hidden xsDown>
                                 <Divider flexItem orientation='vertical'/>
                             </Hidden>
                             <Grid
@@ -375,7 +405,7 @@ class ProfilePreview extends Component<IProps> {
                         </>
                     }
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -391,7 +421,7 @@ class ProfilePreview extends Component<IProps> {
                                     <Typography> {previewUser.mobilePhone} </Typography>
                                 </Grid>
                                 <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                    <IconButton onClick={() => this.copyInfo(previewUser.mobilePhone)}>
                                         <FileCopyOutlinedIcon/>
                                     </IconButton>
                                 </Grid>
@@ -410,7 +440,7 @@ class ProfilePreview extends Component<IProps> {
                                         <Typography> {previewUser.email} </Typography>
                                     </Grid>
                                     <Grid container alignItems='center' item>
-                                        <IconButton onClick={() => this.copyInfo('card')}>
+                                        <IconButton onClick={() => this.copyInfo(previewUser.email)}>
                                             <FileCopyOutlinedIcon/>
                                         </IconButton>
                                     </Grid>
@@ -428,7 +458,7 @@ class ProfilePreview extends Component<IProps> {
                                     <Typography> {previewUser.bankCard} </Typography>
                                 </Grid>
                                 <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo('card')}>
+                                    <IconButton onClick={() => this.copyInfo(previewUser.bankCard)}>
                                         <FileCopyOutlinedIcon/>
                                     </IconButton>
                                 </Grid>
@@ -440,22 +470,29 @@ class ProfilePreview extends Component<IProps> {
                         </InfoWindow>
                     </Grid>
 
-                    <Hidden smDown>
-                        <Divider flexItem orientation='vertical'/>
-                    </Hidden>
-                    <Grid className={cx(classes.gridContainer, classes.textContainer)}
-                          direction='column'
-                          justify='center'
-                          container
-                          item>
-                        <IconButton onClick={this.editClickHandler}>
-                            <EditOutlinedIcon/>
-                        </IconButton>
-                        <IconButton>
-                            <BlockOutlinedIcon/>
-                        </IconButton>
-                    </Grid>
-
+                    {
+                        this.hideExtraBlock === false &&
+                        <>
+                            <Hidden xsDown>
+                                <Divider flexItem orientation='vertical'/>
+                            </Hidden>
+                            <Grid className={cx(classes.gridContainer, classes.textContainer)}
+                                direction='column'
+                                justify='center'
+                                container
+                                item>
+                                    <EditButton
+                                        onClick={this.editClickHandler}
+                                        onMountCallback={this.extraButtonsOnMountCallback}
+                                    />
+                                    <DeleteButton
+                                        id={id}
+                                        onClick={this.removeUserClickHandler}
+                                        onMountCallback={this.extraButtonsOnMountCallback}
+                                    />
+                            </Grid>
+                        </>
+                    }
                 </Grid>
             </div>
         );

@@ -4,7 +4,7 @@ import { IWorker } from '../interfaces/IWorker';
 export const defaultWorker: IWorker = {
     id: null,
     name: null,
-    avatar: null,
+    image: null,
     position: null,
     fired: null,
     hired: null,
@@ -21,7 +21,7 @@ export const defaultWorker: IWorker = {
 export const workerValuesMap: IValuesMap = {
     id: 'id',
     full_name: 'name',
-    avatar: 'avatar',
+    image: 'image',
     position: 'position',
     fired: 'fired',
     hired: 'hired',

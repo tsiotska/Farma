@@ -59,6 +59,7 @@ class EditMedsModal extends Component<IProps> {
         this.snackbarType = medicineChanged
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (medicineChanged) this.closeHandler();
     }
 
     render() {
@@ -79,6 +80,7 @@ class EditMedsModal extends Component<IProps> {
                     onClose={this.snackbarCloseHandler}
                     type={this.snackbarType}
                     autoHideDuration={6000}
+                    position='absolute'
                     anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS

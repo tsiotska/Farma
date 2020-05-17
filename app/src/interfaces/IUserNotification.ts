@@ -8,7 +8,7 @@ export interface IUserNotification {
     workPhone: string;
     mobilePhone: string;
     card: string;
-    avatar: string;
+    image: string;
     created: Date;
     confirmed: boolean;
 }

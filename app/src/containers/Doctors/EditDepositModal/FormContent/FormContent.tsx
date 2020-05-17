@@ -1,6 +1,13 @@
 import {
-    createStyles, withStyles, WithStyles,
-    Grid, InputBase, InputLabel, Button, Typography, FormControl
+    createStyles,
+    withStyles,
+    WithStyles,
+    Grid,
+    InputBase,
+    InputLabel,
+    Button,
+    Typography,
+    FormControl
 } from '@material-ui/core';
 import LoadingMask from '../../../../components/LoadingMask';
 import { inject, observer } from 'mobx-react';
@@ -59,8 +66,6 @@ const styles = (theme: any) => createStyles({
             }
     },
     submitButton: {
-        // height: 40,
-        // margin: '8px 0 0 auto',
         width: '100%',
         padding: '4px 16px',
     },
@@ -97,9 +102,10 @@ class FormContent extends Component<IProps> {
         message: false
     };
 
-    @computed
     get isSubmitAllowed(): boolean {
-        return true;
+        const valuesExist = Object.values(this.formValues).every(x => !!x);
+        const valuesIsValid = Object.values(this.fieldsErrorStatuses).every(x => !x);
+        return valuesExist && valuesIsValid;
     }
 
     get userRole(): USER_ROLE {
@@ -111,10 +117,11 @@ class FormContent extends Component<IProps> {
 
     validate = (propName: keyof IDepositFormValue, value: string) => {
         if (propName === 'deposit') {
+            const casted = +value;
             const isValid = !!value
                 && numberValidator(value)
-                && +value
-                && +value >= 1;
+                && casted
+                && (casted >= 1 || casted <= -1);
             this.fieldsErrorStatuses[propName] = !isValid;
         } else {
             const trimmed = value.replace(/ /g, '');
@@ -134,6 +141,7 @@ class FormContent extends Component<IProps> {
 
     render() {
         const { classes, isLoading, deposits, doctor } = this.props;
+
         return (
             <>
                 {
@@ -173,8 +181,7 @@ class FormContent extends Component<IProps> {
                     }
                 </Grid>
                 {
-                    // this.allowedRoles.includes(this.userRole) &&
-                    true &&
+                    this.allowedRoles.includes(this.userRole) &&
                     <Grid alignItems='center' spacing={2} direction='row' className={classes.footer} container>
                         <Grid xs container item>
                             <FormRow

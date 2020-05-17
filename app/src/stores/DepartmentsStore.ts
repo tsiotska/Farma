@@ -1,3 +1,4 @@
+import { multiDepartmentRoles } from './../constants/Roles';
 import {action, computed, observable, reaction, transaction, when} from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
@@ -156,6 +157,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map();
         this.asyncStatusMap = new Map();
         this.requestParams = new Map();
+        this.pharmacyDemand = false;
         this.clearSalaries();
     }
 
@@ -780,20 +782,23 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editDepartment(image: File | string, name: string) {
         const depToEdit = this.currentDepartment;
         const { api } = this.rootStore;
+
         const formData = new FormData();
         formData.set('json', JSON.stringify({ name }));
         if (typeof image !== 'string') formData.set('image', image || '');
+
         const editedDep = await api.editDepartment(this.currentDepartmentId, formData);
+        const index = this.departments.indexOf(depToEdit);
 
-        if (editedDep) {
-            const idx = this.departments.indexOf(depToEdit);
-            if (idx !== -1) {
-                const { ffm } = depToEdit;
-                this.departments[idx] = { ffm, ...editedDep};
-            }
-        }
+        if (!editedDep || index === -1) return false;
 
-        return !!editedDep;
+        const isImageChanged = formData.has('image') && !!editedDep.image;
+        const isNameChanged = name !== depToEdit.name && editedDep.name;
+
+        if (isImageChanged) this.departments[index].image = editedDep.image;
+        if (isNameChanged) this.departments[index].name = editedDep.name;
+
+        return true;
     }
 
     @action.bound
@@ -821,11 +826,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             manufacturer: 'manufacturer',
             price: 'price',
             barcode: 'barcode',
+            department: 'branch'
         };
+
+        const targetDep = this.departments.find(x => x.name === data.department);
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
                 const newKey = namesMap[key];
+
+                if (newKey === namesMap.department) {
+                    const depId = targetDep ? targetDep.id : this.currentDepartmentId;
+                    return { ...total, [newKey]: depId };
+                }
 
                 const converted = intValues.includes(key)
                     ? +value
@@ -842,15 +855,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         payload.set('json', JSON.stringify(preparedData));
         payload.set('image', image || '');
 
-        const department = +data.department || this.currentDepartmentId;
-
         const newMedicine = await this.dispatchRequest(
-            api.addMedicine(department, data),
+            api.addMedicine(targetDep.id, data),
             'addMedicine'
         );
 
         if (newMedicine) {
-            const targetMeds = this.meds.get(department);
+            const targetMeds = this.meds.get(targetDep.id);
             if (targetMeds) targetMeds.push(newMedicine);
         }
 
@@ -868,8 +879,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             manufacturer: 'manufacturer',
             price: 'price',
             barcode: 'barcode',
+            department: 'branch'
         };
         const { api } = this.rootStore;
+
+        let isDepChanged: boolean = false;
 
         const preparedData: any = Object.entries(data).reduce(
             (total, [key, value]) => {
@@ -879,11 +893,19 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     ? +value
                     : value;
 
-                const isChanged = medicine[key] !== converted;
+                if (newKey === namesMap.department) {
+                    const targetDep = this.departments.find(x => x.name === value);
+                    if (targetDep) {
+                        isDepChanged = true;
+                        return { ...total, [newKey]: targetDep.id };
+                    }
+                } else {
+                    const isChanged = medicine[key] !== converted;
 
-                return (!!newKey && !!converted && isChanged)
-                    ? { ...total, [newKey]: converted }
-                    : total;
+                    return (!!newKey && !!converted && isChanged)
+                        ? { ...total, [newKey]: converted }
+                        : total;
+                }
             },
             {}
         );
@@ -913,6 +935,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                     medicine[restoredPropName] = value;
                 }
             });
+
+            if (isDepChanged) {
+                const { userStore: { user: { position } }} = this.rootStore;
+                if (multiDepartmentRoles.includes(position)) await this.loadAllMeds(false);
+                else this.loadMeds(this.currentDepartmentId);
+            }
         }
 
         return isUpdated;
@@ -936,12 +964,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async loadAllMeds() {
+    async loadAllMeds(shouldReset: boolean = true) {
         const requestName = 'loadAllMeds';
 
         this.setLoading(requestName);
         for (const department of this.departments) {
-            this.meds.set(department.id, []);
+            if (shouldReset) this.meds.set(department.id, []);
             await this.loadMeds(department.id);
         }
 
@@ -1042,7 +1070,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     getLocationsAgents = (depId: number, { id, position }: IUserLikeObject): Promise<IUser[]> => {
         const { api } = this.rootStore;
 
-        if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
+        // if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getAgents(depId, USER_ROLE.REGIONAL_MANAGER);
+        if (position === USER_ROLE.FIELD_FORCE_MANAGER) return api.getRmAgentsInfo(depId);
         if (position === USER_ROLE.REGIONAL_MANAGER) return api.getMPs(depId, id);
         return null;
     }
@@ -1301,7 +1330,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async createWorker(values: IWorkerModalValues, avatar: File, departmentId?: number): Promise<boolean> {
+    async createWorker(values: IWorkerModalValues, image: File, departmentId?: number): Promise<boolean> {
         const { api } = this.rootStore;
 
         const namesMap: IValuesMap = {
@@ -1317,7 +1346,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const formData = new FormData();
-        if (avatar) formData.set('image', avatar);
+        if (image) formData.set('image', image);
         const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
@@ -1359,7 +1388,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const formData = new FormData();
 
-        const initialAvatar = initialWorker.avatar;
+        const initialAvatar = initialWorker.image;
 
         if (initialAvatar !== newAvatar) {
             const isAvatarRemoved = typeof initialAvatar === 'string' && newAvatar === null;
@@ -1391,14 +1420,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             {}
         );
         formData.append('json', JSON.stringify(payload));
-        const { edited, avatar } = await this.dispatchRequest(
+        const { edited, image } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
             'editWorker'
         );
 
         if (edited) {
             if (newAvatar) {
-                initialWorker.avatar = avatar;
+                initialWorker.image = image;
             }
 
             const invertedNames = invert(namesMap);

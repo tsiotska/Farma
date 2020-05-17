@@ -5,7 +5,6 @@ import {
     Grid,
     Typography,
     Button,
-    Snackbar
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -20,6 +19,9 @@ import AddMedsModal from './AddMedsModal';
 import { computed } from 'mobx';
 import EditMedsModal from './EditMedsModal';
 import DeletePopover from '../../components/DeletePopover';
+import { withRestriction } from '../../components/hoc/withRestriction';
+import { IWithRestriction } from '../../interfaces';
+import { PERMISSIONS } from '../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -40,7 +42,7 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     currentDepartmentMeds?: IMedicine[];
     getAsyncStatus?: (key: string) => IAsyncStatus;
     openModal?: (modalName: string) => void;
@@ -61,6 +63,7 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus,
     openModal
 }))
+@withRestriction([ PERMISSIONS.ADD_DRUG ])
 @observer
 class Medicines extends Component<IProps> {
     @computed
@@ -83,7 +86,7 @@ class Medicines extends Component<IProps> {
     addMedsClickHandler = () => this.props.openModal(ADD_MEDICINE_MODAL);
 
     render() {
-        const { classes } = this.props;
+        const { classes, isAllowed } = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>
@@ -91,14 +94,16 @@ class Medicines extends Component<IProps> {
                     <Typography variant='h5' color='textPrimary'>
                         Препарати
                     </Typography>
-                    <Button
-                        onClick={this.addMedsClickHandler}
-                        className={classes.addButton}
-                        variant='contained'>
-                        Додати препарат
-                    </Button>
+                    {
+                        isAllowed &&
+                        <Button
+                            onClick={this.addMedsClickHandler}
+                            className={classes.addButton}
+                            variant='contained'>
+                                Додати препарат
+                        </Button>
+                    }
                 </Grid>
-
                 <ListHeader />
                 {
                     this.sortedMeds.length
@@ -120,12 +125,6 @@ class Medicines extends Component<IProps> {
                         horizontal: 'right',
                     }}
                 />
-                {/* <Snackbar
-                    open={this.sho}
-                    type={}
-                    message={}
-                    onClose={}
-                /> */}
             </Grid>
         );
     }

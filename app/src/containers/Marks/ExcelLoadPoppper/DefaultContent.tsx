@@ -1,17 +1,29 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, Typography, Grid, FormControlLabel, Checkbox, Button } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    Typography,
+    Grid,
+    FormControlLabel,
+    Checkbox,
+    Button,
+    RadioGroup,
+    Radio
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, computed } from 'mobx';
 import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import { DataMode } from './ExcelLoadPopper';
+import { Event } from '@material-ui/icons';
 
 const styles = (theme: any) => createStyles({
     row: {
         margin: '10px 0'
     },
     label: {
+        whiteSpace: 'nowrap',
         marginRight: 0,
         marginLeft: 0,
         '& .MuiCheckbox-root': {
@@ -31,28 +43,34 @@ const styles = (theme: any) => createStyles({
         }
     },
     dateButton: {
+        display: 'flex',
+        justifyContent: 'space-around',
         border: '1px solid #aaa',
-        borderRadius: 2,
-    }
+        borderRadius: 4,
+    },
+    icon: {
+        // marginRight: 8
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
     onDateClick: () => void;
-    closeHandler: () => void;
     from: Date;
     to: Date;
-    loadBonusesExcel?: (mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date) => void;
+    loadBonusesExcel?: (mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date, loadPack: boolean) => void;
     mode: DataMode;
     modeChangeHandler: (newMode: DataMode) => void;
+    loadPackHandler: () => void;
+    loadPack: boolean;
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            loadBonusesExcel
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     loadBonusesExcel
+                 }
+             }
+         }) => ({
     loadBonusesExcel
 }))
 @observer
@@ -80,8 +98,12 @@ class DefaultContent extends Component<IProps> {
         this.props.modeChangeHandler('payment');
     }
 
+    loadPack = () => {
+        this.props.loadPackHandler();
+    }
+
     submitHandler = () => {
-        const { loadBonusesExcel, from, to, mode } = this.props;
+        const { loadBonusesExcel, from, to, mode, loadPack } = this.props;
 
         const dateFrom = new Date(
             from.getFullYear(),
@@ -95,14 +117,14 @@ class DefaultContent extends Component<IProps> {
             1
         );
 
-        loadBonusesExcel(mode, dateFrom, dateTo);
+        loadBonusesExcel(mode, dateFrom, dateTo, loadPack);
     }
 
     render() {
         const {
             classes,
-            closeHandler,
             onDateClick,
+            loadPack,
             mode
         } = this.props;
 
@@ -117,40 +139,55 @@ class DefaultContent extends Component<IProps> {
                     alignContent='center'
                     justify='space-between'
                     container>
-                    <FormControlLabel
-                        control={
-                            <Checkbox checked={mode === 'payment'}
-                                onChange={this.paymentsChangeHandler}
-                                size='small'
-                                color='default'
-                            />
-                        }
-                        className={classes.label}
-                        label={<Typography variant='subtitle1'>Бали</Typography>}
-                    />
-                    <FormControlLabel
-                        className={classes.label}
-                        control={
-                            <Checkbox
-                                checked={mode === 'deposit'}
-                                onChange={this.depositChangeHandler}
-                                size='small'
-                                color='default'
-                            />
-                        }
-                        label={<Typography variant='subtitle1'>Депозити</Typography>}
-                    />
+
+                    <RadioGroup row name='payments' defaultValue='payments'>
+                        <FormControlLabel
+                            value='payments'
+                            label='Бали'
+                            className={classes.label}
+                            control={
+                                <Radio
+                                    onChange={this.paymentsChangeHandler}
+                                    size='small'
+                                    color='default'/>
+                            }
+                        />
+                        <FormControlLabel
+                            value='deposit'
+                            label='Депозити'
+                            className={classes.label}
+                            control={
+                                <Radio
+                                    onChange={this.depositChangeHandler}
+                                    size='small'
+                                    color='default'/>
+                            }
+                        />
+                    </RadioGroup>
                 </Grid>
+
                 <Button onClick={onDateClick} className={cx(classes.row, classes.dateButton)}>
-                    { this.dateString }
+                    <Event className={classes.icon} fontSize='small'/>
+                    <span>{this.dateString}</span>
                 </Button>
+
+                <FormControlLabel
+                    value='payments'
+                    label='Вигрузити звіт в упаковках'
+                    className={classes.label}
+                    control={
+                        <Checkbox
+                            checked={loadPack}
+                            onChange={this.loadPack}
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                            color='default'
+                        />
+                    }
+                />
                 <Grid
                     className={classes.row}
                     wrap='nowrap'
                     justify='space-between' container>
-                    <Button className={classes.closeButton} onClick={closeHandler}>
-                        Закрити
-                    </Button>
                     <Button onClick={this.submitHandler} className={classes.loadButton}>
                         Завантажити
                     </Button>
