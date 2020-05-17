@@ -4,9 +4,8 @@ import { ListItem, ListItemIcon, ListItemText, Checkbox } from '@material-ui/cor
 import { ILPU } from '../../../interfaces/ILPU';
 
 interface IProps {
-    onClick: (lpu: ILPU) => void;
-    lpu: ILPU;
-    title: keyof ILPU;
+    onClick: (item: any) => void;
+    item: { id: number, value: string };
     checked: boolean;
     className: string;
 }
@@ -14,15 +13,15 @@ interface IProps {
 @observer
 class SuggestItem extends Component<IProps> {
     clickHandler = () => {
-        console.log('click');
+        const { onClick, item } = this.props;
+        onClick(item);
     }
 
     render() {
         const {
             className,
             checked,
-            lpu,
-            title
+            item: { value }
         } = this.props;
 
         return (
@@ -39,7 +38,7 @@ class SuggestItem extends Component<IProps> {
                             disableRipple
                         />
                     </ListItemIcon>
-                    <ListItemText primary={lpu[title]} />
+                    <ListItemText primary={value} />
             </ListItem>
         );
     }

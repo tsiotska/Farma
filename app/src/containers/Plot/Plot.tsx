@@ -241,6 +241,14 @@ class Plot extends Component<IProps> {
                                     title: this.titleRenderer,
                                 }
                             },
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        min: 0,
+                                    }
+                                  }]
+                               }
                         }}
                       />
                 }
