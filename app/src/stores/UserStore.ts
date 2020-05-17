@@ -147,7 +147,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
         let url = urls[this.role]
             ? `${urls[this.role][mode]}?from=${dateFromString}&to=${dateToString}`
             : null;
-        url += loadPack ? '?pack=1' : null;
+        url += loadPack ? '?pack=1' : '';
         if (userId === null || !url) return;
         console.log(url);
         api.getExcel(url);
