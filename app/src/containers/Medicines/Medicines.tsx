@@ -32,6 +32,7 @@ const styles = (theme: any) => createStyles({
         borderColor: theme.palette.primary.green.main,
         backgroundColor: 'white',
         border: '1px solid',
+        textTransform: 'none',
         minWidth: 150,
         '&:hover': {
             backgroundColor: '#f3f3f3',
@@ -49,21 +50,21 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartmentMeds,
-            getAsyncStatus
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartmentMeds,
+                     getAsyncStatus
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     currentDepartmentMeds,
     getAsyncStatus,
     openModal
 }))
-@withRestriction([ PERMISSIONS.ADD_DRUG ])
+@withRestriction([PERMISSIONS.ADD_DRUG])
 @observer
 class Medicines extends Component<IProps> {
     @computed
@@ -98,22 +99,21 @@ class Medicines extends Component<IProps> {
                         isAllowed &&
                         <Button
                             onClick={this.addMedsClickHandler}
-                            className={classes.addButton}
-                            variant='contained'>
-                                Додати препарат
+                            className={classes.addButton}>
+                            Додати препарат
                         </Button>
                     }
                 </Grid>
-                <ListHeader />
+                <ListHeader/>
                 {
                     this.sortedMeds.length
-                    ? <List meds={this.sortedMeds} />
-                    : this.isMedsLoading
-                        ? <LoadingMask color='primary' />
+                        ? <List meds={this.sortedMeds}/>
+                        : this.isMedsLoading
+                        ? <LoadingMask color='primary'/>
                         : null
                 }
-                <EditMedsModal />
-                <AddMedsModal />
+                <EditMedsModal/>
+                <AddMedsModal/>
                 <DeletePopover
                     name='medicineDelete'
                     anchorOrigin={{

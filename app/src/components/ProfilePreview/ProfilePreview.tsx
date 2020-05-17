@@ -80,6 +80,7 @@ const styles = (theme: any) => createStyles({
         justifyContent: 'flex-start'
     },
     text: {
+        textAlign: 'center',
         marginTop: 8,
         wordBreak: 'break-word'
     },

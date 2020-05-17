@@ -15,6 +15,12 @@ const styles = (theme: any) => createStyles({
     lastItem: {
         marginRight: 88
     },
+    text: {
+        fontSize: 14,
+        color: '#aaa',
+        fontFamily: 'Source Sans Pro SemiBold',
+        textAlign: 'center'
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -33,43 +39,43 @@ class ListHeader extends Component<IProps> {
                 </Typography>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} noWrap>
                         Назва
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Форма выпуску
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Дозування, мг
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Виробник
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Штрихкод
                     </Typography>
                 </Grid>
 
                 <Grid xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Балл
                     </Typography>
                 </Grid>
 
                 <Grid className={classes.lastItem} xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
+                    <Typography className={classes.text} variant='subtitle1' noWrap>
                         Ціна, грн
                     </Typography>
                 </Grid>
