@@ -10,14 +10,27 @@ import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 
 interface IProps extends IWithRestriction {
     onClick: (e: any) => void;
+    onMountCallback: (type: string, isHidden: boolean) => void;
 }
 
 @withRestriction([ PERMISSIONS.EDIT_USER ])
 @observer
 class EditButton extends Component<IProps> {
+    get isHidden(): boolean {
+        const { isAllowed } = this.props;
+        return !isAllowed;
+    }
+
+    componentDidMount() {
+        const { onMountCallback } = this.props;
+        onMountCallback('edit', this.isHidden);
+    }
+
     render() {
-        const { isAllowed, onClick } = this.props;
-        if (!isAllowed) return null;
+        const { onClick } = this.props;
+
+        if (this.isHidden) return null;
+
         return (
             <IconButton onClick={onClick}>
                 <EditOutlinedIcon />

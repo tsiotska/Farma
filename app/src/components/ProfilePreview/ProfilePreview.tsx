@@ -72,13 +72,17 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px'
     },
     credsContainer: {
-        minWidth: 390
+        minWidth: 390,
+        [theme.breakpoints.down('sm')]: {
+            minWidth: 280,
+        }
     },
     profileTextContainer: {
         justifyContent: 'flex-start'
     },
     text: {
-        marginTop: 8
+        marginTop: 8,
+        wordBreak: 'break-word'
     },
     depositPlus: {
         fontFamily: 'Source Sans Pro SemiBold',
@@ -132,6 +136,10 @@ interface IProps extends WithStyles<typeof styles> {
 class ProfilePreview extends Component<IProps> {
     @observable applyOffset: boolean = false;
     @observable isHovered: boolean = false;
+    @observable extraButton: any = {
+        edit: true,
+        delete: true
+    };
 
     @computed
     get realizationPercent(): number {
@@ -194,6 +202,15 @@ class ProfilePreview extends Component<IProps> {
     get userRole(): USER_ROLE {
         const { user: { position } } = this.props;
         return position;
+    }
+
+    get hideExtraBlock(): boolean {
+        return this.extraButton.edit === false
+            && this.extraButton.delete === false;
+    }
+
+    extraButtonsOnMountCallback = (type: 'edit' | 'delete', isHidden: boolean) => {
+        this.extraButton[type] = !isHidden;
     }
 
     clickHandler = () => {
@@ -330,7 +347,7 @@ class ProfilePreview extends Component<IProps> {
                         </Typography>
                     </Grid>
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -347,7 +364,7 @@ class ProfilePreview extends Component<IProps> {
                         </Typography>
                     </Grid>
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -366,7 +383,7 @@ class ProfilePreview extends Component<IProps> {
                     {
                         this.userRole === USER_ROLE.FIELD_FORCE_MANAGER &&
                         <>
-                            <Hidden smDown>
+                            <Hidden xsDown>
                                 <Divider flexItem orientation='vertical'/>
                             </Hidden>
                             <Grid
@@ -388,7 +405,7 @@ class ProfilePreview extends Component<IProps> {
                         </>
                     }
 
-                    <Hidden smDown>
+                    <Hidden xsDown>
                         <Divider flexItem orientation='vertical'/>
                     </Hidden>
 
@@ -453,22 +470,29 @@ class ProfilePreview extends Component<IProps> {
                         </InfoWindow>
                     </Grid>
 
-                    <Hidden smDown>
-                        <Divider flexItem orientation='vertical'/>
-                    </Hidden>
-                    <Grid className={cx(classes.gridContainer, classes.textContainer)}
-                          direction='column'
-                          justify='center'
-                          container
-                          item>
-                            <EditButton
-                                onClick={this.editClickHandler}
-                            />
-                            <DeleteButton
-                                onClick={this.removeUserClickHandler}
-                                id={id}
-                            />
-                    </Grid>
+                    {
+                        this.hideExtraBlock === false &&
+                        <>
+                            <Hidden xsDown>
+                                <Divider flexItem orientation='vertical'/>
+                            </Hidden>
+                            <Grid className={cx(classes.gridContainer, classes.textContainer)}
+                                direction='column'
+                                justify='center'
+                                container
+                                item>
+                                    <EditButton
+                                        onClick={this.editClickHandler}
+                                        onMountCallback={this.extraButtonsOnMountCallback}
+                                    />
+                                    <DeleteButton
+                                        id={id}
+                                        onClick={this.removeUserClickHandler}
+                                        onMountCallback={this.extraButtonsOnMountCallback}
+                                    />
+                            </Grid>
+                        </>
+                    }
                 </Grid>
             </div>
         );

@@ -9,6 +9,7 @@ import { styles } from '../../FormRow';
 import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 
 interface IProps extends IWithRestriction {
+    onMountCallback: (type: string, isHidden: boolean) => void;
     onClick: (e: any) => void;
     id: number;
     user?: IUser;
@@ -26,11 +27,21 @@ interface IProps extends IWithRestriction {
 @withRestriction([ PERMISSIONS.EDIT_USER ])
 @observer
 class DeleteButton extends Component<IProps> {
-    render() {
-        const { isAllowed, onClick, id, user } = this.props;
+    get isHidden(): boolean {
+        const { isAllowed, id, user } = this.props;
         const isTheSameUser = id === user.id;
+        return !isAllowed || isTheSameUser;
+    }
 
-        if (!isAllowed || isTheSameUser) return null;
+    componentDidMount() {
+        const { onMountCallback } = this.props;
+        onMountCallback('delete', this.isHidden);
+    }
+
+    render() {
+        const {onClick } = this.props;
+
+        if (this.isHidden) return null;
 
         return (
             <IconButton onClick={onClick}>
