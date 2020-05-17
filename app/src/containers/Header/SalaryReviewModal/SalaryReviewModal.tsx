@@ -19,7 +19,7 @@ import { USER_ROLE } from '../../../constants/Roles';
 import SalaryHeader from './SalaryHeader';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
-import DateSelectPopper from '../../Salary/DateSelectPopper';
+import ModalDateSelectPopper from './ModalDateSelectPopper';
 import LoadingMask from '../../../components/LoadingMask';
 
 const styles = createStyles({
@@ -90,7 +90,7 @@ class SalaryReviewModal extends Component<IProps> {
         this.month = value;
     }
 
-    makeRequest = async () => {
+    applyHandler = async () => {
         const { user, loadUserSalaryInfo } = this.props;
         this.isSalesLoading = true;
         await loadUserSalaryInfo(user, this.year, this.month + 1);
@@ -156,10 +156,10 @@ class SalaryReviewModal extends Component<IProps> {
                     <Typography className={classes.headerText} variant='h5'>
                         Заробітня плата
                     </Typography>
-                    <DateSelectPopper
+                    <ModalDateSelectPopper
                         year={this.year}
                         month={this.month}
-                        makeRequest={this.makeRequest}
+                        applyHandler={this.applyHandler}
                         changeMonth={this.monthChangeHandler}
                         changeYear={this.yearChangeHandler}
                     />
