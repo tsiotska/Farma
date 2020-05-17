@@ -88,6 +88,7 @@ class EditDepositModal extends Component<IProps> {
         this.snackbarType = isInserted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (isInserted) this.closeHandler();
     }
 
     async componentDidUpdate(prevProps: IProps) {
