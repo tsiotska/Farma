@@ -32,7 +32,9 @@ const styles = (theme: any) => createStyles({
         margin: '0 0 24px'
     },
     pagination: {
-        margin: '16px 0 60px auto'
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: 16
     },
     retryButton: {
         margin: '10px auto'

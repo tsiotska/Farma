@@ -73,21 +73,6 @@ const styles = (theme: any) => createStyles({
             ? 'white'
             : theme.palette.primary.gray.light
     },
-    text: {
-        textTransform: 'capitalize',
-        color: ({ unconfirmed }: any) => unconfirmed
-            ? 'white'
-            : theme.palette.primary.gray.main,
-        paddingRight: 5,
-        '&.highlight': {
-            textDecoration: 'underline',
-            fontWeight: 'bolder'
-        },
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
-    },
     confirmButton: {
         color: 'white',
         borderColor: 'white',
@@ -106,6 +91,21 @@ const styles = (theme: any) => createStyles({
         '&:hover': {
             cursor: 'pointer'
         }
+    },
+    text: {
+        textTransform: 'capitalize',
+        color: ({ unconfirmed }: any) => unconfirmed
+            ? 'white'
+            : theme.palette.primary.gray.main,
+        paddingRight: 5,
+        '&.highlight': {
+            textDecoration: 'underline',
+            fontWeight: 'bolder'
+        },
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
     cell: {
         minWidth: 120
@@ -264,7 +264,7 @@ class DoctorListItem extends Component<IProps> {
                                 <Typography
                                     variant='body2'
                                     onClick={this.depositModalHandler}
-                                    className={cx(classes.deposit, classes.text)}>
+                                    className={cx(classes.deposit)}>
                                     { deposit || 0 }
                                 </Typography>
                                 {
