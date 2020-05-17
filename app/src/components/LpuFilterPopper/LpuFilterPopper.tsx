@@ -35,7 +35,11 @@ const styles = (theme: any) => createStyles({
             border: '1px solid #aaa'
         }
     },
-    list: {},
+    list: {
+        overflow: 'auto',
+        maxHeight: 300,
+        maxWidth: 250
+    },
     listItem: {}
 });
 
