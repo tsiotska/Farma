@@ -14,6 +14,7 @@ const styles = (theme: any) => createStyles({
     },
     cell: {
         paddingRight: 20,
+        paddingLeft: 0,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         height: 48,
@@ -30,7 +31,7 @@ const styles = (theme: any) => createStyles({
             }
         },
         '&:last-of-type': {
-            width: ({ scrollBarWidth = 0}: any) => 100 - scrollBarWidth
+            width: ({ scrollBarWidth = 0 }: any) => 100 - scrollBarWidth
         },
         '&.displayNone': {
             display: 'none'
@@ -47,6 +48,7 @@ interface IProps extends WithStyles<typeof styles> {
     scrollBarWidth?: number;
     ignoredMeds: number[];
     isIgnored?: boolean;
+    isFixed?: boolean;
 }
 
 @observer
@@ -62,9 +64,9 @@ class TableRow extends Component<IProps> {
         ));
 
         // return meds.map(({ id }) => (
-            // id in data
-            //     ? data[id]
-            //     : null
+        // id in data
+        //     ? data[id]
+        //     : null
         // ));
     }
 
@@ -75,27 +77,27 @@ class TableRow extends Component<IProps> {
             rowStartAddornment,
             mantisLength,
             ignoredMeds,
-            isIgnored
+            isIgnored,
         } = this.props;
 
         return (
             <MuiTableRow className={cx(classes.row, { ignored: isIgnored })}>
                 <TableCell colSpan={2} className={classes.cell}>
-                    { rowStartAddornment }
+                    {rowStartAddornment}
                 </TableCell>
                 {
                     this.data.map((x, i) => (
                         <TableCell key={i} className={cx(classes.cell, { displayNone: ignoredMeds.includes(i) })}>
                             {
                                 x
-                                ? x.toFixed(mantisLength)
-                                : '-'
+                                    ? x.toFixed(mantisLength)
+                                    : '-'
                             }
                         </TableCell>
                     ))
                 }
                 <TableCell className={classes.cell}>
-                    { rowEndAddornment && rowEndAddornment(this.data) }
+                    {rowEndAddornment && rowEndAddornment(this.data)}
                 </TableCell>
             </MuiTableRow>
         );

@@ -66,15 +66,18 @@ const styles = (theme: any) => createStyles({
     errorText: {
         margin: '10px 0'
     },
-    body: {
+    background: {
         background: 'white'
     },
     marginBottom: {
-        marginBottom: 40
+        marginBottom: 10
     },
     iconButton: {
         padding: 4,
         borderRadius: 2
+    },
+    totalRow: {
+        tableLayout: 'fixed',
     },
     totalText: {
         width: '100%'
@@ -103,16 +106,16 @@ interface ISettings {
 }
 
 @inject(({
-    appState: {
-        salesStore: {
-            displayMode,
-            ignoredMeds
-        },
-        departmentsStore: {
-            currentDepartmentMeds
-        }
-    }
-}) => ({
+             appState: {
+                 salesStore: {
+                     displayMode,
+                     ignoredMeds
+                 },
+                 departmentsStore: {
+                     currentDepartmentMeds
+                 }
+             }
+         }) => ({
     displayMode,
     currentDepartmentMeds,
     ignoredMeds
@@ -182,72 +185,78 @@ class DrugsTable extends Component<IProps> {
 
         return (
             <>
-            {/* hack to make table head sticky */}
-            <Header
-                excelClickHandler={excelClickHandler}
-                headerPrepend={headerPrepend}
-                medsArray={this.medsArray}
-                ignoredMeds={this.ignoredIds}
-                shouldCalculateHeight={shouldCalculateOffset}
-                classes={{
-                    container: classes.container,
-                    table: classes.table,
-                    thCell: classes.thCell,
-                    iconButton: classes.iconButton,
-                    totalText: classes.totalText
-                }}
-            />
-            <TableContainer ref={this.ref} className={cx(classes.container, classes.marginBottom)}>
-                <Table padding='none' className={classes.table}>
-                    <TableBody className={classes.body}>
-                        {
-                            Array.isArray(salesStat) && salesStat.length
-                            ? <>
-                                <Body
-                                    meds={this.medsArray}
-                                    ignoredMeds={this.ignoredIds}
-                                    labelData={labelData}
-                                    salesStat={salesStat || []}
-                                    targetProp={this.modeSettings.propName}
-                                    mantisLength={this.modeSettings.mantisLength}
-                                    scrollBarWidth={this.scrollBarWidth}
-                                    rowPrepend={rowPrepend}
-                                    ignoredItems={ignoredItems}
-                                />
-                                <SummaryRow
-                                    stat={salesStat}
-                                    ignoredItems={ignoredItems}
-                                    ignoredMeds={this.ignoredIds}
-                                    targetProp={this.modeSettings.propName}
-                                    mantisLength={this.modeSettings.mantisLength}
-                                    meds={this.medsArray}
-                                />
-                              </>
-                            : <InfoTableRow colSpan={this.medsArray.length + 3}>
-                                {
-                                    isLoading
-                                        ? <LinearProgress />
-                                        : salesStat === null
-                                            ? <>
-                                                <Typography className={classes.errorText} align='center'>
-                                                    Не вдалося отримати дані
+                {/* hack to make table head sticky */}
+                <Header
+                    excelClickHandler={excelClickHandler}
+                    headerPrepend={headerPrepend}
+                    medsArray={this.medsArray}
+                    ignoredMeds={this.ignoredIds}
+                    shouldCalculateHeight={shouldCalculateOffset}
+                    classes={{
+                        container: classes.container,
+                        table: classes.table,
+                        thCell: classes.thCell,
+                        iconButton: classes.iconButton,
+                        totalText: classes.totalText
+                    }}
+                />
+                <TableContainer ref={this.ref} className={cx(classes.container, classes.marginBottom)}>
+                    <Table padding='none' className={classes.table}>
+                        <TableBody className={classes.background}>
+                            {
+                                Array.isArray(salesStat) && salesStat.length
+                                    ? <>
+                                        <Body
+                                            meds={this.medsArray}
+                                            ignoredMeds={this.ignoredIds}
+                                            labelData={labelData}
+                                            salesStat={salesStat || []}
+                                            targetProp={this.modeSettings.propName}
+                                            mantisLength={this.modeSettings.mantisLength}
+                                            scrollBarWidth={this.scrollBarWidth}
+                                            rowPrepend={rowPrepend}
+                                            ignoredItems={ignoredItems}
+                                        />
+                                    </>
+                                    : <InfoTableRow colSpan={this.medsArray.length + 3}>
+                                        {
+                                            isLoading
+                                                ? <LinearProgress/>
+                                                : salesStat === null
+                                                ? <>
+                                                    <Typography className={classes.errorText} align='center'>
+                                                        Не вдалося отримати дані
+                                                    </Typography>
+                                                    <Button
+                                                        className={classes.retryButton}
+                                                        onClick={onRetry}
+                                                        variant='outlined'>
+                                                        Повторити запит
+                                                    </Button>
+                                                </>
+                                                : <Typography className={classes.errorText}>
+                                                    Дані відсутні
                                                 </Typography>
-                                                <Button
-                                                    className={classes.retryButton}
-                                                    onClick={onRetry}
-                                                    variant='outlined'>
-                                                    Повторити запит
-                                                </Button>
-                                            </>
-                                            : <Typography className={classes.errorText}>
-                                                Дані відсутні
-                                            </Typography>
-                                }
-                              </InfoTableRow>
-                        }
+                                        }
+                                    </InfoTableRow>
+                            }
+                        </TableBody>
+                    </Table>
+
+                </TableContainer>
+                <Table className={cx(classes.totalRow)}>
+                    <TableBody className={classes.background}>
+                        {Array.isArray(salesStat) && salesStat.length
+                        && <SummaryRow
+                            stat={salesStat}
+                            ignoredItems={ignoredItems}
+                            ignoredMeds={this.ignoredIds}
+                            targetProp={this.modeSettings.propName}
+                            mantisLength={this.modeSettings.mantisLength}
+                            meds={this.medsArray}
+                        />}
                     </TableBody>
                 </Table>
-            </TableContainer>
             </>
         );
     }

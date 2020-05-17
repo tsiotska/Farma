@@ -384,7 +384,7 @@ class WorkerModal extends Component<IProps> {
                             <Grid justify='space-between'  container>
                                 <FormRow
                                     required
-                                    label='Назва'
+                                    label='ПІБ'
                                     propName='name'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
