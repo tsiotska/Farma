@@ -405,7 +405,7 @@ class WorkerModal extends Component<IProps> {
                                     error={this.errors.get('card')}
                                 />
                                 <FormRow
-                                    label='Домашній телефон'
+                                    label='Мобільний телефон'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
                                     propName='mobilePhone'
@@ -509,7 +509,6 @@ class WorkerModal extends Component<IProps> {
                                     onChange={this.changeHandler}
                                     propName='password'
                                     error={this.errors.get('password')}
-                                    password
                                 />
                             </Grid>
                         </Grid>

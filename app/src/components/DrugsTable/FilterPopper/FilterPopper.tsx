@@ -8,6 +8,7 @@ import { ILPU } from '../../../interfaces/ILPU';
 import { computed, observable, toJS } from 'mobx';
 import SuggestListItem from '../SuggestListItem';
 import debounce from 'lodash/debounce';
+import DateSelect from '../../../containers/Header/SalaryReviewModal/ModalDateSelectPopper/ModalDateSelectPopper';
 
 const styles = (theme: any) => createStyles({
     input: {
@@ -62,15 +63,27 @@ const styles = (theme: any) => createStyles({
     withTopMargin: {
         marginTop: 12
     },
-    submitButton: {
-        marginLeft: 'auto',
-        marginTop: 10
+    discardButton: {
+        color: '#36A0F4',
+        width: '100%'
+    },
+    applyButton: {
+        backgroundColor: '#647CFE',
+        color: 'white',
+        width: '100%',
+        '&:hover': {
+            backgroundColor: '#7a8fff',
+        }
+    },
+    buttonGroup: {
+        padding: 10,
+        marginBottom: 10
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;
-    onClose: () => void;
+    closeHandler: () => void;
     salesPharmacyFilter?: ISalesPharmacyFilter;
     pharmaciesMap?: Map<number, ILPU>;
     setPharmacyFilters?: (value: ISalesPharmacyFilter) => void;
@@ -137,7 +150,7 @@ class FilterPopper extends Component<IProps> {
     applyFilters = () => {
         const map = this.pharmaList.map(({ id }) => id);
         this.props.setPharmacyFilters({ ...this.filters, map });
-        this.props.onClose();
+        this.props.closeHandler();
     }
 
     searchChangeHandler = ({ target: { value }}: any) => {
@@ -190,7 +203,7 @@ class FilterPopper extends Component<IProps> {
     }
 
     render() {
-        const { onClose, anchor, classes } = this.props;
+        const { closeHandler, anchor, classes } = this.props;
         return (
             <Popover
                 anchorOrigin={{
@@ -201,7 +214,6 @@ class FilterPopper extends Component<IProps> {
                     vertical: 'top',
                     horizontal: 'center',
                 }}
-                onClose={onClose}
                 anchorEl={anchor}
                 open={!!anchor}>
                     <Grid className={classes.container} container direction='column'>
@@ -265,13 +277,15 @@ class FilterPopper extends Component<IProps> {
                                 </Typography>
                             }
                         </List>
-                        <Button
-                            color='primary'
-                            variant='contained'
-                            className={classes.submitButton}
-                            onClick={this.applyFilters}>
-                            Застосувати
-                        </Button>
+
+                        <Grid className={classes.buttonGroup} container wrap='nowrap' alignItems='center'>
+                            <Button onClick={closeHandler} className={classes.discardButton}>
+                                Відмінити
+                            </Button>
+                            <Button onClick={this.applyFilters} className={classes.applyButton}>
+                                Застосувати
+                            </Button>
+                        </Grid>
                     </Grid>
             </Popover>
         );
