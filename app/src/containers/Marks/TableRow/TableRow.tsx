@@ -276,6 +276,12 @@ class TableRow extends Component<IProps> {
         return !!expandHandler && typeof expanded === 'boolean';
     }
 
+    get showCloseIcon(): boolean {
+        const { agentInfo, agent: { position } } = this.props;
+
+        return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER;
+    }
+
     expandHandler = () => {
         const { expandHandler, expanded, agent } = this.props;
         if (this.isExpandable) expandHandler(agent, !expanded);
@@ -394,7 +400,7 @@ class TableRow extends Component<IProps> {
                                     />
                                 </InfoWindow>
                             }
-                            { !agentInfo && typeof position !== 'string' && <Close fontSize='small' className={classes.closeIcon} /> }
+                            { this.showCloseIcon && <Close fontSize='small' className={classes.closeIcon} /> }
                         </Grid>
                 </TableCell>
                 { medsContent }
