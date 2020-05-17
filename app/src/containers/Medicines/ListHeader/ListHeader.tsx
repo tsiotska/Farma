@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import { IUser } from '../../../interfaces';
+import { USER_ROLE } from '../../../constants/Roles';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -18,10 +21,26 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    user?: IUser;
 }
 
+@inject(({
+    appState: {
+        userStore: {
+            user
+        }
+    }
+}) => ({
+    user
+}))
 @observer
 class ListHeader extends Component<IProps> {
+    get showPrice(): boolean {
+        const { user } = this.props;
+        const allowedRoles: USER_ROLE[] = [ USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN ];
+        return !!user && allowedRoles.includes(user.position);
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -62,17 +81,20 @@ class ListHeader extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                <Grid xs item zeroMinWidth>
+                <Grid className={cx({ [classes.lastItem]: !this.showPrice })} xs item zeroMinWidth>
                     <Typography variant='subtitle1' noWrap>
                         Балл
                     </Typography>
                 </Grid>
 
-                <Grid className={classes.lastItem} xs item zeroMinWidth>
-                    <Typography variant='subtitle1' noWrap>
-                        Ціна, грн
-                    </Typography>
-                </Grid>
+                {
+                    this.showPrice &&
+                    <Grid className={classes.lastItem} xs item zeroMinWidth>
+                        <Typography variant='subtitle1' noWrap>
+                            Ціна, грн
+                        </Typography>
+                    </Grid>
+                }
             </Grid>
         );
     }
