@@ -9,12 +9,13 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
+import { observable, computed, toJS } from 'mobx';
+
 import Dialog from '../../../components/Dialog';
 import AvatarDropzone from '../../../components/AvatarDropzone';
 import FormRow from '../../../components/FormRow';
 import { IPosition } from '../../../interfaces/IPosition';
 import { USER_ROLE } from '../../../constants/Roles';
-import { observable, computed, toJS } from 'mobx';
 import { phoneValidator, Validator, emailValidator, stringValidator, lengthValidator } from '../../../helpers/validators';
 import { IUser } from '../../../interfaces';
 import LoadingMask from '../../../components/LoadingMask';
@@ -294,15 +295,16 @@ class WorkerModal extends Component<IProps> {
 
     componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker } = this.props;
+        const { open, initialWorker, positions } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
 
         if (becomeClosed) {
             this.formValues = {...this.defaultValues};
             this.image = null;
-        } else if (becomeOpened && !!initialWorker) {
-            this.initValuesFromInitialWorker();
+        } else if (becomeOpened) {
+            this.formValues.position = positions[0].id;
+            if (!!initialWorker) this.initValuesFromInitialWorker();
         }
 
         if (this.requireRegion === false && !!this.formValues.region) {
@@ -424,7 +426,7 @@ class WorkerModal extends Component<IProps> {
                                     onChange={this.changeHandler}
                                     error={this.errors.get('position')}
                                     propName='position'>
-                                        <MenuItem value={USER_ROLE.UNKNOWN} className={classes.menuItem} />
+                                        {/* <MenuItem value={USER_ROLE.UNKNOWN} className={classes.menuItem} /> */}
                                         {
                                             positions.map(({ id, alias }) => (
                                                 <MenuItem

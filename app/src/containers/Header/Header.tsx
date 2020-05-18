@@ -162,16 +162,16 @@ export class Header extends Component<IProps, {}> {
                             </Typography>
                         </Grid>
                         {this.isDepartmentRoute &&
-                        <Grid xs={1}>
-                            <EditBranchButton
-                                onClick={this.editClickHandler}
-                                className={cx(classes.iconButton, classes.settingsButton)}
-                            />
-                            <RemoveBranchButton
-                                onClick={this.deleteClickHandler}
-                                className={cx(classes.iconButton)}
-                            />
-                        </Grid>
+                            <Grid xs={1} item>
+                                <EditBranchButton
+                                    onClick={this.editClickHandler}
+                                    className={cx(classes.iconButton, classes.settingsButton)}
+                                />
+                                <RemoveBranchButton
+                                    onClick={this.deleteClickHandler}
+                                    className={cx(classes.iconButton)}
+                                />
+                            </Grid>
                         }
                         <Grid xs item>
                             <Search/>
