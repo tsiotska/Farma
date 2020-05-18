@@ -55,7 +55,6 @@ interface IProps extends WithStyles<typeof styles> {
     summedPacks: IMarkFraction;
 
     meds?: IMedicine[];
-
 }
 
 @inject(({
