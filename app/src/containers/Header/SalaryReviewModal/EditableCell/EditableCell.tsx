@@ -21,15 +21,17 @@ interface IProps extends WithStyles<typeof styles> {
     level: number;
     medId: number;
     changeMedSalary?: (level: number, medId: number, propName: keyof IMedSalary, value: number) => void;
+    enableSubmitButton: () => void;
+    disabledSubmit?: boolean;
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            changeMedSalary
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     changeMedSalary
+                 }
+             }
+         }) => ({
     changeMedSalary
 }))
 @observer
@@ -37,11 +39,13 @@ class EditableCell extends Component<IProps> {
     readonly invalidNumberRegex = new RegExp(/^(0[1-9]+$)/); // match strings like 01234
     @observable bonusStringValue: string;
 
-    amountChangeHandler = ({ target: { value }}: any) => {
+    amountChangeHandler = ({ target: { value } }: any) => {
         const {
             level,
             medId,
-            changeMedSalary
+            changeMedSalary,
+            enableSubmitButton,
+            disabledSubmit
         } = this.props;
         console.log('value: ', value);
 
@@ -49,15 +53,21 @@ class EditableCell extends Component<IProps> {
         const isValid = value.length
             ? !Number.isNaN(casted)
             : true;
-        console.log('is valid: ', isValid);
-        if (isValid) changeMedSalary(level, medId, 'amount', casted);
+        if (isValid) {
+            changeMedSalary(level, medId, 'amount', casted);
+            if (disabledSubmit) {
+                enableSubmitButton();
+            }
+        }
     }
 
-    bonusChangeHandler = ({ target: { value }}: any) => {
+    bonusChangeHandler = ({ target: { value } }: any) => {
         const {
             level,
             medId,
-            changeMedSalary
+            changeMedSalary,
+            enableSubmitButton,
+            disabledSubmit
         } = this.props;
         console.log('value: ', value);
         const casted = value.length
@@ -71,6 +81,9 @@ class EditableCell extends Component<IProps> {
         if (isValid) {
             this.bonusStringValue = this.invalidNumberRegex.test(value) ? value[1] : value;
             changeMedSalary(level, medId, 'bonus', casted);
+            if (disabledSubmit) {
+                enableSubmitButton();
+            }
         }
     }
 

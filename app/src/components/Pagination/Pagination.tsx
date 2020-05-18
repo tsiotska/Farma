@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Pagination as MuiPagination } from '@material-ui/lab';
+import { createStyles } from '@material-ui/core';
 
 interface IProps {
     className: string;

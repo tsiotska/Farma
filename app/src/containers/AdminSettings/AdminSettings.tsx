@@ -22,9 +22,9 @@ const styles = (theme: any) => createStyles({
     },
     tab: {
         fontSize: theme.typography.pxToRem(20),
-        textTransform: 'capitalize',
         minHeight: 0,
-        padding: '0 10px'
+        padding: '0 10px',
+        textTransform: 'none'
     },
 });
 

@@ -35,6 +35,16 @@ const styles = (theme: any) => createStyles({
     green: {
         backgroundColor: theme.palette.primary.level.green
     },
+    text_semibold: {
+        color: '#868698',
+        fontFamily: 'Source Sans Pro SemiBold',
+        fontSize: 14,
+        fontWeight: 600
+    },
+    label: {
+        fontSize: 14,
+        textAlign: 'center'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -69,8 +79,8 @@ class RoleLevels extends Component<IProps> {
     }
 
     handleChange = (event: any) => {
-        const {role, levelChangeHandler} = this.props;
-        const levelType =  this.levels[role].levelType;
+        const { role, levelChangeHandler } = this.props;
+        const levelType = this.levels[role].levelType;
         levelChangeHandler(levelType, event);
     }
 
@@ -83,25 +93,26 @@ class RoleLevels extends Component<IProps> {
         const { classes, initialLevel } = this.props;
         return (
             <Grid className={classes.root} direction='column' container>
-                <Typography color='textSecondary' variant='h6'>
+                <Typography color='textSecondary' className={classes.text_semibold}>
                     {this.roleLevels.name}
                 </Typography>
 
                 <Grid wrap='nowrap' spacing={1} container>
-                    {
-                        Object.entries(this.roleLevels.colors).map((level, i) => (
-                            <Grid key={i} direction='column' container item>
-                                <Radio
-                                    checked={initialLevel === level[0]}
-                                    onChange={this.handleChange}
-                                    value={level[0]}
-                                    name='roleLevel'
-                                    color='default'
-                                />
-                                <div className={cx(classes.levelLine, level[1])}/>
-                            </Grid>
-                        ))
-                    }
+                    {Object.entries(this.roleLevels.colors).map((level, i) => (
+                        <Grid key={i} direction='column' item>
+                            <Radio
+                                checked={initialLevel === level[0]}
+                                onChange={this.handleChange}
+                                value={level[0]}
+                                name='roleLevel'
+                                color='default'
+                            />
+                            <Typography className={cx(initialLevel === level[0] && classes.text_semibold, classes.label)}>
+                                {level[0]}
+                            </Typography>
+                            <div className={cx(classes.levelLine, level[1])}/>
+                        </Grid>
+                    ))}
                 </Grid>
             </Grid>
         );

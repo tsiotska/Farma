@@ -28,7 +28,7 @@ const styles = (theme: any) => createStyles({
     root: {
         marginBottom: 1,
         minHeight: 48,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'flex-start',
         padding: '5px 0',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
@@ -83,7 +83,8 @@ const styles = (theme: any) => createStyles({
     phoneText: {
         overflow: 'hidden',
         textOverflow: 'ellipsis'
-    }
+    },
+    cell: {}
 });
 
 interface IProps extends WithStyles<typeof styles> {

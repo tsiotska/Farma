@@ -30,7 +30,9 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     pagination: {
-        margin: '16px 0 60px auto'
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: 16
     },
 });
 

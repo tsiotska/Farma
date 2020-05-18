@@ -211,6 +211,7 @@ class Marks extends Component<IProps> {
                                     }>
                                     <ExcelIcon />
                                 </IconButton>
+
                                 <ExcelLoadPopper
                                     anchor={this.excelPopperAnchor}
                                     closeHandler={this.closeExcelPopper}

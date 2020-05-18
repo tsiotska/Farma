@@ -124,7 +124,7 @@ class HeaderCell extends Component<IProps> {
                         }
                         <FilterPopper
                             anchor={this.anchor}
-                            onClose={this.closeHandler}
+                            closeHandler={this.closeHandler}
                         />
                     </Typography>
                 }

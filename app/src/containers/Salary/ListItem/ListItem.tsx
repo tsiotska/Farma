@@ -95,7 +95,13 @@ const styles = (theme: any) => createStyles({
     },
     emptyPlaceholder: {
         marginTop: 10
-    }
+    },
+    textBold: {
+        fontSize: 16,
+        color: '#868698',
+        fontFamily: 'Source Sans Pro SemiBold',
+        textAlign: 'left',
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -237,7 +243,7 @@ class ListItem extends Component<IProps> {
                 {
                     position === 'РМ' &&
                     <ExpansionPanelDetails className={classes.details}>
-                        <Typography>
+                        <Typography className={classes.textBold}>
                             Медичні представники
                         </Typography>
                         {

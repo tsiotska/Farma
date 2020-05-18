@@ -272,7 +272,7 @@ class DoctorModal extends Component<IProps> {
                     required
                 />
                 <FormRow
-                    label='Телефон 1'
+                    label='Мобільний телефон'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('mobilePhone')}
@@ -301,7 +301,7 @@ class DoctorModal extends Component<IProps> {
                         }
                 </FormRow>
                 <FormRow
-                    label='Телефон 2'
+                    label='Робочий телефон'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('workPhone')}

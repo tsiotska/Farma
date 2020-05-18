@@ -384,7 +384,7 @@ class WorkerModal extends Component<IProps> {
                             <Grid justify='space-between'  container>
                                 <FormRow
                                     required
-                                    label='Назва'
+                                    label='ПІБ'
                                     propName='name'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
@@ -405,7 +405,7 @@ class WorkerModal extends Component<IProps> {
                                     error={this.errors.get('card')}
                                 />
                                 <FormRow
-                                    label='Домашній телефон'
+                                    label='Мобільний телефон'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
                                     propName='mobilePhone'
@@ -496,7 +496,7 @@ class WorkerModal extends Component<IProps> {
                                 </Typography>
                                 <FormRow
                                     required
-                                    label='email'
+                                    label='Email'
                                     values={this.formValues}
                                     onChange={this.changeHandler}
                                     propName='email'
@@ -509,7 +509,6 @@ class WorkerModal extends Component<IProps> {
                                     onChange={this.changeHandler}
                                     propName='password'
                                     error={this.errors.get('password')}
-                                    password
                                 />
                             </Grid>
                         </Grid>

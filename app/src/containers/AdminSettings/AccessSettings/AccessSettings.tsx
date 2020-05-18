@@ -143,7 +143,7 @@ class AccessSettings extends Component<IProps> {
                                 targetRole={USER_ROLE.ADMIN}
                             />
                             <TableRow
-                                title='Продукт Менеджер'
+                                title='Продукт менеджер'
                                 onChange={this.changeHandler}
                                 permissions={this.permissions}
                                 targetRole={USER_ROLE.PRODUCT_MANAGER}

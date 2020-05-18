@@ -49,12 +49,14 @@ const styles = (theme: any) => createStyles({
     addWorkerButton: {
         marginLeft: 'auto',
         color: theme.palette.primary.green.main,
-        border: '1px solid',
         borderColor: theme.palette.primary.green.main,
         backgroundColor: 'white',
-        textTransform: 'capitalize',
-        fontSize: theme.typography.pxToRem(15),
-        padding: '5px 12px'
+        border: '1px solid',
+        textTransform: 'none',
+        minWidth: 150,
+        '&:hover': {
+            backgroundColor: '#f3f3f3',
+        }
     }
 });
 
@@ -255,7 +257,7 @@ class Workers extends Component<IProps> {
                         <Button
                             onClick={this.addWorkerClickHandler}
                             className={classes.addWorkerButton}>
-                            Додати Працівника
+                            Додати працівника
                         </Button>
                     }
                 </Grid>

@@ -37,7 +37,10 @@ const styles = (theme: any) => createStyles({
         color: '#555555'
     },
     lastDateContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        '& > p': {
+            fontSize: 14,
+        }
     }
 });
 
@@ -108,11 +111,11 @@ class Header extends Component<IProps> {
                         disabled={this.isSalaryCalculating}
                         onClick={this.calculateClickHandler}
                         className={classes.countSalaryButton}>
-                            {
-                                this.isSalaryCalculating
-                                ? <LoadingMask size={20} />
+                        {
+                            this.isSalaryCalculating
+                                ? <LoadingMask size={20}/>
                                 : 'Розрахувати зарплату'
-                            }
+                        }
                     </Button>
                 </Grid>
                 {
