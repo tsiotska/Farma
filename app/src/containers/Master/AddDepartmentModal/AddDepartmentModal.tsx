@@ -231,10 +231,10 @@ class AddDepartmentModal extends Component<IProps> {
         return !this.invalidDepartmentFields.size && !this.invalidFFMFields.size;
     }
 
-    get allowSubmit(): boolean {
-        return Object.entries(this.departmentData).every((value) =>
-            !value[1]) && Object.entries(this.ffmData).every((value) =>
-            !value[1]);
+    get disableSubmit(): boolean {
+        const departmentDataIsNull = Object.entries(this.departmentData).every((value) => !value[1]);
+        const ffmDataIsNull = Object.entries(this.ffmData).every((value) => !value[1]);
+        return departmentDataIsNull && ffmDataIsNull;
     }
 
     submitHandler = async () => {
@@ -299,7 +299,7 @@ class AddDepartmentModal extends Component<IProps> {
                     invalidFields={this.invalidFFMFields}
                 />
                 <Button
-                    disabled={this.allowSubmit}
+                    disabled={this.disableSubmit}
                     onClick={this.submitHandler}
                     variant='contained'
                     className={classes.submitButton}>
