@@ -39,7 +39,7 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonus: IBonusInfo;
 
     totalSold?: { [key: number]: number };
-    changedMarks?: Map<number,  Map<number, IMark>>;
+    changedMarks?: Map<number, Map<number, IMark>>;
     currentDepartmentId?: number;
     role?: USER_ROLE;
     bonusUsers?: IUserLikeObject[];
@@ -55,6 +55,8 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
     clearPreviewBonusTotal?: () => void;
+
+    removeBonusAgent?: (id: number, parentId: number) => boolean;
 }
 
 export interface IUserInfo {
@@ -64,31 +66,32 @@ export interface IUserInfo {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            loadConfirmedDoctors,
-            getLocationsAgents,
-            currentDepartmentId
-        },
-        userStore: {
-            role,
-            totalSold,
-            loadBonuses,
-            loadBonusesData,
-            clearChangedMarks,
-            changedMarks,
-            updateBonus,
-            addBonusUser,
-            removeBonusUser,
-            bonusUsers,
-            setPreviewBonusTotal,
-            clearPreviewBonusTotal
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     loadConfirmedDoctors,
+                     getLocationsAgents,
+                     currentDepartmentId
+                 },
+                 userStore: {
+                     role,
+                     totalSold,
+                     loadBonuses,
+                     loadBonusesData,
+                     clearChangedMarks,
+                     changedMarks,
+                     updateBonus,
+                     addBonusUser,
+                     removeBonusUser,
+                     bonusUsers,
+                     setPreviewBonusTotal,
+                     clearPreviewBonusTotal,
+                     removeBonusAgent
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     loadConfirmedDoctors,
     getLocationsAgents,
     currentDepartmentId,
@@ -104,7 +107,8 @@ export interface IUserInfo {
     bonusUsers,
     openModal,
     setPreviewBonusTotal,
-    clearPreviewBonusTotal
+    clearPreviewBonusTotal,
+    removeBonusAgent
 }))
 @observer
 class Table extends Component<IProps> {
@@ -128,7 +132,7 @@ class Table extends Component<IProps> {
     }
 
     @computed
-    get sales(): Map<number, IDrugSale>  {
+    get sales(): Map<number, IDrugSale> {
         const { previewBonus } = this.props;
         return previewBonus
             ? previewBonus.sales
@@ -143,7 +147,7 @@ class Table extends Component<IProps> {
 
     @computed
     get userIsMedicalAgent(): boolean {
-        const { parentUser: { position }} = this.props;
+        const { parentUser: { position } } = this.props;
         return position === USER_ROLE.MEDICAL_AGENT;
     }
 
@@ -155,7 +159,7 @@ class Table extends Component<IProps> {
     }
 
     @computed
-    get tooltips(): {[key: number]: number} {
+    get tooltips(): { [key: number]: number } {
         const { totalSold } = this.props;
         return [...this.sales.values()].reduce(
             (total, curr) => {
@@ -297,7 +301,7 @@ class Table extends Component<IProps> {
             );
             if (isNested === false) {
                 this.totalReactionDisposer = reaction(
-                    () => ([ this.summedPacks, this.summedTotal ]),
+                    () => ([this.summedPacks, this.summedTotal]),
                     ([summedPacks, summedTotal]) => this.props.setPreviewBonusTotal(
                         summedPacks,
                         summedTotal
@@ -342,6 +346,18 @@ class Table extends Component<IProps> {
         window.clearTimeout(this.initializationTimeout);
     }
 
+    removeBonusAgent = async (agentId: number) => {
+        const {
+            removeBonusAgent, parentUser, loadBonuses, loadBonusesData
+        } = this.props;
+        const removed = await removeBonusAgent(agentId, parentUser.id);
+        console.log(removed);
+        if (removed) {
+            await loadBonuses(parentUser);
+            await loadBonusesData(parentUser);
+        }
+    }
+
     render() {
         const {
             classes,
@@ -356,81 +372,82 @@ class Table extends Component<IProps> {
 
         return (
             <>
-            <TableSubheader
-                summedTotal={this.summedTotal}
-                isNested={isNested}
-                agents={this.preparedAgents}
-                parentUser={parentUser}
-                agentsLoaded={this.agentsLoaded}
-                previewBonus={previewBonus}
-            />
-            <TableContainer>
-                <MuiTable padding='none'>
-                    <TableBody>
-                        {
-                            this.preparedAgents.map((x, i) => {
-                                const allowEdit = role === USER_ROLE.MEDICAL_AGENT
-                                    ? previewBonus
-                                        ? !previewBonus.status
-                                        : false
-                                    : true;
-                                return (
-                                    <TableRow
-                                        key={x.id}
-                                        agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
-                                        isNested={isNested}
-                                        agent={(x as IUserInfo & IUserLikeObject)}
-                                        showLpu={this.userIsMedicalAgent}
-                                        tooltips={this.tooltips}
-                                        expanded={bonusUsers.some(({ id }) => id === x.id)}
-                                        expandHandler={this.expandHandler}
-                                        allowEdit={allowEdit}
-                                        itemRef={i === lastIndex ? this.refHandler : null}
-                                    />
-                                );
-                            })
-                        }
-                        {
-                            (this.showTotalRow && this.totalRowPosition === 'initial') &&
-                            <TotalRow
-                                agents={this.agentsInfo}
-                                position={this.totalRowPosition}
-                                showLpu={this.userIsMedicalAgent}
-                                flattenMedsInfo={this.flattenMedsInfo}
-                                summedTotal={this.summedTotal}
-                                summedPacks={this.summedPacks}
-                            />
-                        }
-                    </TableBody>
-                </MuiTable>
-            </TableContainer>
-            {
-                (this.showTotalRow && this.totalRowPosition === 'fixed') &&
-                <TableContainer
-                    component={Paper}
-                    className={classes.fixedTable}
-                    style={this.fixedTableStyles}>
+                <TableSubheader
+                    summedTotal={this.summedTotal}
+                    isNested={isNested}
+                    agents={this.preparedAgents}
+                    parentUser={parentUser}
+                    agentsLoaded={this.agentsLoaded}
+                    previewBonus={previewBonus}
+                />
+                <TableContainer>
                     <MuiTable padding='none'>
                         <TableBody>
-                            <TotalRow
-                                position={this.totalRowPosition}
-                                agents={this.agentsInfo}
-                                showLpu={this.userIsMedicalAgent}
-                                flattenMedsInfo={this.flattenMedsInfo}
-                                summedTotal={this.summedTotal}
-                                summedPacks={this.summedPacks}
-                            />
+                            {
+                                this.preparedAgents.map((x, i) => {
+                                    const allowEdit = role === USER_ROLE.MEDICAL_AGENT
+                                        ? previewBonus
+                                            ? !previewBonus.status
+                                            : false
+                                        : true;
+                                    return (
+                                        <TableRow
+                                            key={x.id}
+                                            agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
+                                            isNested={isNested}
+                                            agent={(x as IUserInfo & IUserLikeObject)}
+                                            showLpu={this.userIsMedicalAgent}
+                                            tooltips={this.tooltips}
+                                            expanded={bonusUsers.some(({ id }) => id === x.id)}
+                                            expandHandler={this.expandHandler}
+                                            allowEdit={allowEdit}
+                                            itemRef={i === lastIndex ? this.refHandler : null}
+                                            removeBonusAgent={this.removeBonusAgent}
+                                        />
+                                    );
+                                })
+                            }
+                            {
+                                (this.showTotalRow && this.totalRowPosition === 'initial') &&
+                                <TotalRow
+                                    agents={this.agentsInfo}
+                                    position={this.totalRowPosition}
+                                    showLpu={this.userIsMedicalAgent}
+                                    flattenMedsInfo={this.flattenMedsInfo}
+                                    summedTotal={this.summedTotal}
+                                    summedPacks={this.summedPacks}
+                                />
+                            }
                         </TableBody>
                     </MuiTable>
                 </TableContainer>
-            }
-            {
-                position === USER_ROLE.MEDICAL_AGENT &&
-                <AddDocsModal
-                    previewBonus={previewBonus}
-                    docs={this.agents as IDoctor[]}
-                />
-            }
+                {
+                    (this.showTotalRow && this.totalRowPosition === 'fixed') &&
+                    <TableContainer
+                        component={Paper}
+                        className={classes.fixedTable}
+                        style={this.fixedTableStyles}>
+                        <MuiTable padding='none'>
+                            <TableBody>
+                                <TotalRow
+                                    position={this.totalRowPosition}
+                                    agents={this.agentsInfo}
+                                    showLpu={this.userIsMedicalAgent}
+                                    flattenMedsInfo={this.flattenMedsInfo}
+                                    summedTotal={this.summedTotal}
+                                    summedPacks={this.summedPacks}
+                                />
+                            </TableBody>
+                        </MuiTable>
+                    </TableContainer>
+                }
+                {
+                    position === USER_ROLE.MEDICAL_AGENT &&
+                    <AddDocsModal
+                        previewBonus={previewBonus}
+                        docs={this.agents as IDoctor[]}
+                    />
+                }
             </>
         );
     }

@@ -371,8 +371,8 @@ export class APIRequester {
             rmLevel: 'rm_level'
         };
 
-        const preparedData: any = Object.entries(data).reduce((acc, [ propName, value ]) => (
-            value === null ? acc : { ...acc, [namesMap[propName]]: value}
+        const preparedData: any = Object.entries(data).reduce((acc, [propName, value]) => (
+            value === null ? acc : { ...acc, [namesMap[propName]]: value }
         ), {});
 
         if (isEqual(preparedData, {})) return Promise.resolve(false);
@@ -654,5 +654,18 @@ export class APIRequester {
         return this.instance.get(`/api/branch/${departmentId}/rm/${userId}/worker`)
             .then(workersNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+   removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<any> {
+        console.log('url is');
+        console.log(`/api/branch/${departmentId}/mp/${mpId}/mark/agent/${agentId}?year=${year}&month=${month}`);
+
+        /*return this.instance.delete(`/api/branch/${departmentId}/mp/${mpId}/mark/agent/${agentId}?year=${year}&month=${month}`)
+            .then((res) => {
+                console.log(res);
+                return true;
+            })
+            .catch(this.defaultErrorHandler());*/
+        return Promise.resolve(true);
     }
 }

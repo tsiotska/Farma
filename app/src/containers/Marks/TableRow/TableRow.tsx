@@ -8,8 +8,10 @@ import {
     Divider,
     Collapse,
     Typography,
-    Paper
+    Paper,
+    IconButton
 } from '@material-ui/core';
+import RemoveIcon from '@material-ui/icons/Remove';
 import { KeyboardArrowDown, Close } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -138,7 +140,7 @@ interface IProps extends WithStyles<typeof styles> {
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
     role?: USER_ROLE;
-    changedMarks?: Map<number,  Map<number, IMark>>;
+    changedMarks?: Map<number, Map<number, IMark>>;
     previewBonusChangeHandler?: (
         propName: 'payments' | 'deposit',
         agentInfo: IAgentInfo,
@@ -146,30 +148,32 @@ interface IProps extends WithStyles<typeof styles> {
         value: number
     ) => void;
     expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
+
+    removeBonusAgent?: (id: number) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartmentMeds: meds
-        },
-        userStore: {
-            bonuses,
-            previewBonusChangeHandler,
-            previewBonusMonth,
-            role,
-            userMarks,
-            changedMarks
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartmentMeds: meds
+                 },
+                 userStore: {
+                     bonuses,
+                     previewBonusChangeHandler,
+                     previewBonusMonth,
+                     role,
+                     userMarks,
+                     changedMarks,
+                 }
+             }
+         }) => ({
     meds,
     role,
     bonuses,
     userMarks,
     previewBonusChangeHandler,
     previewBonusMonth,
-    changedMarks
+    changedMarks,
 }))
 @observer
 class TableRow extends Component<IProps> {
@@ -185,6 +189,11 @@ class TableRow extends Component<IProps> {
             divider: classes.divider,
             input: classes.input
         };
+    }
+
+    componentDidMount(): void {
+        // console.log('bonus user:')
+        // console.log(toJS());
     }
 
     @computed
@@ -215,7 +224,7 @@ class TableRow extends Component<IProps> {
                 }
 
                 return total;
-              }, [0, 0])
+            }, [0, 0])
             : [0, 0];
     }
 
@@ -233,7 +242,7 @@ class TableRow extends Component<IProps> {
                 }
 
                 return total;
-              }, [0, 0])
+            }, [0, 0])
             : [0, 0];
     }
 
@@ -245,7 +254,7 @@ class TableRow extends Component<IProps> {
 
     @computed
     get childBonus(): IBonusInfo {
-        const { bonuses, agent, previewBonusMonth} = this.props;
+        const { bonuses, agent, previewBonusMonth } = this.props;
         return bonuses[agent.position]
             ? bonuses[agent.position].find(({ month }) => month === previewBonusMonth)
             : null;
@@ -302,6 +311,11 @@ class TableRow extends Component<IProps> {
         );
     }
 
+    removeBonusAgent = () => {
+        const {removeBonusAgent, agentInfo: {id}} = this.props;
+        removeBonusAgent(id);
+    }
+
     render() {
         const {
             classes,
@@ -354,89 +368,94 @@ class TableRow extends Component<IProps> {
                         }
                     />
                 );
-                })
-            : <TableCell />;
+            })
+            : <TableCell/>;
 
         return (
             <>
-            <MuiTableRow ref={itemRef} className={classes.root}>
-                {
-                    showLpu &&
-                    <TableCell
-                        padding='none'
-                        style={{ width: this.columnWidth }}
-                        className={classes.cell}>
+                <MuiTableRow ref={itemRef} className={classes.root}>
+                    {
+                        showLpu &&
+                        <TableCell
+                            padding='none'
+                            style={{ width: this.columnWidth }}
+                            className={classes.cell}>
                             <Typography variant='body2'>
-                                { LPUName }
+                                {LPUName}
                             </Typography>
                             <Typography variant='body2' color='textSecondary'>
-                                { !!city && `${city} , ` }{ address }
+                                {!!city && `${city} , `}{address}
                             </Typography>
-                    </TableCell>
-                }
-                <TableCell
-                    onClick={this.expandHandler}
-                    padding='none'
-                    style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
-                    className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
-                        <Grid container  wrap='nowrap' alignItems='center'>
+                        </TableCell>
+                    }
+                    <TableCell
+                        onClick={this.expandHandler}
+                        padding='none'
+                        style={{ width: this.columnWidth * (!!showLpu ? 1 : 2) }}
+                        className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
+                        <Grid container wrap='nowrap' alignItems='center'>
                             {
                                 this.isExpandable === true && showLpu === false &&
                                 <KeyboardArrowDown
                                     className={cx(classes.expandIcon, { rotate: expanded === true })}
-                                    fontSize='small' />
+                                    fontSize='small'/>
                             }
                             <Typography variant='body2'>
-                                { name }
+                                {name}
                             </Typography>
                             {
                                 agentInfo && typeof position === 'string' &&
-                                <InfoWindow>
-                                    <AgentInfoWindowForm
-                                      specialty={specialty}
-                                      mobilePhone={mobilePhone}
-                                      workPhone={workPhone}
-                                      card={card}
-                                    />
-                                </InfoWindow>
+                                <>
+                                    <InfoWindow>
+                                        <AgentInfoWindowForm
+                                            specialty={specialty}
+                                            mobilePhone={mobilePhone}
+                                            workPhone={workPhone}
+                                            card={card}
+                                        />
+                                    </InfoWindow>
+                                    <IconButton onClick={this.removeBonusAgent}>
+                                        <RemoveIcon/>
+                                    </IconButton>
+                                </>
                             }
-                            { this.showCloseIcon && <Close fontSize='small' className={classes.closeIcon} /> }
+                            {this.showCloseIcon && <Close fontSize='small' className={classes.closeIcon}/>}
                         </Grid>
-                </TableCell>
-                { medsContent }
-                <TableCell
-                    align='center'
-                    padding='none'
-                    className={cx(classes.cell, classes.column)}>
-                    <Grid direction='column' alignItems='center' container>
+                    </TableCell>
+                    {medsContent}
+                    <TableCell
+                        align='center'
+                        padding='none'
+                        className={cx(classes.cell, classes.column)}>
+                        <Grid direction='column' alignItems='center' container>
                         <span>
                             {this.packs[0]}
                         </span>
-                        <Divider className={classes.divider} />
-                        <span>
+                            <Divider className={classes.divider}/>
+                            <span>
                             {this.packs[1]}
                         </span>
-                    </Grid>
-                </TableCell>
-                <TableCell
-                    align='center'
-                    padding='none'
-                    className={cx(classes.cell, classes.column)}>
-                    <Grid direction='column' alignItems='center' container>
-                        <span>{lastPayment}</span>
-                        <Divider className={classes.divider} />
-                        <span>{lastDeposit}</span>
-                    </Grid>
-                </TableCell>
-                <TableCell
-                    padding='none'
-                    className={cx(classes.cell, classes.column)}>
-                    <Grid
-                        justify='flex-end'
-                        alignItems='center'
-                        wrap='nowrap'
-                        className={classes.lastGridItem}
-                        container>
+                        </Grid>
+                    </TableCell>
+                    <TableCell
+                        align='center'
+                        padding='none'
+                        className={cx(classes.cell, classes.column)}>
+                        <Grid direction='column' alignItems='center' container>
+                            <span>{lastPayment}</span>
+                            <Divider className={classes.divider}/>
+                            <span>{lastDeposit}</span>
+                        </Grid>
+                    </TableCell>
+                    <TableCell
+                        padding='none'
+                        className={cx(classes.cell, classes.column)}>
+                        <Grid
+                            justify='flex-end'
+                            alignItems='center'
+                            wrap='nowrap'
+                            className={classes.lastGridItem}
+                            container>
                             <span className={cx(classes.span1, classes.span)}>
                                 {this.total[1]}
                             </span>
@@ -447,31 +466,31 @@ class TableRow extends Component<IProps> {
                                 <span className={cx(classes.span, classes.alignCenter)}>
                                     {this.total[0]}
                                 </span>
-                                <Divider className={classes.divider2} />
+                                <Divider className={classes.divider2}/>
                                 <span className={cx(classes.span, classes.alignCenter)}>
-                                    { deposit + this.total[1]}
+                                    {deposit + this.total[1]}
                                 </span>
                             </Grid>
-                    </Grid>
-                </TableCell>
-            </MuiTableRow>
-            {
-                this.isExpandable &&
-                <MuiTableRow>
-                    <TableCell
-                        className={cx(classes.nestedContainer, { nest: !!this.nestLevel })}
-                        colSpan={this.columnsCount}>
-                        <Collapse in={expanded} timeout='auto' unmountOnExit>
-                            <Table
-                                previewBonus={this.childBonus}
-                                isLoading={false}
-                                parentUser={agent}
-                                isNested
-                            />
-                        </Collapse>
+                        </Grid>
                     </TableCell>
                 </MuiTableRow>
-            }
+                {
+                    this.isExpandable &&
+                    <MuiTableRow>
+                        <TableCell
+                            className={cx(classes.nestedContainer, { nest: !!this.nestLevel })}
+                            colSpan={this.columnsCount}>
+                            <Collapse in={expanded} timeout='auto' unmountOnExit>
+                                <Table
+                                    previewBonus={this.childBonus}
+                                    isLoading={false}
+                                    parentUser={agent}
+                                    isNested
+                                />
+                            </Collapse>
+                        </TableCell>
+                    </MuiTableRow>
+                }
             </>
         );
     }
