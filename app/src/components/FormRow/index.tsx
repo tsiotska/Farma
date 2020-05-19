@@ -14,8 +14,8 @@ export const styles = (theme: any) => createStyles({
     },
     input: {
         textIndent: 8,  // for select
-        '& > input': {
-            textIndent: 8, // for input
+        '& input': {
+            textIndent: 8, // for input, autocomplete
         }
     },
     labelRoot: {},

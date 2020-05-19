@@ -283,18 +283,12 @@ class DoctorModal extends Component<IProps> {
                     autoComplete
                     id='lpu'
                     label='ЛПУ'
-                    values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('lpu')}
                     propName='lpu'
+                    renderPropName='name'
                     disabled={!LPUs || !LPUs.length}
-                    value={
-                        this.formValues.lpu
-                            ? this.formValues.lpu.id
-                            : ''
-                    }
-                    options={!!LPUs ? LPUs.map(({ id, name }) => (
-                        name)) : []}
+                    options={!!LPUs ? LPUs : []}
                     required/>
 
                 <FormRow
@@ -308,18 +302,12 @@ class DoctorModal extends Component<IProps> {
                     autoComplete
                     id='lpu'
                     label='Спеціальність'
-                    values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('specialty')}
                     propName='specialty'
+                    renderPropName='name'
                     disabled={!specialties || !specialties.length}
-                    value={
-                        this.formValues.specialty
-                            ? this.formValues.specialty.id
-                            : ''
-                    }
-                    options={!!specialties ? specialties.map(({ id, name }) => (
-                        name)) : []}
+                    options={!!specialties ? specialties : []}
                     required/>
                 <FormRow
                     label='Банківська картка'

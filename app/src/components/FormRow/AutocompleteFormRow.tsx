@@ -3,29 +3,23 @@ import {
     FormControl,
     InputLabel,
     FormHelperText,
-    TextField,
+    Input,
+    TextField
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { IProps } from '.';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import cx from 'classnames';
 
+interface IAutosuggestProps<T> extends IProps<T> {
+    renderPropName?: keyof T;
+}
+
 @observer
-class AutocompleteFormRow<T> extends Component<IProps<T>> {
+class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
     changeHandler = (event: any, value: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
-    }
-
-    getSelectedItem() {
-        const {options, values, propName} = this.props;
-        const item = options.find((opt: any) => {
-            if (opt === values[propName]) {
-                return opt;
-            }
-        });
-        console.log(item);
-        return item || {};
     }
 
     public render() {
@@ -33,11 +27,9 @@ class AutocompleteFormRow<T> extends Component<IProps<T>> {
             classes,
             error,
             label,
-            propName,
             disabled,
+            renderPropName,
             required,
-            value,
-            values,
             options,
             id
         } = this.props;
@@ -50,12 +42,14 @@ class AutocompleteFormRow<T> extends Component<IProps<T>> {
 
                 <Autocomplete
                     id={id}
-                    value={this.getSelectedItem}
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
                     options={options}
-                    getOptionLabel={(option: any) => option}
-                    renderInput={(params) => <TextField  {...params} />}
+                    getOptionLabel={({ [renderPropName]: title }: any) => title}
+                    renderInput={(params) => {
+                        console.log('params: ', params);
+                        return <TextField className={classes.input} {...params} InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
+                    }}
                 />
 
                 {
