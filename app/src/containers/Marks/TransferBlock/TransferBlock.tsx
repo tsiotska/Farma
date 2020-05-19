@@ -65,6 +65,7 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonusTotal?: ITotalMarks;
     role?: USER_ROLE;
     salarySettings?: ISalarySettings;
+    isMedsDivisionValid?: boolean;
 }
 
 @inject(({
@@ -73,14 +74,16 @@ interface IProps extends WithStyles<typeof styles> {
             updateBonus,
             previewBonusTotal,
             role,
-            salarySettings
+            salarySettings,
+            isMedsDivisionValid
         }
     }
 }) => ({
     updateBonus,
     previewBonusTotal,
     role,
-    salarySettings
+    salarySettings,
+    isMedsDivisionValid
 }))
 @observer
 class TransferBlock extends Component<IProps> {
@@ -135,14 +138,15 @@ class TransferBlock extends Component<IProps> {
     }
 
     get isValid(): boolean {
-        const { previewBonus } = this.props;
+        const { previewBonus, isMedsDivisionValid } = this.props;
         const current = (this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit);
         const settingsValue = this.bonuses
             ? this.bonuses[1]
             : 100;
-        return previewBonus
+        const condition = previewBonus
             ? current >= settingsValue
             : true;
+        return condition && isMedsDivisionValid;
     }
 
     submitHandler = async () => {

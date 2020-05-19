@@ -156,8 +156,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
                     const newDrugValue = initialMark
                         ? (acc[drugId] || 0)
-                        + (payments - initialMark.payments)
-                        + (deposit - initialMark.deposit)
+                            + (payments - initialMark.payments)
+                            + (deposit - initialMark.deposit)
                         : (acc[drugId] || 0) + payments + deposit;
 
                     acc[drugId] = newDrugValue;
