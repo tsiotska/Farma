@@ -281,7 +281,6 @@ class DoctorModal extends Component<IProps> {
                 />
                 <FormRow
                     autoComplete
-                    id='lpu'
                     label='ЛПУ'
                     onChange={this.changeHandler}
                     error={this.errors.get('lpu')}
@@ -300,7 +299,6 @@ class DoctorModal extends Component<IProps> {
                 />
                 <FormRow
                     autoComplete
-                    id='lpu'
                     label='Спеціальність'
                     onChange={this.changeHandler}
                     error={this.errors.get('specialty')}

@@ -6,7 +6,9 @@ import {
     Input,
     TextField
 } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer} from 'mobx-react';
+import {toJS} from 'mobx';
+
 import { IProps } from '.';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import cx from 'classnames';
@@ -33,7 +35,7 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             options,
             id
         } = this.props;
-
+        console.log('options: ', toJS(options));
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
@@ -47,7 +49,6 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                     options={options}
                     getOptionLabel={({ [renderPropName]: title }: any) => title}
                     renderInput={(params) => {
-                        console.log('params: ', params);
                         return <TextField className={classes.input} {...params} InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
                     }}
                 />
