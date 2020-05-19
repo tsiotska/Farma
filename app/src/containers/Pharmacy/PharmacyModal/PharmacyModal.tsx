@@ -296,11 +296,10 @@ class PharmacyModal extends Component<IProps> {
                             label='Область'
                             onChange={this.changeHandler}
                             propName='oblast'
-                            renderPropName='name'
                             disabled={this.oblastListItems.length === 0}
                             required
-                            options={!!this.oblastListItems ? this.oblastListItems.map((oblast, id) =>
-                                ({ id, name: oblast })) : []}
+                            value={this.formValues.oblast}
+                            options={!!this.oblastListItems ? this.oblastListItems : []}
                             error={this.errors.get('oblast')}/>
                         <FormRow
                             label='Адрес'
@@ -318,8 +317,12 @@ class PharmacyModal extends Component<IProps> {
                             renderPropName='name'
                             disabled={this.formValues.oblast === '' || !this.cities.length}
                             required
-                            options={!!this.cities ? this.cities.map((city, id) =>
-                                ({ id, name: city })) : []}
+                            value={this.formValues.city}
+                            options={!!this.cities ? this.cities.map(
+                                ({ name }, id) => (
+                                     { id, name }
+                                )
+                            ) : []}
                             error={this.errors.get('city')}/>
                         <FormRow
                             label='Телефон 1'
@@ -334,8 +337,12 @@ class PharmacyModal extends Component<IProps> {
                             onChange={this.changeHandler}
                             propName='lpu'
                             renderPropName='name'
-                            options={!!this.lpus ? this.lpus.map((lpu, id) =>
-                                ({ id, name: lpu })) : []}
+                            value={this.formValues.lpu}
+                            options={!!this.lpus ? this.lpus.map(
+                                ({ name }, id) => (
+                                     { id, name }
+                                )
+                            ) : []}
                             disabled={!this.formValues.city || !this.lpus.length}
                             error={this.errors.get('lpu')}/>
                         <FormRow

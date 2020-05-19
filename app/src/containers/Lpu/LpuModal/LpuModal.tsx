@@ -259,8 +259,12 @@ class LpuModal extends Component<IProps> {
                         propName='oblast'
                         renderPropName='name'
                         required
-                        options={!!this.oblastListItems ? this.oblastListItems.map((oblast, id) =>
-                            ({ id, name: oblast })) : []}
+                        value={this.formValues.oblast}
+                        options={!!this.oblastListItems ? this.oblastListItems.map(
+                            ({ name }, id) => (
+                                { id, name }
+                            )
+                        ) : []}
                         error={this.errors.get('oblast')}/>
                     <FormRow
                         required
@@ -278,17 +282,13 @@ class LpuModal extends Component<IProps> {
                         onChange={this.changeHandler}
                         propName='city'
                         renderPropName='name'
-                        options={!!this.cities ? this.cities.map((city, id) =>
-                            ({ id, name: city })) : []}
-                        error={this.errors.get('city')}>
-                        {
-                            this.cities.map(({ id, name }) => (
-                                <MenuItem key={id} value={id}>
-                                    {name}
-                                </MenuItem>
-                            ))
-                        }
-                    </FormRow>
+                        value={this.formValues.city}
+                        options={!!this.cities ? this.cities.map(
+                            ({ name }, id) => (
+                                { id, name }
+                            )
+                        ) : []}
+                        error={this.errors.get('city')}/>
                     <FormRow
                         label='Телефон 1'
                         values={this.formValues}

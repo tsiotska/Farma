@@ -6,8 +6,8 @@ import {
     Input,
     TextField
 } from '@material-ui/core';
-import { observer} from 'mobx-react';
-import {toJS} from 'mobx';
+import { observer } from 'mobx-react';
+import { computed, toJS } from 'mobx';
 
 import { IProps } from '.';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -19,6 +19,30 @@ interface IAutosuggestProps<T> extends IProps<T> {
 
 @observer
 class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
+    @computed
+    get renderPropTitle(): (value: any) => string {
+        const { renderPropName } = this.props;
+        return renderPropName
+            ? ({ [renderPropName]: title }: any) => title
+            : (title: string) => {
+                return title;
+            };
+    }
+
+    // TODO: Треба посетити ізначальне значення в Autocomplete або зробити його повністю контролюємим
+  /*  @computed
+    get getSelectedItem() {
+        const { options, value } = this.props;
+        console.log(toJS(value))
+        if (!value || !value.hasOwnProperty('name')) return;
+        const item = options.find((opt: any) => {
+            if (opt === value) {
+                return opt;
+            }
+        });
+        return item || {};
+    }
+*/
     changeHandler = (event: any, value: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
@@ -35,7 +59,7 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             options,
             id
         } = this.props;
-        console.log('options: ', toJS(options));
+        //  console.log('options: ', toJS(options));
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
@@ -47,10 +71,12 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
                     options={options}
-                    getOptionLabel={({ [renderPropName]: title }: any) => title}
+                    getOptionLabel={this.renderPropTitle}
                     renderInput={(params) => {
-                        return <TextField className={classes.input} {...params} InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
+                        return <TextField className={classes.input} {...params}
+                                          InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
                     }}
+                   // value={this.getSelectedItem}
                 />
 
                 {
