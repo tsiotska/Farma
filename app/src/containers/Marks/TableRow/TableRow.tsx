@@ -191,11 +191,6 @@ class TableRow extends Component<IProps> {
         };
     }
 
-    componentDidMount(): void {
-        // console.log('bonus user:')
-        // console.log(toJS());
-    }
-
     @computed
     get agentMarks(): Map<number, IMark> {
         const { agentInfo } = this.props;
@@ -266,12 +261,13 @@ class TableRow extends Component<IProps> {
         const userRole = typeof agent.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : agent.position;
+        console.log('nest level: ', userRole - role);
         return userRole - role;
     }
 
     @computed
     get columnWidth(): number {
-        return 150 - this.nestLevel * 16 / 2;
+        return 170 - this.nestLevel * 16 / 2;
     }
 
     get isEditable(): boolean {
@@ -391,9 +387,16 @@ class TableRow extends Component<IProps> {
                     <TableCell
                         onClick={this.expandHandler}
                         padding='none'
-                        style={{ width: this.columnWidth * (!!showLpu ? 1 : 2) }}
+                        style={{
+                            maxWidth: this.columnWidth * (!!showLpu ? 1 : 2),
+                            width: this.columnWidth * (!!showLpu ? 1 : 2)
+                        }}
                         className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
-                        <Grid container wrap='nowrap' alignItems='center'>
+                        <Grid
+                            container
+                            wrap='nowrap'
+                            // style={{ maxWidth: this.columnWidth * (!!showLpu ? 1 : 2) }}
+                            alignItems='center'>
                             {
                                 this.isExpandable === true && showLpu === false &&
                                 <KeyboardArrowDown
@@ -403,23 +406,28 @@ class TableRow extends Component<IProps> {
                             <Typography variant='body2'>
                                 {name}
                             </Typography>
-                            {
-                                agentInfo && typeof position === 'string' &&
-                                <>
-                                    <InfoWindow>
-                                        <AgentInfoWindowForm
-                                            specialty={specialty}
-                                            mobilePhone={mobilePhone}
-                                            workPhone={workPhone}
-                                            card={card}
-                                        />
-                                    </InfoWindow>
-                                    <IconButton onClick={this.removeBonusAgent}>
-                                        <RemoveIcon/>
-                                    </IconButton>
-                                </>
-                            }
-                            {this.showCloseIcon && <Close fontSize='small' className={classes.closeIcon}/>}
+                            <Grid justify='center' alignItems='center' container direction='column' wrap='nowrap'>
+                                {
+                                    agentInfo && typeof position === 'string' &&
+                                    <>
+                                        <InfoWindow>
+                                            <AgentInfoWindowForm
+                                                specialty={specialty}
+                                                mobilePhone={mobilePhone}
+                                                workPhone={workPhone}
+                                                card={card}
+                                            />
+                                        </InfoWindow>
+                                        {/* <IconButton onClick={this.removeBonusAgent}> */}
+                                            <RemoveIcon/>
+                                        {/* </IconButton> */}
+                                    </>
+                                }
+                                {
+                                    this.showCloseIcon &&
+                                    <Close fontSize='small' className={classes.closeIcon}/>
+                                }
+                            </Grid>
                         </Grid>
                     </TableCell>
                     {medsContent}
