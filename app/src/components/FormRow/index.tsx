@@ -3,6 +3,7 @@ import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import InputFormRow from './InputFormRow';
 import SelectFormRow from './SelectFormRow';
+import AutocompleteFormRow from './AutocompleteFormRow';
 
 export const styles = (theme: any) => createStyles({
     root: {
@@ -18,7 +19,10 @@ export const styles = (theme: any) => createStyles({
         }
     },
     labelRoot: {},
-    helperText: {}
+    helperText: {},
+    autoComplete: {
+        marginTop: 16
+    }
 });
 
 export interface IProps<T> extends WithStyles<typeof styles> {
@@ -32,20 +36,27 @@ export interface IProps<T> extends WithStyles<typeof styles> {
     required?: boolean;
     fullWidth?: boolean;
     password?: boolean;
+    options?: any;
+    id?: string;
+
+    autoComplete?: boolean;
 }
 
 interface IFormRowProps<T> extends IProps<T> {
     select?: boolean;
+ //   autoComplete?: boolean;
 }
 
 @observer
 class FormRow extends Component<IFormRowProps<any>> {
     render() {
-        const { select, ...inputProps } = this.props;
+        const { select, autoComplete, id, ...inputProps } = this.props;
 
         return select
             ? <SelectFormRow {...inputProps} />
-            : <InputFormRow { ...inputProps} />;
+            : autoComplete ?
+                <AutocompleteFormRow id={id} {...inputProps}/>
+                : <InputFormRow {...inputProps} />;
     }
 }
 

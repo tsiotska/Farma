@@ -46,6 +46,7 @@ interface IProps extends WithStyles<typeof styles> {
 
 export interface IDoctorModalValues {
     [key: string]: string | ILPU | ISpecialty;
+
     name: string;
     lpu: ILPU;
     specialty: ISpecialty;
@@ -56,16 +57,16 @@ export interface IDoctorModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            specialties,
-            loadSpecialties,
-            LPUs,
-            loadLPUs,
-            getDocsPositions
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     specialties,
+                     loadSpecialties,
+                     LPUs,
+                     loadLPUs,
+                     getDocsPositions
+                 }
+             }
+         }) => ({
     specialties,
     loadSpecialties,
     LPUs,
@@ -74,8 +75,8 @@ export interface IDoctorModalValues {
 }))
 @observer
 class DoctorModal extends Component<IProps> {
-    readonly objectFields: Array<keyof IDoctorModalValues> = [ 'lpu', 'specialty' ];
-    readonly optionalFields: Array<keyof IDoctorModalValues> = [ 'mobilePhone', 'workPhone', 'position', 'card'];
+    readonly objectFields: Array<keyof IDoctorModalValues> = ['lpu', 'specialty'];
+    readonly optionalFields: Array<keyof IDoctorModalValues> = ['mobilePhone', 'workPhone', 'position', 'card'];
     readonly allFields: Array<keyof IDoctorModalValues>;
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {
@@ -175,7 +176,7 @@ class DoctorModal extends Component<IProps> {
                 propName === 'lpu'
                     ? LPUs
                     : specialties
-                ) || [];
+            ) || [];
             const targetItem = source.find(x => x.id === id);
             this.formValues[propName] = targetItem || null;
         } else {
@@ -279,8 +280,9 @@ class DoctorModal extends Component<IProps> {
                     propName='mobilePhone'
                 />
                 <FormRow
-                    select
-                    label='ЛПУ/Аптека'
+                    autoComplete
+                    id='lpu'
+                    label='ЛПУ'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('lpu')}
@@ -288,18 +290,13 @@ class DoctorModal extends Component<IProps> {
                     disabled={!LPUs || !LPUs.length}
                     value={
                         this.formValues.lpu
-                        ? this.formValues.lpu.id
-                        : ''
+                            ? this.formValues.lpu.id
+                            : ''
                     }
-                    required>
-                        {
-                            !!LPUs && LPUs.map(({ id, name }) => (
-                                <MenuItem key={id} value={id}>
-                                    { name }
-                                </MenuItem>
-                            ))
-                        }
-                </FormRow>
+                    options={!!LPUs ? LPUs.map(({ id, name }) => (
+                        name)) : []}
+                    required/>
+
                 <FormRow
                     label='Робочий телефон'
                     values={this.formValues}
@@ -308,7 +305,8 @@ class DoctorModal extends Component<IProps> {
                     propName='workPhone'
                 />
                 <FormRow
-                    select
+                    autoComplete
+                    id='lpu'
                     label='Спеціальність'
                     values={this.formValues}
                     onChange={this.changeHandler}
@@ -317,18 +315,12 @@ class DoctorModal extends Component<IProps> {
                     disabled={!specialties || !specialties.length}
                     value={
                         this.formValues.specialty
-                        ? this.formValues.specialty.id
-                        : ''
+                            ? this.formValues.specialty.id
+                            : ''
                     }
-                    required>
-                        {
-                            !!specialties && specialties.map(({ id, name }) => (
-                                <MenuItem key={id} value={id}>
-                                    { name }
-                                </MenuItem>
-                            ))
-                        }
-                </FormRow>
+                    options={!!specialties ? specialties.map(({ id, name }) => (
+                        name)) : []}
+                    required/>
                 <FormRow
                     label='Банківська картка'
                     values={this.formValues}
@@ -342,17 +334,17 @@ class DoctorModal extends Component<IProps> {
                     label='Посада'
                     values={this.formValues}
                     onChange={this.changeHandler}
-                    classes={{root: classes.lastFormRow}}
+                    classes={{ root: classes.lastFormRow }}
                     error={this.errors.get('position')}
                     propName='position'
                     fullWidth>
-                        {
-                            this.docsPositions.map(x => (
-                                <MenuItem key={x} value={x}>
-                                    { x }
-                                </MenuItem>
-                            ))
-                        }
+                    {
+                        this.docsPositions.map(x => (
+                            <MenuItem key={x} value={x}>
+                                {x}
+                            </MenuItem>
+                        ))
+                    }
                 </FormRow>
                 <Button
                     onClick={this.submitHandler}
@@ -360,14 +352,15 @@ class DoctorModal extends Component<IProps> {
                     className={classes.submitButton}
                     variant='contained'
                     color='primary'>
-                        {
-                            isLoading
-                            ? <LoadingMask size={20} />
+                    {
+                        isLoading
+                            ? <LoadingMask size={20}/>
                             : 'Зберегти зміни'
-                        }
+                    }
                 </Button>
             </Dialog>
-        );
+        )
+            ;
     }
 }
 

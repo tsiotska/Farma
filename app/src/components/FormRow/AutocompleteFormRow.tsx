@@ -3,16 +3,29 @@ import {
     FormControl,
     InputLabel,
     FormHelperText,
-    Select
+    TextField,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { IProps } from '.';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import cx from 'classnames';
 
 @observer
-class SelectFormRow<T> extends Component<IProps<T>> {
-    changeHandler = ({ target: { value }}: any) => {
+class AutocompleteFormRow<T> extends Component<IProps<T>> {
+    changeHandler = (event: any, value: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
+    }
+
+    getSelectedItem() {
+        const {options, values, propName} = this.props;
+        const item = options.find((opt: any) => {
+            if (opt === values[propName]) {
+                return opt;
+            }
+        });
+        console.log(item);
+        return item || {};
     }
 
     public render() {
@@ -21,32 +34,30 @@ class SelectFormRow<T> extends Component<IProps<T>> {
             error,
             label,
             propName,
-            children,
             disabled,
             required,
             value,
             values,
-            autoComplete
+            options,
+            id
         } = this.props;
 
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
-                    { label }
+                    {label}
                 </InputLabel>
 
-                <Select
-                    displayEmpty
-                    className={classes.input}
+                <Autocomplete
+                    id={id}
+                    value={this.getSelectedItem}
+                    className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
-                    disableUnderline
-                    value={
-                        value === undefined
-                        ? values[propName]
-                        : value
-                    }>
-                    { children }
-                </Select>
+                    options={options}
+                    getOptionLabel={(option: any) => option}
+                    renderInput={(params) => <TextField  {...params} />}
+                />
+
                 {
                     !!error && typeof error === 'string' &&
                     <FormHelperText className={classes.helperText}>
@@ -58,4 +69,4 @@ class SelectFormRow<T> extends Component<IProps<T>> {
     }
 }
 
-export default SelectFormRow;
+export default AutocompleteFormRow;
