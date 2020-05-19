@@ -4,7 +4,7 @@ import { IWithRestriction } from '../../../interfaces';
 import { PERMISSIONS } from '../../../constants/Permissions';
 import { withRestriction } from '../../../components/hoc/withRestriction';
 import { IconButton } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 interface IProps extends IWithRestriction {
     onClick: (e: any) => void;
@@ -20,7 +20,7 @@ class RemoveButton extends Component<IProps> {
 
         return (
             <IconButton onClick={onClick}>
-                <Delete fontSize='small' />
+                <DeleteOutlineIcon fontSize='small' />
             </IconButton>
         );
     }

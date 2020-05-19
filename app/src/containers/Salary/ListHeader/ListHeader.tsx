@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles';
 
 const styles = (theme: any) => createStyles({
     root: {
-        margin: '5px 0'
+        margin: '20px 0 2px',
     },
     text: {
         fontSize: 14,

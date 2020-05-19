@@ -10,7 +10,7 @@ const styles = (theme: any) => createStyles({
     root: {
         padding: '0 10px',
         color: theme.palette.primary.gray.light,
-        margin: '15px 0 10px'
+        margin: '20px 0 2px',
     },
     firstItem: {
         width: 90,

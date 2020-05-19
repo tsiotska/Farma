@@ -11,7 +11,7 @@ import {
 import { inject, observer } from 'mobx-react';
 import { ILPU } from '../../../interfaces/ILPU';
 import cx from 'classnames';
-import { Edit, Delete } from '@material-ui/icons';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { gridStyles } from '../gridStyles';
 import { ILocation } from '../../../interfaces/ILocation';
 import CommitBadge from '../../../components/CommitBadge';
@@ -218,7 +218,7 @@ class ListItem extends Component<IProps> {
                       type={generalType}
                       className={classes.iconButton}
                       onClick={this.deleteClickHandler}>
-                      <Delete className={classes.icon}/>
+                      <DeleteOutlineIcon className={classes.icon}/>
                     </DeleteButton>
                 </Grid>
             </Grid>

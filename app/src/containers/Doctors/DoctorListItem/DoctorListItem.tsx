@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { Delete, Edit } from '@material-ui/icons';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import cx from 'classnames';
 
 import { IDoctor } from '../../../interfaces/IDoctor';
@@ -270,7 +270,7 @@ class DoctorListItem extends Component<IProps> {
                                 {
                                     isAllowed &&
                                     <IconButton onClick={this.editClickHandler}>
-                                        <Edit className={classes.editIcon} fontSize='small' />
+                                        <EditOutlinedIcon className={classes.editIcon} fontSize='small' />
                                     </IconButton>
                                 }
                             </>

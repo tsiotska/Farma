@@ -11,7 +11,7 @@ import { SortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopp
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
     root: {
-        marginBottom: 12
+        margin: '20px 0 2px',
     },
     text: {
         fontFamily: 'Source Sans Pro SemiBold',
