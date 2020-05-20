@@ -27,7 +27,6 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             : (title: string) => (title || '');
     }
 
-    // TODO: Треба посетити ізначальне значення в Autocomplete або зробити його повністю контролюємим
     @computed
     get getSelectedItem() {
         const {
@@ -38,12 +37,9 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
 
         if (!value || !options) return '';
         if (typeof value === 'object') {
-            const targetValue = value[renderPropName];
-            return options
-                ? options.find((x: any) => x[renderPropName] === targetValue)
-                : '';
+            return value[renderPropName];
         }
-        return options.find((x: any) => x === value) || '';
+        return value;
     }
 
     changeHandler = (event: any, value: any) => {
@@ -59,11 +55,17 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             disabled,
             renderPropName,
             required,
-            options,
-            id
+            id,
+            options
         } = this.props;
-        const preparedOptions = options.map((opt: any) => (opt[renderPropName]));
 
+        let preparedOptions;
+        //    if (!Array.isArray(options)) {
+        preparedOptions = options.map((opt: any) => (opt[renderPropName]));
+        /*     } else {
+                 preparedOptions = options;
+             }
+             */
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
@@ -71,7 +73,8 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                 </InputLabel>
 
                 <Autocomplete
-                    defaultValue={this.getSelectedItem}
+                    id={id}
+                    value={this.getSelectedItem}
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
                     options={preparedOptions}

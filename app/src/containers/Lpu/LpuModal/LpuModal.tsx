@@ -253,6 +253,7 @@ class LpuModal extends Component<IProps> {
                 />
                 <Grid justify='space-between' container>
                     <FormRow
+                        id='unikum'
                         autoComplete
                         label='Область'
                         onChange={this.changeHandler}
@@ -271,6 +272,7 @@ class LpuModal extends Component<IProps> {
                         error={this.errors.get('address')}
                     />
                     <FormRow
+                        id='diverse'
                         autoComplete
                         required
                         disabled={!this.formValues.oblast}
