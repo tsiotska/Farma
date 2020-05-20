@@ -125,7 +125,7 @@ class Notifications extends Component<IProps> {
     delete = async (type: string, id: number) => {
         const { deleteNotification } = this.props;
         const isDeleted = await deleteNotification(type, id);
-        console.log(isDeleted);
+        if (isDeleted) this.updateNotifications();
         this.snackbarType = isDeleted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
@@ -137,7 +137,7 @@ class Notifications extends Component<IProps> {
     accept = async (type: string, id: number) => {
         const { acceptNotification } = this.props;
         const isAccepted = await acceptNotification(type, id);
-        console.log(isAccepted);
+        if (isAccepted) this.updateNotifications();
         this.snackbarType = isAccepted
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
@@ -149,7 +149,7 @@ class Notifications extends Component<IProps> {
     return = async (type: string, id: number) => {
         const { returnNotification } = this.props;
         const isReturned = await returnNotification(type, id);
-        console.log(isReturned);
+        if (isReturned) this.updateNotifications();
         this.snackbarType = isReturned
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
@@ -160,7 +160,6 @@ class Notifications extends Component<IProps> {
 
     render() {
         const { notifications, classes } = this.props;
-
         let showSubheader: boolean = true;
         return (
             <Grid direction='column' container>

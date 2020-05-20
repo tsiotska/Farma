@@ -77,20 +77,20 @@ class HCFPanel extends Component<IProps> {
     }
 
     deleteHandler = ({ currentTarget }: any) => {
-        console.log('currentTarget');
-        console.log(currentTarget);
         const { type, deleteClickHandler } = this.props;
-        // const {[type]: { id }} = this.props;
-        // deleteClickHandler(currentTarget, type, id);
+        const id = this.props[type].id;
+        deleteClickHandler(currentTarget, type, id);
     }
 
     acceptHandler = () => {
-        const { type, hcf: { id }, acceptNotification } = this.props;
+        const { type, acceptNotification } = this.props;
+        const id = this.props[type].id;
         acceptNotification(type, id);
     }
 
     returnHandler = () => {
-        const { type, hcf: { id }, returnNotification } = this.props;
+        const { type, returnNotification } = this.props;
+        const id = this.props[type].id;
         returnNotification(type, id);
     }
 
@@ -107,12 +107,10 @@ class HCFPanel extends Component<IProps> {
                 FFMCommit,
                 RMCommit,
                 id,
-
                 deleted,
                 confirmed
             }
         } = this.props;
-        console.log(toJS(action));
         return (
             <>
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
