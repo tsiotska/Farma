@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { Edit } from '@material-ui/icons';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { PERMISSIONS } from '../../../constants/Permissions';
 import { IUser } from '../../../interfaces';
 
@@ -62,7 +62,7 @@ class EditButton extends Component<IProps> {
             <IconButton
                 onClick={onClick}
                 className={className}>
-                <Edit className={iconClassName}/>
+                <EditOutlinedIcon className={iconClassName}/>
             </IconButton>
         );
     }

@@ -149,7 +149,7 @@ class CommonSettings extends Component<IProps> {
     }
 
     get disableSubmit(): boolean {
-        return Object.entries(this.changedValues).every((value) => !value[1]);
+        return Object.values(this.changedValues).every((value) => !value);
     }
 
     render() {

@@ -20,7 +20,7 @@ const styles = (theme: any) => createStyles({
         height: 48
     },
     firstColumn: {
-        width: 284
+        width: 324
     },
     column: {
         width: 70,

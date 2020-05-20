@@ -302,11 +302,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
             }
 
             const preparedMarks = [...mergedMarks.values()].map(({
-                    deposit,
-                    drugId,
-                    mark,
-                    payments
-                }) => ({
+                                                                     deposit,
+                                                                     drugId,
+                                                                     mark,
+                                                                     payments
+                                                                 }) => ({
                     agent: agentId,
                     deposit: deposit,
                     drug: drugId,
@@ -918,5 +918,20 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ),
             'insertDeposit'
         );
+    }
+
+    @action.bound
+    removeBonusAgent(agentId: number, parentId: number): Promise<boolean> {
+        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+
+        return this.dispatchRequest(
+            api.removeAgent(
+                currentDepartmentId,
+                parentId,
+                agentId,
+                this.bonusesYear,
+                this.previewBonusMonth
+            ),
+            'removeAgent');
     }
 }

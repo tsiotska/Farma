@@ -679,4 +679,10 @@ export class APIRequester {
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
+
+   removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<any> {
+        return this.instance.delete(`/api/branch/${departmentId}/mp/${mpId}/mark/agent/${agentId}?year=${year}&month=${month}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

@@ -112,11 +112,12 @@ class TableHeader extends Component<IProps> {
         const userRole = typeof parentUser.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : parentUser.position;
-        return (userRole - role) + (isNested ? 1 : 0);
+        // return (userRole - role) + (isNested ? 1 : 0);
+        return (userRole - role) + 1;
     }
 
     get columnWidth(): number {
-        return 150 - this.nestLevel * 16 / 2;
+        return 170 - this.nestLevel * 16 / 2;
     }
 
     get sales(): Map<number, IDrugSale> {

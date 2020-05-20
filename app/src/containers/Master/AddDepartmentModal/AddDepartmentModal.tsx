@@ -232,8 +232,8 @@ class AddDepartmentModal extends Component<IProps> {
     }
 
     get disableSubmit(): boolean {
-        const departmentDataIsNull = Object.entries(this.departmentData).every((value) => !value[1]);
-        const ffmDataIsNull = Object.entries(this.ffmData).every((value) => !value[1]);
+        const departmentDataIsNull = Object.values(this.departmentData).every((value) => !value);
+        const ffmDataIsNull = Object.values(this.ffmData).every((value) => !value);
         return departmentDataIsNull && ffmDataIsNull;
     }
 

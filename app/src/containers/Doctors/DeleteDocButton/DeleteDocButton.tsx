@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, IconButton } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { Delete } from '@material-ui/icons';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { IWithRestriction } from '../../../interfaces';
 import { withRestriction } from '../../../components/hoc/withRestriction';
 import { PERMISSIONS } from '../../../constants/Permissions';
@@ -22,7 +22,7 @@ class DeleteDocButton extends Component<IProps> {
 
         return (
             <IconButton onClick={onClick}>
-                <Delete
+                <DeleteOutlineIcon
                     className={className}
                     fontSize='small'
                 />

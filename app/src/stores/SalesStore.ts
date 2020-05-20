@@ -492,7 +492,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadSalesExcel() {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-        if (!currentDepartmentId) return;
+        // if (!currentDepartmentId) return;
         const url = this.getMedsStatUrl(currentDepartmentId, true);
         if (url) api.getExcel(url);
     }
