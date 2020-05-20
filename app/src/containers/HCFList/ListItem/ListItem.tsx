@@ -18,9 +18,6 @@ import CommitBadge from '../../../components/CommitBadge';
 import LoadingMask from '../../../components/LoadingMask';
 import { observable, toJS } from 'mobx';
 import DeleteButton from '../DeleteButton';
-import { withRestriction } from '../../../components/hoc/withRestriction';
-import { PERMISSIONS } from '../../../constants/Permissions';
-import { IWithRestriction } from '../../../interfaces';
 import EditButton from '../EditButton';
 
 const styles = (theme: any) => createStyles({
@@ -83,6 +80,9 @@ const styles = (theme: any) => createStyles({
     phoneText: {
         overflow: 'hidden',
         textOverflow: 'ellipsis'
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main
     },
     cell: {}
 });
@@ -206,7 +206,7 @@ class ListItem extends Component<IProps> {
                             </Button>
                             : <EditButton
                                 onClick={this.onEditClick}
-                                className={classes.iconButton}
+                                className={cx(classes.iconButton, classes.colorGreen)}
                                 iconClassName={classes.icon}
                                 type={generalType}
                                 unconfirmed={unconfirmed}
