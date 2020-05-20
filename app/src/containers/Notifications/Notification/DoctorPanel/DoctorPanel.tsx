@@ -6,7 +6,7 @@ import { Delete } from '@material-ui/icons';
 import CommitBadge from '../../../../components/CommitBadge';
 import { IPosition } from '../../../../interfaces/IPosition';
 
-const styles = (theme: any) =>  createStyles({
+const styles = (theme: any) => createStyles({
     badge: {
         marginRight: 5,
         backgroundColor: '#f2f2f2',
@@ -27,6 +27,13 @@ const styles = (theme: any) =>  createStyles({
         color: theme.palette.primary.green.main,
         borderColor: theme.palette.primary.green.main
     },
+    returnButton: {
+        padding: '2px 0',
+        margin: '0 4px',
+        minWidth: 95,
+        color: theme.palette.secondary.dark,
+        borderColor: theme.palette.secondary.dark
+    },
     phone: {
         minWidth: 220
     }
@@ -35,22 +42,45 @@ const styles = (theme: any) =>  createStyles({
 interface IProps extends WithStyles<typeof styles> {
     doctor: IDoctor;
     positions?: Map<number, IPosition>;
+    action?: string;
+    type?: string;
+
+    acceptNotification?: (type: string, id: number) => void;
+    deleteClickHandler?: (currentTarget: any, type: string, id: number) => void;
+    returnNotification?: (type: string, id: number) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            positions
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     positions
+                 }
+             }
+         }) => ({
     positions
 }))
 @observer
 class DoctorPanel extends Component<IProps> {
+
+    deleteHandler = ({ currentTarget }: any) => {
+        const { type, doctor: { id }, deleteClickHandler } = this.props;
+        deleteClickHandler(currentTarget, type, id);
+    }
+
+    acceptHandler = () => {
+        const { type, doctor: { id }, acceptNotification } = this.props;
+        acceptNotification(type, id);
+    }
+
+    returnHandler = () => {
+        const { type, doctor: { id }, returnNotification } = this.props;
+        returnNotification(type, id);
+    }
+
     render() {
         const {
             classes,
+            action,
             doctor: {
                 FFMCommit,
                 RMCommit,
@@ -59,46 +89,61 @@ class DoctorPanel extends Component<IProps> {
                 workPhone,
                 card,
                 LPUName,
-                position
+                position,
+                id,
             }
         } = this.props;
 
         return (
             <>
                 <Grid xs wrap='nowrap' alignItems='center' container item>
-                    <CommitBadge committed={FFMCommit} title='ФФМ' className={classes.badge} />
-                    <CommitBadge committed={RMCommit} title='РМ' className={classes.badge} />
+                    {action === 'accept' &&
+                    <>
+                        <CommitBadge committed={FFMCommit} title='ФФМ' className={classes.badge}/>
+                        <CommitBadge committed={RMCommit} title='РМ' className={classes.badge}/>
+                    </>
+                    }
                     <Typography variant='body2'>
-                        { name }
+                        {name}
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        { LPUName }
+                        {LPUName}
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        { position }
+                        {position}
                     </Typography>
                 </Grid>
                 <Grid className={classes.phone} xs container item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{ workPhone || '-' }</span>
-                        <span>{ mobilePhone || '-' }</span>
+                        <span>{workPhone || '-'}</span>
+                        <span>{mobilePhone || '-'}</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        { card }
+                        {card}
                     </Typography>
                 </Grid>
-                <Button variant='outlined' className={classes.confirmButton}>
-                    Підтвердити
+
+                {action === 'accept' &&
+                <>
+                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
+                        Підтвердити
+                    </Button>
+                    <IconButton onClick={this.deleteHandler}>
+                        <Delete/>
+                    </IconButton>
+                </>
+                }
+                {action === 'return' &&
+                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                    Повернути
                 </Button>
-                <IconButton>
-                    <Delete />
-                </IconButton>
+                }
             </>
         );
     }

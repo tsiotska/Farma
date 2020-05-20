@@ -12,6 +12,7 @@ export interface ILPU {
     FFMCommit?: boolean;
     RMCommit?: boolean;
     confirmed?: boolean;
+    deleted?: boolean;
 
     lpu?: number;
     lpuName: string;

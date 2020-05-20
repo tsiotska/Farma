@@ -29,6 +29,13 @@ const styles = (theme: any) => createStyles({
         color: theme.palette.primary.green.main,
         borderColor: theme.palette.primary.green.main
     },
+    returnButton: {
+        padding: '2px 0',
+        margin: '0 4px',
+        minWidth: 95,
+        color: theme.palette.secondary.dark,
+        borderColor: theme.palette.secondary.dark
+    },
     phone: {
         minWidth: 220
     }
@@ -37,15 +44,21 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     hcf: ILPU;
     regions?: Map<number, ILocation>;
+    action?: string;
+    type?: string;
+
+    acceptNotification?: (type: string, id: number) => void;
+    deleteClickHandler?: (currentTarget: any, type: string, id: number) => void;
+    returnNotification?: (type: string, id: number) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            regions,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     regions,
+                 }
+             }
+         }) => ({
     regions,
 }))
 @observer
@@ -63,9 +76,28 @@ class HCFPanel extends Component<IProps> {
             : '-';
     }
 
+    deleteHandler = ({ currentTarget }: any) => {
+        console.log('currentTarget');
+        console.log(currentTarget);
+        const { type, deleteClickHandler } = this.props;
+        // const {[type]: { id }} = this.props;
+        // deleteClickHandler(currentTarget, type, id);
+    }
+
+    acceptHandler = () => {
+        const { type, hcf: { id }, acceptNotification } = this.props;
+        acceptNotification(type, id);
+    }
+
+    returnHandler = () => {
+        const { type, hcf: { id }, returnNotification } = this.props;
+        returnNotification(type, id);
+    }
+
     render() {
         const {
             classes,
+            action,
             hcf: {
                 name,
                 oblast,
@@ -73,39 +105,45 @@ class HCFPanel extends Component<IProps> {
                 phone1,
                 phone2,
                 FFMCommit,
-                RMCommit
+                RMCommit,
+                id,
+
+                deleted,
+                confirmed
             }
         } = this.props;
-
+        console.log(toJS(action));
         return (
             <>
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
+                    {action === 'accept' &&
                     <>
-                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit} />
-                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit} />
+                        <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
+                        <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                     </>
+                    }
                     <Typography className={classes.text} variant='body2'>
-                        { name || '-' }
+                        {name || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { this.regionName }
+                        {this.regionName}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { oblast || '-' }
+                        {oblast || '-'}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { this.cityName }
+                        {this.cityName}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        { address || '-' }
+                        {address || '-'}
                     </Typography>
                 </Grid>
                 <Grid
@@ -116,16 +154,26 @@ class HCFPanel extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{ phone1 || '-' }</span>
-                        <span>{ phone2 || '-' }</span>
+                        <span>{phone1 || '-'}</span>
+                        <span>{phone2 || '-'}</span>
                     </Typography>
                 </Grid>
-                <Button variant='outlined' className={classes.confirmButton}>
-                    Підтвердити
+
+                {action === 'accept' &&
+                <>
+                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
+                        Підтвердити
+                    </Button>
+                    <IconButton onClick={this.deleteHandler}>
+                        <Delete/>
+                    </IconButton>
+                </>
+                }
+                {action === 'return' &&
+                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                    Повернути
                 </Button>
-                <IconButton>
-                    <Delete />
-                </IconButton>
+                }
             </>
         );
     }

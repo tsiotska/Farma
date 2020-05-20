@@ -28,18 +28,18 @@ const styles = (theme: any) => createStyles({
     }
 });
 
-interface IProps extends WithStyles<typeof styles>, Pick<PopoverProps,  'anchorOrigin' | 'transformOrigin'> {
+interface IProps extends WithStyles<typeof styles>, Pick<PopoverProps, 'anchorOrigin' | 'transformOrigin'> {
     name: string;
     delPopoverSettings?: IDeletePopoverSettings;
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            delPopoverSettings
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     delPopoverSettings
+                 }
+             }
+         }) => ({
     delPopoverSettings
 }))
 @observer
@@ -53,7 +53,8 @@ class DeletePopover extends Component<IProps> {
                 anchorEl,
                 callback,
                 name
-        }} = this.props;
+            }
+        } = this.props;
         const namesIsEqual = givenName === name;
         return namesIsEqual
             ? anchorEl
@@ -71,8 +72,8 @@ class DeletePopover extends Component<IProps> {
     }
 
     componentDidUpdate(prevProps: IProps) {
-        const { delPopoverSettings: { anchorEl: prevAnchor }} = prevProps;
-        const { delPopoverSettings: { anchorEl }} = this.props;
+        const { delPopoverSettings: { anchorEl: prevAnchor } } = prevProps;
+        const { delPopoverSettings: { anchorEl } } = this.props;
         const becomeOpen = !prevAnchor && !!anchorEl;
         const becomeClosed = !!prevAnchor && !anchorEl;
         if (becomeOpen) {
@@ -101,27 +102,27 @@ class DeletePopover extends Component<IProps> {
                 transformOrigin={transformOrigin}
                 elevation={20}
                 classes={{ paper: classes.paper }}>
-                    <Tooltip
-                        title={
-                            this.disabledConfirm
-                                ? ''
-                                : 'Видалити'
-                        }
-                        placement='top'
-                        enterDelay={250}
-                        arrow>
-                        <IconButton
-                            disabled={this.disabledConfirm}
-                            onClick={this.confirmClickHandler}
-                            className={cx(classes.iconButton, {[classes.removeButton]: !this.disabledConfirm})}>
-                            <Done fontSize='small' />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Відмінити' placement='top' enterDelay={250} arrow>
-                        <IconButton onClick={this.rejectClickHandler} className={classes.iconButton}>
-                            <Close fontSize='small' />
-                        </IconButton>
-                    </Tooltip>
+                <Tooltip
+                    title={
+                        this.disabledConfirm
+                            ? ''
+                            : 'Видалити'
+                    }
+                    placement='top'
+                    enterDelay={250}
+                    arrow>
+                    <IconButton
+                        disabled={this.disabledConfirm}
+                        onClick={this.confirmClickHandler}
+                        className={cx(classes.iconButton, { [classes.removeButton]: !this.disabledConfirm })}>
+                        <Done fontSize='small'/>
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title='Відмінити' placement='top' enterDelay={250} arrow>
+                    <IconButton onClick={this.rejectClickHandler} className={classes.iconButton}>
+                        <Close fontSize='small'/>
+                    </IconButton>
+                </Tooltip>
             </Popover>
         );
     }

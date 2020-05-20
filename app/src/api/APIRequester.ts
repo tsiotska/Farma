@@ -249,6 +249,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
+    deleteDoctor(id: number): Promise<boolean> {
+        return this.instance.delete(`/api/agent/${id}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
     getMedsSalesStat(url: string): Promise<IMedsSalesStat[]> {
         return this.instance.get(url)
             .then(({ data }) => medsStatNormalizer(data))
@@ -371,8 +377,8 @@ export class APIRequester {
             rmLevel: 'rm_level'
         };
 
-        const preparedData: any = Object.entries(data).reduce((acc, [ propName, value ]) => (
-            value === null ? acc : { ...acc, [namesMap[propName]]: value}
+        const preparedData: any = Object.entries(data).reduce((acc, [propName, value]) => (
+            value === null ? acc : { ...acc, [namesMap[propName]]: value }
         ), {});
 
         if (isEqual(preparedData, {})) return Promise.resolve(false);
@@ -654,5 +660,23 @@ export class APIRequester {
         return this.instance.get(`/api/branch/${departmentId}/rm/${userId}/worker`)
             .then(workersNormalizer)
             .catch(this.defaultErrorHandler());
+    }
+
+    acceptNotification(type: string, id: number): Promise<boolean> {
+        return this.instance.put(`/api/${type}/${id}/accept`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    deleteNotification(type: string, id: number): Promise<boolean> {
+        return this.instance.delete(`/api/${type}/${id}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    returnNotification(type: string, id: number): Promise<boolean> {
+        return this.instance.put(`/api/return/${type}/${id}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
     }
 }

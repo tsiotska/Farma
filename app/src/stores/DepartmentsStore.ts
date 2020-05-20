@@ -1,31 +1,31 @@
 import { multiDepartmentRoles } from './../constants/Roles';
-import {action, computed, observable, reaction, transaction, when} from 'mobx';
+import { action, computed, observable, reaction, transaction, when } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
-import {IDoctorModalValues} from './../containers/Doctors/DoctorModal/DoctorModal';
-import {IWorkerModalValues} from './../containers/Header/WorkerModal/WorkerModal';
-import {IPharmacyModalValues} from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
-import {IValuesMap} from './../helpers/normalizers/normalizer';
-import {IFormValues} from './../containers/Medicines/FormContent/FormContent';
-import {ILPU} from '../interfaces/ILPU';
-import {IDepartment} from './../interfaces/IDepartment';
-import {IRootStore} from './../interfaces/IRootStore';
+import { IDoctorModalValues } from './../containers/Doctors/DoctorModal/DoctorModal';
+import { IWorkerModalValues } from './../containers/Header/WorkerModal/WorkerModal';
+import { IPharmacyModalValues } from './../containers/Pharmacy/PharmacyModal/PharmacyModal';
+import { IValuesMap } from './../helpers/normalizers/normalizer';
+import { IFormValues } from './../containers/Medicines/FormContent/FormContent';
+import { ILPU } from '../interfaces/ILPU';
+import { IDepartment } from './../interfaces/IDepartment';
+import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import {IDepartmentsStore} from '../interfaces/IDepartmentsStore';
-import {IMedicine} from '../interfaces/IMedicine';
-import {IPosition} from '../interfaces/IPosition';
-import {IWorker} from '../interfaces/IWorker';
-import {USER_ROLE} from '../constants/Roles';
-import {ILocation} from '../interfaces/ILocation';
-import {IUser} from '../interfaces/IUser';
-import {PERMISSIONS} from '../constants/Permissions';
-import {IDoctor} from '../interfaces/IDoctor';
-import {IUserSalary} from '../interfaces/IUserSalary';
-import {ISpecialty} from '../interfaces/ISpecialty';
-import {ILpuModalValues} from '../containers/Lpu/LpuModal/LpuModal';
-import {SORT_ORDER} from './UIStore';
-import {CONFIRM_STATUS} from '../constants/ConfirmationStatuses';
+import { IDepartmentsStore } from '../interfaces/IDepartmentsStore';
+import { IMedicine } from '../interfaces/IMedicine';
+import { IPosition } from '../interfaces/IPosition';
+import { IWorker } from '../interfaces/IWorker';
+import { USER_ROLE } from '../constants/Roles';
+import { ILocation } from '../interfaces/ILocation';
+import { IUser } from '../interfaces/IUser';
+import { PERMISSIONS } from '../constants/Permissions';
+import { IDoctor } from '../interfaces/IDoctor';
+import { IUserSalary } from '../interfaces/IUserSalary';
+import { ISpecialty } from '../interfaces/ISpecialty';
+import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
+import { SORT_ORDER } from './UIStore';
+import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
 
 export interface IExpandedWorker {
     id: number;
@@ -249,7 +249,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async loadUnconfirmedDoctors(): Promise<IDoctor[]> {
-        const {api, userStore: {previewUser}} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const condition = (this.currentDepartmentId
             && previewUser
             && previewUser.id)
@@ -483,24 +483,24 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
-            const newPropName = namesMap[propName];
+            .reduce((acc, [propName, value]: [keyof ILpuModalValues, any]) => {
+                const newPropName = namesMap[propName];
 
-            let actualValue: any = value;
-            if (propName === 'city') {
-                actualValue = (value && 'id' in value)
-                    ? value.id
-                    : null;
-            } else if (propName === 'oblast') {
-                actualValue = (value && 'name' in value)
-                    ? value.name
-                    : null;
-            }
+                let actualValue: any = value;
+                if (propName === 'city') {
+                    actualValue = (value && 'id' in value)
+                        ? value.id
+                        : null;
+                } else if (propName === 'oblast') {
+                    actualValue = (value && 'name' in value)
+                        ? value.name
+                        : null;
+                }
 
-            return (newPropName && !!actualValue)
-            ? { ...acc, [newPropName]: actualValue}
-            : acc;
-        }, {});
+                return (newPropName && !!actualValue)
+                    ? { ...acc, [newPropName]: actualValue }
+                    : acc;
+            }, {});
 
         const newLpu = await this.dispatchRequest(
             api.addLpu(payload),
@@ -522,7 +522,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async editLpu(initialLpu: ILPU, data: ILpuModalValues): Promise<boolean> {
         const { api } = this.rootStore;
 
-        const objectFields: Array<keyof ILpuModalValues> = [ 'city', 'oblast' ];
+        const objectFields: Array<keyof ILpuModalValues> = ['city', 'oblast'];
         const namesMap: IValuesMap = {
             name: 'name',
             type: 'org_type',
@@ -534,22 +534,22 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]: [keyof ILpuModalValues, any]) => {
-            const newPropName = namesMap[propName];
+            .reduce((acc, [propName, value]: [keyof ILpuModalValues, any]) => {
+                const newPropName = namesMap[propName];
 
-            let actualValue: any = value;
-            if (objectFields.includes(propName)) {
-                actualValue = (value && typeof value === 'object')
-                    ? propName === 'city'
-                        ? value.id
-                        : value.name
-                    : null;
-            }
+                let actualValue: any = value;
+                if (objectFields.includes(propName)) {
+                    actualValue = (value && typeof value === 'object')
+                        ? propName === 'city'
+                            ? value.id
+                            : value.name
+                        : null;
+                }
 
-            return (newPropName && !!actualValue)
-            ? { ...acc, [newPropName]: actualValue}
-            : acc;
-        }, {});
+                return (newPropName && !!actualValue)
+                    ? { ...acc, [newPropName]: actualValue }
+                    : acc;
+            }, {});
 
         const isLpuEdited = await this.dispatchRequest(
             api.editLpu(initialLpu.id, payload),
@@ -557,7 +557,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (isLpuEdited) {
-            Object.entries(data).forEach(([ propName, value ]) => {
+            Object.entries(data).forEach(([propName, value]) => {
                 if (objectFields.includes(propName)) {
                     const actualValue = (value && typeof value === 'object')
                         ? value.name
@@ -607,16 +607,16 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         };
 
         const payload: any = Object.entries(data)
-        .reduce((acc, [propName, value ]: [keyof IPharmacyModalValues, any]) => {
-            const newPropName = namesMap[propName];
-            if (propName === 'city') {
-                const actualValue = value.id;
-                return { ...acc, city: actualValue };
-            }
-            return (newPropName && !!value)
-            ? { ...acc, [newPropName]: value }
-            : acc;
-        }, {});
+            .reduce((acc, [propName, value]: [keyof IPharmacyModalValues, any]) => {
+                const newPropName = namesMap[propName];
+                if (propName === 'city') {
+                    const actualValue = value.id;
+                    return { ...acc, city: actualValue };
+                }
+                return (newPropName && !!value)
+                    ? { ...acc, [newPropName]: value }
+                    : acc;
+            }, {});
 
         const newPharmacy = await this.dispatchRequest(
             api.addPharmacy(payload),
@@ -674,7 +674,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (isPharmacyEdited) {
-            Object.entries(data).forEach(([ key, value ]) => {
+            Object.entries(data).forEach(([key, value]) => {
                 if (key === 'city') {
                     const cityName = value.name;
                     initialPharmacy[key] = cityName;
@@ -937,7 +937,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             });
 
             if (isDepChanged) {
-                const { userStore: { user: { position } }} = this.rootStore;
+                const { userStore: { user: { position } } } = this.rootStore;
                 if (multiDepartmentRoles.includes(position)) await this.loadAllMeds(false);
                 else this.loadMeds(this.currentDepartmentId);
             }
@@ -1089,7 +1089,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (role === USER_ROLE.REGIONAL_MANAGER) loadPositionsId = USER_ROLE.MEDICAL_AGENT;
         if (!depId || !role || !loadPositionsId) return;
         this.setLoading(requestName);
-        const res = await  api.getAgents(depId, loadPositionsId);
+        const res = await api.getAgents(depId, loadPositionsId);
 
         const dataIsRelevant = this.currentDepartmentId === depId && userRole === this.rootStore.userStore.role;
         if (!dataIsRelevant) return;
@@ -1197,7 +1197,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     async editDoc(initialDoc: IDoctor, formValues: IDoctorModalValues) {
-        const { api, userStore: { previewUser }} = this.rootStore;
+        const { api, userStore: { previewUser } } = this.rootStore;
         const mpId = (!!previewUser && previewUser.position === USER_ROLE.MEDICAL_AGENT)
             ? previewUser.id
             : null;
@@ -1212,7 +1212,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             position: 'position'
         };
         let actualValue: any;
-        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+        const payload = [...Object.entries(formValues)].reduce((acc, [key, value]) => {
             const initialValue = initialDoc[key];
             const propName = namesMap[key];
 
@@ -1231,7 +1231,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 const initLpu = initialDoc.LPUId;
                 return actualValue === initLpu
                     ? acc
-                    : { ...acc, [propName]: (actualValue || '')};
+                    : { ...acc, [propName]: (actualValue || '') };
             } else {
                 actualValue = value;
             }
@@ -1295,7 +1295,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             position: 'position'
         };
 
-        const payload = [...Object.entries(formValues)].reduce((acc, [ key, value ]) => {
+        const payload = [...Object.entries(formValues)].reduce((acc, [key, value]) => {
             const propName = namesMap[key];
             if (!propName || !value) return acc;
             if (propName === namesMap.card) {
@@ -1347,7 +1347,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const formData = new FormData();
         if (image) formData.set('image', image);
-        const payload = Object.entries(values).reduce((acc, [ prop, value ]) => {
+        const payload = Object.entries(values).reduce((acc, [prop, value]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
             if (normalizedPropName === namesMap.card) {
@@ -1430,11 +1430,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 initialWorker.image = image;
             }
             // if (image) {
-                // initialWorker.image = image;
+            // initialWorker.image = image;
             // }
 
             const invertedNames = invert(namesMap);
-            Object.entries(payload).forEach(([ key, value ]) => {
+            Object.entries(payload).forEach(([key, value]) => {
                 const invertedName = invertedNames[key];
                 initialValue = initialWorker[invertedName];
                 if (invertedName && initialValue !== value) {
@@ -1585,7 +1585,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @action.bound
     private getMedicalDepartmentsApiUrl(unconfirmed: boolean = false): string {
-        const { userStore: { previewUser }} = this.rootStore;
+        const { userStore: { previewUser } } = this.rootStore;
         if (!previewUser || !this.currentDepartmentId) return null;
         const { position, id } = previewUser;
 
@@ -1670,7 +1670,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-   async loadRmAgentsInfo(): Promise<any> {
+    async loadRmAgentsInfo(): Promise<any> {
         const { api } = this.rootStore;
         if (this.currentDepartmentId === null) return;
         const data = await api.getRmAgentsInfo(this.currentDepartmentId);
@@ -1685,11 +1685,32 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     async loadMpAgentsInfo(userId: number): Promise<any> {
         const { api } = this.rootStore;
         if (this.currentDepartmentId === null) return null;
-        const data = await  api.getMpAgentsInfo(this.currentDepartmentId, userId);
+        const data = await api.getMpAgentsInfo(this.currentDepartmentId, userId);
         if (!data) return;
         return data.map((item: any) => ({
             ...item,
             region: this.regions.get(item.region) || null
         }));
+    }
+
+    @action.bound
+    async acceptNotification(type: string, id: number) {
+        const { api } = this.rootStore;
+        if (!type || !id) return;
+        return await api.acceptNotification(type, id);
+    }
+
+    @action.bound
+    async deleteNotification(type: string, id: number) {
+        const { api } = this.rootStore;
+        if (!type || !id) return;
+        return await api.deleteNotification(type, id);
+    }
+
+    @action.bound
+    async returnNotification(type: string, id: number) {
+        const { api } = this.rootStore;
+        if (!type || !id) return;
+        return await api.returnNotification(type, id);
     }
 }

@@ -23,7 +23,7 @@ export interface IFilterBy {
 export interface IDeletePopoverSettings {
     name: string;
     anchorEl: Element;
-    callback: (confirm: boolean) => void;
+    callback: (confirm: boolean, type?: string, id?: number) => void;
 }
 
 export interface ISalesPharmacyFilter {

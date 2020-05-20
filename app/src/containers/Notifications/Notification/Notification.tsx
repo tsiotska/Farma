@@ -10,7 +10,7 @@ import cx from 'classnames';
 import { NOTIFICATIONS_TYPE } from '../../../constants/NotificationsType';
 import DoctorPanel from './DoctorPanel';
 import HCFPanel from './HCFPanel';
-import AgentPanel from './AgentPanel';
+import UserPanel from './UserPanel';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -56,15 +56,19 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     notification: INotification;
     departments?: IDepartment[];
+
+    acceptNotification?: (type: string, id: number) => void;
+    deleteClickHandler?: (currentTarget: any, type: string, id: number) => void;
+    returnNotification?: (type: string, id: number) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            departments,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     departments,
+                 }
+             }
+         }) => ({
     departments,
 }))
 @observer
@@ -73,7 +77,7 @@ class Notification extends Component<IProps> {
 
     @computed
     get iconSrc(): string {
-        const { departments, notification: { department }} = this.props;
+        const { departments, notification: { department } } = this.props;
         const currentDep = departments.find(({ id }) => id === department);
         return currentDep
             ? currentDep.image
@@ -81,17 +85,19 @@ class Notification extends Component<IProps> {
     }
 
     render() {
-        const { classes, notification: { type, user, message, payload } } = this.props;
-
+        const {
+            classes, notification: { type, action, user, message, payload },
+            deleteClickHandler, acceptNotification, returnNotification
+        } = this.props;
         return (
             <Paper className={classes.root}>
                 <Grid className={cx(classes.row, classes.titleRow)} alignItems='center' container>
                     {
                         this.iconSrc
-                        ? <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon} />
-                        : <span className={classes.icon} />
+                            ? <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon}/>
+                            : <span className={classes.icon}/>
                     }
-                    <Divider className={classes.divider} orientation='vertical' />
+                    <Divider className={classes.divider} orientation='vertical'/>
                     <Grid xs={4} wrap='nowrap' alignItems='center' zeroMinWidth container item>
                         {
                             typeof user === 'object' &&
@@ -108,20 +114,52 @@ class Notification extends Component<IProps> {
                             />
                         }
                     </Grid>
-                    <Divider className={classes.divider} orientation='vertical' />
+                    <Divider className={classes.divider} orientation='vertical'/>
                     <Grid xs container item>
                         <Typography variant='body2' className={classes.textSemiBold}>
-                            { message }
+                            {message}
                         </Typography>
                     </Grid>
                 </Grid>
                 {
                     payload &&
                     <Grid className={cx(classes.row, classes.subjectRow)} alignItems='center' container>
-                        { type === NOTIFICATIONS_TYPE.AGENT && <DoctorPanel doctor={payload} /> }
-                        { type === NOTIFICATIONS_TYPE.HCF && <HCFPanel hcf={payload} /> }
-                        { type === NOTIFICATIONS_TYPE.PHARMACY && <HCFPanel hcf={payload} /> }
-                        { type === NOTIFICATIONS_TYPE.USER && <AgentPanel agent={payload} /> }
+                        {type === NOTIFICATIONS_TYPE.AGENT &&
+                        <DoctorPanel
+                            doctor={payload}
+                            action={action}
+                            type='agent'
+                            acceptNotification={acceptNotification}
+                            returnNotification={returnNotification}
+                            deleteClickHandler={deleteClickHandler}
+                        />}
+                        {type === NOTIFICATIONS_TYPE.HCF &&
+                        <HCFPanel
+                            hcf={payload}
+                            action={action}
+                            type='hcf'
+                            acceptNotification={acceptNotification}
+                            returnNotification={returnNotification}
+                            deleteClickHandler={deleteClickHandler}
+                        />}
+                        {type === NOTIFICATIONS_TYPE.PHARMACY &&
+                        <HCFPanel
+                            hcf={payload}
+                            action={action}
+                            type='pharmacy'
+                            acceptNotification={acceptNotification}
+                            returnNotification={returnNotification}
+                            deleteClickHandler={deleteClickHandler}
+                        />}
+                        {type === NOTIFICATIONS_TYPE.USER &&
+                        <UserPanel
+                            user={payload}
+                            action={action}
+                            type='user'
+                            acceptNotification={acceptNotification}
+                            returnNotification={returnNotification}
+                            deleteClickHandler={deleteClickHandler}
+                        />}
                     </Grid>
                 }
             </Paper>

@@ -3,10 +3,14 @@ import { observer, inject } from 'mobx-react';
 import { withStyles, createStyles, WithStyles, Grid } from '@material-ui/core';
 import { IDepartment } from '../../interfaces/IDepartment';
 import { INotification } from '../../interfaces/iNotification';
-import { toJS, computed, reaction } from 'mobx';
+import { toJS, computed, reaction, observable } from 'mobx';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import Notification from './Notification';
 import { ILPU } from '../../interfaces/ILPU';
+import Snackbar from '../../components/Snackbar';
+import DeletePopover from '../../components/DeletePopover';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import { IDeletePopoverSettings } from '../../stores/UIStore';
 
 const styles = createStyles({});
 
@@ -18,23 +22,34 @@ interface IProps extends WithStyles<typeof styles> {
     loadNotificationsUsers?: () => void;
     reviewNotifications?: () => void;
     notificationsCount?: number;
+
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    acceptNotification?: (type: string, id: number) => boolean;
+    deleteNotification?: (type: string, id: number) => boolean;
+    returnNotification?: (type: string, id: number) => boolean;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            setCurrentDepartment,
-        },
-        userStore: {
-            loadNotifications,
-            notifications,
-            getAsyncStatus,
-            loadNotificationsUsers,
-            reviewNotifications,
-            notificationsCount,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     setCurrentDepartment,
+                     acceptNotification,
+                     deleteNotification,
+                     returnNotification
+                 },
+                 userStore: {
+                     loadNotifications,
+                     notifications,
+                     getAsyncStatus,
+                     loadNotificationsUsers,
+                     reviewNotifications,
+                     notificationsCount,
+                 },
+                 uiStore: {
+                     openDelPopper
+                 }
+             }
+         }) => ({
     setCurrentDepartment,
     loadNotifications,
     notifications,
@@ -42,9 +57,15 @@ interface IProps extends WithStyles<typeof styles> {
     loadNotificationsUsers,
     reviewNotifications,
     notificationsCount,
+    openDelPopper,
+    acceptNotification,
+    deleteNotification,
+    returnNotification
 }))
 @observer
 class Notifications extends Component<IProps> {
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable snackbarMessage: string = null;
     timeout: any = null;
     reactionDisposer: any = null;
 
@@ -79,9 +100,62 @@ class Notifications extends Component<IProps> {
         );
     }
 
+    deleteConfirmHandler = (confirmed: boolean, type: string, id: number) => {
+        this.props.openDelPopper(null);
+        if (confirmed) {
+            this.delete(type, id);
+        }
+    }
+
+    deleteClickHandler = (currentTarget: any, type: string, id: number) => this.props.openDelPopper({
+        anchorEl: currentTarget,
+        callback: (confirmed: boolean) => this.deleteConfirmHandler(confirmed, type, id),
+        name: 'deleteNotification'
+    })
+
+    snackbarCloseHandler = () => {
+        this.snackbarMessage = null;
+    }
+
     componentWillUnmount() {
         window.clearTimeout(this.timeout);
         this.reactionDisposer();
+    }
+
+    delete = async (type: string, id: number) => {
+        const { deleteNotification } = this.props;
+        const isDeleted = await deleteNotification(type, id);
+        console.log(isDeleted);
+        this.snackbarType = isDeleted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isDeleted
+            ? 'Повідомлення успішно видалено'
+            : 'Не вдалося видалити повідомлення';
+    }
+
+    accept = async (type: string, id: number) => {
+        const { acceptNotification } = this.props;
+        const isAccepted = await acceptNotification(type, id);
+        console.log(isAccepted);
+        this.snackbarType = isAccepted
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isAccepted
+            ? 'Повідомлення успішно підтверджено'
+            : 'Не вдалося підтвердити повідомлення';
+    }
+
+    return = async (type: string, id: number) => {
+        const { returnNotification } = this.props;
+        const isReturned = await returnNotification(type, id);
+        console.log(isReturned);
+        this.snackbarType = isReturned
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = isReturned
+            ? 'Повідомлення успішно повернено'
+            : 'Не вдалося повернути повідомлення';
     }
 
     render() {
@@ -102,12 +176,34 @@ class Notifications extends Component<IProps> {
 
                         return (
                             <React.Fragment key={id}>
-                                { before }
-                                <Notification notification={notification} />
+                                {before}
+                                <Notification
+                                    notification={notification}
+                                    deleteClickHandler={this.deleteClickHandler}
+                                    acceptNotification={this.accept}
+                                    returnNotification={this.return}
+                                />
+                                <Snackbar
+                                    open={!!this.snackbarMessage}
+                                    onClose={this.snackbarCloseHandler}
+                                    type={this.snackbarType}
+                                    message={this.snackbarMessage}
+                                />
                             </React.Fragment>
                         );
                     })
                 }
+                <DeletePopover
+                    name='deleteNotification'
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
             </Grid>
         );
     }

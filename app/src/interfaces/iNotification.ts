@@ -10,4 +10,5 @@ export interface INotification {
     type: NOTIFICATIONS_TYPE;
     isNew: boolean;
     payload?: any;
+    action?: string;
 }

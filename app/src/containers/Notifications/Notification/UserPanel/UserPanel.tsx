@@ -35,36 +35,65 @@ const styles = (theme: any) => createStyles({
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
+    returnButton: {
+        padding: '2px 0',
+        margin: '0 4px',
+        minWidth: 95,
+        color: theme.palette.secondary.dark,
+        borderColor: theme.palette.secondary.dark
+    },
     phone: {
         minWidth: 220
     }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    agent: IUserNotification;
+    user: IUserNotification;
     positions?: Map<number, IPosition>;
+    action?: string;
+    type?: string;
+
+    acceptNotification?: (type: string, id: number) => void;
+    deleteClickHandler?: (currentTarget: any, type: string, id: number) => void;
+    returnNotification?: (type: string, id: number) => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            positions
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     positions
+                 }
+             }
+         }) => ({
     positions
 }))
 @observer
-class AgentPanel extends Component<IProps> {
+class UserPanel extends Component<IProps> {
     get positionName(): string {
-        const { positions, agent: { position } } = this.props;
+        const { positions, user: { position } } = this.props;
         const targetPosition = positions.get(position);
         return targetPosition
             ? targetPosition.alias
             : '-';
     }
+
+    deleteHandler = ({ currentTarget }: any) => {
+        const { type, user: { id }, deleteClickHandler } = this.props;
+        deleteClickHandler(currentTarget, type, id);
+    }
+
+    acceptHandler = () => {
+        const { type, user: { id }, acceptNotification } = this.props;
+        acceptNotification(type, id);
+    }
+
+    returnHandler = () => {
+        const { type, user: { id }, returnNotification } = this.props;
+        returnNotification(type, id);
+    }
+
     render() {
-        const { classes, agent } = this.props;
+        const { classes, user, action } = this.props;
         const {
             name,
             email,
@@ -72,12 +101,16 @@ class AgentPanel extends Component<IProps> {
             mobilePhone,
             card,
             confirmed,
-        } = agent;
+        } = user;
 
         return (
             <>
                 <Grid xs container item>
-                    <CommitBadge committed={confirmed} title='ФФМ' className={classes.badge} />
+                    {action === 'accept' &&
+                    <>
+                        <CommitBadge committed={confirmed} title='ФФМ' className={classes.badge}/>
+                    </>
+                    }
                     <Typography variant='body2'>
                         {name || '-'}
                     </Typography>
@@ -94,8 +127,8 @@ class AgentPanel extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.phone} xs container item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{ workPhone || '-' }</span>
-                        <span>{ mobilePhone || '-' }</span>
+                        <span>{workPhone || '-'}</span>
+                        <span>{mobilePhone || '-'}</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
@@ -103,15 +136,24 @@ class AgentPanel extends Component<IProps> {
                         {card || '-'}
                     </Typography>
                 </Grid>
-                <Button variant='outlined' className={classes.confirmButton}>
-                    Підтвердити
+                {action === 'accept' &&
+                <>
+                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
+                        Підтвердити
+                    </Button>
+                    <IconButton onClick={this.deleteHandler}>
+                        <Delete/>
+                    </IconButton>
+                </>
+                }
+                {action === 'return' &&
+                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                    Повернути
                 </Button>
-                <IconButton>
-                    <Delete />
-                </IconButton>
+                }
             </>
         );
     }
 }
 
-export default withStyles(styles)(AgentPanel);
+export default withStyles(styles)(UserPanel);

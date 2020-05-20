@@ -548,7 +548,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
             api.getNotifications(),
             requestName
         );
-
         const responesExist = res && Array.isArray(res);
         if (!responesExist) return;
 

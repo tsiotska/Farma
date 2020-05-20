@@ -10,6 +10,7 @@ import { USER_ROLE } from '../../constants/Roles';
 
 const defaultNotification: INotification = {
     id: null,
+    action: null,
     user: null,
     department: null,
     message: null,
@@ -20,6 +21,7 @@ const defaultNotification: INotification = {
 };
 
 const valuesMap: IValuesMap = {
+    action: 'action',
     user: 'user',
     branch: 'department',
     message: 'message',
