@@ -28,6 +28,7 @@ import AddBonusModal from './AddBonusModal';
 import MonthPicker from './MonthPicker';
 import { IUser } from '../../interfaces';
 import { IUserLikeObject } from '../../stores/DepartmentsStore';
+import DeletePopover from '../../components/DeletePopover';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -248,6 +249,17 @@ class Marks extends Component<IProps> {
                     }
                 </Paper>
                 <AddBonusModal />
+                <DeletePopover
+                    name='deleteBonusAgent'
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
             </Grid>
         );
     }

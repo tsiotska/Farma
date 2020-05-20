@@ -18,7 +18,6 @@ import { USER_ROLE } from '../../../constants/Roles';
 import TotalRow from '../TotalRow';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import AddDocsModal from '../AddDocsModal';
-import { Close } from '@material-ui/icons';
 import { ADD_DOC_MODAL } from '../../../constants/Modals';
 import TableSubheader from '../TableSubheader';
 import { IMarkFraction } from '../../../stores/UserStore';

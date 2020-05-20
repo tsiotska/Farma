@@ -11,7 +11,7 @@ import {
     Paper,
     IconButton
 } from '@material-ui/core';
-import RemoveIcon from '@material-ui/icons/Remove';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { KeyboardArrowDown, Close } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -25,6 +25,7 @@ import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
+import { IDeletePopoverSettings } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -123,6 +124,10 @@ const styles = (theme: any) => createStyles({
         width: 14,
         height: 14,
         marginLeft: 'auto'
+    },
+    removeIcon: {
+        color: theme.palette.primary.level.red,
+        padding: 4
     }
 });
 
@@ -149,6 +154,7 @@ interface IProps extends WithStyles<typeof styles> {
     ) => void;
     expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
 
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeBonusAgent?: (id: number) => void;
 }
 
@@ -164,6 +170,9 @@ interface IProps extends WithStyles<typeof styles> {
                      role,
                      userMarks,
                      changedMarks,
+                 },
+                 uiStore: {
+                     openDelPopper
                  }
              }
          }) => ({
@@ -174,6 +183,7 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonusChangeHandler,
     previewBonusMonth,
     changedMarks,
+    openDelPopper
 }))
 @observer
 class TableRow extends Component<IProps> {
@@ -307,8 +317,22 @@ class TableRow extends Component<IProps> {
         );
     }
 
+    deleteConfirmHandler = (confirmed: boolean) => {
+        console.log(confirmed);
+        this.props.openDelPopper(null);
+        if (confirmed) {
+            this.removeBonusAgent();
+        }
+    }
+
+    deleteClickHandler = ({ currentTarget }: any) => this.props.openDelPopper({
+        anchorEl: currentTarget,
+        callback: this.deleteConfirmHandler,
+        name: 'deleteBonusAgent'
+    })
+
     removeBonusAgent = () => {
-        const {removeBonusAgent, agentInfo: {id}} = this.props;
+        const { removeBonusAgent, agentInfo: { id } } = this.props;
         removeBonusAgent(id);
     }
 
@@ -418,9 +442,9 @@ class TableRow extends Component<IProps> {
                                                 card={card}
                                             />
                                         </InfoWindow>
-                                        {/* <IconButton onClick={this.removeBonusAgent}> */}
-                                            <RemoveIcon/>
-                                        {/* </IconButton> */}
+                                        <IconButton className={classes.removeIcon} onClick={this.deleteClickHandler}>
+                                            <RemoveCircleOutlineOutlinedIcon/>
+                                        </IconButton>
                                     </>
                                 }
                                 {
