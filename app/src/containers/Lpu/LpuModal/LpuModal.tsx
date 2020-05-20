@@ -260,11 +260,7 @@ class LpuModal extends Component<IProps> {
                         renderPropName='name'
                         required
                         value={this.formValues.oblast}
-                        options={!!this.oblastListItems ? this.oblastListItems.map(
-                            ({ name }, id) => (
-                                { id, name }
-                            )
-                        ) : []}
+                        options={!!this.oblastListItems ? this.oblastListItems : []}
                         error={this.errors.get('oblast')}/>
                     <FormRow
                         required
@@ -283,11 +279,7 @@ class LpuModal extends Component<IProps> {
                         propName='city'
                         renderPropName='name'
                         value={this.formValues.city}
-                        options={!!this.cities ? this.cities.map(
-                            ({ name }, id) => (
-                                { id, name }
-                            )
-                        ) : []}
+                        options={!!this.cities ? this.cities : []}
                         error={this.errors.get('city')}/>
                     <FormRow
                         label='Телефон 1'

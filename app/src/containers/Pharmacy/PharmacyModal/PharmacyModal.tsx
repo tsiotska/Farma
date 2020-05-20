@@ -318,11 +318,7 @@ class PharmacyModal extends Component<IProps> {
                             disabled={this.formValues.oblast === '' || !this.cities.length}
                             required
                             value={this.formValues.city}
-                            options={!!this.cities ? this.cities.map(
-                                ({ name }, id) => (
-                                     { id, name }
-                                )
-                            ) : []}
+                            options={!!this.cities ? this.cities : []}
                             error={this.errors.get('city')}/>
                         <FormRow
                             label='Телефон 1'
@@ -338,11 +334,7 @@ class PharmacyModal extends Component<IProps> {
                             propName='lpu'
                             renderPropName='name'
                             value={this.formValues.lpu}
-                            options={!!this.lpus ? this.lpus.map(
-                                ({ name }, id) => (
-                                     { id, name }
-                                )
-                            ) : []}
+                            options={!!this.lpus ? this.lpus : []}
                             disabled={!this.formValues.city || !this.lpus.length}
                             error={this.errors.get('lpu')}/>
                         <FormRow

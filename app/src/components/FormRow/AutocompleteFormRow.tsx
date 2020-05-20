@@ -23,26 +23,30 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
     get renderPropTitle(): (value: any) => string {
         const { renderPropName } = this.props;
         return renderPropName
-            ? ({ [renderPropName]: title }: any) => title
-            : (title: string) => {
-                return title;
-            };
+            ? ({ [renderPropName]: title }: any) => (title || '')
+            : (title: string) => (title || '');
     }
 
     // TODO: Треба посетити ізначальне значення в Autocomplete або зробити його повністю контролюємим
-  /*  @computed
+    @computed
     get getSelectedItem() {
-        const { options, value } = this.props;
-        console.log(toJS(value))
-        if (!value || !value.hasOwnProperty('name')) return;
-        const item = options.find((opt: any) => {
-            if (opt === value) {
-                return opt;
-            }
-        });
-        return item || {};
+        const {
+            options,
+            value,
+            renderPropName
+        } = this.props;
+       /* console.log('value')
+        console.log(value)*/
+        if (!value || !options) return '';
+        if (typeof value === 'object') {
+            const targetValue = value[renderPropName];
+            return options
+                ? options.find((x: any) => x[renderPropName] === targetValue)
+                : '';
+        }
+        return options.find((x: any) => x === value) || '';
     }
-*/
+
     changeHandler = (event: any, value: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
@@ -59,7 +63,8 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             options,
             id
         } = this.props;
-        //  console.log('options: ', toJS(options));
+        const preparedOptions = options.map((opt: any) => (opt[renderPropName]));
+
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
@@ -67,16 +72,15 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                 </InputLabel>
 
                 <Autocomplete
-                    id={id}
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
-                    options={options}
-                    getOptionLabel={this.renderPropTitle}
+                    options={preparedOptions}
+                    // getOptionLabel={this.renderPropTitle}
                     renderInput={(params) => {
                         return <TextField className={classes.input} {...params}
                                           InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
                     }}
-                   // value={this.getSelectedItem}
+                    defaultValue={this.getSelectedItem}
                 />
 
                 {

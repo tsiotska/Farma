@@ -288,11 +288,7 @@ class DoctorModal extends Component<IProps> {
                     renderPropName='name'
                     disabled={!LPUs || !LPUs.length}
                     value={this.formValues.lpu}
-                    options={!!LPUs ? LPUs.map(
-                        ({ name }, id) => (
-                            { id, name }
-                        )
-                    ) : []}
+                    options={!!LPUs ? LPUs : []}
                     required/>
 
                 <FormRow
@@ -311,11 +307,7 @@ class DoctorModal extends Component<IProps> {
                     renderPropName='name'
                     value={this.formValues.specialty}
                     disabled={!specialties || !specialties.length}
-                    options={!!specialties ? specialties.map(
-                        ({ name }, id) => (
-                            { id, name }
-                        )
-                    ) : []}
+                    options={!!specialties ? specialties : []}
                     required/>
                 <FormRow
                     label='Банківська картка'

@@ -28,7 +28,7 @@ export const styles = (theme: any) => createStyles({
 export interface IProps<T> extends WithStyles<typeof styles> {
     label: string;
     values: T;
-    value?: number | string | object;
+    value?: number | string | T;
     propName: keyof T;
     onChange: (propName: keyof T, value: string) => void;
     error: boolean | string;
