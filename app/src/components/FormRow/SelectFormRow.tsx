@@ -25,7 +25,8 @@ class SelectFormRow<T> extends Component<IProps<T>> {
             disabled,
             required,
             value,
-            values
+            values,
+            autoComplete
         } = this.props;
 
         return (
@@ -33,6 +34,7 @@ class SelectFormRow<T> extends Component<IProps<T>> {
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
                     { label }
                 </InputLabel>
+
                 <Select
                     displayEmpty
                     className={classes.input}

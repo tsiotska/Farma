@@ -109,6 +109,9 @@ const styles = (theme: any) => createStyles({
     },
     cell: {
         minWidth: 120
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main
     }
 });
 
@@ -269,7 +272,7 @@ class DoctorListItem extends Component<IProps> {
                                 </Typography>
                                 {
                                     isAllowed &&
-                                    <IconButton onClick={this.editClickHandler}>
+                                    <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
                                         <EditOutlinedIcon className={classes.editIcon} fontSize='small' />
                                     </IconButton>
                                 }

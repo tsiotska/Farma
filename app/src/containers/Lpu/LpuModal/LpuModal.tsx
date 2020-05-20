@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import {
     createStyles,
@@ -43,6 +42,7 @@ interface IProps extends WithStyles<typeof styles> {
 
 export interface ILpuModalValues {
     [key: string]: string | ILocation;
+
     name: string;
     oblast: ILocation;
     city: ILocation;
@@ -53,21 +53,21 @@ export interface ILpuModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            oblasti,
-            loadSpecificCities,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     oblasti,
+                     loadSpecificCities,
+                 }
+             }
+         }) => ({
     oblasti,
     loadSpecificCities,
 }))
 @observer
 class LpuModal extends Component<IProps> {
-    readonly objectFields: Array<keyof ILpuModalValues> = [ 'oblast', 'city' ];
-    readonly optionalFields: Array<keyof ILpuModalValues> = [ 'phone1', 'phone2' ];
-    readonly errorMessages: {[key: string]: string} = {
+    readonly objectFields: Array<keyof ILpuModalValues> = ['oblast', 'city'];
+    readonly optionalFields: Array<keyof ILpuModalValues> = ['phone1', 'phone2'];
+    readonly errorMessages: { [key: string]: string } = {
         phone1: 'Телефон має склададатись з 10 або 12 цифр',
         phone2: 'Телефон має склададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
@@ -243,106 +243,84 @@ class LpuModal extends Component<IProps> {
                 title={title}
                 fullWidth
                 maxWidth='sm'>
+                <FormRow
+                    label='Назва'
+                    values={this.formValues}
+                    onChange={this.changeHandler}
+                    propName='name'
+                    error={this.errors.get('name')}
+                    required
+                />
+                <Grid justify='space-between' container>
                     <FormRow
-                        label='Назва'
+                        autoComplete
+                        label='Область'
+                        onChange={this.changeHandler}
+                        propName='oblast'
+                        renderPropName='name'
+                        required
+                        value={this.formValues.oblast}
+                        options={!!this.oblastListItems ? this.oblastListItems : []}
+                        error={this.errors.get('oblast')}/>
+                    <FormRow
+                        required
+                        label='Адрес'
                         values={this.formValues}
                         onChange={this.changeHandler}
-                        propName='name'
-                        error={this.errors.get('name')}
-                        required
+                        propName='address'
+                        error={this.errors.get('address')}
                     />
-                    <Grid justify='space-between' container>
-                        <FormRow
-                            select
-                            label='Область'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            propName='oblast'
-                            value={
-                                this.formValues.oblast
-                                ? this.formValues.oblast.id
-                                : ''
-                            }
-                            required
-                            error={this.errors.get('oblast')}>
-                                {
-                                    this.oblastListItems.map(({ name, id }) => (
-                                        <MenuItem key={id} value={id}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
-                        <FormRow
-                            required
-                            label='Адрес'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            propName='address'
-                            error={this.errors.get('address')}
-                        />
-                        <FormRow
-                            select
-                            required
-                            disabled={!this.formValues.oblast}
-                            label='Місто'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            value={
-                                this.formValues.city
-                                ? this.formValues.city.id
-                                : ''
-                            }
-                            propName='city'
-                            error={this.errors.get('city')}>
-                                {
-                                    this.cities.map(({ id, name }) => (
-                                        <MenuItem key={id} value={id}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
-                        <FormRow
-                            label='Телефон 1'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            propName='phone1'
-                            error={this.errors.get('phone1')}
-                        />
-                        <FormRow
-                            select
-                            required
-                            disabled={!types.length}
-                            label='Тип'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            propName='type'
-                            error={this.errors.get('type')}>
-                                {
-                                    types.map(name => (
-                                        <MenuItem key={name} value={name}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
-                        <FormRow
-                            label='Телефон 2'
-                            values={this.formValues}
-                            onChange={this.changeHandler}
-                            propName='phone2'
-                            error={this.errors.get('phone2')}
-                        />
-                    </Grid>
-                    <Button
-                        variant='contained'
-                        color='primary'
-                        className={classes.submitButton}
-                        onClick={this.submitHandler}
-                        disabled={!this.allowSubmit}>
-                        Зберегти
-                    </Button>
+                    <FormRow
+                        autoComplete
+                        required
+                        disabled={!this.formValues.oblast}
+                        label='Місто'
+                        onChange={this.changeHandler}
+                        propName='city'
+                        renderPropName='name'
+                        value={this.formValues.city}
+                        options={!!this.cities ? this.cities : []}
+                        error={this.errors.get('city')}/>
+                    <FormRow
+                        label='Телефон 1'
+                        values={this.formValues}
+                        onChange={this.changeHandler}
+                        propName='phone1'
+                        error={this.errors.get('phone1')}
+                    />
+                    <FormRow
+                        select
+                        required
+                        disabled={!types.length}
+                        label='Тип'
+                        values={this.formValues}
+                        onChange={this.changeHandler}
+                        propName='type'
+                        error={this.errors.get('type')}>
+                        {
+                            types.map(name => (
+                                <MenuItem key={name} value={name}>
+                                    {name}
+                                </MenuItem>
+                            ))
+                        }
+                    </FormRow>
+                    <FormRow
+                        label='Телефон 2'
+                        values={this.formValues}
+                        onChange={this.changeHandler}
+                        propName='phone2'
+                        error={this.errors.get('phone2')}
+                    />
+                </Grid>
+                <Button
+                    variant='contained'
+                    color='primary'
+                    className={classes.submitButton}
+                    onClick={this.submitHandler}
+                    disabled={!this.allowSubmit}>
+                    Зберегти
+                </Button>
             </Dialog>
         );
     }

@@ -34,6 +34,7 @@ import { IWithRestriction } from '../../interfaces';
 import { withRestriction } from '../hoc/withRestriction';
 import { PERMISSIONS } from '../../constants/Permissions';
 import DeleteButton from './DeleteButton';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -103,6 +104,9 @@ const styles = (theme: any) => createStyles({
     },
     placeholderImage: {
         margin: '8px 6px 8px 10px'
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main
     },
     nameCell: {},
     locationCell: {},
@@ -379,8 +383,8 @@ class WorkerListItem extends Component<IProps> {
                                     isAllowed &&
                                     <IconButton
                                         onClick={this.editClickHandler}
-                                        className={classes.iconButton}>
-                                        <Edit fontSize='small' />
+                                        className={cx(classes.iconButton, classes.colorGreen)}>
+                                        <EditOutlinedIcon fontSize='small' />
                                     </IconButton>
                                 }
                             </>

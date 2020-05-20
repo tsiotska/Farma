@@ -36,7 +36,7 @@ interface IProps extends WithStyles<typeof styles> {
         oblastName?: string;
         regionId?: number;
     }) => Promise<ILocation[]>;
-    loadSpecificLpus?: (cityId: number) =>  Promise<ILPU[]>;
+    loadSpecificLpus?: (cityId: number) => Promise<ILPU[]>;
 }
 
 export interface IPharmacyModalValues {
@@ -51,14 +51,14 @@ export interface IPharmacyModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            oblasti,
-            loadSpecificCities,
-            loadSpecificLpus,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     oblasti,
+                     loadSpecificCities,
+                     loadSpecificLpus,
+                 }
+             }
+         }) => ({
     oblasti,
     loadSpecificCities,
     loadSpecificLpus,
@@ -82,10 +82,10 @@ class PharmacyModal extends Component<IProps> {
     @observable lpus: ILPU[] = [];
 
     @observable errors: Map<keyof IPharmacyModalValues, boolean | string> = new Map();
-    @observable optionalFields: Array<keyof IPharmacyModalValues> = [ 'lpu', 'phone1', 'phone2' ];
+    @observable optionalFields: Array<keyof IPharmacyModalValues> = ['lpu', 'phone1', 'phone2'];
     @observable formValues: IPharmacyModalValues = { ...this.initialValues };
 
-    readonly errorMessages: {[key: string]: string} = {
+    readonly errorMessages: { [key: string]: string } = {
         phone1: 'Телефон має скададатись з 10 або 12 цифр',
         phone2: 'Телефон має скададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
@@ -110,8 +110,8 @@ class PharmacyModal extends Component<IProps> {
 
             if (x === 'city') {
                 const cityName = currentValue
-                ? (currentValue as ILocation).name
-                : null;
+                    ? (currentValue as ILocation).name
+                    : null;
 
                 return initialValue !== cityName;
             }
@@ -123,7 +123,7 @@ class PharmacyModal extends Component<IProps> {
     @computed
     get allowSubmit(): boolean {
         const requiredProps = this.allProps
-        .filter((x) => (this.optionalFields as string[]).includes(x) === false);
+            .filter((x) => (this.optionalFields as string[]).includes(x) === false);
         const hasRequiredProps = requiredProps.every(x => !!this.formValues[x]);
         const isAllPropsValid = this.allProps.every(x => !(this.errors as Map<string, any>).get(x));
         return hasRequiredProps && isAllPropsValid && this.valuesChanged;
@@ -178,7 +178,7 @@ class PharmacyModal extends Component<IProps> {
     }
 
     loadSpecificCities = async (oblastName: string) => {
-        const res = await this.props.loadSpecificCities({oblastName});
+        const res = await this.props.loadSpecificCities({ oblastName });
         if (Array.isArray(res)) this.cities = res;
     }
 
@@ -275,13 +275,13 @@ class PharmacyModal extends Component<IProps> {
 
         return (
             <>
-            <Dialog
-                classes={{ title: classes.header }}
-                open={open}
-                onClose={onClose}
-                title={title}
-                fullWidth
-                maxWidth='sm'>
+                <Dialog
+                    classes={{ title: classes.header }}
+                    open={open}
+                    onClose={onClose}
+                    title={title}
+                    fullWidth
+                    maxWidth='sm'>
                     <FormRow
                         label='Назва'
                         values={this.formValues}
@@ -292,25 +292,15 @@ class PharmacyModal extends Component<IProps> {
                     />
                     <Grid justify='space-between' container>
                         <FormRow
-                            select
+                            autoComplete
                             label='Область'
-                            values={this.formValues}
                             onChange={this.changeHandler}
                             propName='oblast'
-                            required
                             disabled={this.oblastListItems.length === 0}
-                            error={this.errors.get('oblast')}>
-                                {
-                                    this.oblastListItems.map(name => (
-                                        <MenuItem
-                                            className={classes.menuItem}
-                                            value={name}
-                                            key={name}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
+                            required
+                            value={this.formValues.oblast}
+                            options={!!this.oblastListItems ? this.oblastListItems : []}
+                            error={this.errors.get('oblast')}/>
                         <FormRow
                             label='Адрес'
                             values={this.formValues}
@@ -320,27 +310,16 @@ class PharmacyModal extends Component<IProps> {
                             required
                         />
                         <FormRow
-                            select
+                            autoComplete
                             label='Місто'
-                            values={this.formValues}
                             onChange={this.changeHandler}
                             propName='city'
+                            renderPropName='name'
                             disabled={this.formValues.oblast === '' || !this.cities.length}
-                            value={
-                                this.formValues.city
-                                ? this.formValues.city.id
-                                : ''
-                            }
                             required
-                            error={this.errors.get('city')}>
-                                {
-                                    this.cities.map(({ id, name }) => (
-                                        <MenuItem className={classes.menuItem} key={id} value={id}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
+                            value={this.formValues.city}
+                            options={!!this.cities ? this.cities : []}
+                            error={this.errors.get('city')}/>
                         <FormRow
                             label='Телефон 1'
                             values={this.formValues}
@@ -349,22 +328,15 @@ class PharmacyModal extends Component<IProps> {
                             error={this.errors.get('phone1')}
                         />
                         <FormRow
-                            select
+                            autoComplete
                             label='ЛПУ'
-                            values={this.formValues}
                             onChange={this.changeHandler}
                             propName='lpu'
+                            renderPropName='name'
+                            value={this.formValues.lpu}
+                            options={!!this.lpus ? this.lpus : []}
                             disabled={!this.formValues.city || !this.lpus.length}
-                            error={this.errors.get('lpu')}>
-                                <MenuItem value='' className={classes.menuItem} />
-                                {
-                                    this.lpus.map(({ id, name }) => (
-                                        <MenuItem className={classes.menuItem} key={id} value={name}>
-                                            { name }
-                                        </MenuItem>
-                                    ))
-                                }
-                        </FormRow>
+                            error={this.errors.get('lpu')}/>
                         <FormRow
                             label='Телефон 2'
                             values={this.formValues}
@@ -381,13 +353,13 @@ class PharmacyModal extends Component<IProps> {
                             disabled={!types.length}
                             required
                             error={this.errors.get('type')}>
-                                {
-                                    types.map(x => (
-                                        <MenuItem className={classes.menuItem} key={x} value={x}>
-                                            { x }
-                                        </MenuItem>
-                                    ))
-                                }
+                            {
+                                types.map(x => (
+                                    <MenuItem className={classes.menuItem} key={x} value={x}>
+                                        {x}
+                                    </MenuItem>
+                                ))
+                            }
                         </FormRow>
                     </Grid>
                     <Button
@@ -398,7 +370,7 @@ class PharmacyModal extends Component<IProps> {
                         disabled={!this.allowSubmit}>
                         Зберегти
                     </Button>
-            </Dialog>
+                </Dialog>
             </>
         );
     }
