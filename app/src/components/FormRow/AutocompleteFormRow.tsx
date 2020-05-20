@@ -35,8 +35,7 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             value,
             renderPropName
         } = this.props;
-       /* console.log('value')
-        console.log(value)*/
+
         if (!value || !options) return '';
         if (typeof value === 'object') {
             const targetValue = value[renderPropName];
@@ -72,6 +71,7 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                 </InputLabel>
 
                 <Autocomplete
+                    defaultValue={this.getSelectedItem}
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
                     options={preparedOptions}
@@ -80,7 +80,6 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                         return <TextField className={classes.input} {...params}
                                           InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
                     }}
-                    defaultValue={this.getSelectedItem}
                 />
 
                 {
