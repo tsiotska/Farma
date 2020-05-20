@@ -30,7 +30,7 @@ const styles = (theme: any) => createStyles({
         marginBottom: 1,
         minHeight: 48,
         padding: '5px 0 5px 8px',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'flex-start',
         backgroundColor: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.blue
@@ -49,9 +49,6 @@ const styles = (theme: any) => createStyles({
             borderBottomLeftRadius: 2,
             borderBottomRightRadius: 2,
         }
-    },
-    column: {
-        minWidth: 120
     },
     badgesContainer: {
         minWidth: 100,
@@ -76,6 +73,25 @@ const styles = (theme: any) => createStyles({
             ? 'white'
             : theme.palette.primary.gray.light
     },
+    confirmButton: {
+        color: 'white',
+        borderColor: 'white',
+        height: 36,
+        padding: '0 8px',
+        marginLeft: 'auto',
+        marginRight: 20,
+        minWidth: 100
+    },
+    infoIcon: {
+        alignSelf: 'center'
+    },
+    deposit: {
+        width: '100%',
+        color: '#647cfe',
+        '&:hover': {
+            cursor: 'pointer'
+        }
+    },
     text: {
         textTransform: 'capitalize',
         color: ({ unconfirmed }: any) => unconfirmed
@@ -91,24 +107,8 @@ const styles = (theme: any) => createStyles({
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
-    confirmButton: {
-        color: 'white',
-        borderColor: 'white',
-        height: 36,
-        padding: '0 8px',
-        marginLeft: 'auto',
-        marginRight: 20,
-        minWidth: 100
-    },
-    infoIcon: {
-        alignSelf: 'center'
-    },
-    deposit: {
-        width: '100%',
-        color: '#647CFE',
-        '&:hover': {
-            cursor: 'pointer'
-        }
+    cell: {
+        minWidth: 120
     }
 });
 
@@ -206,12 +206,12 @@ class DoctorListItem extends Component<IProps> {
             <Grid ref={rootRef} className={classes.root} alignItems='center' wrap='nowrap' container>
                 {
                     unconfirmed && showBadges &&
-                    <Grid className={classes.badgesContainer}>
+                    <Grid className={cx(classes.cell, classes.badgesContainer)}>
                         <CommitBadge className={classes.badge} title='ФФМ' committed={FFMCommit}/>
                         <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                     </Grid>
                 }
-                <Grid xs container item>
+                <Grid xs className={classes.cell} container item>
                     <Typography variant='body2' className={classes.text}>
                         {LPUName || '-'}
                     </Typography>
@@ -219,17 +219,17 @@ class DoctorListItem extends Component<IProps> {
                         {address}
                     </Typography>
                 </Grid>
-                <Grid xs container item>
+                <Grid xs className={classes.cell} container item>
                     <Typography variant='body2' className={cx(classes.text, { highlight: !!highlight })}>
                         {name || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs={1} className={classes.cell} container item>
                     <Typography variant='body2' className={classes.text}>
                         {specialty || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs={1} className={classes.cell} container item>
                     <Typography variant='body2' className={cx(classes.phoneContainer, classes.text)}>
                         {
                             !mobilePhone && !workPhone
@@ -241,12 +241,12 @@ class DoctorListItem extends Component<IProps> {
                         }
                     </Typography>
                 </Grid>
-                <Grid xs={1} className={classes.column} container item>
+                <Grid xs={1} className={classes.cell} container item>
                     <Typography variant='body2' className={classes.text}>
                         {card || '-'}
                     </Typography>
                 </Grid>
-                <Grid xs={3} alignItems='center' wrap='nowrap' container item>
+                <Grid xs={3} className={classes.cell} alignItems='center' wrap='nowrap' container item>
                     {
                         (unconfirmed && isAllowed)
                             ? <Button
@@ -260,20 +260,20 @@ class DoctorListItem extends Component<IProps> {
                                         : 'Підтвердити'
                                 }
                             </Button>
-                        : <>
-                            <Typography
-                                variant='body2'
-                                onClick={this.depositModalHandler}
-                                className={cx(classes.deposit, classes.text)}>
-                                { deposit || 0 }
-                            </Typography>
-                            {
-                                isAllowed &&
-                                <IconButton onClick={this.editClickHandler}>
-                                    <Edit className={classes.editIcon} fontSize='small' />
-                                </IconButton>
-                            }
-                          </>
+                            : <>
+                                <Typography
+                                    variant='body2'
+                                    onClick={this.depositModalHandler}
+                                    className={cx(classes.deposit)}>
+                                    { deposit || 0 }
+                                </Typography>
+                                {
+                                    isAllowed &&
+                                    <IconButton onClick={this.editClickHandler}>
+                                        <Edit className={classes.editIcon} fontSize='small' />
+                                    </IconButton>
+                                }
+                            </>
                     }
                     {
                         <DeleteDocButton

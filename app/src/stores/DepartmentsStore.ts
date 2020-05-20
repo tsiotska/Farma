@@ -1426,9 +1426,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         );
 
         if (edited) {
-            if (newAvatar) {
+            if (formData.has('image')) {
                 initialWorker.image = image;
             }
+            // if (image) {
+                // initialWorker.image = image;
+            // }
 
             const invertedNames = invert(namesMap);
             Object.entries(payload).forEach(([ key, value ]) => {

@@ -54,7 +54,7 @@ class TableRow extends Component<IProps> {
             <Grid direction='column' wrap='nowrap' container>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center' container item>
+                    <Grid justify='center' alignItems='center' className={cx(classes.cell)} container item>
                         <Typography className={classes.title_bold} variant='body1'>
                             {title}
                         </Typography>
@@ -70,7 +70,7 @@ class TableRow extends Component<IProps> {
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center' container item>
+                    <Grid alignItems='center' className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
                             {title}
                         </Typography>
@@ -120,7 +120,7 @@ class TableRow extends Component<IProps> {
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center' container item>
+                    <Grid alignItems='center' className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
                             {title}
                         </Typography>
@@ -164,7 +164,7 @@ class TableRow extends Component<IProps> {
                 </Grid>
 
                 <Grid className={cx(classes.complexHeader)}>
-                    <Grid className={cx(classes.cell)} justify='center' container item>
+                    <Grid alignItems='center' className={cx(classes.cell)} justify='center' container item>
                         <Typography color='textSecondary' variant='body1'>
                             {title}
                         </Typography>

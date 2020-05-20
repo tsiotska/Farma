@@ -47,7 +47,7 @@ const styles = (theme: any) => createStyles({
     divideContainer_line: {
         width: '18%',
         height: 1,
-        backgroundColor:  theme.palette.primary.level.green
+        backgroundColor: theme.palette.primary.level.green
     },
     divideContainer_label: {
         color: theme.palette.primary.level.green,
@@ -69,19 +69,19 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartmentMeds
-        },
-        userStore: {
-            changeUserSalary,
-            userSales,
-            salarySettings,
-            clearUserSalaryInfo,
-            getAsyncStatus
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartmentMeds
+                 },
+                 userStore: {
+                     changeUserSalary,
+                     userSales,
+                     salarySettings,
+                     clearUserSalaryInfo,
+                     getAsyncStatus
+                 }
+             }
+         }) => ({
     changeUserSalary,
     currentDepartmentMeds,
     userSales,
@@ -89,11 +89,12 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     clearUserSalaryInfo,
     getAsyncStatus
 }))
-@withRestriction([ PERMISSIONS.EDIT_SALARY ])
+@withRestriction([PERMISSIONS.EDIT_SALARY])
 @observer
 class UserContent extends Component<IProps> {
     readonly colors: any;
     @observable userLevel: number = 1;
+    @observable disabledSubmit: boolean = true;
 
     constructor(props: IProps) {
         super(props);
@@ -198,7 +199,7 @@ class UserContent extends Component<IProps> {
                 ? salaryInfo.meds
                 : {};
 
-            const bonusValues = Object.entries(meds).map(([ medId, { amount, bonus }]) => {
+            const bonusValues = Object.entries(meds).map(([medId, { amount, bonus }]) => {
                 const soldAmount = userSales[medId]
                     ? (userSales[medId].amount || 0)
                     : 0;
@@ -215,13 +216,17 @@ class UserContent extends Component<IProps> {
         });
     }
 
-    changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value }}: any) => {
+    changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value } }: any) => {
         const { changeUserSalary } = this.props;
         const casted = +value;
         const isValid = value.length
             ? !Number.isNaN(casted)
             : true;
         if (isValid) changeUserSalary(level, propName, casted);
+    }
+
+    enableSubmitButton = () => {
+        this.disabledSubmit = false;
     }
 
     levelReactionDisposer: any;
@@ -269,6 +274,8 @@ class UserContent extends Component<IProps> {
                             medicine={medicine}
                             salary={salary}
                             editable={isAllowed}
+                            enableSubmitButton={this.enableSubmitButton}
+                            disabledSubmit={this.disabledSubmit}
                         />
                     ))
                 }
@@ -336,11 +343,11 @@ class UserContent extends Component<IProps> {
                         className={classes.submitButton}
                         variant='contained'
                         onClick={onSubmit}
-                        disabled={this.isLoadingSubmit}>
+                        disabled={this.isLoadingSubmit || this.disabledSubmit}>
                         {
                             this.isLoadingSubmit
-                            ? <LoadingMask size={20} />
-                            : 'Зберегти'
+                                ? <LoadingMask size={20}/>
+                                : 'Зберегти'
                         }
                     </Button>
                 }

@@ -31,8 +31,8 @@ const styles = (theme: any) => createStyles({
         overflow: 'hidden'
     },
     icon: {
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
     },
     divider: {
         backgroundColor: '#e2e2e2',

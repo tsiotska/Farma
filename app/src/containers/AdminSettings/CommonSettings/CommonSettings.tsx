@@ -44,15 +44,15 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-             appState: {
-                 userStore: {
-                     salarySettings,
-                     submitCommonSettingsChanges,
-                     getAsyncStatus,
-                     loadUserSalarySettings
-                 }
-             }
-         }) => ({
+    appState: {
+        userStore: {
+            salarySettings,
+            submitCommonSettingsChanges,
+            getAsyncStatus,
+            loadUserSalarySettings
+        }
+    }
+}) => ({
     salarySettings,
     submitCommonSettingsChanges,
     getAsyncStatus,
@@ -148,6 +148,10 @@ class CommonSettings extends Component<IProps> {
         this.showSnackbar = false;
     }
 
+    get disableSubmit(): boolean {
+        return Object.entries(this.changedValues).every((value) => !value[1]);
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -220,6 +224,7 @@ class CommonSettings extends Component<IProps> {
                 </Grid>
 
                 <Button
+                    disabled={this.disableSubmit}
                     onClick={this.submitHandler}
                     className={classes.submitButton}
                     variant='contained'

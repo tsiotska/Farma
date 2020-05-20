@@ -304,7 +304,7 @@ class LpuModal extends Component<IProps> {
                                 }
                         </FormRow>
                         <FormRow
-                            label='Основний телефон'
+                            label='Телефон 1'
                             values={this.formValues}
                             onChange={this.changeHandler}
                             propName='phone1'
@@ -328,7 +328,7 @@ class LpuModal extends Component<IProps> {
                                 }
                         </FormRow>
                         <FormRow
-                            label='Запасний телефон'
+                            label='Телефон 2'
                             values={this.formValues}
                             onChange={this.changeHandler}
                             propName='phone2'

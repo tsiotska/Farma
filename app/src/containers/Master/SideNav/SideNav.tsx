@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { History, Location } from 'history';
 import { withRouter, matchPath } from 'react-router-dom';
-import { NotificationsNoneOutlined, HomeOutlined, Add } from '@material-ui/icons';
+import { NotificationsNoneOutlined, Add } from '@material-ui/icons';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import Config from '../../../../Config';
 import { IUser, IWithRestriction } from '../../../interfaces';
@@ -240,7 +240,7 @@ class SideNav extends Component<IProps> {
                 {
                     isAllowed &&
                     <SideNavButton clickHandler={this.addDepartmentClickHandler} className={classes.iconWrapper}>
-                        <Add className={classes.iconSm} fontSize='small' />
+                        <Add className={classes.iconSm}/>
                     </SideNavButton>
                 }
                 <Button onClick={this.notificationsClickHandler} className={cx(classes.action, { marginTopAuto: true, [classes.active]: this.isNotificationsRouteActive })}>

@@ -12,10 +12,10 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
-import { IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
+import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
 import { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
@@ -53,6 +53,9 @@ const styles = (theme: any) => createStyles({
         paddingBottom: '5px !important',
         '&:last-of-type': {
             paddingRight: 8
+        },
+        '&.invalid': {
+            color: '#EE6969'
         }
     },
     span: {
@@ -74,9 +77,11 @@ interface IProps extends WithStyles<typeof styles> {
     parentUser: IUserInfo & IUserLikeObject;
     isNested: boolean;
 
+    setDivisionValidity?: (value: boolean) => void;
     role?: USER_ROLE;
     totalSold?: { [key: number]: number };
     meds?: IMedicine[];
+    changedMedsMarks?: { [key: number]: number };
 }
 
 @inject(({
@@ -86,16 +91,22 @@ interface IProps extends WithStyles<typeof styles> {
         },
         userStore: {
             totalSold,
-            role
+            role,
+            changedMedsMarks,
+            setDivisionValidity
         }
     }
 }) => ({
     meds,
     role,
-    totalSold
+    totalSold,
+    changedMedsMarks,
+    setDivisionValidity
 }))
 @observer
 class TableHeader extends Component<IProps> {
+    isValid: boolean;
+
     get nestLevel(): number {
         const { role, parentUser, isNested } = this.props;
         const userRole = typeof parentUser.position === 'string'
@@ -115,15 +126,73 @@ class TableHeader extends Component<IProps> {
             : new Map();
     }
 
-    render() {
+    componentDidUpdate() {
+        const { setDivisionValidity, parentUser: { position } } = this.props;
+        if (position === USER_ROLE.MEDICAL_AGENT) {
+            setDivisionValidity(this.isValid);
+        }
+    }
+
+    getMedsList() {
         const {
             classes,
             meds,
-            showLpu,
             totalSold,
             previewBonus,
-            hideName
+            hideName,
+            changedMedsMarks
         } = this.props;
+
+        this.isValid = true;
+        return meds.length
+        ? meds.map(x => {
+            const saleInfo = this.sales.get(x.id);
+            const leftValue = (totalSold[x.id] || 0) + (
+                (x.id in changedMedsMarks)
+                    ? changedMedsMarks[x.id]
+                    : 0
+            );
+            const rightValue = saleInfo
+                ? saleInfo.amount
+                : 0;
+            if (leftValue > rightValue) {
+                this.isValid = false;
+            }
+            return (
+                <TableCell
+                    key={x.id}
+                    padding='none'
+                    className={cx(classes.cell, { invalid: leftValue > rightValue })}>
+                    <Grid
+                        direction='column'
+                        container>
+                            {
+                                !hideName &&
+                                <Typography className={classes.medItem}>
+                                    { x.name }
+                                </Typography>
+                            }
+                            {
+                                !!previewBonus &&
+                                <Typography variant='subtitle1' className={classes.salesStat}>
+                                    <span className={classes.span}>
+                                        { leftValue }
+                                    </span>
+                                    <span>/</span>
+                                    <span className={classes.span}>
+                                        { rightValue }
+                                    </span>
+                                </Typography>
+                            }
+                    </Grid>
+                </TableCell>
+            );
+        })
+        : <TableCell />;
+    }
+
+    render() {
+        const { classes, showLpu } = this.props;
 
         return (
             <TableContainer className={classes.container}>
@@ -148,43 +217,7 @@ class TableHeader extends Component<IProps> {
                                 })}>
                                 ПІБ
                             </TableCell>
-                            {
-                                meds.length
-                                ? meds.map(x => {
-                                    const saleInfo = this.sales.get(x.id);
-
-                                    return (
-                                        <TableCell
-                                            key={x.id}
-                                            padding='none'
-                                            className={classes.cell}>
-                                            <Grid
-                                                direction='column'
-                                                container>
-                                                    {
-                                                        !hideName &&
-                                                        <Typography className={classes.medItem}>
-                                                            { x.name }
-                                                        </Typography>
-                                                    }
-                                                    {
-                                                        !!previewBonus &&
-                                                        <Typography variant='subtitle1' className={classes.salesStat}>
-                                                            <span className={classes.span}>
-                                                                { totalSold[x.id] || 0 }
-                                                            </span>
-                                                            <span>/</span>
-                                                            <span className={classes.span}>
-                                                                { saleInfo ? saleInfo.amount : 0 }
-                                                            </span>
-                                                        </Typography>
-                                                    }
-                                            </Grid>
-                                        </TableCell>
-                                    );
-                                })
-                                : <TableCell />
-                            }
+                            { this.getMedsList() }
                             <TableCell
                                 padding='none'
                                 align='center'

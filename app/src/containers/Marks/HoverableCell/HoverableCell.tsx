@@ -33,16 +33,20 @@ interface IProps extends WithStyles<typeof styles> {
         value: number
     ) => void;
     changedMarks?: Map<number,  Map<number, IMark>>;
+    changedMedsMarks?: { [key: number]: number };
+
 }
 
 @inject(({
     appState: {
         userStore: {
-            changedMarks
+            changedMarks,
+            changedMedsMarks
         }
     }
 }) => ({
-    changedMarks
+    changedMarks,
+    changedMedsMarks
 }))
 @observer
 class HoverableCell extends Component<IProps> {

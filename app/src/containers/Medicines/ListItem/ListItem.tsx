@@ -19,6 +19,8 @@ import cx from 'classnames';
 import { MEDICINE_EDIT_MODAL } from '../../../constants/Modals';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
 import RemoveButton from '../RemoveButton';
+import { USER_ROLE } from '../../../constants/Roles';
+import { IUser } from '../../../interfaces';
 
 const styles = (theme: any) => createStyles({
     wrapper: {
@@ -97,22 +99,32 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     deleteHandler?: (medId: number) => (confirmed: boolean) => void;
+    user?: IUser;
 }
 
 @inject(({
     appState: {
-
         uiStore: {
             openModal,
             openDelPopper
+        },
+        userStore: {
+            user
         }
     }
 }) => ({
+    user,
     openModal,
     openDelPopper
 }))
 @observer
 class ListItem extends Component<IProps> {
+    get showPrice(): boolean {
+        const { user } = this.props;
+        const allowedRoles: USER_ROLE[] = [ USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN ];
+        return !!user && allowedRoles.includes(user.position);
+    }
+
     removeClickHandler = ({ currentTarget }: any) => {
         const { openDelPopper, deleteHandler, medicine: { id } } = this.props;
         openDelPopper({
@@ -131,7 +143,7 @@ class ListItem extends Component<IProps> {
         const {
             classes,
             medicine,
-            allowEdit
+            allowEdit,
         } = this.props;
 
         const {
@@ -185,11 +197,14 @@ class ListItem extends Component<IProps> {
                         { mark }
                     </Typography>
                 </Grid>
-                <Grid xs container item zeroMinWidth>
-                    <Typography className={classes.bold} variant='body2'>
-                        { price }
-                    </Typography>
-                </Grid>
+                {
+                    this.showPrice &&
+                    <Grid xs container item zeroMinWidth>
+                        <Typography className={classes.bold} variant='body2'>
+                            { price }
+                        </Typography>
+                    </Grid>
+                }
 
                 <div className={classes.buttonsWrapper}>
                     {

@@ -11,7 +11,12 @@ export const styles = (theme: any) => createStyles({
             ? '100%'
             : '48%',
     },
-    input: {},
+    input: {
+        textIndent: 8,  // for select
+        '& > input': {
+            textIndent: 8, // for input
+        }
+    },
     labelRoot: {},
     helperText: {}
 });

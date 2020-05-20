@@ -18,6 +18,11 @@ const styles = (theme: any) => createStyles({
     },
     snackbar: {
         position: 'fixed'
+    },
+    submitButton: {
+        width: 90,
+        height: 36,
+        marginLeft: 'auto'
     }
 });
 
@@ -29,17 +34,17 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            openModal,
-            openedModal,
-            modalPayload,
-        },
-        departmentsStore: {
-            editDepartment
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openModal,
+                     openedModal,
+                     modalPayload,
+                 },
+                 departmentsStore: {
+                     editDepartment
+                 }
+             }
+         }) => ({
     openModal,
     openedModal,
     modalPayload,
@@ -61,7 +66,7 @@ class EditDepartmentModal extends Component<IProps> {
     }
 
     get isOpen(): boolean {
-        const { openedModal, modalPayload} = this.props;
+        const { openedModal, modalPayload } = this.props;
         return openedModal === EDIT_DEPARTMENT_MODAL && !!modalPayload;
     }
 
@@ -138,42 +143,43 @@ class EditDepartmentModal extends Component<IProps> {
                 onClose={this.closeHandler}
                 maxWidth='xs'
                 title='Редагувати віділення'>
-                    <Grid alignItems='center' wrap='nowrap'  container>
-                        <DepartmentDropzone
-                            file={this.image}
-                            classes={this.dropzoneClasses}
-                            error={this.errors.get('image')}
-                            removeIcon={this.removeIcon}
-                            appendFile={this.appendImage}
-                        />
-                        <FormRow
-                            fullWidth
-                            required
-                            label='Назва віділення'
-                            value={this.name}
-                            onChange={this.nameChangeHandler}
-                            propName='name'
-                            error={this.errors.get('name')}
-                        />
-                    </Grid>
-                    <Button
-                        disabled={this.allowSubmit === false}
-                        onClick={this.submitHandler}
-                        color='primary'
-                        variant='contained'>
-                        Зберегти зміни
-                    </Button>
-                    <Snackbar
-                        classes={{ root: classes.snackbar }}
-                        open={this.showSnackbar}
-                        onClose={this.snackbarCloseHandler}
-                        type={this.snackbarType}
-                        message={
-                            this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                                ? 'Віділення успішно змінено'
-                                : 'Неможливо змінити віділення'
-                        }
+                <Grid alignItems='center' wrap='nowrap' container>
+                    <DepartmentDropzone
+                        file={this.image}
+                        classes={this.dropzoneClasses}
+                        error={this.errors.get('image')}
+                        removeIcon={this.removeIcon}
+                        appendFile={this.appendImage}
                     />
+                    <FormRow
+                        fullWidth
+                        required
+                        label='Назва віділення'
+                        value={this.name}
+                        onChange={this.nameChangeHandler}
+                        propName='name'
+                        error={this.errors.get('name')}
+                    />
+                </Grid>
+                <Button
+                    className={classes.submitButton}
+                    disabled={this.allowSubmit === false}
+                    onClick={this.submitHandler}
+                    color='primary'
+                    variant='contained'>
+                    Зберегти
+                </Button>
+                <Snackbar
+                    classes={{ root: classes.snackbar }}
+                    open={this.showSnackbar}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={
+                        this.snackbarType === SNACKBAR_TYPE.SUCCESS
+                            ? 'Віділення успішно змінено'
+                            : 'Неможливо змінити віділення'
+                    }
+                />
             </Dialog>
         );
     }

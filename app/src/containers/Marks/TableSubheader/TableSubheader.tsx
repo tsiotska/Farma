@@ -19,7 +19,7 @@ import { IMarkFraction } from '../../../stores/UserStore';
 import { ISalarySettings } from '../../../interfaces/ISalarySettings';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { IUserInfo } from '../Table/Table';
-import { toJS } from 'mobx';
+import { toJS, observable } from 'mobx';
 import TableHeader from '../TableHeader';
 
 const styles = (theme: any) => createStyles({
@@ -84,6 +84,7 @@ interface IProps extends WithStyles<typeof styles> {
     clearChangedMarks?: () => void;
     openModal?: (modalName: string) => void;
     updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
+    isMedsDivisionValid?: boolean;
 }
 
 @inject(({
@@ -92,7 +93,8 @@ interface IProps extends WithStyles<typeof styles> {
             changedMarks,
             clearChangedMarks,
             updateBonus,
-            salarySettings
+            salarySettings,
+            isMedsDivisionValid
         },
         uiStore: {
             openModal
@@ -103,7 +105,8 @@ interface IProps extends WithStyles<typeof styles> {
     clearChangedMarks,
     openModal,
     updateBonus,
-    salarySettings
+    salarySettings,
+    isMedsDivisionValid
 }))
 @observer
 class TableSubheader extends Component<IProps> {
@@ -120,6 +123,7 @@ class TableSubheader extends Component<IProps> {
 
     get isValid(): boolean {
         const {
+            isMedsDivisionValid,
             summedTotal: { payments, deposit },
             salarySettings
         } = this.props;
@@ -128,9 +132,11 @@ class TableSubheader extends Component<IProps> {
             ? salarySettings.payments
             : 0;
         const settingsPayments = (1 - initValue) * 100;
-        return settingsPayments >= 0 && settingsPayments <= 100
+        const isTotalDivisionValid = settingsPayments >= 0 && settingsPayments <= 100
             ? current >= settingsPayments
             : false;
+
+        return isMedsDivisionValid && isTotalDivisionValid;
     }
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);

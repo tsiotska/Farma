@@ -17,7 +17,6 @@ const styles = (theme: any) => createStyles({
         padding: '0 20px'
     },
     plotContainer: {
-        marginBottom: theme.spacing(4),
         '& > *:last-child': {
             marginLeft: 20
         },
