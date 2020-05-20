@@ -30,10 +30,13 @@ const styles = (theme: any) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    type: 'hcf' | 'pharmacy';
+
     getAsyncStatus?: (key: string) => IAsyncStatus;
     sortLpuBy?: (propName: SortableProps, order: SORT_ORDER) => void;
     clearLpuSorting?: () => void;
     LPUs?: ILPU[];
+    pharmacies?: ILPU[];
     LpuSortSettings?: ISortBy;
     LpuFilterSettings?: IFilterBy;
     filterLpuBy?: (propName: SortableProps, selectedValues: ILPU[]) => void;
@@ -49,7 +52,8 @@ export interface IState {
     appState: {
         departmentsStore: {
             LPUs,
-            getAsyncStatus
+            getAsyncStatus,
+            pharmacies
         },
         uiStore: {
             LpuSortSettings,
@@ -59,6 +63,7 @@ export interface IState {
     }
 }) => ({
     LPUs,
+    pharmacies,
     getAsyncStatus,
     LpuSortSettings,
     LpuFilterSettings,
@@ -66,45 +71,72 @@ export interface IState {
 }))
 @observer
 class Header extends Component<IProps> {
-    readonly defaultState: IState = {
-        propName: null,
-        order: null,
-        selectedLpus: []
-    };
-    @observable sortState: IState = { ...this.defaultState };
     @observable filterPopperAnchor: HTMLElement = null;
     @observable searchString: string = '';
-    @observable suggestions: Array<{ id: number, value: string}> = [];
+    @observable propName: SortableProps = null;
+    @observable order: SORT_ORDER = null;
+    @observable selectedItems: any[] = [];
+
+    @observable source: ILPU[] = null;
 
     @computed
     get isLoading(): boolean {
-        return this.props.getAsyncStatus('loadLPUs').loading;
+        const { getAsyncStatus, type } = this.props;
+        const targetFoo = type === 'pharmacy'
+            ? 'loadPharmacies'
+            : 'loadLPUs';
+        return getAsyncStatus(targetFoo).loading;
     }
 
     @computed
     get sortCallback(): any {
-        const { order, propName } = this.sortState;
-        return order === SORT_ORDER.ASCENDING
-            ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-            : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+        return this.order === SORT_ORDER.ASCENDING
+            ? (a: any, b: any) => a.value.localeCompare(b.value)
+            : (a: any, b: any) => b.value.localeCompare(a.value);
     }
 
     // @computed
-    get mappedLpus(): Array<{ id: number, value: string }> {
-        const { LPUs } = this.props;
-        const { propName } = this.sortState;
-        if (!propName || !LPUs || this.isLoading) return [];
-        const mapped = LPUs.map(({ id, [propName]: value }) => ({ id, value }));
-        return uniqBy(mapped, 'value');
+    get options(): any[] {
+        const checklist: string[] = [];
+        const res: any[] = [];
+
+        if (!this.source || !this.propName) return res;
+
+        const maxIter = this.isLoading
+            ? (this.source.length > 200 ? 200 : this.source.length)
+            : this.source.length;
+
+        const lowerCaseFilter = this.searchString
+            ? this.searchString.toLowerCase()
+            : '';
+
+        for (let i = 0; i < maxIter; ++i) {
+            const curr = this.source[i];
+            const {[this.propName]: value} = curr;
+
+            const passFilter = lowerCaseFilter === ''
+                ? true
+                : value.includes(lowerCaseFilter);
+
+            if (passFilter === true && checklist.includes(value) === false) {
+                checklist.push(value);
+                res.push({ id: i, value });
+            }
+        }
+
+        return this.order
+            ? res.sort(this.sortCallback)
+            : res;
     }
 
-    itemClickHandler = (x: any) => {
-        const indOf = this.sortState.selectedLpus.indexOf(x);
-        if (indOf === -1) {
-            this.sortState.selectedLpus.push(x);
+    itemClickHandler = ({ value }: any) => {
+        const itemIndex = this.selectedItems.indexOf(value);
+        if (itemIndex === -1) {
+            this.selectedItems.push(value);
         } else {
-            this.sortState.selectedLpus.splice(indOf, 1);
+            this.selectedItems.splice(itemIndex, 1);
         }
+        console.log(this.selectedItems);
     }
 
     inputChangeHandler = ({ target: { value }}: any) => {
@@ -112,63 +144,95 @@ class Header extends Component<IProps> {
     }
 
     findSuggestions = () => {
-        const { propName } = this.sortState;
-        const toLower = this.searchString.toLowerCase();
-        this.suggestions = this.mappedLpus.filter(({ value }) => value.toLowerCase().includes(toLower));
+        // const { propName } = this.sortState;
+        // const toLower = (this.searchString || '').toLowerCase();
+        // console.log('options: ', toJS(this.options));
+        // this.suggestions = this.options.filter(({ value }) => value.toLowerCase().includes(toLower));
     }
 
     sortOrderChangeHandler = (order: SORT_ORDER) => {
-        this.sortState.order = order;
+        this.order = order;
     }
 
     popoverCloseHandler = () => {
         this.filterPopperAnchor = null;
-        this.sortState = {...this.defaultState};
+        this.resetValues();
     }
 
-    buttonClickHandler = (propName: SortableProps) => ({ target }: any) => {
-        const { LpuSortSettings, LpuFilterSettings } = this.props;
+    resetValues = () => {
+        this.propName = null;
+        this.order = null;
+        this.selectedItems = [];
+        this.searchString = '';
+    }
 
+    openFilterPopper = (propName: SortableProps) => ({ target }: any) => {
+        // const { LpuSortSettings, LpuFilterSettings } = this.props;
+
+        this.resetValues();
         this.filterPopperAnchor = target;
-        this.sortState.propName = propName;
+        this.propName = propName;
+        console.log('propName: ', this.propName);
 
-        if (LpuSortSettings && LpuSortSettings.propName === propName) {
-            this.sortState.order = LpuSortSettings.order;
-        }
-        if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
-            // this.sortState.selectedLpus = LpuFilterSettings.selectedValues;
-        }
+        // if (LpuSortSettings && LpuSortSettings.propName === propName) {
+        //     this.sortState.order = LpuSortSettings.order;
+        // }
+        // if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
+        //     // this.sortState.selectedLpus = LpuFilterSettings.selectedValues;
+        // }
     }
 
     applyFilters = () => {
-        const {
-            sortLpuBy,
-            filterLpuBy,
-            LpuSortSettings,
-            LpuFilterSettings
-        } = this.props;
+        // const {
+        //     sortLpuBy,
+        //     filterLpuBy,
+        //     LpuSortSettings,
+        //     LpuFilterSettings
+        // } = this.props;
 
-        const {
-            propName,
-            order,
-            selectedLpus,
-        } = this.sortState;
+        // const {
+        //     propName,
+        //     order,
+        //     selectedLpus,
+        // } = this.sortState;
 
-        if (order !== null) {
-            const condition = !!LpuSortSettings
-                ? (order !== LpuSortSettings.order) || propName !== LpuSortSettings.propName
-                : true;
-            if (condition) sortLpuBy(propName, order);
-        }
+        // if (order !== null) {
+        //     const condition = !!LpuSortSettings
+        //         ? (order !== LpuSortSettings.order) || propName !== LpuSortSettings.propName
+        //         : true;
+        //     if (condition) sortLpuBy(propName, order);
+        // }
 
-        if (selectedLpus.length || (!!LpuFilterSettings && LpuFilterSettings.propName === propName)) {
-            // filterLpuBy(propName, selectedLpus);
+        // if (selectedLpus.length || (!!LpuFilterSettings && LpuFilterSettings.propName === propName)) {
+        //     // filterLpuBy(propName, selectedLpus);
+        // }
+    }
+
+    componentDidUpdate(prevProps: IProps) {
+        const { LPUs, pharmacies, type } = this.props;
+        const source = type === 'pharmacy'
+            ? pharmacies
+            : LPUs;
+
+        if (this.filterPopperAnchor && !!source) {
+            if (this.source === source) return;
+
+            const sourceIsEmpty = !this.source || !source.length;
+
+            if (this.isLoading && sourceIsEmpty) {
+                this.source = source.slice(0, 2500);
+            } else if (this.isLoading === false) {
+                this.source = source;
+            }
+        } else {
+            this.source = null;
         }
     }
 
     render() {
-        const { classes } = this.props;
-
+        const { classes, LPUs } = this.props;
+        console.log('src: ', this.source && this.source.length);
+        console.log('opt: ', this.options.length);
         return (
             <>
             <Grid className={classes.root} container alignItems='center'>
@@ -176,7 +240,7 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Назва
                         <IconButton
-                            onClick={this.buttonClickHandler('name')}
+                            onClick={this.openFilterPopper('name')}
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />
                         </IconButton>
@@ -187,7 +251,7 @@ class Header extends Component<IProps> {
                         Регіон
                         <IconButton
                             disabled
-                            // onClick={this.buttonClickHandler('region')}
+                            // onClick={this.openFilterPopper('region')}
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />
                         </IconButton>
@@ -198,7 +262,7 @@ class Header extends Component<IProps> {
                         Область
                         <IconButton
                             disabled
-                            onClick={this.buttonClickHandler('oblast')}
+                            onClick={this.openFilterPopper('oblast')}
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />
                         </IconButton>
@@ -209,7 +273,7 @@ class Header extends Component<IProps> {
                         Місто
                         <IconButton
                             disabled
-                            onClick={this.buttonClickHandler('city')}
+                            onClick={this.openFilterPopper('city')}
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />
                         </IconButton>
@@ -231,15 +295,16 @@ class Header extends Component<IProps> {
                 onClose={this.popoverCloseHandler}
                 isLoading={this.isLoading}
 
-                order={this.sortState.order}
+                order={this.order}
                 onOrderChange={this.sortOrderChangeHandler}
 
                 searchString={this.searchString}
                 onSearchStringChange={this.inputChangeHandler}
                 applySearch={this.findSuggestions}
 
-                suggestions={this.suggestions}
-                selectedItems={this.sortState.selectedLpus}
+                totalLength={this.source ? this.source.length : 0}
+                suggestions={this.options}
+                selectedItems={this.selectedItems}
                 itemClickHandler={this.itemClickHandler}
 
                 applyClickHandler={this.applyFilters}

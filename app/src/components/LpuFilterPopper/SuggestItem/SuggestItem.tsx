@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { ListItem, ListItemIcon, ListItemText, Checkbox } from '@material-ui/core';
-import { ILPU } from '../../../interfaces/ILPU';
+import {
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Checkbox
+} from '@material-ui/core';
+import { toJS } from 'mobx';
 
-interface IProps {
-    onClick: (item: any) => void;
-    item: { id: number, value: string };
+interface IProps<T> {
+    onClick: (item: T) => void;
+    item: T;
+    renderPropName: keyof T;
     checked: boolean;
     className: string;
 }
 
 @observer
-class SuggestItem extends Component<IProps> {
+class SuggestItem<T> extends Component<IProps<T>> {
     clickHandler = () => {
         const { onClick, item } = this.props;
         onClick(item);
@@ -21,8 +27,13 @@ class SuggestItem extends Component<IProps> {
         const {
             className,
             checked,
-            item: { value }
+            item,
+            renderPropName
         } = this.props;
+
+        const title = item[renderPropName];
+
+        if (!title) return null;
 
         return (
             <ListItem
@@ -38,7 +49,7 @@ class SuggestItem extends Component<IProps> {
                             disableRipple
                         />
                     </ListItemIcon>
-                    <ListItemText primary={value} />
+                    <ListItemText primary={title} />
             </ListItem>
         );
     }

@@ -1,5 +1,5 @@
 import { multiDepartmentRoles } from './../constants/Roles';
-import {action, computed, observable, reaction, transaction, when} from 'mobx';
+import {action, computed, observable, reaction, transaction, when, toJS} from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
@@ -449,6 +449,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         while (keepDoing) {
             const url = `${initialUrl}?page=${page}`;
             const part = await api.getMedicalDepartments(url);
+
             if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
                 this.LPUs = null;
                 break;

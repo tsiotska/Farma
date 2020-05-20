@@ -39,7 +39,7 @@ class HCFList extends Component<IProps> {
 
         return (
             <Grid direction='column' className={classes.root} container>
-                { showHeader && <Header />}
+                { showHeader && <Header type={type} />}
                 <PharmaciesList
                     confirmHandler={confirmHandler}
                     onDelete={onDelete}

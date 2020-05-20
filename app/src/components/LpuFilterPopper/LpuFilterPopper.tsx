@@ -19,10 +19,9 @@ import cx from 'classnames';
 import { SORT_ORDER, ISortBy } from '../../stores/UIStore';
 import { ILPU } from '../../interfaces/ILPU';
 import SuggestItem from './SuggestItem';
-import { toJS, computed } from 'mobx';
-import { IState } from '../../containers/HCFList/Header/Header';
 import LoadingMask from '../LoadingMask';
 import { Search } from '@material-ui/icons';
+import SuggestList from './SuggestList';
 
 const styles = (theme: any) => createStyles({
     input: {
@@ -43,20 +42,6 @@ const styles = (theme: any) => createStyles({
             borderColor: '#aaa'
         }
     },
-    list: {
-        overflow: 'auto',
-        maxHeight: 300,
-        maxWidth: 250
-    },
-    listItem: {
-        '& .MuiCheckbox-root': {
-            padding: 0
-        },
-        '& .MuiListItemIcon-root': {
-            minWidth: 20
-        },
-        textTransform: 'capitalize'
-    },
     submitButton: {
         color: theme.palette.primary.lightBlue
     },
@@ -67,9 +52,6 @@ const styles = (theme: any) => createStyles({
     placeholder: {
         marginTop: 12
     },
-    alignCenter: {
-        textAlign: 'center'
-    }
 });
 
 // export type SortableProps = 'name' | 'region' | 'oblast' | 'city';
@@ -87,6 +69,7 @@ interface IProps extends WithStyles<typeof styles> {
     onSearchStringChange: (e: any) => void;
     applySearch: () => void;
 
+    totalLength: number;
     suggestions: Array<{ id: number, value: string}>;
     selectedItems: Array<{ id: number, value: string}>;
     itemClickHandler: (lpu: ILPU) => void;
@@ -96,69 +79,24 @@ interface IProps extends WithStyles<typeof styles> {
 
 @observer
 class LpuFilterPopper extends Component<IProps> {
-    sortAtoZ = () => {
-        this.props.onOrderChange(SORT_ORDER.ASCENDING);
+    readonly wrapperClasses: any;
+    readonly anchorOrigin: any = {
+        vertical: 'bottom',
+        horizontal: 'center',
+    };
+    readonly transformOrigin: any = {
+        vertical: 'top',
+        horizontal: 'center',
+    };
+
+    constructor(props: IProps) {
+        super(props);
+        this.wrapperClasses = { wrapper: props.classes.placeholder };
     }
 
-    sortZtoA = () => {
-        this.props.onOrderChange(SORT_ORDER.DESCENDING);
-    }
+    sortAtoZ = () => this.props.onOrderChange(SORT_ORDER.ASCENDING);
 
-    getList = () => {
-        const {
-            classes,
-            isLoading,
-            suggestions,
-            selectedItems,
-            itemClickHandler,
-        } = this.props;
-
-        const suggestionsExist = !!suggestions;
-
-        if (isLoading) return <LoadingMask classes={{ wrapper: classes.placeholder }} size={20} />;
-        if (suggestionsExist === false || suggestions.length === 0) {
-            return <Typography className={classes.placeholder} align='center'>
-                {
-                    suggestionsExist
-                        ? 'Відповідні дані відсутні'
-                        : 'Дані відсутні'
-                }
-            </Typography>;
-        }
-
-        const threshold = 100;
-        const rest = suggestions.length - threshold;
-        const shouldSlice = rest >= threshold;
-        const items = shouldSlice
-            ? suggestions.slice(0, threshold)
-            : suggestions;
-        const itemsInRest = suggestions.length - items.length;
-
-        return (
-            <List className={classes.list}>
-                {
-                    items.slice(0, 50).map(x => (
-                        <SuggestItem
-                            key={x.id}
-                            item={x}
-                            checked={selectedItems.includes(x) === true}
-                            onClick={itemClickHandler}
-                            className={classes.listItem}
-                        />
-                    ))
-                }
-                {
-                    itemsInRest > 0 &&
-                    <ListItem className={classes.listItem} dense>
-                        <ListItemText
-                            className={classes.alignCenter}
-                            primary={`і ще ${itemsInRest} об'єктів`}
-                        />
-                    </ListItem>
-                }
-            </List>
-        );
-    }
+    sortZtoA = () => this.props.onOrderChange(SORT_ORDER.DESCENDING);
 
     render() {
         const {
@@ -171,18 +109,15 @@ class LpuFilterPopper extends Component<IProps> {
             onSearchStringChange,
             applySearch,
             applyClickHandler,
+            suggestions,
+            itemClickHandler,
+            selectedItems
         } = this.props;
 
         return (
             <Popover
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
+                anchorOrigin={this.anchorOrigin}
+                transformOrigin={this.transformOrigin}
                 onClose={onClose}
                 anchorEl={anchor}
                 open={!!anchor}>
@@ -190,7 +125,6 @@ class LpuFilterPopper extends Component<IProps> {
                         <Button
                             className={cx(classes.button, { active: order === SORT_ORDER.ASCENDING} )}
                             onClick={this.sortAtoZ}>
-
                                 Сортувати від А до Я
                             </Button>
                         <Button
@@ -200,9 +134,9 @@ class LpuFilterPopper extends Component<IProps> {
                             </Button>
                         <Divider className={classes.divider} />
                         <Input
+                            disableUnderline
                             disabled={isLoading}
                             className={classes.input}
-                            disableUnderline
                             onChange={onSearchStringChange}
                             value={searchString}
                             endAdornment={
@@ -214,7 +148,25 @@ class LpuFilterPopper extends Component<IProps> {
                                 </IconButton>
                             }
                         />
-                        { this.getList() }
+                        {
+                            (!!suggestions && suggestions.length)
+                            ? <SuggestList
+                                items={suggestions}
+                                itemClickHandler={itemClickHandler}
+                                renderPropName='value'
+                                selectedItems={selectedItems}
+                                isLoading={isLoading}
+                              />
+                            : isLoading
+                                ? <LoadingMask classes={this.wrapperClasses} size={20} />
+                                : <Typography>
+                                    {
+                                        !!suggestions
+                                            ? 'Відповідні дані відсутні'
+                                            : 'Дані відсутні'
+                                    }
+                                </Typography>
+                        }
                         <Button onClick={applyClickHandler} className={classes.submitButton}>
                             Застосувати
                         </Button>
