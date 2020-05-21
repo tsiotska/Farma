@@ -45,12 +45,14 @@ const styles = (theme: any) => createStyles({
         '& > *': {
             opacity: ({ scaleIndex }: any) => 1 - 2 * scaleIndex / 10,
         },
+
     },
     container: {
         padding: '14px 20px',
         '&:hover': {
             opacity: 1
-        }
+        },
+        boxShadow: '0 0 10px rgba(0,0,0,0.5)'
     },
     gridContainer: {
         padding: '8px 0',

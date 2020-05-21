@@ -187,18 +187,31 @@ class UserContent extends Component<IProps> {
 
     @computed
     get bonuses(): number[] {
-        const { salarySettings, salary, userSales, previewUser } = this.props;
-        console.log('previewUser');
-        console.log(toJS(previewUser));
+        const { salarySettings, salary, userSales, previewUser: { position } } = this.props;
+        let levelType: string;
 
-        // if (this.userLevel >= salarySettings.rmLevel) {
+        switch (position) {
+            case USER_ROLE.REGIONAL_MANAGER:
+                levelType = 'rmLevel';
+                break;
+            case USER_ROLE.MEDICAL_AGENT:
+                levelType = 'mpLevel';
+                break;
+            default:
+                return;
+        }
         const treshold = salarySettings
             ? salarySettings.kpi
             : null;
 
         if (treshold === null) return [];
         return this.levels.map(x => {
-            if (x !== this.userLevel || !userSales) return 0;
+            if (x !== this.userLevel
+                || !userSales
+                || this.userLevel < salarySettings[levelType]) {
+                return 0;
+            }
+
             const salaryInfo = salary.get(x);
             const meds = salaryInfo
                 ? salaryInfo.meds
@@ -219,7 +232,6 @@ class UserContent extends Component<IProps> {
                 ? filtered.reduce((total, current) => total + current, 0)
                 : 0;
         });
-        //  }
     }
 
     changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value } }: any) => {

@@ -322,6 +322,8 @@ class WorkerModal extends Component<IProps> {
         } else if (becomeOpened) {
             this.formValues.position = positions[0].id;
             this.regionsList = await loadRMRegions();
+
+          //  this.regionsList.set()
             if (!!initialWorker) this.initValuesFromInitialWorker();
         }
         if (this.requireRegion === false && !!this.formValues.region) {
