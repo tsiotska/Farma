@@ -20,6 +20,8 @@ const styles = createStyles({
     },
     credentials: {
         textAlign: 'start',
+        marginTop: 8,
+        wordBreak: 'break-word',
         fontFamily: 'Source Sans Pro SemiBold'
     },
     levelButton: {
@@ -34,6 +36,8 @@ const styles = createStyles({
         color: '#647cfe'
     },
     position: {
+        marginTop: 8,
+        wordBreak: 'break-word',
         textAlign: 'start'
     }
 });
@@ -117,8 +121,7 @@ class UserShortInfo extends Component<IProps> {
         return (
             <>
                 <Avatar className={classes.avatar} {...this.avatarProps} />
-                <Grid
-                    className={classes.textContainer}
+                <Grid className={classes.textContainer}
                     direction='column'
                     container>
                     <Typography className={classes.credentials} color='textPrimary'>
@@ -140,7 +143,6 @@ class UserShortInfo extends Component<IProps> {
                             { !disableText && <Typography>Подивитись заплату </Typography>}
                         </Button>
                     }
-
                 </Grid>
             </>
         );

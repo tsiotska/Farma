@@ -11,8 +11,8 @@ import {
 import { observer, inject } from 'mobx-react';
 import { IUserNotification } from '../../../../interfaces/IUserNotification';
 import CommitBadge from '../../../../components/CommitBadge';
-import { Delete } from '@material-ui/icons';
 import { IPosition } from '../../../../interfaces/IPosition';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const styles = (theme: any) => createStyles({
     badge: {
@@ -80,7 +80,7 @@ class UserPanel extends Component<IProps> {
         const targetPosition = positions.get(position);
         return targetPosition
             ? targetPosition.alias
-            : '-';
+            : '';
     }
 
     deleteHandler = ({ currentTarget }: any) => {
@@ -119,12 +119,12 @@ class UserPanel extends Component<IProps> {
                     </>
                     }
                     <Typography variant='body2'>
-                        {name || '-'}
+                        {name || ''}
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        {email || '-'}
+                        {email || ''}
                     </Typography>
                 </Grid>
                 <Grid xs container item>
@@ -134,13 +134,13 @@ class UserPanel extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.phone} xs container item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{workPhone || '-'}</span>
-                        <span>{mobilePhone || '-'}</span>
+                        <span>{workPhone || ''}</span>
+                        <span>{mobilePhone || ''}</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
                     <Typography variant='body2'>
-                        {card || '-'}
+                        {card || ''}
                     </Typography>
                 </Grid>
                 {action === 'accept' && confirmed ?
@@ -149,7 +149,7 @@ class UserPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
                     : action === 'accept' &&
@@ -159,7 +159,7 @@ class UserPanel extends Component<IProps> {
                             Підтвердити
                         </Button>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
                 }

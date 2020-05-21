@@ -67,7 +67,7 @@ interface IProps extends WithStyles<typeof styles> {
         regionId?: number;
     }) => Promise<ILocation[]>;
     regions?: Map<number, ILocation>;
-    loadRegions?: (position: number) => void;
+    loadRMRegions?: () => Map<number, ILocation>;
 }
 
 export interface IWorkerModalValues {
@@ -89,13 +89,13 @@ export interface IWorkerModalValues {
                  departmentsStore: {
                      loadSpecificCities,
                      regions,
-                     loadRegions
+                     loadRMRegions
                  }
              }
          }) => ({
     loadSpecificCities,
     regions,
-    loadRegions
+    loadRMRegions
 }))
 @observer
 class WorkerModal extends Component<IProps> {
@@ -121,6 +121,7 @@ class WorkerModal extends Component<IProps> {
         region: 0,
     };
 
+    @observable regionsList: Map<number, ILocation> = new Map();
     @observable formValues: IWorkerModalValues = { ...this.defaultValues };
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
     @observable image: File | string = null;
@@ -206,10 +207,10 @@ class WorkerModal extends Component<IProps> {
 
     @computed
     get regions(): ILocation[] {
-        const { regions, open } = this.props;
+        const { open } = this.props;
         if (open === false) return [];
         const res: ILocation[] = [];
-        regions.forEach(x => {
+        this.regionsList.forEach(x => {
             res.push(x);
         });
         return res;
@@ -250,13 +251,19 @@ class WorkerModal extends Component<IProps> {
             : (errorMessage || true);
     }
 
-    positionChangeCallback = async () => {
+    positionChangeCallback = async (position: number) => {
+        const { regions, loadRMRegions } = this.props;
+        if (position === USER_ROLE.REGIONAL_MANAGER) {
+            this.regionsList = await loadRMRegions();   // again request for free, maybe save it locally
+        } else {
+            this.regionsList = regions;
+        }
         const { initialWorker } = this.props;
         if (!initialWorker) return;
         const { initialWorker: { city, region } } = this.props;
         if (this.requireRegion === true && !this.formValues.region) {
             this.formValues.region = region || this.defaultValues.region;
-            await this.loadSpecificCities(); // this.formValues.position
+            await this.loadSpecificCities();
         }
         if (this.requireCity === true && !this.formValues.city) {
             this.formValues.city = city || this.defaultValues.city;
@@ -267,11 +274,9 @@ class WorkerModal extends Component<IProps> {
         if (propName === 'position') {
             const converted = +value;
             if (converted !== this.formValues[propName]) {
-                console.log('loading regions...');
-                await this.props.loadRegions(this.formValues.position);
+                this.formValues[propName] = converted;
+                this.positionChangeCallback(converted);
             }
-            this.formValues[propName] = converted;
-            this.positionChangeCallback();
         } else if (propName === 'region') {
             this.formValues[propName] = +value || 0;
             this.formValues.city = this.defaultValues.city;
@@ -307,7 +312,7 @@ class WorkerModal extends Component<IProps> {
 
     async componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker, positions, regions } = this.props;
+        const { open, initialWorker, positions, loadRMRegions } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
 
@@ -316,12 +321,8 @@ class WorkerModal extends Component<IProps> {
             this.image = null;
         } else if (becomeOpened) {
             this.formValues.position = positions[0].id;
+            this.regionsList = await loadRMRegions();
             if (!!initialWorker) this.initValuesFromInitialWorker();
-        }
-        console.log(regions);
-        if (this.requireRegion && !regions) {
-            console.log('loading');
-            // await this.props.loadRegions(this.formValues.position);
         }
         if (this.requireRegion === false && !!this.formValues.region) {
             this.formValues.region = this.defaultValues.region;
@@ -352,7 +353,6 @@ class WorkerModal extends Component<IProps> {
             card: card || this.defaultValues.card,
             position: position || this.defaultValues.position,
             email: email || this.defaultValues.email,
-
             password: this.defaultValues.password,
             city: this.defaultValues.city,
             region: this.defaultValues.region,
@@ -378,7 +378,6 @@ class WorkerModal extends Component<IProps> {
             title,
             onClose,
             classes,
-            regions,
             isLoading,
             positions,
             initialWorker,
@@ -470,8 +469,8 @@ class WorkerModal extends Component<IProps> {
                                         label='Регіон'
                                         values={this.formValues}
                                         value={
-                                            this.regions.length && regions.has(this.formValues.region)
-                                                ? regions.get(this.formValues.region).id
+                                            this.regions.length && this.regionsList.has(this.formValues.region)
+                                                ? this.regionsList.get(this.formValues.region).id
                                                 : ''
                                         }
                                         onChange={this.changeHandler}

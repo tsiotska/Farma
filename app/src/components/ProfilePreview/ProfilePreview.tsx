@@ -283,9 +283,7 @@ class ProfilePreview extends Component<IProps> {
                         item>
                         <UserShortInfo
                             classes={{
-                                textContainer: classes.profileTextContainer,
-                                credentials: classes.text,
-                                position: classes.text,
+                                textContainer: classes.profileTextContainer
                             }}
                             user={user}/>
                     </Grid>

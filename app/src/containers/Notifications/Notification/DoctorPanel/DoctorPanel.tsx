@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { WithStyles, withStyles, createStyles, Grid, Typography, Button, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IDoctor } from '../../../../interfaces/IDoctor';
-import { Delete } from '@material-ui/icons';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import CommitBadge from '../../../../components/CommitBadge';
 import { IPosition } from '../../../../interfaces/IPosition';
 
@@ -127,8 +127,8 @@ class DoctorPanel extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.phone} xs container item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{workPhone || '-'}</span>
-                        <span>{mobilePhone || '-'}</span>
+                        <span>{workPhone || ''}</span>
+                        <span>{mobilePhone || ''}</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
@@ -142,7 +142,7 @@ class DoctorPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
                     : action === 'accept' &&
@@ -152,7 +152,7 @@ class DoctorPanel extends Component<IProps> {
                             Підтвердити
                         </Button>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
                 }

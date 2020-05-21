@@ -363,11 +363,11 @@ class TableRow extends Component<IProps> {
         const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 
         const lastPayment = agentInfo
-            ? agentInfo.lastPayment || '-'
-            : '-';
+            ? agentInfo.lastPayment || 0
+            : 0;
         const lastDeposit = agentInfo
-            ? agentInfo.lastDeposit || '-'
-            : '-';
+            ? agentInfo.lastDeposit || 0
+            : 0;
 
         const medsContent = meds.length
             ? meds.map(({ id }) => {

@@ -7,6 +7,7 @@ import CommitBadge from '../../../../components/CommitBadge';
 import { Edit, Delete } from '@material-ui/icons';
 import cx from 'classnames';
 import { ILocation } from '../../../../interfaces/ILocation';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const styles = (theme: any) => createStyles({
     badge: {
@@ -79,7 +80,7 @@ class HCFPanel extends Component<IProps> {
         const targetRegion = regions.get(region);
         return targetRegion
             ? targetRegion.name
-            : '-';
+            : '';
     }
 
     deleteHandler = ({ currentTarget }: any) => {
@@ -127,7 +128,7 @@ class HCFPanel extends Component<IProps> {
                     </>
                     }
                     <Typography className={classes.text} variant='body2'>
-                        {name || '-'}
+                        {name || ''}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
@@ -137,7 +138,7 @@ class HCFPanel extends Component<IProps> {
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        {oblast || '-'}
+                        {oblast || ''}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
@@ -147,7 +148,7 @@ class HCFPanel extends Component<IProps> {
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        {address || '-'}
+                        {address || ''}
                     </Typography>
                 </Grid>
                 <Grid
@@ -158,8 +159,8 @@ class HCFPanel extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{phone1 || '-'}</span>
-                        <span>{phone2 || '-'}</span>
+                        <span>{phone1 || ''}</span>
+                        <span>{phone2 || ''}</span>
                     </Typography>
                 </Grid>
 
@@ -169,7 +170,7 @@ class HCFPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
                     : action === 'accept' &&
@@ -179,7 +180,7 @@ class HCFPanel extends Component<IProps> {
                             Підтвердити
                         </Button>
                         <IconButton onClick={this.deleteHandler}>
-                            <Delete/>
+                            <DeleteOutlineIcon/>
                         </IconButton>
                     </>
 

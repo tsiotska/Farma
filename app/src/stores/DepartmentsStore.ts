@@ -955,8 +955,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (removed) {
             const depMeds = this.meds.get(depId);
             const med = depMeds
-                ? null
-                : depMeds.find(({ id }) => id === medId);
+                ?  depMeds.find(({ id }) => id === medId)
+                : null;
 
             if (med) med.deleted = true;
         }
@@ -1039,36 +1039,24 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 ? data.map((x): [number, ILocation] => ([x.id, x]))
                 : [];
 
-       // const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
+        const loadRegionsPromise = api.getLocations('api/region').then(getMapped);
         const loadOblastiPromise = api.getOblasti().then(getMapped);
         const loadCitiesPromise = api.getLocations('api/city').then(getMapped);
 
-      // this.regions = new Map(await loadRegionsPromise);
+        this.regions = new Map(await loadRegionsPromise);
         this.oblasti = new Map(await loadOblastiPromise);
         this.cities = new Map(await loadCitiesPromise);
     }
 
     @action.bound
-    async loadRegions(position: number) {
+    async loadRMRegions(): Promise<Map<number, ILocation>> {   // loads free regions
         const { api } = this.rootStore;
-
-        const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
-            data ? data.map((x): [number, ILocation] => ([x.id, x])) : [];
-        console.log(this.currentDepartmentId);
-        const depId = this.currentDepartmentId;
-        let url;
-        switch (position) {
-            case USER_ROLE.REGIONAL_MANAGER:
-                url = `api/branch/${depId}/region`;
-                break;
-            case USER_ROLE.MEDICAL_AGENT:
-                url = 'api/region';
-                break;
-            default:
-                return;
-        }
-        const loadRegionsPromise = api.getLocations(url).then(getMapped);
-        this.regions = new Map(await loadRegionsPromise);
+        const mappedRegions = await api.getLocations(`api/branch/${this.currentDepartmentId}/region`)
+            .then((data: ILocation[]): Array<[number, ILocation]> =>
+                data ?
+                    data.map((x): [number, ILocation] => ([x.id, x]))
+                    : []);
+        return new Map(mappedRegions);
     }
 
     @action.bound
