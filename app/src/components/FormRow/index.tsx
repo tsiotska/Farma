@@ -30,14 +30,14 @@ export interface IProps<T> extends WithStyles<typeof styles> {
     values: T;
     value?: number | string | T;
     propName: keyof T;
-    onChange: (propName: keyof T, value: string) => void;
+    onChange: (propName: keyof T, value: number | string | T) => void;
     error: boolean | string;
     disabled?: boolean;
     required?: boolean;
     fullWidth?: boolean;
+
     password?: boolean;
     options?: any;
-    id?: string;
 
     autoComplete?: boolean;
 }
@@ -50,12 +50,12 @@ interface IFormRowProps<T> extends IProps<T> {
 @observer
 class FormRow extends Component<IFormRowProps<any>> {
     render() {
-        const { select, autoComplete, id, ...inputProps } = this.props;
+        const { select, autoComplete, ...inputProps } = this.props;
 
         return select
             ? <SelectFormRow {...inputProps} />
             : autoComplete ?
-                <AutocompleteFormRow id={id} {...inputProps}/>
+                <AutocompleteFormRow {...inputProps}/>
                 : <InputFormRow {...inputProps} />;
     }
 }

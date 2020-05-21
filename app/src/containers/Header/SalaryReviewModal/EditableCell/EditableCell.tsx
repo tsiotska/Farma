@@ -47,7 +47,6 @@ class EditableCell extends Component<IProps> {
             enableSubmitButton,
             disabledSubmit
         } = this.props;
-        console.log('value: ', value);
 
         const casted = +value;
         const isValid = value.length
@@ -69,7 +68,7 @@ class EditableCell extends Component<IProps> {
             enableSubmitButton,
             disabledSubmit
         } = this.props;
-        console.log('value: ', value);
+
         const casted = value.length
             ? +value
             : null;

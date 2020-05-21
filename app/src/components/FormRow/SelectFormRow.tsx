@@ -26,7 +26,6 @@ class SelectFormRow<T> extends Component<IProps<T>> {
             required,
             value,
             values,
-            autoComplete
         } = this.props;
 
         return (

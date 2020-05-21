@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { computed, toJS } from 'mobx';
 
 import { IProps } from '.';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, { RenderInputParams } from '@material-ui/lab/Autocomplete';
 import cx from 'classnames';
 
 interface IAutosuggestProps<T> extends IProps<T> {
@@ -19,33 +19,28 @@ interface IAutosuggestProps<T> extends IProps<T> {
 
 @observer
 class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
-    @computed
-    get renderPropTitle(): (value: any) => string {
-        const { renderPropName } = this.props;
-        return renderPropName
+    constructor(props: IAutosuggestProps<T>) {
+        super(props);
+        const { renderPropName } = props;
+        this.renderPropTitle = renderPropName
             ? ({ [renderPropName]: title }: any) => (title || '')
             : (title: string) => (title || '');
     }
 
-    @computed
-    get getSelectedItem() {
-        const {
-            options,
-            value,
-            renderPropName
-        } = this.props;
-
-        if (!value || !options) return '';
-        if (typeof value === 'object') {
-            return value[renderPropName];
-        }
-        return value;
-    }
+    renderPropTitle: (value: any) => string;
 
     changeHandler = (event: any, value: any) => {
         const { onChange, propName } = this.props;
         onChange(propName, value);
     }
+
+    renderInput = (params: RenderInputParams) => (
+        <TextField
+            {...params}
+            className={this.props.classes.input}
+            InputProps={{ ...params.InputProps, disableUnderline: true }}
+        />
+    )
 
     public render() {
         const {
@@ -53,19 +48,11 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
             error,
             label,
             disabled,
-            renderPropName,
             required,
-            id,
-            options
+            options,
+            value
         } = this.props;
 
-        let preparedOptions;
-        //    if (!Array.isArray(options)) {
-        preparedOptions = options.map((opt: any) => (opt[renderPropName]));
-        /*     } else {
-                 preparedOptions = options;
-             }
-             */
         return (
             <FormControl disabled={disabled} className={classes.root} error={!!error}>
                 <InputLabel className={classes.labelRoot} disableAnimation shrink required={required}>
@@ -73,16 +60,12 @@ class AutocompleteFormRow<T> extends Component<IAutosuggestProps<T>> {
                 </InputLabel>
 
                 <Autocomplete
-                    id={id}
-                    value={this.getSelectedItem}
+                    value={value}
                     className={cx(classes.autoComplete)}
                     onChange={this.changeHandler}
-                    options={preparedOptions}
-                    // getOptionLabel={this.renderPropTitle}
-                    renderInput={(params) => {
-                        return <TextField className={classes.input} {...params}
-                                          InputProps={{ ...params.InputProps, disableUnderline: true }}/>;
-                    }}
+                    options={options}
+                    getOptionLabel={this.renderPropTitle}
+                    renderInput={this.renderInput}
                 />
 
                 {

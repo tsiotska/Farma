@@ -174,7 +174,9 @@ class DoctorModal extends Component<IProps> {
     changeHandler = (propName: keyof IDoctorModalValues, value: string) => {
         const { LPUs, specialties } = this.props;
         if (this.objectFields.includes(propName)) {
-            const id = +value;
+            const id = value
+                ? (value as any).id
+                : null;
             const source = (
                 propName === 'lpu'
                     ? LPUs
@@ -196,6 +198,7 @@ class DoctorModal extends Component<IProps> {
 
         const becomeOpen = wasOpen === false && open === true;
         if (!becomeOpen) return;
+
         const specialtyPromise = loadSpecialties();
         const lpusPromise = loadLPUs();
 
@@ -284,43 +287,40 @@ class DoctorModal extends Component<IProps> {
                     propName='mobilePhone'
                 />
                 <FormRow
+                    required
                     autoComplete
                     label='ЛПУ'
-                    onChange={this.changeHandler}
-                    error={this.errors.get('lpu')}
                     propName='lpu'
                     renderPropName='name'
+                    onChange={this.changeHandler}
+                    error={this.errors.get('lpu')}
                     disabled={!LPUs || !LPUs.length}
                     value={this.formValues.lpu}
-                    options={!!LPUs ? LPUs : []}
-                    required/>
-
+                    options={!!LPUs ? LPUs : []}/>
                 <FormRow
                     label='Робочий телефон'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('workPhone')}
-                    propName='workPhone'
-                />
+                    propName='workPhone' />
                 <FormRow
+                    required
                     autoComplete
                     label='Спеціальність'
-                    onChange={this.changeHandler}
-                    error={this.errors.get('specialty')}
                     propName='specialty'
                     renderPropName='name'
+                    onChange={this.changeHandler}
                     value={this.formValues.specialty}
                     disabled={!specialties || !specialties.length}
                     options={!!specialties ? specialties : []}
-                    required/>
+                    error={this.errors.get('specialty')}/>
                 <FormRow
                     label='Банківська картка'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     error={this.errors.get('card')}
                     propName='card'
-                    required
-                />
+                    required/>
                 <FormRow
                     select
                     label='Посада'
