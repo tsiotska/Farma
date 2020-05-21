@@ -685,4 +685,10 @@ export class APIRequester {
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
+
+    deleteDepartment(departmentId: number): Promise<any> {
+        return this.instance.delete(`/api/branch/${departmentId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
 }

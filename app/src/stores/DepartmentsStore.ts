@@ -1713,4 +1713,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (!type || !id) return;
         return await api.returnNotification(type, id);
     }
+
+    @action.bound
+    async deleteDepartment() {
+        const { api } = this.rootStore;
+        const depId = this.currentDepartmentId;
+        if (!depId) return null;
+        return await api.deleteDepartment(depId);
+    }
 }
