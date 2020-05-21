@@ -1,5 +1,5 @@
 import { multiDepartmentRoles } from './../constants/Roles';
-import { action, computed, observable, reaction, transaction, when } from 'mobx';
+import { action, computed, observable, reaction, transaction, when, toJS } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
@@ -1012,15 +1012,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities({ oblastName, regionId }: {
-        oblastName?: string;
-        regionId?: number;
-    }) {
+    loadSpecificCities({ oblastName, regionId }: { oblastName?: string; regionId?: number; }) {
         let url: string;
         if (oblastName) url = `api/city?oblast=${oblastName}`;
         if (regionId) url = `api/city?region=${regionId}`;
-        return url
-            ? this.rootStore.api.getLocations(url)
+        return url ? this.rootStore.api.getLocations(url)
             : null;
     }
 
@@ -1050,6 +1046,29 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map(await loadRegionsPromise);
         this.oblasti = new Map(await loadOblastiPromise);
         this.cities = new Map(await loadCitiesPromise);
+    }
+
+    @action.bound
+    async loadRegions(position: number) {
+        const { api } = this.rootStore;
+
+        const getMapped = (data: ILocation[]): Array<[number, ILocation]> =>
+            data ? data.map((x): [number, ILocation] => ([x.id, x])) : [];
+        console.log(this.currentDepartmentId);
+        const depId = this.currentDepartmentId;
+        let url;
+        switch (position) {
+            case USER_ROLE.REGIONAL_MANAGER:
+                url = `api/branch/${depId}/region`;
+                break;
+            case USER_ROLE.MEDICAL_AGENT:
+                url = 'api/region';
+                break;
+            default:
+                return;
+        }
+        const loadRegionsPromise = api.getLocations(url).then(getMapped);
+        this.regions = new Map(await loadRegionsPromise);
     }
 
     @action.bound

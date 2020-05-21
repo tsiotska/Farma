@@ -11,6 +11,7 @@ import { NOTIFICATIONS_TYPE } from '../../../constants/NotificationsType';
 import DoctorPanel from './DoctorPanel';
 import HCFPanel from './HCFPanel';
 import UserPanel from './UserPanel';
+import Settings from '-!react-svg-loader!../../../../assets/icons/settings.svg';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -95,7 +96,7 @@ class Notification extends Component<IProps> {
                     {
                         this.iconSrc
                             ? <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon}/>
-                            : <span className={classes.icon}/>
+                            : <Settings className={classes.icon}/>
                     }
                     <Divider className={classes.divider} orientation='vertical'/>
                     <Grid xs={4} wrap='nowrap' alignItems='center' zeroMinWidth container item>

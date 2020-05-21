@@ -16,7 +16,13 @@ import AvatarDropzone from '../../../components/AvatarDropzone';
 import FormRow from '../../../components/FormRow';
 import { IPosition } from '../../../interfaces/IPosition';
 import { USER_ROLE } from '../../../constants/Roles';
-import { phoneValidator, Validator, emailValidator, stringValidator, lengthValidator } from '../../../helpers/validators';
+import {
+    phoneValidator,
+    Validator,
+    emailValidator,
+    stringValidator,
+    lengthValidator
+} from '../../../helpers/validators';
 import { IUser } from '../../../interfaces';
 import LoadingMask from '../../../components/LoadingMask';
 import { IWorker } from '../../../interfaces/IWorker';
@@ -61,10 +67,12 @@ interface IProps extends WithStyles<typeof styles> {
         regionId?: number;
     }) => Promise<ILocation[]>;
     regions?: Map<number, ILocation>;
+    loadRegions?: (position: number) => void;
 }
 
 export interface IWorkerModalValues {
     [key: string]: string | number;
+
     name: string;
     workPhone: string;
     mobilePhone: string;
@@ -77,15 +85,17 @@ export interface IWorkerModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            loadSpecificCities,
-            regions
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     loadSpecificCities,
+                     regions,
+                     loadRegions
+                 }
+             }
+         }) => ({
     loadSpecificCities,
-    regions
+    regions,
+    loadRegions
 }))
 @observer
 class WorkerModal extends Component<IProps> {
@@ -104,14 +114,14 @@ class WorkerModal extends Component<IProps> {
         workPhone: '',
         mobilePhone: '',
         card: '',
-        position: USER_ROLE.UNKNOWN,
+        position: USER_ROLE.REGIONAL_MANAGER,
         email: '',
         password: '',
         city: 0,
         region: 0,
     };
 
-    @observable formValues: IWorkerModalValues = {...this.defaultValues};
+    @observable formValues: IWorkerModalValues = { ...this.defaultValues };
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
     @observable image: File | string = null;
     @observable cities: ILocation[] = [];
@@ -144,7 +154,7 @@ class WorkerModal extends Component<IProps> {
     get optionalValues(): Array<keyof IWorkerModalValues> {
         const { open, initialWorker } = this.props;
         const defaultValues: Array<keyof IWorkerModalValues> = ['mobilePhone', 'workPhone', 'card'];
-        if (open && initialWorker) return [...defaultValues, 'password' ];
+        if (open && initialWorker) return [...defaultValues, 'password'];
         return defaultValues;
     }
 
@@ -153,19 +163,19 @@ class WorkerModal extends Component<IProps> {
         const { initialWorker } = this.props;
 
         const valuesChanged = initialWorker
-        ? this.allProps.some(x => {
-            const initialValue = initialWorker[x];
-            const currentValue = this.formValues[x];
+            ? this.allProps.some(x => {
+                const initialValue = initialWorker[x];
+                const currentValue = this.formValues[x];
 
-            if (this.regionRelatedFields.includes(x)) {
-                return (initialValue || 0) !== currentValue;
-            } else if (x === 'position') {
-                return initialValue !== currentValue;
-            }
+                if (this.regionRelatedFields.includes(x)) {
+                    return (initialValue || 0) !== currentValue;
+                } else if (x === 'position') {
+                    return initialValue !== currentValue;
+                }
 
-            return (initialValue || '') !== currentValue;
-        })
-        : this.allProps.some(x => !!this.formValues[x]);
+                return (initialValue || '') !== currentValue;
+            })
+            : this.allProps.some(x => !!this.formValues[x]);
 
         const imageChanged = initialWorker
             ? this.image !== initialWorker.image
@@ -191,7 +201,7 @@ class WorkerModal extends Component<IProps> {
                     : isOptional;
 
                 return allow && isOk;
-        }, this.valuesChanged);
+            }, this.valuesChanged);
     }
 
     @computed
@@ -199,11 +209,9 @@ class WorkerModal extends Component<IProps> {
         const { regions, open } = this.props;
         if (open === false) return [];
         const res: ILocation[] = [];
-
         regions.forEach(x => {
             res.push(x);
         });
-
         return res;
     }
 
@@ -243,12 +251,15 @@ class WorkerModal extends Component<IProps> {
     }
 
     positionChangeCallback = async () => {
+        console.log('loading');
+        await this.props.loadRegions(this.formValues.position);
+
         const { initialWorker } = this.props;
         if (!initialWorker) return;
         const { initialWorker: { city, region } } = this.props;
         if (this.requireRegion === true && !this.formValues.region) {
             this.formValues.region = region || this.defaultValues.region;
-            await this.loadSpecificCities();
+            await this.loadSpecificCities(); // this.formValues.position
         }
         if (this.requireCity === true && !this.formValues.city) {
             this.formValues.city = city || this.defaultValues.city;
@@ -293,20 +304,24 @@ class WorkerModal extends Component<IProps> {
         this.image = null;
     }
 
-    componentDidUpdate(prevProps: IProps) {
+   async componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
         const { open, initialWorker, positions } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
 
         if (becomeClosed) {
-            this.formValues = {...this.defaultValues};
+            this.formValues = { ...this.defaultValues };
             this.image = null;
         } else if (becomeOpened) {
             this.formValues.position = positions[0].id;
             if (!!initialWorker) this.initValuesFromInitialWorker();
         }
 
+        if (this.requireRegion) {
+            console.log('loading');
+            // await this.props.loadRegions(this.formValues.position);
+        }
         if (this.requireRegion === false && !!this.formValues.region) {
             this.formValues.region = this.defaultValues.region;
         }
@@ -326,7 +341,8 @@ class WorkerModal extends Component<IProps> {
                 position,
                 email,
                 image
-        }} = this.props;
+            }
+        } = this.props;
 
         this.formValues = {
             name: name || this.defaultValues.name,
@@ -375,160 +391,160 @@ class WorkerModal extends Component<IProps> {
                 onClose={onClose}
                 title={title}
                 maxWidth='md'>
-                    <Grid wrap='nowrap' container>
-                        <AvatarDropzone
-                            classes={this.dropzoneClasses}
-                            appendFile={this.appendFileHandler}
-                            removeIcon={this.removeFileHandler}
-                            file={this.image}
-                        />
-                        <Grid container>
-                            <Grid justify='space-between'  container>
-                                <FormRow
-                                    required
-                                    label='ПІБ'
-                                    propName='name'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    error={this.errors.get('name')}
-                                />
-                                <FormRow
-                                    label='Робочий телефон'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    propName='workPhone'
-                                    error={this.errors.get('workPhone')}
-                                />
-                                <FormRow
-                                    label='Банківська картка'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    propName='card'
-                                    error={this.errors.get('card')}
-                                />
-                                <FormRow
-                                    label='Мобільний телефон'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    propName='mobilePhone'
-                                    error={this.errors.get('mobilePhone')}
-                                />
-                                <FormRow
-                                    required
-                                    select
-                                    label='Посада'
-                                    values={this.formValues}
-                                    value={
-                                        positions.length
+                <Grid wrap='nowrap' container>
+                    <AvatarDropzone
+                        classes={this.dropzoneClasses}
+                        appendFile={this.appendFileHandler}
+                        removeIcon={this.removeFileHandler}
+                        file={this.image}
+                    />
+                    <Grid container>
+                        <Grid justify='space-between' container>
+                            <FormRow
+                                required
+                                label='ПІБ'
+                                propName='name'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                error={this.errors.get('name')}
+                            />
+                            <FormRow
+                                label='Робочий телефон'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                propName='workPhone'
+                                error={this.errors.get('workPhone')}
+                            />
+                            <FormRow
+                                label='Банківська картка'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                propName='card'
+                                error={this.errors.get('card')}
+                            />
+                            <FormRow
+                                label='Мобільний телефон'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                propName='mobilePhone'
+                                error={this.errors.get('mobilePhone')}
+                            />
+                            <FormRow
+                                required
+                                select
+                                label='Посада'
+                                values={this.formValues}
+                                value={
+                                    positions.length
                                         ? this.formValues.position
                                         : USER_ROLE.UNKNOWN
-                                    }
-                                    onChange={this.changeHandler}
-                                    error={this.errors.get('position')}
-                                    propName='position'>
-                                        {/* <MenuItem value={USER_ROLE.UNKNOWN} className={classes.menuItem} /> */}
+                                }
+                                onChange={this.changeHandler}
+                                error={this.errors.get('position')}
+                                propName='position'>
+                                {/* <MenuItem value={USER_ROLE.UNKNOWN} className={classes.menuItem} /> */}
+                                {
+                                    positions.map(({ id, alias }) => (
+                                        <MenuItem
+                                            key={id}
+                                            value={`${id}`}
+                                            className={classes.menuItem}>
+                                            {alias}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </FormRow>
+                        </Grid>
+                        {
+                            showLocationsBlock &&
+                            <Grid justify='space-between' container>
+                                <Typography className={classes.subheader}>
+                                    Територія
+                                </Typography>
+                                {
+                                    this.requireRegion &&
+                                    <FormRow
+                                        required
+                                        select
+                                        label='Регіон'
+                                        values={this.formValues}
+                                        value={
+                                            this.regions.length && regions.has(this.formValues.region)
+                                                ? regions.get(this.formValues.region).id
+                                                : ''
+                                        }
+                                        onChange={this.changeHandler}
+                                        error={this.errors.get('region')}
+                                        propName='region'>
                                         {
-                                            positions.map(({ id, alias }) => (
-                                                <MenuItem
-                                                    key={id}
-                                                    value={`${id}`}
-                                                    className={classes.menuItem}>
-                                                    { alias }
+                                            this.regions.map(({ id, name }) => (
+                                                <MenuItem key={id} value={id}>
+                                                    {name}
                                                 </MenuItem>
                                             ))
                                         }
-                                </FormRow>
+                                    </FormRow>
+                                }
+                                {
+                                    this.requireCity &&
+                                    <FormRow
+                                        required
+                                        select
+                                        label='Місто'
+                                        values={this.formValues}
+                                        onChange={this.changeHandler}
+                                        error={this.errors.get('city')}
+                                        disabled={this.cities.length === 0}
+                                        propName='city'>
+                                        <MenuItem value={this.defaultValues.city} className={classes.menuItem}/>
+                                        {
+                                            this.cities.map(({ id, name }) => (
+                                                <MenuItem key={id} value={id}>
+                                                    {name}
+                                                </MenuItem>
+                                            ))
+                                        }
+                                    </FormRow>
+                                }
                             </Grid>
-                            {
-                                showLocationsBlock &&
-                                <Grid justify='space-between' container>
-                                    <Typography className={classes.subheader}>
-                                        Територія
-                                    </Typography>
-                                    {
-                                        this.requireRegion &&
-                                        <FormRow
-                                            required
-                                            select
-                                            label='Регіон'
-                                            values={this.formValues}
-                                            value={
-                                                this.regions.length && regions.has(this.formValues.region)
-                                                ? regions.get(this.formValues.region).id
-                                                : ''
-                                            }
-                                            onChange={this.changeHandler}
-                                            error={this.errors.get('region')}
-                                            propName='region'>
-                                                {
-                                                    this.regions.map(({ id, name }) => (
-                                                        <MenuItem key={id} value={id}>
-                                                            { name }
-                                                        </MenuItem>
-                                                    ))
-                                                }
-                                        </FormRow>
-                                    }
-                                    {
-                                        this.requireCity &&
-                                        <FormRow
-                                            required
-                                            select
-                                            label='Місто'
-                                            values={this.formValues}
-                                            onChange={this.changeHandler}
-                                            error={this.errors.get('city')}
-                                            disabled={this.cities.length === 0}
-                                            propName='city'>
-                                                <MenuItem value={this.defaultValues.city} className={classes.menuItem} />
-                                                {
-                                                    this.cities.map(({ id, name }) => (
-                                                        <MenuItem key={id} value={id}>
-                                                            { name }
-                                                        </MenuItem>
-                                                    ))
-                                                }
-                                        </FormRow>
-                                    }
-                                </Grid>
-                            }
-                            <Grid justify='space-between' container>
-                                <Typography className={classes.subheader}>
-                                    Авторизація
-                                </Typography>
-                                <FormRow
-                                    required
-                                    label='Email'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    propName='email'
-                                    error={this.errors.get('email')}
-                                />
-                                <FormRow
-                                    required={this.optionalValues.includes('password') === false}
-                                    label='Пароль'
-                                    values={this.formValues}
-                                    onChange={this.changeHandler}
-                                    propName='password'
-                                    error={this.errors.get('password')}
-                                />
-                            </Grid>
+                        }
+                        <Grid justify='space-between' container>
+                            <Typography className={classes.subheader}>
+                                Авторизація
+                            </Typography>
+                            <FormRow
+                                required
+                                label='Email'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                propName='email'
+                                error={this.errors.get('email')}
+                            />
+                            <FormRow
+                                required={this.optionalValues.includes('password') === false}
+                                label='Пароль'
+                                values={this.formValues}
+                                onChange={this.changeHandler}
+                                propName='password'
+                                error={this.errors.get('password')}
+                            />
                         </Grid>
                     </Grid>
-                    <Button
-                        color='primary'
-                        variant='contained'
-                        className={classes.submitButton}
-                        onClick={this.submitHandler}
-                        disabled={this.allowSubmit === false}>
-                        {
-                            isLoading
-                            ? <LoadingMask size={20} />
+                </Grid>
+                <Button
+                    color='primary'
+                    variant='contained'
+                    className={classes.submitButton}
+                    onClick={this.submitHandler}
+                    disabled={this.allowSubmit === false}>
+                    {
+                        isLoading
+                            ? <LoadingMask size={20}/>
                             : initialWorker
-                                ? 'Зберегти зміни'
-                                : 'Додати користувача'
-                        }
-                    </Button>
+                            ? 'Зберегти зміни'
+                            : 'Додати користувача'
+                    }
+                </Button>
             </Dialog>
         );
     }
