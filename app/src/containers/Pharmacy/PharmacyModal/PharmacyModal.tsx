@@ -51,14 +51,14 @@ export interface IPharmacyModalValues {
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     oblasti,
-                     loadSpecificCities,
-                     loadSpecificLpus,
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            oblasti,
+            loadSpecificCities,
+            loadSpecificLpus,
+        }
+    }
+}) => ({
     oblasti,
     loadSpecificCities,
     loadSpecificLpus,
@@ -167,7 +167,7 @@ class PharmacyModal extends Component<IProps> {
 
     changeHandler = (propName: keyof IPharmacyModalValues, value: string) => {
         if (propName === 'city') {
-            const cityId = +value;
+            const cityId = value ? (value as any).id : null;
             const targetCity = this.cities.find(({ id }) => id === cityId);
             this.formValues.city = targetCity || null;
         } else {
@@ -292,14 +292,14 @@ class PharmacyModal extends Component<IProps> {
                     />
                     <Grid justify='space-between' container>
                         <FormRow
+                            required
                             autoComplete
                             label='Область'
-                            onChange={this.changeHandler}
                             propName='oblast'
-                            disabled={this.oblastListItems.length === 0}
-                            required
+                            onChange={this.changeHandler}
                             value={this.formValues.oblast}
                             options={!!this.oblastListItems ? this.oblastListItems : []}
+                            disabled={this.oblastListItems.length === 0}
                             error={this.errors.get('oblast')}/>
                         <FormRow
                             label='Адрес'
@@ -310,15 +310,15 @@ class PharmacyModal extends Component<IProps> {
                             required
                         />
                         <FormRow
+                            required
                             autoComplete
                             label='Місто'
-                            onChange={this.changeHandler}
                             propName='city'
                             renderPropName='name'
-                            disabled={this.formValues.oblast === '' || !this.cities.length}
-                            required
+                            onChange={this.changeHandler}
                             value={this.formValues.city}
                             options={!!this.cities ? this.cities : []}
+                            disabled={this.formValues.oblast === '' || !this.cities.length}
                             error={this.errors.get('city')}/>
                         <FormRow
                             label='Телефон 1'
@@ -330,9 +330,9 @@ class PharmacyModal extends Component<IProps> {
                         <FormRow
                             autoComplete
                             label='ЛПУ'
-                            onChange={this.changeHandler}
                             propName='lpu'
                             renderPropName='name'
+                            onChange={this.changeHandler}
                             value={this.formValues.lpu}
                             options={!!this.lpus ? this.lpus : []}
                             disabled={!this.formValues.city || !this.lpus.length}

@@ -271,7 +271,6 @@ class TableRow extends Component<IProps> {
         const userRole = typeof agent.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : agent.position;
-        console.log('nest level: ', userRole - role);
         return userRole - role;
     }
 

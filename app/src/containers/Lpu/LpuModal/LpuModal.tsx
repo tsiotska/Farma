@@ -53,13 +53,13 @@ export interface ILpuModalValues {
 }
 
 @inject(({
-             appState: {
-                 departmentsStore: {
-                     oblasti,
-                     loadSpecificCities,
-                 }
-             }
-         }) => ({
+    appState: {
+        departmentsStore: {
+            oblasti,
+            loadSpecificCities,
+        }
+    }
+}) => ({
     oblasti,
     loadSpecificCities,
 }))
@@ -156,7 +156,10 @@ class LpuModal extends Component<IProps> {
 
     changeHandler = (propName: keyof ILpuModalValues, value: string) => {
         if (this.objectFields.includes(propName)) {
-            const id = +value;
+            const id = value
+                ? (value as any).id
+                : null;
+
             if (propName === 'oblast') {
                 const targetOblast = this.oblastListItems.find(x => x.id === id) || null;
                 this.formValues[propName] = targetOblast;
@@ -253,7 +256,6 @@ class LpuModal extends Component<IProps> {
                 />
                 <Grid justify='space-between' container>
                     <FormRow
-                        id='unikum'
                         autoComplete
                         label='Область'
                         onChange={this.changeHandler}
@@ -272,7 +274,6 @@ class LpuModal extends Component<IProps> {
                         error={this.errors.get('address')}
                     />
                     <FormRow
-                        id='diverse'
                         autoComplete
                         required
                         disabled={!this.formValues.oblast}
