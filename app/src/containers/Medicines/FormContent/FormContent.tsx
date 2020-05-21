@@ -16,6 +16,7 @@ import { IMedicine } from '../../../interfaces/IMedicine';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import FormRow from '../../../components/FormRow';
 import isEqual from 'lodash/isEqual';
+import { ILpuModalValues } from '../../Lpu/LpuModal/LpuModal';
 
 const styles = (theme: any) => createStyles({
     columnFirst: {
@@ -65,13 +66,13 @@ export interface IFormValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            departments,
-            currentDepartment
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     departments,
+                     currentDepartment
+                 }
+             }
+         }) => ({
     departments,
     currentDepartment
 }))
@@ -88,7 +89,7 @@ class FormContent extends Component<IProps> {
         barcode: '',
         department: '',
     };
-    @observable formValues: IFormValues = {...this.initialValue};
+    @observable formValues: IFormValues = { ...this.initialValue };
 
     @observable fieldsErrorStatuses: Record<keyof IFormValues, boolean> = {
         name: false,
@@ -105,6 +106,8 @@ class FormContent extends Component<IProps> {
     barcodeLengthValidator: Validator;
     readonly validators: Record<keyof IFormValues, IValidatorSettings[]> = null;
 
+    // readonly optionalFields: Array<keyof IFormValues> = ['dosage'];
+
     constructor(props: IProps) {
         super(props);
         this.lengthValidator = (value: string): boolean => {
@@ -115,24 +118,23 @@ class FormContent extends Component<IProps> {
             return !!value && value.length === 13;
         };
 
-        const stringValidators =  [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }];
-        const moneyValidators =  [
+        const stringValidators = [{ validator: this.lengthValidator, text: 'Мінімальна довжина поля - 3 символи' }];
+        const moneyValidators = [
             { validator: stringValidator, text: 'Пусті значення недопустимі' },
             { validator: moneyValidator, text: 'Неправильне числове значення' }
         ];
-        const numberValidators =  [
-            { validator: numberValidator, text: 'Неправильне числове значення' },
-            { validator: stringValidator, text: 'Пусті значення недопустимі' }
+        const dosageValidator = [
+            { validator: numberValidator, text: 'Неправильне числове значення' }
         ];
-        const barcodeValidators =  [
+        const barcodeValidators = [
             { validator: onlyNumbersValidator, text: 'Допустимі лише цифри' },
-            { validator: this.barcodeLengthValidator, text: 'Штрихкод має бути завдовжки 13 символів'}
+            { validator: this.barcodeLengthValidator, text: 'Штрихкод має бути завдовжки 13 символів' }
         ];
 
         this.validators = {
             name: stringValidators,
             releaseForm: stringValidators,
-            dosage: numberValidators,
+            dosage: dosageValidator,
             manufacturer: stringValidators,
             mark: moneyValidators,
             price: moneyValidators,
@@ -150,7 +152,7 @@ class FormContent extends Component<IProps> {
 
     @computed
     get isSubmitAllowed(): boolean {
-        const allValuesExist = Object.entries(this.formValues).every(([ propName, value]) => this.optionalValues.includes((propName as keyof IFormValues))
+        const allValuesExist = Object.entries(this.formValues).every(([propName, value]) => this.optionalValues.includes((propName as keyof IFormValues))
             ? true
             : !!value
         );
@@ -242,7 +244,7 @@ class FormContent extends Component<IProps> {
         this.formValues = { ...this.initialValue };
         if (defaultMedicine) {
             Object.entries(this.formValues)
-                .forEach(([ propName, value ]: [keyof IFormValues, string]) => this.validate(propName, value));
+                .forEach(([propName, value]: [keyof IFormValues, string]) => this.validate(propName, value));
         }
 
     }
@@ -272,7 +274,6 @@ class FormContent extends Component<IProps> {
                             required
                         />
                         <FormRow
-                            required
                             label='Дозування, мг'
                             values={this.formValues}
                             onChange={this.changeHandler}
@@ -299,7 +300,7 @@ class FormContent extends Component<IProps> {
                             required
                         />
                     </Grid>
-                   <Grid direction='column' xs container item>
+                    <Grid direction='column' xs container item>
                         <FormRow
                             label='Форма выпуску'
                             values={this.formValues}
@@ -341,7 +342,7 @@ class FormContent extends Component<IProps> {
                             {
                                 departments && departments.map(({ id, name }) => (
                                     <MenuItem key={id} className={classes.menuItem} value={name}>
-                                        { name }
+                                        {name}
                                     </MenuItem>
                                 ))
                             }
@@ -354,11 +355,11 @@ class FormContent extends Component<IProps> {
                     variant='contained'
                     color='primary'
                     onClick={this.submitHandler}>
-                        {
-                            isLoading
-                            ? <LoadingMask size={20} />
+                    {
+                        isLoading
+                            ? <LoadingMask size={20}/>
                             : 'Додати'
-                        }
+                    }
                 </Button>
             </>
         );

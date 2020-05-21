@@ -114,7 +114,7 @@ class WorkerModal extends Component<IProps> {
         workPhone: '',
         mobilePhone: '',
         card: '',
-        position: USER_ROLE.REGIONAL_MANAGER,
+        position: USER_ROLE.UNKNOWN,
         email: '',
         password: '',
         city: 0,
@@ -251,9 +251,6 @@ class WorkerModal extends Component<IProps> {
     }
 
     positionChangeCallback = async () => {
-        console.log('loading');
-        await this.props.loadRegions(this.formValues.position);
-
         const { initialWorker } = this.props;
         if (!initialWorker) return;
         const { initialWorker: { city, region } } = this.props;
@@ -266,9 +263,13 @@ class WorkerModal extends Component<IProps> {
         }
     }
 
-    changeHandler = (propName: keyof IWorkerModalValues, value: string) => {
+    changeHandler = async (propName: keyof IWorkerModalValues, value: string) => {
         if (propName === 'position') {
             const converted = +value;
+            if (converted !== this.formValues[propName]) {
+                console.log('loading regions...');
+                await this.props.loadRegions(this.formValues.position);
+            }
             this.formValues[propName] = converted;
             this.positionChangeCallback();
         } else if (propName === 'region') {
@@ -304,9 +305,9 @@ class WorkerModal extends Component<IProps> {
         this.image = null;
     }
 
-   async componentDidUpdate(prevProps: IProps) {
+    async componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker, positions } = this.props;
+        const { open, initialWorker, positions, regions } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
 
@@ -317,8 +318,8 @@ class WorkerModal extends Component<IProps> {
             this.formValues.position = positions[0].id;
             if (!!initialWorker) this.initValuesFromInitialWorker();
         }
-
-        if (this.requireRegion) {
+        console.log(regions);
+        if (this.requireRegion && !regions) {
             console.log('loading');
             // await this.props.loadRegions(this.formValues.position);
         }
