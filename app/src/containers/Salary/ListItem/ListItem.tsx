@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Grid, Typography, LinearProgress } from '@material-ui/core';
+import {
+    createStyles,
+    WithStyles,
+    ExpansionPanel,
+    ExpansionPanelSummary,
+    ExpansionPanelDetails,
+    Grid,
+    Typography,
+    LinearProgress
+} from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IUserSalary } from '../../../interfaces/IUserSalary';
@@ -7,7 +16,7 @@ import { KeyboardArrowDown } from '@material-ui/icons';
 import { IUser } from '../../../interfaces';
 import UserShortInfo from '../../../components/UserShortInfo';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import {computed, observable, toJS} from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 
@@ -118,16 +127,16 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            getAsyncStatus,
-            locationsAgents
-        },
-        uiStore: {
-            isInfoPopperOpen
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     getAsyncStatus,
+                     locationsAgents
+                 },
+                 uiStore: {
+                     isInfoPopperOpen
+                 }
+             }
+         }) => ({
     getAsyncStatus,
     locationsAgents,
     isInfoPopperOpen
@@ -167,7 +176,6 @@ class ListItem extends Component<IProps> {
             agentInfo,
             expandedAgentsInfo
         } = this.props;
-
         return (
             <ExpansionPanel
                 onChange={this.expandChangeHandler}
@@ -182,62 +190,62 @@ class ListItem extends Component<IProps> {
                     expanded: classes.expanded
                 }}>
                 <ExpansionPanelSummary
-                    expandIcon={expandable && <KeyboardArrowDown fontSize='small' />}
+                    expandIcon={expandable && <KeyboardArrowDown fontSize='small'/>}
                     classes={{
                         content: classes.summaryContent,
                         root: classes.summaryRoot,
                         expandIcon: classes.expandIcon
                     }}>
-                        <Grid className={classes.contantCol} wrap='nowrap' alignItems='center' container item>
-                            <UserShortInfo
-                                user={locationsAgents.get(id)}
-                                classes={{
-                                    avatar: classes.icon,
-                                    textContainer: classes.userTextContainer,
-                                    credentials: classes.text,
-                                    position: classes.text,
-                                }}
-                                disableClick
-                                hideLevel
-                                hidePosition
-                            />
-                            {
-                                agentInfo &&
-                                <InfoWindow>
-                                  <AgentInfoWindowForm
+                    <Grid className={classes.contantCol} wrap='nowrap' alignItems='center' container item>
+                        <UserShortInfo
+                            user={locationsAgents.get(id)}
+                            classes={{
+                                avatar: classes.icon,
+                                textContainer: classes.userTextContainer,
+                                credentials: classes.text,
+                                position: classes.text,
+                            }}
+                            disableClick
+                            hideLevel
+                            hidePosition
+                        />
+                        {
+                            agentInfo &&
+                            <InfoWindow>
+                                <AgentInfoWindowForm
                                     region={agentInfo.region}
                                     mobilePhone={agentInfo.mobilePhone}
                                     workPhone={agentInfo.workPhone}
                                     card={agentInfo.card}
-                                  />
-                                </InfoWindow>
-                            }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { position }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { money }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { position }
-                            { level }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { salary }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { extraCosts }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { kpi }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { bonus }
-                        </Grid>
-                        <Grid xs justify='center' alignItems='center' container item>
-                            { total }
-                        </Grid>
+                                />
+                            </InfoWindow>
+                        }
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {position}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {money}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {position}
+                        {level}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {salary}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {extraCosts}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {kpi}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {bonus}
+                    </Grid>
+                    <Grid xs justify='center' alignItems='center' container item>
+                        {total}
+                    </Grid>
 
                 </ExpansionPanelSummary>
                 {
@@ -248,24 +256,24 @@ class ListItem extends Component<IProps> {
                         </Typography>
                         {
                             (subSalaries && subSalaries.length)
-                            ? subSalaries.map(x => (
-                                <ListItem
-                                    agentInfo={
-                                        expandedAgentsInfo
-                                            // tslint:disable-next-line:no-shadowed-variable
-                                            ? expandedAgentsInfo.find(({ id }: { id: number }) => id === x.id)
-                                            : null
-                                    }
-                                    key={x.id}
-                                    classes={classes}
-                                    expandable={false}
-                                    isExpanded={false}
-                                    userSalary={x}
-                                    position='МП'
-                                />
-                            ))
-                            : this.isLoading
-                                ? <LinearProgress />
+                                ? subSalaries.map(x => (
+                                    <ListItem
+                                        agentInfo={
+                                            expandedAgentsInfo
+                                                // tslint:disable-next-line:no-shadowed-variable
+                                                ? expandedAgentsInfo.find(({ id }: { id: number }) => id === x.id)
+                                                : null
+                                        }
+                                        key={x.id}
+                                        classes={classes}
+                                        expandable={false}
+                                        isExpanded={false}
+                                        userSalary={x}
+                                        position='МП'
+                                    />
+                                ))
+                                : this.isLoading
+                                ? <LinearProgress/>
                                 : <Typography variant='body2' className={classes.emptyPlaceholder}>
                                     Список МП пустий
                                 </Typography>

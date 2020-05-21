@@ -930,7 +930,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 parentId,
                 agentId,
                 this.bonusesYear,
-                this.previewBonusMonth
+                this.previewBonusMonth + 1
             ),
             'removeAgent');
     }

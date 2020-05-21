@@ -124,10 +124,7 @@ class Table extends Component<IProps> {
     @computed
     get agentsInfo(): IAgentInfo[] {
         const { previewBonus } = this.props;
-
-        return previewBonus
-            ? previewBonus.agents
-            : [];
+        return previewBonus ? previewBonus.agents : [];
     }
 
     @computed

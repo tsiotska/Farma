@@ -16,6 +16,7 @@ export interface IAgentInfo {
     lastPayment: number;
     lastDeposit: number;
     deposit: number;
+    isDone?: boolean;
     marks: Map<number, IMark>;
 }
 

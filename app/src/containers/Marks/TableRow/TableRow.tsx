@@ -26,7 +26,6 @@ import { USER_ROLE } from '../../../constants/Roles';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
-import Settings from '../../Header/Header';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -293,7 +292,7 @@ class TableRow extends Component<IProps> {
 
     get showCloseIcon(): boolean {
         const { agentInfo, agent: { position } } = this.props;
-
+       // console.log(toJS(this.props.agentInfo));
         return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER;
     }
 

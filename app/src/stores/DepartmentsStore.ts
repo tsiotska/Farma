@@ -955,7 +955,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (removed) {
             const depMeds = this.meds.get(depId);
             const med = depMeds
-                ?  depMeds.find(({ id }) => id === medId)
+                ? depMeds.find(({ id }) => id === medId)
                 : null;
 
             if (med) med.deleted = true;
