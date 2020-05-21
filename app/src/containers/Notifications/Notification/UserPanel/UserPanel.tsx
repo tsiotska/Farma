@@ -168,10 +168,15 @@ class UserPanel extends Component<IProps> {
                     <Typography variant='body1' className={classes.colorRed}>
                         Повернено
                     </Typography>
-                    : action === 'return' &&
-                    <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                        Повернути
-                    </Button>
+                    : action === 'return' ?
+                        <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                            Повернути
+                        </Button>
+                        :
+                        deleted &&
+                        <Typography variant='body1' className={classes.colorRed}>
+                            Видалено
+                        </Typography>
                 }
             </>
         );

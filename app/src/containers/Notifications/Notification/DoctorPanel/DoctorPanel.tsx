@@ -41,7 +41,7 @@ const styles = (theme: any) => createStyles({
         color: theme.palette.primary.green.main,
     },
     colorRed: {
-        color:  theme.palette.secondary.dark
+        color: theme.palette.secondary.dark
     }
 });
 
@@ -155,18 +155,23 @@ class DoctorPanel extends Component<IProps> {
                             <Delete/>
                         </IconButton>
                     </>
-
                 }
 
                 {action === 'return' && deleted ?
                     <Typography variant='body1' className={classes.colorRed}>
                         Повернено
                     </Typography>
-                    : action === 'return' &&
-                    <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                        Повернути
-                    </Button>
+                    : action === 'return' ?
+                        <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                            Повернути
+                        </Button>
+                        :
+                        deleted &&
+                        <Typography variant='body1' className={classes.colorRed}>
+                            Видалено
+                        </Typography>
                 }
+
             </>
         );
     }
