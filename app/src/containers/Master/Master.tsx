@@ -60,8 +60,7 @@ const styles = (theme: any) => createStyles({
             // [`@media (max-width:${ theme.breakpoints.width('lg') +  theme.overrides.MuiDrawer.paper.width + 5}px)`]: {
             maxWidth: 'none',
             // marginLeft: 80,
-            marginLeft: theme.overrides.MuiDrawer.paper.width + 5,
-            color: 'red'
+            marginLeft: theme.overrides.MuiDrawer.paper.width + 5
         }
     },
 });

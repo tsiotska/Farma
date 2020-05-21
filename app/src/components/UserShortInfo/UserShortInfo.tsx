@@ -19,6 +19,7 @@ const styles = createStyles({
         justifyContent: 'space-around'
     },
     credentials: {
+        textAlign: 'start',
         fontFamily: 'Source Sans Pro SemiBold'
     },
     levelButton: {
@@ -32,7 +33,9 @@ const styles = createStyles({
         alignItems: 'flex-start',
         color: '#647cfe'
     },
-    position: {}
+    position: {
+        textAlign: 'start'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {

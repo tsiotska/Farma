@@ -38,6 +38,12 @@ const styles = (theme: any) => createStyles({
     },
     phone: {
         minWidth: 220
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main,
+    },
+    colorRed: {
+        color:  theme.palette.secondary.dark
     }
 });
 
@@ -157,20 +163,36 @@ class HCFPanel extends Component<IProps> {
                     </Typography>
                 </Grid>
 
-                {action === 'accept' &&
-                <>
-                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
-                        Підтвердити
-                    </Button>
-                    <IconButton onClick={this.deleteHandler}>
-                        <Delete/>
-                    </IconButton>
-                </>
+                {action === 'accept' && confirmed ?
+                    <>
+                        <Typography variant='body1' className={classes.colorGreen}>
+                            Підтверджено
+                        </Typography>
+                        <IconButton onClick={this.deleteHandler}>
+                            <Delete/>
+                        </IconButton>
+                    </>
+                    : action === 'accept' &&
+                    <>
+                        <Button onClick={this.acceptHandler} variant='outlined'
+                                className={classes.confirmButton}>
+                            Підтвердити
+                        </Button>
+                        <IconButton onClick={this.deleteHandler}>
+                            <Delete/>
+                        </IconButton>
+                    </>
+
                 }
-                {action === 'return' &&
-                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                    Повернути
-                </Button>
+
+                {action === 'return' && deleted ?
+                    <Typography variant='body1' className={classes.colorRed}>
+                        Повернено
+                    </Typography>
+                    : action === 'return' &&
+                    <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                        Повернути
+                    </Button>
                 }
             </>
         );

@@ -11,7 +11,7 @@ import {
     Paper,
     IconButton
 } from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import PersonRemove from '-!react-svg-loader!../../../../assets/icons/personRemoveFill.svg';
 import { KeyboardArrowDown, Close } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -26,6 +26,7 @@ import { USER_ROLE } from '../../../constants/Roles';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import Settings from '../../Header/Header';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -127,7 +128,7 @@ const styles = (theme: any) => createStyles({
     },
     removeIcon: {
         color: theme.palette.primary.level.red,
-        padding: 4
+        padding: 8
     }
 });
 
@@ -442,7 +443,7 @@ class TableRow extends Component<IProps> {
                                             />
                                         </InfoWindow>
                                         <IconButton className={classes.removeIcon} onClick={this.deleteClickHandler}>
-                                            <RemoveCircleOutlineOutlinedIcon/>
+                                            <PersonRemove width={20} height={20}/>
                                         </IconButton>
                                     </>
                                 }
