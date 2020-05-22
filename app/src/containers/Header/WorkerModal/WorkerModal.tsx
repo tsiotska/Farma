@@ -254,7 +254,8 @@ class WorkerModal extends Component<IProps> {
     positionChangeCallback = async (position: number) => {
         const { regions, loadRMRegions } = this.props;
         if (position === USER_ROLE.REGIONAL_MANAGER) {
-            this.regionsList = await loadRMRegions();   // again request for free, maybe save it locally
+            this.regionsList = await loadRMRegions();
+            this.insertBookedRegion();
         } else {
             this.regionsList = regions;
         }
@@ -310,6 +311,14 @@ class WorkerModal extends Component<IProps> {
         this.image = null;
     }
 
+    insertBookedRegion = () => {
+        const { regions } = this.props;
+        if (!this.regionsList.has(this.formValues.region)) {
+            const currentRegion = regions.get(this.formValues.region);  // we get current booked region for RM
+         //   this.regionsList.set(currentRegion.id, currentRegion); // and set its it empty list with free and our one regions
+        }
+    }
+
     async componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
         const { open, initialWorker, positions, loadRMRegions } = this.props;
@@ -323,8 +332,10 @@ class WorkerModal extends Component<IProps> {
             this.formValues.position = positions[0].id;
             this.regionsList = await loadRMRegions();
 
-          //  this.regionsList.set()
-            if (!!initialWorker) this.initValuesFromInitialWorker();
+            if (!!initialWorker) {
+                this.initValuesFromInitialWorker();
+                this.insertBookedRegion();
+            }
         }
         if (this.requireRegion === false && !!this.formValues.region) {
             this.formValues.region = this.defaultValues.region;

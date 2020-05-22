@@ -294,7 +294,7 @@ class TableRow extends Component<IProps> {
         const { agentInfo, agent: { position } } = this.props;
         console.log(toJS(this.props.agentInfo));
         return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER
-            || agentInfo && !agentInfo.isDone;
+            || agentInfo && agentInfo.isDone === false;
     }
 
     expandHandler = () => {

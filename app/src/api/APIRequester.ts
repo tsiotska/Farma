@@ -513,7 +513,7 @@ export class APIRequester {
 
         return url
             ? this.instance.get(url)
-                .then(bonusesDataNormalizer) // bonusesDataNormalizer
+                .then(bonusesDataNormalizer)
                 .catch(this.defaultErrorHandler())
             : null;
     }

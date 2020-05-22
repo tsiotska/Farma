@@ -53,7 +53,6 @@ interface IProps extends WithStyles<typeof styles> {
     flattenMedsInfo: IMark[];
     summedTotal: IMarkFraction;
     summedPacks: IMarkFraction;
-
     meds?: IMedicine[];
 }
 

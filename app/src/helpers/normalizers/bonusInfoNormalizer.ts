@@ -20,7 +20,7 @@ const defaultAgentInfo: IAgentInfo = {
     deposit: null,
     lastPayment: null,
     lastDeposit: null,
-    isDone: false,
+    isDone: true,
     marks: new Map(),
 };
 
