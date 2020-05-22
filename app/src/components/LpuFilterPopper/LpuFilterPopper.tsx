@@ -71,7 +71,7 @@ interface IProps extends WithStyles<typeof styles> {
 
     totalLength: number;
     suggestions: Array<{ id: number, value: string}>;
-    selectedItems: Array<{ id: number, value: string}>;
+    ignoredItems: Array<{ id: number, value: string}>;
     itemClickHandler: (lpu: ILPU) => void;
 
     applyClickHandler: () => void;
@@ -111,7 +111,7 @@ class LpuFilterPopper extends Component<IProps> {
             applyClickHandler,
             suggestions,
             itemClickHandler,
-            selectedItems
+            ignoredItems
         } = this.props;
 
         return (
@@ -135,13 +135,11 @@ class LpuFilterPopper extends Component<IProps> {
                         <Divider className={classes.divider} />
                         <Input
                             disableUnderline
-                            // disabled={isLoading}
                             className={classes.input}
                             onChange={onSearchStringChange}
                             value={searchString}
                             endAdornment={
                                 <IconButton
-                                    // disabled={isLoading}
                                     onClick={applySearch}
                                     className={classes.iconButton} >
                                     <Search fontSize='small' />
@@ -154,7 +152,7 @@ class LpuFilterPopper extends Component<IProps> {
                                 items={suggestions}
                                 itemClickHandler={itemClickHandler}
                                 renderPropName='value'
-                                selectedItems={selectedItems}
+                                ignoredItems={ignoredItems}
                                 isLoading={isLoading}
                               />
                             : isLoading

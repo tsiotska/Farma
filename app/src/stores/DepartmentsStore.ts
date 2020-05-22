@@ -99,21 +99,6 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        // const { uiStore: { LpuSortSettings } } = this.rootStore;
-        // if (!LpuSortSettings || !this.LPUs) return this.LPUs;
-
-        // const { order, propName } = LpuSortSettings;
-
-        // if (['name', 'oblast'].includes(propName)) {
-        //     const callback = order === SORT_ORDER.ASCENDING
-        //         // @ts-ignore
-        //         ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-        //         // @ts-ignore
-        //         : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
-        //     return this.LPUs.sort(callback);
-        // } else {
-        //     return this.LPUs;
-        // }
         const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
 
         if (!this.LPUs) return this.LPUs;
@@ -129,11 +114,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? this.LPUs.slice().sort(callback)
             : this.LPUs;
 
-        const selectedValues = LpuFilterSettings ? LpuFilterSettings.selectedValues : null;
+        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
         const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
 
-        return (selectedValues && selectedValues.length && filterPropName)
-            ? sorted.filter(x => selectedValues.includes(x[filterPropName]))
+        return (ignoredValues && ignoredValues.length && filterPropName)
+            ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
             : sorted;
 
     }
@@ -155,18 +140,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? this.pharmacies.slice().sort(callback)
             : this.pharmacies;
 
-        const selectedValues = LpuFilterSettings ? LpuFilterSettings.selectedValues : null;
+        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
         const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
 
-        return (selectedValues && selectedValues.length && filterPropName)
-            ? sorted.filter(x => selectedValues.includes(x[filterPropName]))
+        return (ignoredValues && ignoredValues.length && filterPropName)
+            ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
             : sorted;
-
-        // if (['name', 'oblast'].includes(sortPropName)) {
-        //     return this.pharmacies.sort(callback);
-        // } else {
-        //     return this.pharmacies;
-        // }
     }
 
     @computed

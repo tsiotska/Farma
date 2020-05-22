@@ -81,7 +81,8 @@ class Header extends Component<IProps> {
     @observable searchInputValue: string = '';
     @observable propName: SortableProps = null;
     @observable order: SORT_ORDER = null;
-    @observable selectedItems: any[] = [];
+    // @observable selectedItems: any[] = [];
+    @observable ignoredItems: any[] = [];
 
     @observable source: ILPU[] = null;
 
@@ -147,11 +148,11 @@ class Header extends Component<IProps> {
     }
 
     itemClickHandler = ({ value }: any) => {
-        const itemIndex = this.selectedItems.indexOf(value);
+        const itemIndex = this.ignoredItems.indexOf(value);
         if (itemIndex === -1) {
-            this.selectedItems.push(value);
+            this.ignoredItems.push(value);
         } else {
-            this.selectedItems.splice(itemIndex, 1);
+            this.ignoredItems.splice(itemIndex, 1);
         }
     }
 
@@ -176,7 +177,7 @@ class Header extends Component<IProps> {
     resetValues = () => {
         this.propName = null;
         this.order = null;
-        this.selectedItems = [];
+        this.ignoredItems = [];
         this.searchString = '';
         this.searchInputValue = '';
     }
@@ -228,7 +229,8 @@ class Header extends Component<IProps> {
             this.order = LpuSortSettings.order;
         }
         if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
-            this.selectedItems = [...LpuFilterSettings.selectedValues];
+            this.ignoredItems = [ ...LpuFilterSettings.ignoredItems ];
+            // this.selectedItems = [...LpuFilterSettings.selectedValues];
         }
     }
 
@@ -242,7 +244,7 @@ class Header extends Component<IProps> {
             sortLpuBy(this.propName, this.order);
         }
 
-        filterLpuBy(this.propName, this.selectedItems);
+        filterLpuBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
     }
 
@@ -325,7 +327,8 @@ class Header extends Component<IProps> {
 
                 totalLength={this.totalLength}
                 suggestions={this.filteredOptions}
-                selectedItems={this.selectedItems}
+                // selectedItems={this.selectedItems}
+                ignoredItems={this.ignoredItems}
                 itemClickHandler={this.itemClickHandler}
 
                 applyClickHandler={this.applyFilters}
