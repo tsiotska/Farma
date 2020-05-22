@@ -71,7 +71,7 @@ class SuggestList<T extends IMinimumInterface> extends Component<IProps<T>> {
             selectedItems,
             isLoading
         } = this.props;
-        console.log('items in rest: ', this.itemsInRest);
+
         return (
             <List className={classes.list}>
                 {

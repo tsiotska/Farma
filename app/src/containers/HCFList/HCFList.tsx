@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { createStyles, WithStyles, Grid } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import PharmaciesList from './PharmaciesList';
 import Header from './Header';
@@ -22,10 +22,30 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmed?: boolean;
     onDelete?: (deleted: boolean) => void;
     type: 'hcf' | 'pharmacy';
+    clearLpuSorting?: () => void;
+    clearLpuFilters?: () => void;
 }
 
+@inject(({
+    appState: {
+        uiStore: {
+            clearLpuSorting,
+            clearLpuFilters
+        }
+    }
+}) => ({
+    clearLpuSorting,
+    clearLpuFilters
+}))
 @observer
 class HCFList extends Component<IProps> {
+    componentWillUnmount() {
+        const {unconfirmed, clearLpuSorting, clearLpuFilters} = this.props;
+        if (!unconfirmed) {
+            clearLpuSorting();
+            clearLpuFilters();
+        }
+    }
     render() {
         const {
             classes,

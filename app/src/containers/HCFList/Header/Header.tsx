@@ -4,14 +4,12 @@ import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
 import { gridStyles } from '../gridStyles';
 import { FilterList } from '@material-ui/icons';
-import { observable, computed, toJS } from 'mobx';
+import { observable, computed, toJS, reaction } from 'mobx';
 import LpuFilterPopper from '../../../components/LpuFilterPopper';
 import { SortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopper';
 import { ILPU } from '../../../interfaces/ILPU';
 import { SORT_ORDER, ISortBy, IFilterBy } from '../../../stores/UIStore';
-import debounce from 'lodash/debounce';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
-import { uniqBy } from 'lodash';
 
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
@@ -25,7 +23,10 @@ const styles = (theme: any) => createStyles({
     iconButton: {
         padding: 4,
         borderRadius: 2,
-        marginLeft: 5
+        marginLeft: 5,
+        '&.active': {
+            color: theme.palette.primary.green.main
+        }
     }
 });
 
@@ -58,7 +59,8 @@ export interface IState {
         uiStore: {
             LpuSortSettings,
             LpuFilterSettings,
-            filterLpuBy
+            filterLpuBy,
+            sortLpuBy
         }
     }
 }) => ({
@@ -67,17 +69,29 @@ export interface IState {
     getAsyncStatus,
     LpuSortSettings,
     LpuFilterSettings,
-    filterLpuBy
+    filterLpuBy,
+    sortLpuBy
 }))
 @observer
 class Header extends Component<IProps> {
+    sortReaction: any;
+
     @observable filterPopperAnchor: HTMLElement = null;
     @observable searchString: string = '';
+    @observable searchInputValue: string = '';
     @observable propName: SortableProps = null;
     @observable order: SORT_ORDER = null;
     @observable selectedItems: any[] = [];
 
     @observable source: ILPU[] = null;
+
+    get totalLength(): number {
+        const { type, pharmacies, LPUs} = this.props;
+        const source = type === 'pharmacy'
+            ? pharmacies
+            : LPUs;
+        return (source || []).length;
+    }
 
     @computed
     get isLoading(): boolean {
@@ -91,32 +105,37 @@ class Header extends Component<IProps> {
     @computed
     get sortCallback(): any {
         return this.order === SORT_ORDER.ASCENDING
-            ? (a: any, b: any) => a.value.localeCompare(b.value)
-            : (a: any, b: any) => b.value.localeCompare(a.value);
+            ? (a: any, b: any) => a[this.propName].localeCompare(b[this.propName])
+            : (a: any, b: any) => b[this.propName].localeCompare(a[this.propName]);
     }
 
-    // @computed
-    get options(): any[] {
+    @computed
+    get sortedOptions(): ILPU[] {
+        return (this.order && this.source)
+            ? this.source.slice().sort(this.sortCallback)
+            : this.source;
+    }
+
+    @computed
+    get filteredOptions(): any[] {
         const checklist: string[] = [];
         const res: any[] = [];
 
-        if (!this.source || !this.propName) return res;
+        if (!this.sortedOptions) return res;
 
         const maxIter = this.isLoading
-            ? (this.source.length > 200 ? 200 : this.source.length)
-            : this.source.length;
+            ? (this.sortedOptions.length > 200 ? 200 : this.sortedOptions.length)
+            : this.sortedOptions.length;
 
         const lowerCaseFilter = this.searchString
             ? this.searchString.toLowerCase()
             : '';
 
         for (let i = 0; i < maxIter; ++i) {
-            const curr = this.source[i];
-            const {[this.propName]: value} = curr;
+            const value = this.sortedOptions[i][this.propName];
 
-            const passFilter = lowerCaseFilter === ''
-                ? true
-                : value.includes(lowerCaseFilter);
+            // if filterString === '' -> its already pass filter, otherwise -> check searchString
+            const passFilter = lowerCaseFilter === '' || value.includes(lowerCaseFilter);
 
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);
@@ -124,9 +143,7 @@ class Header extends Component<IProps> {
             }
         }
 
-        return this.order
-            ? res.sort(this.sortCallback)
-            : res;
+        return res;
     }
 
     itemClickHandler = ({ value }: any) => {
@@ -136,18 +153,14 @@ class Header extends Component<IProps> {
         } else {
             this.selectedItems.splice(itemIndex, 1);
         }
-        console.log(this.selectedItems);
     }
 
     inputChangeHandler = ({ target: { value }}: any) => {
-        this.searchString = value;
+        this.searchInputValue = value;
     }
 
     findSuggestions = () => {
-        // const { propName } = this.sortState;
-        // const toLower = (this.searchString || '').toLowerCase();
-        // console.log('options: ', toJS(this.options));
-        // this.suggestions = this.options.filter(({ value }) => value.toLowerCase().includes(toLower));
+        this.searchString = this.searchInputValue;
     }
 
     sortOrderChangeHandler = (order: SORT_ORDER) => {
@@ -155,6 +168,7 @@ class Header extends Component<IProps> {
     }
 
     popoverCloseHandler = () => {
+        if (this.sortReaction) this.sortReaction();
         this.filterPopperAnchor = null;
         this.resetValues();
     }
@@ -164,75 +178,84 @@ class Header extends Component<IProps> {
         this.order = null;
         this.selectedItems = [];
         this.searchString = '';
+        this.searchInputValue = '';
     }
 
     openFilterPopper = (propName: SortableProps) => ({ target }: any) => {
-        // const { LpuSortSettings, LpuFilterSettings } = this.props;
+        const {
+            type,
+            LPUs,
+            pharmacies,
+            LpuSortSettings,
+            LpuFilterSettings
+        } = this.props;
 
-        this.resetValues();
-        this.filterPopperAnchor = target;
-        this.propName = propName;
-        console.log('propName: ', this.propName);
-
-        // if (LpuSortSettings && LpuSortSettings.propName === propName) {
-        //     this.sortState.order = LpuSortSettings.order;
-        // }
-        // if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
-        //     // this.sortState.selectedLpus = LpuFilterSettings.selectedValues;
-        // }
-    }
-
-    applyFilters = () => {
-        // const {
-        //     sortLpuBy,
-        //     filterLpuBy,
-        //     LpuSortSettings,
-        //     LpuFilterSettings
-        // } = this.props;
-
-        // const {
-        //     propName,
-        //     order,
-        //     selectedLpus,
-        // } = this.sortState;
-
-        // if (order !== null) {
-        //     const condition = !!LpuSortSettings
-        //         ? (order !== LpuSortSettings.order) || propName !== LpuSortSettings.propName
-        //         : true;
-        //     if (condition) sortLpuBy(propName, order);
-        // }
-
-        // if (selectedLpus.length || (!!LpuFilterSettings && LpuFilterSettings.propName === propName)) {
-        //     // filterLpuBy(propName, selectedLpus);
-        // }
-    }
-
-    componentDidUpdate(prevProps: IProps) {
-        const { LPUs, pharmacies, type } = this.props;
         const source = type === 'pharmacy'
             ? pharmacies
             : LPUs;
 
-        if (this.filterPopperAnchor && !!source) {
-            if (this.source === source) return;
+        this.resetValues();
+        this.filterPopperAnchor = target;
+        this.propName = propName;
 
-            const sourceIsEmpty = !this.source || !source.length;
+        this.sortReaction = reaction(
+            () => ([this.isLoading, source && source.length]),
+            ([isLoading, size]: [boolean, number], r) => {
+                if (isLoading) {
+                    if (!size) return;
 
-            if (this.isLoading && sourceIsEmpty) {
-                this.source = source.slice(0, 2500);
-            } else if (this.isLoading === false) {
-                this.source = source;
+                    const newItems = size > 200
+                        ? source.slice(0, 200)
+                        : source;
+
+                    const storedItemsLength = this.source
+                        ? this.source.length
+                        : -1;
+
+                    if (storedItemsLength !== newItems.length) {
+                        this.source = newItems;
+                    }
+                } else {
+                    this.source = source;
+                    r.dispose();
+                }
+            }, {
+                fireImmediately: true
             }
-        } else {
-            this.source = null;
+        );
+
+        if (LpuSortSettings && LpuSortSettings.propName === propName) {
+            this.order = LpuSortSettings.order;
+        }
+        if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
+            this.selectedItems = [...LpuFilterSettings.selectedValues];
         }
     }
 
+    applyFilters = () => {
+        const {
+            sortLpuBy,
+            filterLpuBy,
+        } = this.props;
+
+        if (this.order !== null) {
+            sortLpuBy(this.propName, this.order);
+        }
+
+        filterLpuBy(this.propName, this.selectedItems);
+        this.popoverCloseHandler();
+    }
+
+    componentWillUnmount() {
+        if (this.sortReaction) this.sortReaction();
+    }
+
     render() {
-        const { classes, LPUs } = this.props;
-        console.log('src: ', this.source && this.source.length);
-        console.log('opt: ', this.options.length);
+        const { classes, LpuFilterSettings, LpuSortSettings } = this.props;
+
+        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+
         return (
             <>
             <Grid className={classes.root} container alignItems='center'>
@@ -241,7 +264,7 @@ class Header extends Component<IProps> {
                         Назва
                         <IconButton
                             onClick={this.openFilterPopper('name')}
-                            className={classes.iconButton}>
+                            className={cx(classes.iconButton, { active: ('name' === sortPropName || 'name' === filterPropName) }) }>
                             <FilterList fontSize='small' />
                         </IconButton>
                     </Typography>
@@ -250,8 +273,8 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Регіон
                         <IconButton
-                            disabled
                             // onClick={this.openFilterPopper('region')}
+                            // className={cx(classes.iconButton, { active: ('region' === sortPropName || 'region' === filterPropName) }) }>
                             className={classes.iconButton}>
                             <FilterList fontSize='small' />
                         </IconButton>
@@ -261,9 +284,8 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Область
                         <IconButton
-                            disabled
                             onClick={this.openFilterPopper('oblast')}
-                            className={classes.iconButton}>
+                            className={cx(classes.iconButton, { active: ('oblast' === sortPropName || 'oblast' === filterPropName) }) }>
                             <FilterList fontSize='small' />
                         </IconButton>
                     </Typography>
@@ -272,9 +294,8 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Місто
                         <IconButton
-                            disabled
                             onClick={this.openFilterPopper('city')}
-                            className={classes.iconButton}>
+                            className={cx(classes.iconButton, { active: ('city' === sortPropName || 'city' === filterPropName) }) }>
                             <FilterList fontSize='small' />
                         </IconButton>
                     </Typography>
@@ -298,12 +319,12 @@ class Header extends Component<IProps> {
                 order={this.order}
                 onOrderChange={this.sortOrderChangeHandler}
 
-                searchString={this.searchString}
+                searchString={this.searchInputValue}
                 onSearchStringChange={this.inputChangeHandler}
                 applySearch={this.findSuggestions}
 
-                totalLength={this.source ? this.source.length : 0}
-                suggestions={this.options}
+                totalLength={this.totalLength}
+                suggestions={this.filteredOptions}
                 selectedItems={this.selectedItems}
                 itemClickHandler={this.itemClickHandler}
 

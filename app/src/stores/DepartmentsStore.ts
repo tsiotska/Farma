@@ -99,40 +99,74 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const { uiStore: { LpuSortSettings } } = this.rootStore;
-        if (!LpuSortSettings || !this.LPUs) return this.LPUs;
+        // const { uiStore: { LpuSortSettings } } = this.rootStore;
+        // if (!LpuSortSettings || !this.LPUs) return this.LPUs;
 
-        const { order, propName } = LpuSortSettings;
+        // const { order, propName } = LpuSortSettings;
 
-        if (['name', 'oblast'].includes(propName)) {
-            const callback = order === SORT_ORDER.ASCENDING
-                // @ts-ignore
-                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-                // @ts-ignore
-                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
-            return this.LPUs.sort(callback);
-        } else {
-            return this.LPUs;
-        }
+        // if (['name', 'oblast'].includes(propName)) {
+        //     const callback = order === SORT_ORDER.ASCENDING
+        //         // @ts-ignore
+        //         ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
+        //         // @ts-ignore
+        //         : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
+        //     return this.LPUs.sort(callback);
+        // } else {
+        //     return this.LPUs;
+        // }
+        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
+
+        if (!this.LPUs) return this.LPUs;
+
+        const order = LpuSortSettings ? LpuSortSettings.order : null;
+        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+
+        const callback = order === SORT_ORDER.ASCENDING
+            ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
+            : (a: ILPU, b: ILPU) => b[sortPropName].localeCompare(a[sortPropName]);
+
+        const sorted = (sortPropName && order)
+            ? this.LPUs.slice().sort(callback)
+            : this.LPUs;
+
+        const selectedValues = LpuFilterSettings ? LpuFilterSettings.selectedValues : null;
+        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+
+        return (selectedValues && selectedValues.length && filterPropName)
+            ? sorted.filter(x => selectedValues.includes(x[filterPropName]))
+            : sorted;
+
     }
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const { uiStore: { LpuSortSettings } } = this.rootStore;
-        if (!LpuSortSettings || !this.pharmacies) return this.pharmacies;
+        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
 
-        const { order, propName } = LpuSortSettings;
+        if (!this.pharmacies) return this.pharmacies;
 
-        if (['name', 'oblast'].includes(propName)) {
-            const callback = order === SORT_ORDER.ASCENDING
-                // @ts-ignore
-                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-                // @ts-ignore
-                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
-            return this.pharmacies.sort(callback);
-        } else {
-            return this.pharmacies;
-        }
+        const order = LpuSortSettings ? LpuSortSettings.order : null;
+        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+
+        const callback = order === SORT_ORDER.ASCENDING
+            ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
+            : (a: ILPU, b: ILPU) => b[sortPropName].localeCompare(a[sortPropName]);
+
+        const sorted = (sortPropName && order)
+            ? this.pharmacies.slice().sort(callback)
+            : this.pharmacies;
+
+        const selectedValues = LpuFilterSettings ? LpuFilterSettings.selectedValues : null;
+        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+
+        return (selectedValues && selectedValues.length && filterPropName)
+            ? sorted.filter(x => selectedValues.includes(x[filterPropName]))
+            : sorted;
+
+        // if (['name', 'oblast'].includes(sortPropName)) {
+        //     return this.pharmacies.sort(callback);
+        // } else {
+        //     return this.pharmacies;
+        // }
     }
 
     @computed

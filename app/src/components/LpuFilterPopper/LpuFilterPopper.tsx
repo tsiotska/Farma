@@ -135,13 +135,13 @@ class LpuFilterPopper extends Component<IProps> {
                         <Divider className={classes.divider} />
                         <Input
                             disableUnderline
-                            disabled={isLoading}
+                            // disabled={isLoading}
                             className={classes.input}
                             onChange={onSearchStringChange}
                             value={searchString}
                             endAdornment={
                                 <IconButton
-                                    disabled={isLoading}
+                                    // disabled={isLoading}
                                     onClick={applySearch}
                                     className={classes.iconButton} >
                                     <Search fontSize='small' />

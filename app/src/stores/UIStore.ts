@@ -18,7 +18,7 @@ export interface ISortBy {
 
 export interface IFilterBy {
     propName: SortableProps;
-    selectedValues: ILPU[];
+    selectedValues: any[];
 }
 
 export interface IDeletePopoverSettings {
@@ -128,7 +128,7 @@ export class UIStore implements IUIStore {
 
     @action.bound
     filterLpuBy(propName: SortableProps, selectedValues: ILPU[]) {
-        this.LpuFilterSettings = { propName, selectedValues };
+        this.LpuFilterSettings = { propName, selectedValues: [...selectedValues] };
     }
 
     @action.bound
