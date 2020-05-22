@@ -14,7 +14,7 @@ import { IPosition } from '../../../interfaces/IPosition';
 import { ADD_WORKER_MODAL } from '../../../constants/Modals';
 import { USER_ROLE } from '../../../constants/Roles';
 import DeletePopover from '../../../components/DeletePopover';
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 import Snackbar from '../../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import { withRestriction } from '../../../components/hoc/withRestriction';
@@ -39,23 +39,23 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            workers,
-            loadAdminWorkers,
-            positions
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     workers,
+                     loadAdminWorkers,
+                     positions
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     workers,
     loadAdminWorkers,
     positions,
     openModal
 }))
-@withRestriction([ PERMISSIONS.ADD_USER ])
+@withRestriction([PERMISSIONS.ADD_USER])
 @observer
 class UserSettings extends Component<IProps> {
     @observable showSnackbar: boolean = false;
@@ -85,6 +85,9 @@ class UserSettings extends Component<IProps> {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.showSnackbar = true;
+        if (removed) {
+            this.props.loadAdminWorkers();
+        }
     }
 
     componentDidMount() {
@@ -93,10 +96,10 @@ class UserSettings extends Component<IProps> {
 
     render() {
         const { classes, workers, positions, isAllowed } = this.props;
-
+        console.log(toJS(workers));
         return (
             <Grid direction='column' container>
-                <ListHeader />
+                <ListHeader/>
                 {
                     workers.map(worker => (
                         <ListItem
@@ -117,7 +120,7 @@ class UserSettings extends Component<IProps> {
                         Додати користувача
                     </Button>
                 }
-                <DeletePopover name='deleteWorker' />
+                <DeletePopover name='deleteWorker'/>
                 <Snackbar
                     open={this.showSnackbar}
                     type={this.snackbarType}
