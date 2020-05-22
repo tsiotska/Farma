@@ -15,7 +15,8 @@ export const defaultLPU: ILPU = {
     RMCommit: null,
     confirmed: true,
     lpuName: null,
-    lpu: null
+    lpu: null,
+    deleted: null
 };
 
 export const lpuValuesMap: IValuesMap = {
@@ -33,7 +34,8 @@ export const lpuValuesMap: IValuesMap = {
     rm_confirmed: 'RMCommit',
     confirmed: 'confirmed',
     hcf: 'lpu',
-    hcf_name: 'lpuName'
+    hcf_name: 'lpuName',
+    deleted: 'deleted'
 };
 
 export const lpuNormalizer = ({ data: { data }}: any) => objectArrayNormalizer(

@@ -188,7 +188,6 @@ class Marks extends Component<IProps> {
             bonuses,
         } = this.props;
 
-        console.log(toJS(bonuses));
         return (
             <Grid className={classes.root} direction='column' container>
                 <Typography variant='h5' className={classes.title}>

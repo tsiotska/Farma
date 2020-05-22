@@ -44,7 +44,7 @@ const styles = (theme: any) => createStyles({
         color: theme.palette.primary.green.main,
     },
     colorRed: {
-        color:  theme.palette.secondary.dark
+        color: theme.palette.secondary.dark
     }
 });
 
@@ -84,20 +84,20 @@ class HCFPanel extends Component<IProps> {
     }
 
     deleteHandler = ({ currentTarget }: any) => {
-        const { type, deleteClickHandler } = this.props;
-        const id = this.props[type].id;
+        const { type, hcf, deleteClickHandler } = this.props;
+        const id = hcf.id;
         deleteClickHandler(currentTarget, type, id);
     }
 
     acceptHandler = () => {
-        const { type, acceptNotification } = this.props;
-        const id = this.props[type].id;
+        const { type, hcf, acceptNotification } = this.props;
+        const id = hcf.id;
         acceptNotification(type, id);
     }
 
     returnHandler = () => {
-        const { type, returnNotification } = this.props;
-        const id = this.props[type].id;
+        const { type, hcf, returnNotification } = this.props;
+        const id = hcf.id;
         returnNotification(type, id);
     }
 
@@ -114,10 +114,11 @@ class HCFPanel extends Component<IProps> {
                 FFMCommit,
                 RMCommit,
                 id,
-                deleted,
-                confirmed
+                confirmed,
+                deleted
             }
         } = this.props;
+
         return (
             <>
                 <Grid xs={3} alignItems='center' wrap='nowrap' container item>
@@ -173,32 +174,30 @@ class HCFPanel extends Component<IProps> {
                             <DeleteOutlineIcon/>
                         </IconButton>
                     </>
-                    : action === 'accept' &&
-                    <>
-                        <Button onClick={this.acceptHandler} variant='outlined'
-                                className={classes.confirmButton}>
-                            Підтвердити
-                        </Button>
-                        <IconButton onClick={this.deleteHandler}>
-                            <DeleteOutlineIcon/>
-                        </IconButton>
-                    </>
-
+                    : action === 'accept' && deleted ?
+                            <Typography variant='body1' className={classes.colorRed}>
+                                Видалено
+                            </Typography>
+                        : action === 'accept' ?
+                        <>
+                            <Button onClick={this.acceptHandler} variant='outlined'
+                                    className={classes.confirmButton}>
+                                Підтвердити
+                            </Button>
+                            <IconButton onClick={this.deleteHandler}>
+                                <DeleteOutlineIcon/>
+                            </IconButton>
+                        </> : null
                 }
 
                 {action === 'return' && deleted ?
+                    <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                        Повернути
+                    </Button>
+                    : action === 'return' &&
                     <Typography variant='body1' className={classes.colorRed}>
                         Повернено
                     </Typography>
-                    : action === 'return' ?
-                        <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                            Повернути
-                        </Button>
-                        :
-                        deleted &&
-                        <Typography variant='body1' className={classes.colorRed}>
-                            Видалено
-                        </Typography>
                 }
             </>
         );

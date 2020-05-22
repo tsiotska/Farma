@@ -18,7 +18,7 @@ export const defaultUser: IUser = {
     depositPlus: null,
     bankCard: null,
     mobilePhone: null,
-    email: null
+    email: null,
 };
 
 const valuesMap: IValuesMap = {
@@ -40,7 +40,7 @@ const valuesMap: IValuesMap = {
 
     bank_card: 'bankCard',
     mobile_phone: 'mobilePhone',
-    email: 'email'
+    email: 'email',
 };
 
 const requiredProps = ['id', 'full_name', 'position'];

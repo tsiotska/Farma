@@ -15,5 +15,5 @@ export interface ILPU {
     deleted?: boolean;
 
     lpu?: number;
-    lpuName: string;
+    lpuName?: string;
 }

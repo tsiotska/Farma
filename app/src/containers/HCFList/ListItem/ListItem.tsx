@@ -141,6 +141,7 @@ class ListItem extends Component<IProps> {
                 address,
                 phone1,
                 phone2,
+                lpuName,
                 FFMCommit,
                 RMCommit
             }
@@ -156,9 +157,18 @@ class ListItem extends Component<IProps> {
                             <CommitBadge className={classes.badge} title='РМ' committed={RMCommit}/>
                         </>
                     }
-                    <Typography className={classes.text} variant='body2'>
-                        {name}
-                    </Typography>
+
+                    <Grid direction='column' item container>
+                        {lpuName &&
+                        <Typography color='textSecondary'>
+                            {lpuName}
+                        </Typography>
+                        }
+                        <Typography className={classes.text} variant='body2'>
+                            {name}
+                        </Typography>
+                    </Grid>
+
                 </Grid>
                 <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
@@ -214,11 +224,11 @@ class ListItem extends Component<IProps> {
                     }
 
                     <DeleteButton
-                      unconfirmed={unconfirmed}
-                      type={generalType}
-                      className={classes.iconButton}
-                      onClick={this.deleteClickHandler}>
-                      <DeleteOutlineIcon className={classes.icon}/>
+                        unconfirmed={unconfirmed}
+                        type={generalType}
+                        className={classes.iconButton}
+                        onClick={this.deleteClickHandler}>
+                        <DeleteOutlineIcon className={classes.icon}/>
                     </DeleteButton>
                 </Grid>
             </Grid>

@@ -164,7 +164,7 @@ class CommonSettings extends Component<IProps> {
                     Бонуси
                 </Typography>
 
-                <Grid className={classes.formBlock} direction='column' container>
+                <Grid className={classes.formBlock} direction='column' item container>
                     <Typography>
                         Рівень зарахування бонусів
                     </Typography>
@@ -179,7 +179,7 @@ class CommonSettings extends Component<IProps> {
 
                 <Grid className={classes.formBlock} alignItems='center' container>
                     <Typography>
-                        Бонус за виконання продуктів
+                        Ліміт товарів для нарахування бонусів
                     </Typography>
                     <Input
                         value={

@@ -20,7 +20,7 @@ const defaultAgentInfo: IAgentInfo = {
     deposit: null,
     lastPayment: null,
     lastDeposit: null,
-    isDone: null,
+    isDone: false,
     marks: new Map(),
 };
 
@@ -56,9 +56,9 @@ const marksValuesMap: IValuesMap = {
 const agentsValuesMap: IValuesMap = {
     id: 'id',
     deposit: 'deposit',
-    last_payments: 'lastPayment',
-    last_deposit: 'lastDeposit',
     is_done: 'isDone',
+    last_payments: 'lastPayment',
+    last_deposit: 'lastDeposit'
 };
 
 export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayNormalizer(

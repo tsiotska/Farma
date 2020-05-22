@@ -99,7 +99,7 @@ class RoleLevels extends Component<IProps> {
 
                 <Grid wrap='nowrap' spacing={1} container>
                     {Object.entries(this.roleLevels.colors).map((level, i) => (
-                        <Grid key={i} direction='column' item>
+                        <Grid key={i} direction='column' container item>
                             <Radio
                                 checked={initialLevel === level[0]}
                                 onChange={this.handleChange}

@@ -340,7 +340,7 @@ class UserContent extends Component<IProps> {
                     emptyPlaceholder=''
                 />
                 <SumRow
-                    title='Бонус за виконання більше 5 продуктів'
+                    title='Бонус за виконання продуктів'
                     levels={this.levels}
                     userLevel={this.userLevel}
                     values={this.bonuses}
