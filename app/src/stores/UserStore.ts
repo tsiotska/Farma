@@ -204,7 +204,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
             : null;
         url += loadPack ? '&pack=1' : '';
         if (userId === null || !url) return;
-        console.log(url);
         api.getExcel(url);
     }
 

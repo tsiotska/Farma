@@ -6,18 +6,28 @@ import {
     Grid,
     Button,
     Divider,
-    Input
+    Input,
+    Typography,
+    List,
+    IconButton,
+    ListItem,
+    ListItemText
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { SORT_ORDER, ISortBy } from '../../stores/UIStore';
+import { ILPU } from '../../interfaces/ILPU';
+import SuggestItem from './SuggestItem';
+import LoadingMask from '../LoadingMask';
+import { Search } from '@material-ui/icons';
+import SuggestList from './SuggestList';
 
 const styles = (theme: any) => createStyles({
     input: {
         border: '1px solid #aaa',
         borderRadius: 2,
-        padding: '0 8px'
+        padding: '0 0 0 8px'
     },
     container: {
         padding: 12
@@ -27,90 +37,151 @@ const styles = (theme: any) => createStyles({
     },
     button: {
         marginTop: 10,
+        border: '1px solid transparent',
         '&.active': {
-            border: '1px solid #aaa'
+            borderColor: '#aaa'
         }
-    }
+    },
+    submitButton: {
+        color: theme.palette.primary.lightBlue
+    },
+    iconButton: {
+        padding: 6,
+        borderRadius: 2
+    },
+    placeholder: {
+        marginTop: 12
+    },
 });
 
-export type SortableProps = 'name' | 'region' | 'oblast' | 'city';
+export type SortableProps = 'regionName' | 'name' | 'oblast' | 'city';
 
 interface IProps extends WithStyles<typeof styles> {
-    anchor: HTMLElement;
+    toggleAll: () => void;
     propName: SortableProps;
+    anchor: HTMLElement;
     onClose: () => void;
-    sortLpuBy?: (propName: SortableProps, order: SORT_ORDER) => void;
-    LpuSortSettings?: ISortBy;
+    isLoading: boolean;
+
+    order: SORT_ORDER;
+    onOrderChange: (order: SORT_ORDER) => void;
+
+    searchString: string;
+    onSearchStringChange: (e: any) => void;
+    applySearch: () => void;
+
+    totalLength: number;
+    suggestions: Array<{ id: number, value: string}>;
+    ignoredItems: Array<{ id: number, value: string}>;
+    itemClickHandler: (lpu: ILPU) => void;
+
+    applyClickHandler: () => void;
 }
 
-@inject(({
-    appState: {
-        uiStore: {
-            sortLpuBy,
-            LpuSortSettings
-        }
-    }
-}) => ({
-    sortLpuBy,
-    LpuSortSettings
-}))
 @observer
 class LpuFilterPopper extends Component<IProps> {
-    get sortPropName(): SortableProps {
-        const { LpuSortSettings } = this.props;
-        return LpuSortSettings
-            ? LpuSortSettings.propName
-            : null;
+    readonly wrapperClasses: any;
+    readonly anchorOrigin: any = {
+        vertical: 'bottom',
+        horizontal: 'center',
+    };
+    readonly transformOrigin: any = {
+        vertical: 'top',
+        horizontal: 'center',
+    };
+    readonly titles: Record<SortableProps, string> = {
+        'regionName': 'Регіон',
+        'name': 'Назва',
+        'oblast': 'Область',
+        'city': 'Місто',
+    };
+    constructor(props: IProps) {
+        super(props);
+        this.wrapperClasses = { wrapper: props.classes.placeholder };
     }
 
-    get sortOrder(): SORT_ORDER {
-        const { LpuSortSettings } = this.props;
-        return LpuSortSettings
-            ? LpuSortSettings.order
-            : null;
+    get title(): string {
+        const { propName } = this.props;
+        return this.titles[propName];
     }
 
-    sortAtoZ = () => {
-        const { sortLpuBy, propName, onClose } = this.props;
-        sortLpuBy(propName, SORT_ORDER.ASCENDING);
-        onClose();
-    }
+    sortAtoZ = () => this.props.onOrderChange(SORT_ORDER.ASCENDING);
 
-    sortZtoA = () => {
-        const { sortLpuBy, propName, onClose } = this.props;
-        sortLpuBy(propName, SORT_ORDER.DESCENDING);
-        onClose();
-    }
+    sortZtoA = () => this.props.onOrderChange(SORT_ORDER.DESCENDING);
 
     render() {
-        const { classes, anchor, onClose, propName } = this.props;
+        const {
+            classes,
+            anchor,
+            onClose,
+            isLoading,
+            order,
+            searchString,
+            onSearchStringChange,
+            applySearch,
+            applyClickHandler,
+            suggestions,
+            itemClickHandler,
+            ignoredItems,
+            toggleAll
+        } = this.props;
 
         return (
             <Popover
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
+                anchorOrigin={this.anchorOrigin}
+                transformOrigin={this.transformOrigin}
                 onClose={onClose}
                 anchorEl={anchor}
                 open={!!anchor}>
                     <Grid className={classes.container} container direction='column'>
                         <Button
-                            className={cx(classes.button, { active: this.sortPropName === propName && this.sortOrder === SORT_ORDER.ASCENDING})}
+                            className={cx(classes.button, { active: order === SORT_ORDER.ASCENDING} )}
                             onClick={this.sortAtoZ}>
                                 Сортувати від А до Я
                             </Button>
                         <Button
-                            className={cx(classes.button, { active: this.sortPropName === propName && this.sortOrder === SORT_ORDER.DESCENDING})}
+                            className={cx(classes.button, { active: order === SORT_ORDER.DESCENDING} )}
                             onClick={this.sortZtoA}>
                                 Сортувати від Я до А
                             </Button>
-                        {/* <Divider className={classes.divider} />
-                        <Input className={classes.input} disableUnderline /> */}
+                        <Divider className={classes.divider} />
+                        <Input
+                            disableUnderline
+                            className={classes.input}
+                            onChange={onSearchStringChange}
+                            value={searchString}
+                            endAdornment={
+                                <IconButton
+                                    onClick={applySearch}
+                                    className={classes.iconButton} >
+                                    <Search fontSize='small' />
+                                </IconButton>
+                            }
+                        />
+                        {
+                            (!!suggestions && suggestions.length)
+                            ? <SuggestList
+                                title={this.title}
+                                items={suggestions}
+                                itemClickHandler={itemClickHandler}
+                                renderPropName='value'
+                                ignoredItems={ignoredItems}
+                                isLoading={isLoading}
+                                toggleAll={toggleAll}
+                              />
+                            : isLoading
+                                ? <LoadingMask classes={this.wrapperClasses} size={20} />
+                                : <Typography>
+                                    {
+                                        !!suggestions
+                                            ? 'Відповідні дані відсутні'
+                                            : 'Дані відсутні'
+                                    }
+                                </Typography>
+                        }
+                        <Button onClick={applyClickHandler} className={classes.submitButton}>
+                            Застосувати
+                        </Button>
                     </Grid>
             </Popover>
         );
