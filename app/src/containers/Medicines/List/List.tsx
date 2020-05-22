@@ -53,6 +53,7 @@ class List extends Component<IProps> {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.showSnackbar = true;
+
     }
 
     snackbarCloseHandler = () => {

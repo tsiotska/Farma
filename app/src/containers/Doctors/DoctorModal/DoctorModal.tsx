@@ -27,6 +27,9 @@ const styles = (theme: any) => createStyles({
     },
     lastFormRow: {
         paddingRight: '52%'
+    },
+    name: {
+        textTransform: 'capitalize'
     }
 });
 
@@ -212,7 +215,7 @@ class DoctorModal extends Component<IProps> {
         } = initialDoc;
 
         this.formValues = {
-            name: name.split(/\s+/).map(word => word[0].toUpperCase() + word.substring(1)).join(' ') || this.initialFormValues.name,
+            name: name || this.initialFormValues.name,
             lpu: this.initialFormValues.lpu,
             specialty: this.initialFormValues.specialty,
             mobilePhone: mobilePhone || this.initialFormValues.mobilePhone,
@@ -268,6 +271,7 @@ class DoctorModal extends Component<IProps> {
                 fullWidth
                 maxWidth='sm'>
                 <FormRow
+                    className={classes.name}
                     label='ПІБ'
                     values={this.formValues}
                     onChange={this.changeHandler}

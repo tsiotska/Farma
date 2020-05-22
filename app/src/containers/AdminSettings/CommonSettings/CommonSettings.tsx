@@ -44,15 +44,15 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            salarySettings,
-            submitCommonSettingsChanges,
-            getAsyncStatus,
-            loadUserSalarySettings
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     salarySettings,
+                     submitCommonSettingsChanges,
+                     getAsyncStatus,
+                     loadUserSalarySettings
+                 }
+             }
+         }) => ({
     salarySettings,
     submitCommonSettingsChanges,
     getAsyncStatus,
@@ -136,12 +136,15 @@ class CommonSettings extends Component<IProps> {
 
     submitHandler = async () => {
         if (this.isRequestProccessing) return;
-        const { submitCommonSettingsChanges } = this.props;
+        const { submitCommonSettingsChanges, loadUserSalarySettings } = this.props;
         const res = await submitCommonSettingsChanges(this.changedValues);
         this.showSnackbar = true;
         this.snackbarType = res
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
+        if (res) {
+            await loadUserSalarySettings();
+        }
     }
 
     snackbarCloseHandler = () => {
@@ -176,7 +179,7 @@ class CommonSettings extends Component<IProps> {
 
                 <Grid className={classes.formBlock} alignItems='center' container>
                     <Typography>
-                        Ліміт товарів для нарахування бонусів
+                        Бонус за виконання продуктів
                     </Typography>
                     <Input
                         value={

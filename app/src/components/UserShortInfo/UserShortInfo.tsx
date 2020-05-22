@@ -19,6 +19,9 @@ const styles = createStyles({
         justifyContent: 'space-around'
     },
     credentials: {
+        textAlign: 'start',
+        marginTop: 8,
+        wordBreak: 'break-word',
         fontFamily: 'Source Sans Pro SemiBold'
     },
     levelButton: {
@@ -32,7 +35,11 @@ const styles = createStyles({
         alignItems: 'flex-start',
         color: '#647cfe'
     },
-    position: {}
+    position: {
+        marginTop: 8,
+        wordBreak: 'break-word',
+        textAlign: 'start'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -114,8 +121,7 @@ class UserShortInfo extends Component<IProps> {
         return (
             <>
                 <Avatar className={classes.avatar} {...this.avatarProps} />
-                <Grid
-                    className={classes.textContainer}
+                <Grid className={classes.textContainer}
                     direction='column'
                     container>
                     <Typography className={classes.credentials} color='textPrimary'>
@@ -137,7 +143,6 @@ class UserShortInfo extends Component<IProps> {
                             { !disableText && <Typography>Подивитись заплату </Typography>}
                         </Button>
                     }
-
                 </Grid>
             </>
         );

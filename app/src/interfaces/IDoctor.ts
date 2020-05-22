@@ -13,6 +13,7 @@ export interface IDoctor {
     created: Date;
     confirmed: boolean;
     deposit: number;
+    deleted?: boolean;
 
     address?: string;
     city?: string;

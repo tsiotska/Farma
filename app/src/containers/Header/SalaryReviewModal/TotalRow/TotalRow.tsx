@@ -119,7 +119,7 @@ class TotalRow extends Component<IProps> {
                                     className={cx({ [this.actualBlockColors[i] ]: true })}
                                     container>
                                     <Typography align='center'>
-                                        { x || '' }
+                                        { x || 0 }
                                     </Typography>
                                 </Grid>
                         </Grid>

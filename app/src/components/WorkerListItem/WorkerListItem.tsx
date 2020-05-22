@@ -305,7 +305,7 @@ class WorkerListItem extends Component<IProps> {
                     }}>
                     <Grid
                         xs={3}
-                        onClick={this.workerClickHandler}
+                        onClick={!fired && this.workerClickHandler}
                         className={cx(classes.gridItem, classes.nameCell)}
                         wrap='nowrap'
                         alignItems='center'

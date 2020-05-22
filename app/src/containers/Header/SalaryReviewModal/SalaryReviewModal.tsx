@@ -53,19 +53,19 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            loadUserSalaryInfo,
-            userSalary,
-            submitSalaryChanges
-        },
-        uiStore: {
-            modalPayload: user,
-            openedModal,
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     loadUserSalaryInfo,
+                     userSalary,
+                     submitSalaryChanges
+                 },
+                 uiStore: {
+                     modalPayload: user,
+                     openedModal,
+                     openModal
+                 }
+             }
+         }) => ({
     loadUserSalaryInfo,
     userSalary,
     openedModal,
@@ -141,7 +141,6 @@ class SalaryReviewModal extends Component<IProps> {
 
     render() {
         const { user, classes, userSalary } = this.props;
-
         return (
             <Dialog
                 maxWidth='lg'
@@ -165,13 +164,13 @@ class SalaryReviewModal extends Component<IProps> {
                     />
                     {
                         this.isSalesLoading &&
-                        <LoadingMask size={20} />
+                        <LoadingMask size={20}/>
                     }
                 </Grid>
                 <SalaryHeader levelsCount={this.levelsCount}/>
                 <UserContent
                     levelsCount={this.levelsCount}
-                    user={user}
+                    previewUser={user}
                     salary={userSalary}
                     onSubmit={this.submitHandler}
                 />

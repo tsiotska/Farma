@@ -11,7 +11,7 @@ import {
     Paper,
     IconButton
 } from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import PersonRemove from '-!react-svg-loader!../../../../assets/icons/personRemoveFill.svg';
 import { KeyboardArrowDown, Close } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -127,7 +127,7 @@ const styles = (theme: any) => createStyles({
     },
     removeIcon: {
         color: theme.palette.primary.level.red,
-        padding: 4
+        padding: 8
     }
 });
 
@@ -292,7 +292,7 @@ class TableRow extends Component<IProps> {
 
     get showCloseIcon(): boolean {
         const { agentInfo, agent: { position } } = this.props;
-
+       // console.log(toJS(this.props.agentInfo));
         return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER;
     }
 
@@ -362,11 +362,11 @@ class TableRow extends Component<IProps> {
         const deposit = (agent as any).deposit || (agentInfo ? agentInfo.deposit : 0);
 
         const lastPayment = agentInfo
-            ? agentInfo.lastPayment || '-'
-            : '-';
+            ? agentInfo.lastPayment || 0
+            : 0;
         const lastDeposit = agentInfo
-            ? agentInfo.lastDeposit || '-'
-            : '-';
+            ? agentInfo.lastDeposit || 0
+            : 0;
 
         const medsContent = meds.length
             ? meds.map(({ id }) => {
@@ -442,7 +442,7 @@ class TableRow extends Component<IProps> {
                                             />
                                         </InfoWindow>
                                         <IconButton className={classes.removeIcon} onClick={this.deleteClickHandler}>
-                                            <RemoveCircleOutlineOutlinedIcon/>
+                                            <PersonRemove width={20} height={20}/>
                                         </IconButton>
                                     </>
                                 }

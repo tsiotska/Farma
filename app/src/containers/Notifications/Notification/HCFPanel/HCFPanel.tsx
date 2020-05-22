@@ -7,6 +7,7 @@ import CommitBadge from '../../../../components/CommitBadge';
 import { Edit, Delete } from '@material-ui/icons';
 import cx from 'classnames';
 import { ILocation } from '../../../../interfaces/ILocation';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const styles = (theme: any) => createStyles({
     badge: {
@@ -38,6 +39,12 @@ const styles = (theme: any) => createStyles({
     },
     phone: {
         minWidth: 220
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main,
+    },
+    colorRed: {
+        color:  theme.palette.secondary.dark
     }
 });
 
@@ -73,7 +80,7 @@ class HCFPanel extends Component<IProps> {
         const targetRegion = regions.get(region);
         return targetRegion
             ? targetRegion.name
-            : '-';
+            : '';
     }
 
     deleteHandler = ({ currentTarget }: any) => {
@@ -121,7 +128,7 @@ class HCFPanel extends Component<IProps> {
                     </>
                     }
                     <Typography className={classes.text} variant='body2'>
-                        {name || '-'}
+                        {name || ''}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
@@ -131,7 +138,7 @@ class HCFPanel extends Component<IProps> {
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        {oblast || '-'}
+                        {oblast || ''}
                     </Typography>
                 </Grid>
                 <Grid xs alignItems='center' container item>
@@ -141,7 +148,7 @@ class HCFPanel extends Component<IProps> {
                 </Grid>
                 <Grid xs alignItems='center' container item>
                     <Typography className={classes.text} variant='body2'>
-                        {address || '-'}
+                        {address || ''}
                     </Typography>
                 </Grid>
                 <Grid
@@ -152,25 +159,46 @@ class HCFPanel extends Component<IProps> {
                     container
                     item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{phone1 || '-'}</span>
-                        <span>{phone2 || '-'}</span>
+                        <span>{phone1 || ''}</span>
+                        <span>{phone2 || ''}</span>
                     </Typography>
                 </Grid>
 
-                {action === 'accept' &&
-                <>
-                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
-                        Підтвердити
-                    </Button>
-                    <IconButton onClick={this.deleteHandler}>
-                        <Delete/>
-                    </IconButton>
-                </>
+                {action === 'accept' && confirmed ?
+                    <>
+                        <Typography variant='body1' className={classes.colorGreen}>
+                            Підтверджено
+                        </Typography>
+                        <IconButton onClick={this.deleteHandler}>
+                            <DeleteOutlineIcon/>
+                        </IconButton>
+                    </>
+                    : action === 'accept' &&
+                    <>
+                        <Button onClick={this.acceptHandler} variant='outlined'
+                                className={classes.confirmButton}>
+                            Підтвердити
+                        </Button>
+                        <IconButton onClick={this.deleteHandler}>
+                            <DeleteOutlineIcon/>
+                        </IconButton>
+                    </>
+
                 }
-                {action === 'return' &&
-                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                    Повернути
-                </Button>
+
+                {action === 'return' && deleted ?
+                    <Typography variant='body1' className={classes.colorRed}>
+                        Повернено
+                    </Typography>
+                    : action === 'return' ?
+                        <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                            Повернути
+                        </Button>
+                        :
+                        deleted &&
+                        <Typography variant='body1' className={classes.colorRed}>
+                            Видалено
+                        </Typography>
                 }
             </>
         );

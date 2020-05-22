@@ -251,7 +251,9 @@ class AddDepartmentModal extends Component<IProps> {
         this.isProccessing = false;
 
         this.openSnackbar(report);
-
+        if (report && report.hasOwnProperty('isFFMCreated') && report.isFFMCreated) { // correct it all
+            this.props.openModal(null);
+        }
     }
 
     closeHandler = () => this.props.openModal(null);

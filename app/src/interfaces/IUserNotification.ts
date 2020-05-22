@@ -11,4 +11,5 @@ export interface IUserNotification {
     image: string;
     created: Date;
     confirmed: boolean;
+    deleted?: boolean;
 }

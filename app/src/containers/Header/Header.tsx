@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { AppBar, Typography, IconButton, Grid } from '@material-ui/core';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { ArrowBack, EditOutlined, DeleteOutlined } from '@material-ui/icons';
 import { matchPath, RouteComponentProps } from 'react-router-dom';
 import cx from 'classnames';
@@ -28,6 +28,8 @@ import EditDepartmentModal from './EditDeparmentModal';
 import { EDIT_DEPARTMENT_MODAL } from '../../constants/Modals';
 import EditBranchButton from './EditBranchButton';
 import RemoveBranchButton from './RemoveBranchButton';
+import Snackbar from '../../components/Snackbar';
+import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -62,12 +64,14 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     isAdmin?: boolean;
     openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    deleteDepartment?: () => boolean;
 }
 
 @inject(({
              appState: {
                  departmentsStore: {
-                     currentDepartment
+                     currentDepartment,
+                     deleteDepartment
                  },
                  userStore: {
                      isAdmin
@@ -81,10 +85,14 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     currentDepartment,
     openDelPopper,
     openModal,
-    isAdmin
+    isAdmin,
+    deleteDepartment
 }))
 @observer
 export class Header extends Component<IProps, {}> {
+    @observable snackbarType: SNACKBAR_TYPE = SNACKBAR_TYPE.SUCCESS;
+    @observable snackbarMessage: string = '';
+
     get departmentName(): string {
         const { currentDepartment } = this.props;
         return currentDepartment
@@ -127,8 +135,22 @@ export class Header extends Component<IProps, {}> {
 
     backClickHandler = () => this.props.history.push(ADMIN_ROUTE);
 
-    deleteConfirmHandler = (confirmed: boolean) => {
-        this.props.openDelPopper(null);
+    deleteConfirmHandler = async (confirmed: boolean) => {
+        const { openDelPopper, deleteDepartment } = this.props;
+        openDelPopper(null);
+        if (confirmed) {
+            const isDeleted = await deleteDepartment();
+            this.snackbarType = isDeleted
+                ? SNACKBAR_TYPE.SUCCESS
+                : SNACKBAR_TYPE.ERROR;
+            this.snackbarMessage = isDeleted
+                ? 'Департмент успішно видалено'
+                : 'Не вдалося видалити департмент';
+        }
+    }
+
+    snackbarCloseHandler = () => {
+        this.snackbarMessage = null;
     }
 
     deleteClickHandler = ({ currentTarget }: any) => this.props.openDelPopper({
@@ -162,16 +184,16 @@ export class Header extends Component<IProps, {}> {
                             </Typography>
                         </Grid>
                         {this.isDepartmentRoute &&
-                            <Grid xs={1} item>
-                                <EditBranchButton
-                                    onClick={this.editClickHandler}
-                                    className={cx(classes.iconButton, classes.settingsButton)}
-                                />
-                                <RemoveBranchButton
-                                    onClick={this.deleteClickHandler}
-                                    className={cx(classes.iconButton)}
-                                />
-                            </Grid>
+                        <Grid xs={1} item>
+                            <EditBranchButton
+                                onClick={this.editClickHandler}
+                                className={cx(classes.iconButton, classes.settingsButton)}
+                            />
+                            <RemoveBranchButton
+                                onClick={this.deleteClickHandler}
+                                className={cx(classes.iconButton)}
+                            />
+                        </Grid>
                         }
                         <Grid xs item>
                             <Search/>
@@ -191,6 +213,12 @@ export class Header extends Component<IProps, {}> {
                 <AddWorkerModal showLocationsBlock={!this.isSettingsRoute}/>
                 <EditWorkerModal showLocationsBlock={!this.isSettingsRoute}/>
                 <EditDepartmentModal/>
+                <Snackbar
+                    open={!!this.snackbarMessage}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={this.snackbarMessage}
+                />
                 <DeletePopover
                     name='deleteDepartment'
                     anchorOrigin={{

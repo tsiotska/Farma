@@ -282,7 +282,7 @@ class Workers extends Component<IProps> {
                         </IconButton>
                     }
                 />
-                <DeletePopover name='workerDelete' />
+                <DeletePopover name='deleteWorker' />
                 <Snackbar
                     open={!!this.snackbarMessage}
                     type={this.snackbarType}

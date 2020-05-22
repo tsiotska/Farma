@@ -13,7 +13,7 @@ import { SNACKBAR_TYPE } from '../../constants/Snackbars';
 
 const styles = (theme: any) => createStyles({
     root: {
-        position: ({ position }: any) => position === 'fixed' ? 'fixed' : 'absolute'
+        position: 'fixed'
     }
 });
 

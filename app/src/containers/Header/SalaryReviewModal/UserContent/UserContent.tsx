@@ -14,6 +14,7 @@ import { IAsyncStatus } from '../../../../stores/AsyncStore';
 import LoadingMask from '../../../../components/LoadingMask';
 import { withRestriction } from '../../../../components/hoc/withRestriction';
 import { PERMISSIONS } from '../../../../constants/Permissions';
+import { USER_ROLE } from '../../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -57,7 +58,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     currentDepartmentMeds?: IMedicine[];
-    user: IUser;
+    previewUser: IUser;
     salary: Map<number, ISalaryInfo>;
     levelsCount: number;
     userSales?: IUserSales;
@@ -186,14 +187,31 @@ class UserContent extends Component<IProps> {
 
     @computed
     get bonuses(): number[] {
-        const { salarySettings, salary, userSales } = this.props;
+        const { salarySettings, salary, userSales, previewUser: { position } } = this.props;
+        let levelType: string;
+
+        switch (position) {
+            case USER_ROLE.REGIONAL_MANAGER:
+                levelType = 'rmLevel';
+                break;
+            case USER_ROLE.MEDICAL_AGENT:
+                levelType = 'mpLevel';
+                break;
+            default:
+                return;
+        }
         const treshold = salarySettings
             ? salarySettings.kpi
             : null;
 
         if (treshold === null) return [];
         return this.levels.map(x => {
-            if (x !== this.userLevel || !userSales) return 0;
+            if (x !== this.userLevel
+                || !userSales
+                || this.userLevel < salarySettings[levelType]) {
+                return 0;
+            }
+
             const salaryInfo = salary.get(x);
             const meds = salaryInfo
                 ? salaryInfo.meds

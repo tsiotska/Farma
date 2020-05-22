@@ -1,5 +1,5 @@
 import { multiDepartmentRoles } from './../constants/Roles';
-import {action, computed, observable, reaction, transaction, when, toJS} from 'mobx';
+import { action, computed, observable, reaction, transaction, when, toJS } from 'mobx';
 import invert from 'lodash/invert';
 import flattenDeep from 'lodash/flattenDeep';
 
@@ -969,8 +969,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         if (removed) {
             const depMeds = this.meds.get(depId);
             const med = depMeds
-                ? null
-                : depMeds.find(({ id }) => id === medId);
+                ? depMeds.find(({ id }) => id === medId)
+                : null;
 
             if (med) med.deleted = true;
         }
@@ -1026,15 +1026,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    loadSpecificCities({ oblastName, regionId }: {
-        oblastName?: string;
-        regionId?: number;
-    }) {
+    loadSpecificCities({ oblastName, regionId }: { oblastName?: string; regionId?: number; }) {
         let url: string;
         if (oblastName) url = `api/city?oblast=${oblastName}`;
         if (regionId) url = `api/city?region=${regionId}`;
-        return url
-            ? this.rootStore.api.getLocations(url)
+        return url ? this.rootStore.api.getLocations(url)
             : null;
     }
 
@@ -1064,6 +1060,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         this.regions = new Map(await loadRegionsPromise);
         this.oblasti = new Map(await loadOblastiPromise);
         this.cities = new Map(await loadCitiesPromise);
+    }
+
+    @action.bound
+    async loadRMRegions(): Promise<Map<number, ILocation>> {   // loads free regions
+        const { api } = this.rootStore;
+        const mappedRegions = await api.getLocations(`api/branch/${this.currentDepartmentId}/region`)
+            .then((data: ILocation[]): Array<[number, ILocation]> =>
+                data ?
+                    data.map((x): [number, ILocation] => ([x.id, x]))
+                    : []);
+        return new Map(mappedRegions);
     }
 
     @action.bound
@@ -1726,5 +1733,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const { api } = this.rootStore;
         if (!type || !id) return;
         return await api.returnNotification(type, id);
+    }
+
+    @action.bound
+    async deleteDepartment() {
+        const { api } = this.rootStore;
+        const depId = this.currentDepartmentId;
+        if (!depId) return null;
+        return await api.deleteDepartment(depId);
     }
 }

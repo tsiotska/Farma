@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { WithStyles, withStyles, createStyles, Grid, Typography, Button, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { IDoctor } from '../../../../interfaces/IDoctor';
-import { Delete } from '@material-ui/icons';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import CommitBadge from '../../../../components/CommitBadge';
 import { IPosition } from '../../../../interfaces/IPosition';
 
@@ -36,6 +36,12 @@ const styles = (theme: any) => createStyles({
     },
     phone: {
         minWidth: 220
+    },
+    colorGreen: {
+        color: theme.palette.primary.green.main,
+    },
+    colorRed: {
+        color: theme.palette.secondary.dark
     }
 });
 
@@ -90,6 +96,8 @@ class DoctorPanel extends Component<IProps> {
                 card,
                 LPUName,
                 position,
+                deleted,
+                confirmed,
                 id,
             }
         } = this.props;
@@ -119,8 +127,8 @@ class DoctorPanel extends Component<IProps> {
                 </Grid>
                 <Grid className={classes.phone} xs container item>
                     <Typography className={classes.text} variant='body2'>
-                        <span>{workPhone || '-'}</span>
-                        <span>{mobilePhone || '-'}</span>
+                        <span>{workPhone || ''}</span>
+                        <span>{mobilePhone || ''}</span>
                     </Typography>
                 </Grid>
                 <Grid xs container item>
@@ -128,22 +136,42 @@ class DoctorPanel extends Component<IProps> {
                         {card}
                     </Typography>
                 </Grid>
+                {action === 'accept' && confirmed ?
+                    <>
+                        <Typography variant='body1' className={classes.colorGreen}>
+                            Підтверджено
+                        </Typography>
+                        <IconButton onClick={this.deleteHandler}>
+                            <DeleteOutlineIcon/>
+                        </IconButton>
+                    </>
+                    : action === 'accept' &&
+                    <>
+                        <Button onClick={this.acceptHandler} variant='outlined'
+                                className={classes.confirmButton}>
+                            Підтвердити
+                        </Button>
+                        <IconButton onClick={this.deleteHandler}>
+                            <DeleteOutlineIcon/>
+                        </IconButton>
+                    </>
+                }
 
-                {action === 'accept' &&
-                <>
-                    <Button onClick={this.acceptHandler} variant='outlined' className={classes.confirmButton}>
-                        Підтвердити
-                    </Button>
-                    <IconButton onClick={this.deleteHandler}>
-                        <Delete/>
-                    </IconButton>
-                </>
+                {action === 'return' && deleted ?
+                    <Typography variant='body1' className={classes.colorRed}>
+                        Повернено
+                    </Typography>
+                    : action === 'return' ?
+                        <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
+                            Повернути
+                        </Button>
+                        :
+                        deleted &&
+                        <Typography variant='body1' className={classes.colorRed}>
+                            Видалено
+                        </Typography>
                 }
-                {action === 'return' &&
-                <Button onClick={this.returnHandler} variant='outlined' className={classes.returnButton}>
-                    Повернути
-                </Button>
-                }
+
             </>
         );
     }

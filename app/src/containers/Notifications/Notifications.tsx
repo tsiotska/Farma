@@ -182,16 +182,16 @@ class Notifications extends Component<IProps> {
                                     acceptNotification={this.accept}
                                     returnNotification={this.return}
                                 />
-                                <Snackbar
-                                    open={!!this.snackbarMessage}
-                                    onClose={this.snackbarCloseHandler}
-                                    type={this.snackbarType}
-                                    message={this.snackbarMessage}
-                                />
                             </React.Fragment>
                         );
                     })
                 }
+                <Snackbar
+                    open={!!this.snackbarMessage}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={this.snackbarMessage}
+                />
                 <DeletePopover
                     name='deleteNotification'
                     anchorOrigin={{
