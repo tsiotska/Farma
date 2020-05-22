@@ -3,7 +3,7 @@ import { WithStyles, createStyles, Grid, Typography, withStyles, IconButton } fr
 import { observer, inject } from 'mobx-react';
 import cx from 'classnames';
 import { gridStyles } from '../gridStyles';
-import { FilterList } from '@material-ui/icons';
+import { FilterList, Close } from '@material-ui/icons';
 import { observable, computed, toJS, reaction } from 'mobx';
 import LpuFilterPopper from '../../../components/LpuFilterPopper';
 import { SortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopper';
@@ -18,7 +18,8 @@ const styles = (theme: any) => createStyles({
     },
     text: {
         fontFamily: 'Source Sans Pro SemiBold',
-        color: theme.palette.primary.gray.light
+        color: theme.palette.primary.gray.light,
+        width: '100%'
     },
     iconButton: {
         padding: 4,
@@ -27,6 +28,12 @@ const styles = (theme: any) => createStyles({
         '&.active': {
             color: theme.palette.primary.green.main
         }
+    },
+    closeIconButton: {
+        padding: 4,
+        borderRadius: 2,
+        fontSize: 10,
+        marginRight: 2,
     }
 });
 
@@ -36,11 +43,13 @@ interface IProps extends WithStyles<typeof styles> {
     getAsyncStatus?: (key: string) => IAsyncStatus;
     sortLpuBy?: (propName: SortableProps, order: SORT_ORDER) => void;
     clearLpuSorting?: () => void;
+    clearLpuFilters?: () => void;
     LPUs?: ILPU[];
     pharmacies?: ILPU[];
     LpuSortSettings?: ISortBy;
     LpuFilterSettings?: IFilterBy;
     filterLpuBy?: (propName: SortableProps, selectedValues: ILPU[]) => void;
+
 }
 
 export interface IState {
@@ -60,7 +69,9 @@ export interface IState {
             LpuSortSettings,
             LpuFilterSettings,
             filterLpuBy,
-            sortLpuBy
+            sortLpuBy,
+            clearLpuSorting,
+            clearLpuFilters
         }
     }
 }) => ({
@@ -70,7 +81,9 @@ export interface IState {
     LpuSortSettings,
     LpuFilterSettings,
     filterLpuBy,
-    sortLpuBy
+    sortLpuBy,
+    clearLpuSorting,
+    clearLpuFilters
 }))
 @observer
 class Header extends Component<IProps> {
@@ -264,6 +277,12 @@ class Header extends Component<IProps> {
         }
     }
 
+    clearAll = () => {
+        const { clearLpuFilters, clearLpuSorting } = this.props;
+        clearLpuFilters();
+        clearLpuSorting();
+    }
+
     componentWillUnmount() {
         if (this.sortReaction) this.sortReaction();
     }
@@ -324,10 +343,16 @@ class Header extends Component<IProps> {
                         Адрес
                     </Typography>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.phone)} xs={1} alignItems='center' container item>
+                <Grid className={cx(classes.cell, classes.phone)} xs={1} alignItems='center' wrap='nowrap' container item>
                     <Typography className={classes.text} variant='body2'>
                         Телефон
                     </Typography>
+                    {
+                        (!!LpuSortSettings || !!LpuFilterSettings) &&
+                        <IconButton className={classes.closeIconButton} onClick={this.clearAll}>
+                            <Close fontSize='small' />
+                        </IconButton>
+                    }
                 </Grid>
             </Grid>
             <LpuFilterPopper
