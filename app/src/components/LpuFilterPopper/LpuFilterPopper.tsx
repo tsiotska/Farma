@@ -57,6 +57,8 @@ const styles = (theme: any) => createStyles({
 export type SortableProps = 'regionName' | 'name' | 'oblast' | 'city';
 
 interface IProps extends WithStyles<typeof styles> {
+    toggleAll: () => void;
+    propName: SortableProps;
     anchor: HTMLElement;
     onClose: () => void;
     isLoading: boolean;
@@ -87,10 +89,20 @@ class LpuFilterPopper extends Component<IProps> {
         vertical: 'top',
         horizontal: 'center',
     };
-
+    readonly titles: Record<SortableProps, string> = {
+        'regionName': 'Регіон',
+        'name': 'Назва',
+        'oblast': 'Область',
+        'city': 'Місто',
+    };
     constructor(props: IProps) {
         super(props);
         this.wrapperClasses = { wrapper: props.classes.placeholder };
+    }
+
+    get title(): string {
+        const { propName } = this.props;
+        return this.titles[propName];
     }
 
     sortAtoZ = () => this.props.onOrderChange(SORT_ORDER.ASCENDING);
@@ -110,7 +122,8 @@ class LpuFilterPopper extends Component<IProps> {
             applyClickHandler,
             suggestions,
             itemClickHandler,
-            ignoredItems
+            ignoredItems,
+            toggleAll
         } = this.props;
 
         return (
@@ -148,11 +161,13 @@ class LpuFilterPopper extends Component<IProps> {
                         {
                             (!!suggestions && suggestions.length)
                             ? <SuggestList
+                                title={this.title}
                                 items={suggestions}
                                 itemClickHandler={itemClickHandler}
                                 renderPropName='value'
                                 ignoredItems={ignoredItems}
                                 isLoading={isLoading}
+                                toggleAll={toggleAll}
                               />
                             : isLoading
                                 ? <LoadingMask classes={this.wrapperClasses} size={20} />

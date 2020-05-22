@@ -40,6 +40,7 @@ class SuggestItem<T> extends Component<IProps<T>> {
                 onClick={this.clickHandler}
                 className={className}
                 button
+                divider
                 dense>
                     <ListItemIcon>
                         <Checkbox

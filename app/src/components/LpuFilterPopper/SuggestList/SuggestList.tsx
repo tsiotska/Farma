@@ -4,7 +4,10 @@ import {
     WithStyles,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    ListSubheader,
+    ListItemIcon,
+    Checkbox
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
@@ -28,7 +31,15 @@ const styles = (theme: any) => createStyles({
     },
     alignCenter: {
         textAlign: 'center'
-    }
+    },
+    subheader: {
+        background: 'white',
+        padding: 0,
+        paddingTop: 10,
+        '& > div': {
+            height: 37
+        }
+    },
 });
 
 interface IMinimumInterface {
@@ -37,10 +48,12 @@ interface IMinimumInterface {
 
 interface IProps<T extends IMinimumInterface> extends WithStyles<typeof styles> {
     items: T[];
+    title: string;
     itemClickHandler: (item: T) => void;
     renderPropName: keyof T;
     ignoredItems: any[];
     isLoading: boolean;
+    toggleAll: () => void;
 }
 
 @observer
@@ -69,11 +82,35 @@ class SuggestList<T extends IMinimumInterface> extends Component<IProps<T>> {
             itemClickHandler,
             renderPropName,
             ignoredItems,
-            isLoading
+            isLoading,
+            title,
+            toggleAll
         } = this.props;
 
         return (
-            <List className={classes.list}>
+            <List
+                className={classes.list}
+                subheader={
+                    <ListSubheader className={classes.subheader}>
+                        <ListItem
+                            className={classes.item}
+                            onClick={toggleAll}
+                            button
+                            divider
+                            dense>
+                                <ListItemIcon>
+                                    <Checkbox
+                                        checked={ignoredItems.length === 0}
+                                        edge='start'
+                                        color='default'
+                                        disableRipple
+                                    />
+                                </ListItemIcon>
+                                <ListItemText primary={title} />
+                        </ListItem>
+                    </ListSubheader>
+                }
+            >
                 {
                     this.itemsToShow.map(x => (
                         <SuggestItem
@@ -82,7 +119,6 @@ class SuggestList<T extends IMinimumInterface> extends Component<IProps<T>> {
                             item={x}
                             renderPropName={renderPropName}
                             checked={ignoredItems.includes(x[renderPropName]) === false}
-                            // checked={selectedItems.includes(x[renderPropName])}
                             className={classes.item}
                         />
                     ))

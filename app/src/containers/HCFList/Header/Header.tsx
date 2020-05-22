@@ -252,6 +252,18 @@ class Header extends Component<IProps> {
         this.popoverCloseHandler();
     }
 
+    toggleAll = () => {
+        if (this.ignoredItems.length) {
+            this.ignoredItems = [];
+        } else {
+            this.ignoredItems = this.sortedOptions.reduce((acc, {[this.propName]: value}) => {
+                return acc.includes(value)
+                    ? acc
+                    : [...acc, value];
+            }, []);
+        }
+    }
+
     componentWillUnmount() {
         if (this.sortReaction) this.sortReaction();
     }
@@ -319,6 +331,8 @@ class Header extends Component<IProps> {
                 </Grid>
             </Grid>
             <LpuFilterPopper
+                toggleAll={this.toggleAll}
+                propName={this.propName}
                 anchor={this.filterPopperAnchor}
                 onClose={this.popoverCloseHandler}
                 isLoading={this.isLoading}
