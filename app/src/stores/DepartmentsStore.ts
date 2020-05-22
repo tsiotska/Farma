@@ -105,7 +105,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
         const order = LpuSortSettings ? LpuSortSettings.order : null;
         const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
-
+        // console.log('order: ', toJS(order));
         const callback = order === SORT_ORDER.ASCENDING
             ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
             : (a: ILPU, b: ILPU) => b[sortPropName].localeCompare(a[sortPropName]);
@@ -113,7 +113,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const sorted = (sortPropName && order)
             ? this.LPUs.slice().sort(callback)
             : this.LPUs;
-
+        // console.log('sorted: ', toJS(sorted));
         const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
         const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
 

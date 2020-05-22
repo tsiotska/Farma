@@ -54,8 +54,7 @@ const styles = (theme: any) => createStyles({
     },
 });
 
-// export type SortableProps = 'name' | 'region' | 'oblast' | 'city';
-export type SortableProps = 'name' | 'oblast' | 'city';
+export type SortableProps = 'regionName' | 'name' | 'oblast' | 'city';
 
 interface IProps extends WithStyles<typeof styles> {
     anchor: HTMLElement;

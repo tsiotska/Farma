@@ -7,7 +7,7 @@ import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { ILPU } from '../interfaces/ILPU';
 
 export enum SORT_ORDER {
-    ASCENDING, // a-z
+    ASCENDING = 1, // a-z
     DESCENDING // z-a
 }
 

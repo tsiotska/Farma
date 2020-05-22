@@ -166,6 +166,10 @@ class Header extends Component<IProps> {
 
     sortOrderChangeHandler = (order: SORT_ORDER) => {
         this.order = order;
+        console.log(
+            'new order: ', order, toJS(this.order),
+            'propName: ', toJS(this.propName));
+
     }
 
     popoverCloseHandler = () => {
@@ -275,9 +279,10 @@ class Header extends Component<IProps> {
                     <Typography className={classes.text} variant='body2'>
                         Регіон
                         <IconButton
-                            // onClick={this.openFilterPopper('region')}
-                            // className={cx(classes.iconButton, { active: ('region' === sortPropName || 'region' === filterPropName) }) }>
-                            className={classes.iconButton}>
+                            onClick={this.openFilterPopper('regionName')}
+                            className={cx(classes.iconButton, { active: ('regionName' === sortPropName || 'regionName' === filterPropName) }) }
+                            // className={classes.iconButton}
+                            >
                             <FilterList fontSize='small' />
                         </IconButton>
                     </Typography>
