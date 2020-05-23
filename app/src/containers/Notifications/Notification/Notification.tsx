@@ -23,11 +23,9 @@ const styles = (theme: any) => createStyles({
         padding: '0 8px',
     },
     titleRow: {
-        height: 60,
         borderBottom: '1px solid #e2e2e2'
     },
     subjectRow: {
-        height: 48,
         backgroundColor: '#fafbfc',
         overflow: 'hidden'
     },
@@ -95,8 +93,12 @@ class Notification extends Component<IProps> {
                 <Grid className={cx(classes.row, classes.titleRow)} alignItems='center' container>
                     {
                         this.iconSrc
-                            ? <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon}/>
-                            : <Settings className={classes.icon}/>
+                            ? <Grid justify='center' alignItems='center' item>
+                                <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon}/>
+                            </Grid>
+                            : <Grid justify='center' alignItems='center' item>
+                                <Settings className={classes.icon}/>
+                            </Grid>
                     }
                     <Divider className={classes.divider} orientation='vertical'/>
                     <Grid xs={4} wrap='nowrap' alignItems='center' zeroMinWidth container item>
