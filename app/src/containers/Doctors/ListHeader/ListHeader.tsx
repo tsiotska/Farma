@@ -13,8 +13,8 @@ const styles = (theme: any) => createStyles({
     },
     root: {
         marginTop: 16,
-        marginBottom: 12,
-        paddingLeft: 8
+        padding: '0 10px',
+        height: 40,
     },
     excelButton: {
         marginLeft: 'auto'
@@ -27,12 +27,12 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            loadDocsExcel
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     loadDocsExcel
+                 }
+             }
+         }) => ({
     loadDocsExcel
 }))
 @observer
