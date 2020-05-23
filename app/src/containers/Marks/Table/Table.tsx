@@ -174,6 +174,7 @@ class Table extends Component<IProps> {
                 : [];
             return res;
         }
+        // console.log(toJS(this.agents));
         return this.agents.slice(0, 50);
     }
 
@@ -347,7 +348,6 @@ class Table extends Component<IProps> {
             removeBonusAgent, parentUser, loadBonuses, loadBonusesData
         } = this.props;
         const removed = await removeBonusAgent(agentId, parentUser.id);
-        console.log(removed);
         if (removed) {
             await loadBonuses(parentUser);
             await loadBonusesData(parentUser);

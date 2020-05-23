@@ -95,7 +95,6 @@ export const bonusesDataNormalizer = ({
         { requiredProps: [ 'id', 'last_payments', 'last_deposit', 'is_done' ] }
     ).map(agent => {
         const { [agent.id]: agentMarks, ...rest } = groupedMarks;
-
         groupedMarks = rest;
 
         if (agentMarks) {
@@ -108,7 +107,6 @@ export const bonusesDataNormalizer = ({
 
             agent.marks = new Map(normalizedMarks);
         }
-
         return agent;
     });
 
@@ -138,7 +136,6 @@ export const bonusesDataNormalizer = ({
         drugSaleValuesMap,
         { requiredProps: ['drug', 'amount', 'mark']}
     ).map(x => ([ x.id, x ]));
-
     return {
         sales: new Map(normalizedSales),
         agents: normalizedAgents
