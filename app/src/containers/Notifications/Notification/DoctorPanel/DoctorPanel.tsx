@@ -142,7 +142,7 @@ class DoctorPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <DeleteOutlineIcon/>
+                            <DeleteOutlineIcon fontSize='small'/>
                         </IconButton>
                     </>
                     : action === 'accept' && deleted ?
@@ -156,7 +156,7 @@ class DoctorPanel extends Component<IProps> {
                                     Підтвердити
                                 </Button>
                                 <IconButton onClick={this.deleteHandler}>
-                                    <DeleteOutlineIcon/>
+                                    <DeleteOutlineIcon fontSize='small'/>
                                 </IconButton>
                             </> : null
                 }

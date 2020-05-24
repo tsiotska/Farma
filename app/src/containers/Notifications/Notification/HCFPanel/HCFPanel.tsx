@@ -2,10 +2,7 @@ import React, { Component } from 'react';
 import { WithStyles, withStyles, createStyles, Grid, Typography, Button, IconButton } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { ILPU } from '../../../../interfaces/ILPU';
-import { toJS } from 'mobx';
 import CommitBadge from '../../../../components/CommitBadge';
-import { Edit, Delete } from '@material-ui/icons';
-import cx from 'classnames';
 import { ILocation } from '../../../../interfaces/ILocation';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
@@ -171,7 +168,7 @@ class HCFPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <DeleteOutlineIcon/>
+                            <DeleteOutlineIcon fontSize='small'/>
                         </IconButton>
                     </>
                     : action === 'accept' && deleted ?
@@ -185,7 +182,7 @@ class HCFPanel extends Component<IProps> {
                                 Підтвердити
                             </Button>
                             <IconButton onClick={this.deleteHandler}>
-                                <DeleteOutlineIcon/>
+                                <DeleteOutlineIcon fontSize='small'/>
                             </IconButton>
                         </> : null
                 }

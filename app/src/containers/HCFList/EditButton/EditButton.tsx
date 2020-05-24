@@ -62,7 +62,7 @@ class EditButton extends Component<IProps> {
             <IconButton
                 onClick={onClick}
                 className={className}>
-                <EditOutlinedIcon className={iconClassName}/>
+                <EditOutlinedIcon fontSize='small' className={iconClassName}/>
             </IconButton>
         );
     }

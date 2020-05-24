@@ -372,20 +372,20 @@ class WorkerListItem extends Component<IProps> {
                             fired === false &&
                             <>
                                 {
-                                    isVacancy === false &&
-                                    <DeleteButton
-                                        workerId={id}
-                                        className={classes.iconButton}
-                                        onClick={this.removeClickHandler}
-                                    />
-                                }
-                                {
                                     isAllowed &&
                                     <IconButton
                                         onClick={this.editClickHandler}
                                         className={cx(classes.iconButton, classes.colorGreen)}>
                                         <EditOutlinedIcon fontSize='small' />
                                     </IconButton>
+                                }
+                                {
+                                    isVacancy === false &&
+                                    <DeleteButton
+                                        workerId={id}
+                                        className={classes.iconButton}
+                                        onClick={this.removeClickHandler}
+                                    />
                                 }
                             </>
                         }

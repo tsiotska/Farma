@@ -9,7 +9,6 @@ import {
     IconButton
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
-import { toJS } from 'mobx';
 import { IUserNotification } from '../../../../interfaces/IUserNotification';
 import CommitBadge from '../../../../components/CommitBadge';
 import { IPosition } from '../../../../interfaces/IPosition';
@@ -153,7 +152,7 @@ class UserPanel extends Component<IProps> {
                             Підтверджено
                         </Typography>
                         <IconButton onClick={this.deleteHandler}>
-                            <DeleteOutlineIcon/>
+                            <DeleteOutlineIcon fontSize='small'/>
                         </IconButton>
                     </>
                     : action === 'accept' && deleted ?
@@ -167,7 +166,7 @@ class UserPanel extends Component<IProps> {
                                     Підтвердити
                                 </Button>
                                 <IconButton onClick={this.deleteHandler}>
-                                    <DeleteOutlineIcon/>
+                                    <DeleteOutlineIcon fontSize='small'/>
                                 </IconButton>
                             </> : null
                 }

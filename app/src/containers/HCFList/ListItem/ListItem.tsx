@@ -57,7 +57,6 @@ const styles = (theme: any) => createStyles({
         borderRadius: 2
     },
     icon: {
-        fontSize: '1rem',
         color: ({ unconfirmed }: any) => unconfirmed
             ? theme.palette.primary.white
             : ''
@@ -228,7 +227,7 @@ class ListItem extends Component<IProps> {
                         type={generalType}
                         className={classes.iconButton}
                         onClick={this.deleteClickHandler}>
-                        <DeleteOutlineIcon className={classes.icon}/>
+                        <DeleteOutlineIcon fontSize='small' className={classes.icon}/>
                     </DeleteButton>
                 </Grid>
             </Grid>
