@@ -196,7 +196,6 @@ class AddDocsModal extends Component<IProps> {
 
         return (
             <Dialog
-                closeIcon
                 open={openedModal === ADD_DOC_MODAL}
                 onClose={this.closeHandler}
                 title='Додати лікаря'
