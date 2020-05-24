@@ -9,7 +9,6 @@ const styles = (theme: any) => createStyles({
     root: {
         transition: '0.3s',
         padding: 8,
-        minHeight: 48,
         cursor: 'pointer',
         borderBottom: '1px solid #aaa',
         maxWidth: ({ maxWidth }: any) => maxWidth,
@@ -22,7 +21,6 @@ const styles = (theme: any) => createStyles({
     },
     mpText: {
         color: '#aaa',
-        whiteSpace: 'nowrap',
     },
     item: {
         overflow: 'hidden',
@@ -62,8 +60,7 @@ class SearchItem extends Component<IProps> {
             <Grid
                 onClick={this.clickHandler}
                 className={cx(classes.root, { [classes.rootLoading]: isLoading })}
-                alignItems='flex-start'
-                container>
+                alignItems='center' container>
                 <Grid className={classes.item} direction='column' xs container item  zeroMinWidth>
                     <Typography className={classes.mpText} variant='body2'>
                         МП: { mpName }

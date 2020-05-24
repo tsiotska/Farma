@@ -292,7 +292,6 @@ class TableRow extends Component<IProps> {
 
     get showCloseIcon(): boolean {
         const { agentInfo, agent: { position } } = this.props;
-        console.log(toJS(this.props.agentInfo));
         return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER
             || agentInfo && agentInfo.isDone === false;
     }
