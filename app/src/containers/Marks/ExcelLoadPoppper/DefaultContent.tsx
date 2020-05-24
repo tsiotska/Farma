@@ -13,7 +13,7 @@ import {
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable, computed } from 'mobx';
-import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../../components/DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import { DataMode } from './ExcelLoadPopper';
 import { Event } from '@material-ui/icons';

@@ -23,7 +23,7 @@ import { IWorker } from '../../interfaces/IWorker';
 import { IUserCommonInfo } from '../../interfaces/IUser';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
-import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
 import Config from '../../../Config';

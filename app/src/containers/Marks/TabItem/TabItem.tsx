@@ -6,7 +6,7 @@ import { IBonusInfo } from '../../../interfaces/IBonusInfo';
 import ExcelIcon from '../../../components/ExcelIcon';
 import { Check, Close } from '@material-ui/icons';
 import cx from 'classnames';
-import { uaMonthsNames } from '../../Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../../components/DateTimeUtils/DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     root: {

@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { createStyles, WithStyles, Button, Grid } from '@material-ui/core';
 import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { observer, inject } from 'mobx-react';
+import { computed } from 'mobx';
 import { withStyles } from '@material-ui/styles';
-import Dialog from '../../../components/Dialog';
-import { DATA_RANGE_MODAL } from '../../../constants/Modals';
+import Dialog from '../Dialog';
+import { DATA_RANGE_MODAL } from '../../constants/Modals';
 import { observable } from 'mobx';
 import DateTimeUtils from '../DateTimeUtils';
 
@@ -17,7 +18,6 @@ const styles = (theme: any) => createStyles({
     },
     submitButton: {
         marginLeft: 'auto',
-        color: theme.palette.primary.lightBlue
     }
 });
 
@@ -32,20 +32,20 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            openedModal,
-            openModal
-        },
-        salesStore: {
-            dateFrom,
-            dateTo,
-            setDateTo,
-            setDateFrom,
-            loadAllStat
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openedModal,
+                     openModal
+                 },
+                 salesStore: {
+                     dateFrom,
+                     dateTo,
+                     setDateTo,
+                     setDateFrom,
+                     loadAllStat
+                 }
+             }
+         }) => ({
     openedModal,
     openModal,
     dateFrom,
@@ -69,6 +69,11 @@ class DateRangeModal extends Component<IProps> {
         this.localDateTo = newDate;
     }
 
+    @computed
+    get disableSubmit() {
+        return !this.localDateFrom && !this.localDateTo;
+    }
+
     submitHandler = () => {
         const {
             setDateFrom,
@@ -79,12 +84,12 @@ class DateRangeModal extends Component<IProps> {
         } = this.props;
 
         const isDateToChanged = this.localDateTo
-        ? this.localDateTo.getTime() !== dateTo.getTime()
-        : false;
+            ? this.localDateTo.getTime() !== dateTo.getTime()
+            : false;
 
         const isDateFromChanged = this.localDateFrom
-        ? this.localDateFrom.getTime() !== dateFrom.getTime()
-        : false;
+            ? this.localDateFrom.getTime() !== dateFrom.getTime()
+            : false;
 
         this.closeHandler();
         if (isDateToChanged) setDateTo(this.localDateTo);
@@ -139,7 +144,8 @@ class DateRangeModal extends Component<IProps> {
                             onChange={this.setDateTo}
                         />
                     </Grid>
-                    <Button onClick={this.submitHandler} className={classes.submitButton}>
+                    <Button variant='contained' color='primary' disabled={this.disableSubmit} onClick={this.submitHandler}
+                            className={classes.submitButton}>
                         Застосувати
                     </Button>
                 </Dialog>

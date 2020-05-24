@@ -9,17 +9,16 @@ import {
 import { observer, inject, } from 'mobx-react';
 import Dialog from '../../../components/Dialog';
 import { SALARY_PREVIEW_MODAL } from '../../../constants/Modals';
-import ProfilePreview from '../../../components/ProfilePreview';
 import UserShortInfo from '../../../components/UserShortInfo';
 import { IUser } from '../../../interfaces';
-import { toJS, observable, computed } from 'mobx';
+import { toJS, observable } from 'mobx';
 import UserContent from './UserContent';
 import { ISalaryInfo } from '../../../interfaces/ISalaryInfo';
 import { USER_ROLE } from '../../../constants/Roles';
 import SalaryHeader from './SalaryHeader';
 import { SNACKBAR_TYPE } from '../../../constants/Snackbars';
 import Snackbar from '../../../components/Snackbar';
-import ModalDateSelectPopper from './ModalDateSelectPopper';
+import DateSelectPopper from '../../../components/DateSelectPopper';
 import LoadingMask from '../../../components/LoadingMask';
 
 const styles = createStyles({
@@ -93,7 +92,7 @@ class SalaryReviewModal extends Component<IProps> {
     applyHandler = async () => {
         const { user, loadUserSalaryInfo } = this.props;
         this.isSalesLoading = true;
-        await loadUserSalaryInfo(user, this.year, this.month + 1);
+        await loadUserSalaryInfo(user, this.year, this.month);
         this.isSalesLoading = false;
     }
 
@@ -155,7 +154,7 @@ class SalaryReviewModal extends Component<IProps> {
                     <Typography className={classes.headerText} variant='h5'>
                         Заробітня плата
                     </Typography>
-                    <ModalDateSelectPopper
+                    <DateSelectPopper
                         year={this.year}
                         month={this.month}
                         applyHandler={this.applyHandler}

@@ -680,7 +680,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     async loadUserSalaryInfo({ id }: IUser, year: number, month: number) {
         const requestName = 'loadUserSalaryInfo';
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-        const time = `?year=${year}&month=${month}`;
+        const time = `?year=${year}&month=${month + 1}`;
         if (!currentDepartmentId || !id) return;
 
         const res = await this.dispatchRequest(

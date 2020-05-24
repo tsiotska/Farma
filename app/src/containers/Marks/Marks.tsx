@@ -18,7 +18,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { computed, toJS, observable, reaction } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
-import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../components/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';

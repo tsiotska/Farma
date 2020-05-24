@@ -75,21 +75,22 @@ class Salary extends Component<IProps> {
     }
 
     changeYear = (value: number) => {
-        const { loadSalaries } = this.props;
         if (value === this.currentYear && this.currentMonth < this.month) {
             this.month = 0;
         }
         this.year = value;
-        loadSalaries(this.year, this.month + 1);
     }
 
     changeMonth = (value: number) => {
-        const { loadSalaries } = this.props;
         if (this.year === this.currentYear && value > this.currentMonth) {
             this.year = this.year - 1;
         }
         this.month = value;
-        loadSalaries(this.year, this.month + 1);
+    }
+
+    applyHandler = async () => {
+        const { loadSalaries } = this.props;
+        await loadSalaries(this.year, this.month + 1);
     }
 
    expandHandler = async (userSalary: IUserSalary, e: any, expanded: boolean) => {
@@ -130,6 +131,7 @@ class Salary extends Component<IProps> {
                     }
                     year={this.year}
                     month={this.month}
+                    applyHandler={this.applyHandler}
                     changeMonth={this.changeMonth}
                     changeYear={this.changeYear}
                 />
