@@ -22,28 +22,28 @@ interface IProps extends WithStyles<typeof styles> {
     unconfirmed?: boolean;
     onDelete?: (deleted: boolean) => void;
     type: 'hcf' | 'pharmacy';
-    clearLpuSorting?: () => void;
-    clearLpuFilters?: () => void;
+    clearSorting?: () => void;
+    clearFilters?: () => void;
 }
 
 @inject(({
     appState: {
         uiStore: {
-            clearLpuSorting,
-            clearLpuFilters
+            clearSorting,
+            clearFilters
         }
     }
 }) => ({
-    clearLpuSorting,
-    clearLpuFilters
+    clearSorting,
+    clearFilters
 }))
 @observer
 class HCFList extends Component<IProps> {
     componentWillUnmount() {
-        const {unconfirmed, clearLpuSorting, clearLpuFilters} = this.props;
+        const {unconfirmed, clearSorting, clearFilters} = this.props;
         if (!unconfirmed) {
-            clearLpuSorting();
-            clearLpuFilters();
+            clearSorting();
+            clearFilters();
         }
     }
     render() {

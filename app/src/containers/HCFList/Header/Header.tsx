@@ -6,7 +6,7 @@ import { gridStyles } from '../gridStyles';
 import { FilterList, Close } from '@material-ui/icons';
 import { observable, computed, toJS, reaction } from 'mobx';
 import LpuFilterPopper from '../../../components/LpuFilterPopper';
-import { SortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopper';
+import { LPUSortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopper';
 import { ILPU } from '../../../interfaces/ILPU';
 import { SORT_ORDER, ISortBy, IFilterBy } from '../../../stores/UIStore';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
@@ -43,19 +43,19 @@ interface IProps extends WithStyles<typeof styles> {
     type: 'hcf' | 'pharmacy';
 
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    sortLpuBy?: (propName: SortableProps, order: SORT_ORDER) => void;
-    clearLpuSorting?: () => void;
-    clearLpuFilters?: () => void;
+    sortDataBy?: (propName: LPUSortableProps, order: SORT_ORDER) => void;
+    clearSorting?: () => void;
+    clearFilters?: () => void;
     LPUs?: ILPU[];
     pharmacies?: ILPU[];
-    LpuSortSettings?: ISortBy;
-    LpuFilterSettings?: IFilterBy;
-    filterLpuBy?: (propName: SortableProps, selectedValues: ILPU[]) => void;
+    sortSettings?: ISortBy;
+    filterSettings?: IFilterBy;
+    filterDataBy?: (propName: LPUSortableProps, selectedValues: ILPU[]) => void;
 
 }
 
 export interface IState {
-    propName: SortableProps;
+    propName: LPUSortableProps;
     order: SORT_ORDER;
     selectedLpus: Array<{ id: number, value: string }>;
 }
@@ -68,24 +68,24 @@ export interface IState {
             pharmacies
         },
         uiStore: {
-            LpuSortSettings,
-            LpuFilterSettings,
-            filterLpuBy,
-            sortLpuBy,
-            clearLpuSorting,
-            clearLpuFilters
+            sortSettings,
+            filterSettings,
+            filterDataBy,
+            sortDataBy,
+            clearSorting,
+            clearFilters
         }
     }
 }) => ({
     LPUs,
     pharmacies,
     getAsyncStatus,
-    LpuSortSettings,
-    LpuFilterSettings,
-    filterLpuBy,
-    sortLpuBy,
-    clearLpuSorting,
-    clearLpuFilters
+    sortSettings,
+    filterSettings,
+    filterDataBy,
+    sortDataBy,
+    clearSorting,
+    clearFilters
 }))
 @observer
 class Header extends Component<IProps> {
@@ -94,7 +94,7 @@ class Header extends Component<IProps> {
     @observable filterPopperAnchor: HTMLElement = null;
     @observable searchString: string = '';
     @observable searchInputValue: string = '';
-    @observable propName: SortableProps = null;
+    @observable propName: LPUSortableProps = null;
     @observable order: SORT_ORDER = null;
     // @observable selectedItems: any[] = [];
     @observable ignoredItems: any[] = [];
@@ -201,13 +201,13 @@ class Header extends Component<IProps> {
         this.searchInputValue = '';
     }
 
-    openFilterPopper = (propName: SortableProps) => ({ target }: any) => {
+    openFilterPopper = (propName: LPUSortableProps) => ({ target }: any) => {
         const {
             type,
             LPUs,
             pharmacies,
-            LpuSortSettings,
-            LpuFilterSettings
+            sortSettings,
+            filterSettings
         } = this.props;
 
         const source = type === 'pharmacy'
@@ -244,26 +244,26 @@ class Header extends Component<IProps> {
             }
         );
 
-        if (LpuSortSettings && LpuSortSettings.propName === propName) {
-            this.order = LpuSortSettings.order;
+        if (sortSettings && sortSettings.propName === propName) {
+            this.order = sortSettings.order;
         }
-        if (LpuFilterSettings && LpuFilterSettings.propName === propName) {
-            this.ignoredItems = [ ...LpuFilterSettings.ignoredItems ];
+        if (filterSettings && filterSettings.propName === propName) {
+            this.ignoredItems = [ ...filterSettings.ignoredItems ];
             // this.selectedItems = [...LpuFilterSettings.selectedValues];
         }
     }
 
     applyFilters = () => {
         const {
-            sortLpuBy,
-            filterLpuBy,
+            sortDataBy,
+            filterDataBy,
         } = this.props;
 
         if (this.order !== null) {
-            sortLpuBy(this.propName, this.order);
+            sortDataBy(this.propName, this.order);
         }
 
-        filterLpuBy(this.propName, this.ignoredItems);
+        filterDataBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
     }
 
@@ -280,9 +280,9 @@ class Header extends Component<IProps> {
     }
 
     clearAll = () => {
-        const { clearLpuFilters, clearLpuSorting } = this.props;
-        clearLpuFilters();
-        clearLpuSorting();
+        const { clearFilters, clearSorting } = this.props;
+        clearFilters();
+        clearSorting();
     }
 
     componentWillUnmount() {
@@ -290,10 +290,10 @@ class Header extends Component<IProps> {
     }
 
     render() {
-        const { classes, LpuFilterSettings, LpuSortSettings } = this.props;
+        const { classes, filterSettings, sortSettings } = this.props;
 
-        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
-        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
+        const filterPropName = filterSettings ? filterSettings.propName : null;
 
         return (
             <>
@@ -350,7 +350,7 @@ class Header extends Component<IProps> {
                         Телефон
                     </Typography>
                     {
-                        (!!LpuSortSettings || !!LpuFilterSettings) &&
+                        (!!sortSettings || !!filterSettings) &&
                         <IconButton className={classes.closeIconButton} onClick={this.clearAll}>
                             <Close fontSize='small' />
                         </IconButton>
@@ -373,7 +373,6 @@ class Header extends Component<IProps> {
 
                 totalLength={this.totalLength}
                 suggestions={this.filteredOptions}
-                // selectedItems={this.selectedItems}
                 ignoredItems={this.ignoredItems}
                 itemClickHandler={this.itemClickHandler}
 

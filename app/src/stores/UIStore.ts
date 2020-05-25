@@ -1,9 +1,9 @@
 import { IRootStore } from './../interfaces/IRootStore';
-import { INotification } from './../interfaces/iNotification';
 import { SNACKBAR_TYPE } from './../constants/Snackbars';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action, toJS } from 'mobx';
-import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
+import { LPUSortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
+import { DoctorsSortableProps } from '../components/DoctorsFilterPopper/DoctorsFilterPopper';
 import { ILPU } from '../interfaces/ILPU';
 
 export enum SORT_ORDER {
@@ -13,11 +13,11 @@ export enum SORT_ORDER {
 
 export interface ISortBy {
     order: SORT_ORDER;
-    propName: SortableProps;
+    propName: LPUSortableProps | DoctorsSortableProps;
 }
 
 export interface IFilterBy {
-    propName: SortableProps;
+    propName: LPUSortableProps | DoctorsSortableProps;
     ignoredItems: any[];
 }
 
@@ -56,8 +56,8 @@ export class UIStore implements IUIStore {
     };
     @observable isInfoPopperOpen: boolean = false;
 
-    @observable LpuSortSettings: ISortBy = null;
-    @observable LpuFilterSettings: IFilterBy = null;
+    @observable sortSettings: ISortBy = null;
+    @observable filterSettings: IFilterBy = null;
 
     @observable salesPharmacyFilter: ISalesPharmacyFilter = {
         order: null,
@@ -117,23 +117,23 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    sortLpuBy(propName: SortableProps, order: SORT_ORDER) {
-        this.LpuSortSettings = { propName, order };
+    sortDataBy(propName: LPUSortableProps | DoctorsSortableProps, order: SORT_ORDER) {
+        this.sortSettings = { propName, order };
     }
 
     @action.bound
-    clearLpuSorting() {
-        this.LpuSortSettings = null;
+    clearSorting() {
+        this.sortSettings = null;
     }
 
     @action.bound
-    filterLpuBy(propName: SortableProps, ignoredItems: ILPU[]) {
-        this.LpuFilterSettings = { propName, ignoredItems: [...ignoredItems] };
+    filterDataBy(propName: LPUSortableProps | DoctorsSortableProps, ignoredItems: ILPU[]) {
+        this.filterSettings = { propName, ignoredItems: [...ignoredItems] };
     }
 
     @action.bound
-    clearLpuFilters() {
-        this.LpuFilterSettings = null;
+    clearFilters() {
+        this.filterSettings = null;
     }
 
     @action.bound

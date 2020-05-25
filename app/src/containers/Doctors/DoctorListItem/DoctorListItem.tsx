@@ -129,14 +129,18 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
              appState: {
                  uiStore: {
                      openModal,
-                     openDelPopper
+                     openDelPopper,
+                     clearSorting,
+                     clearFilters
                  }
              }
          }) => ({
     openDelPopper,
-    openModal
+    openModal,
+    clearSorting,
+    clearFilters
 }))
-@withRestriction([ PERMISSIONS.EDIT_AGENT ])
+@withRestriction([PERMISSIONS.EDIT_AGENT])
 @observer
 class DoctorListItem extends Component<IProps> {
     @observable isLoadingConfirmation: boolean = false;
@@ -265,12 +269,12 @@ class DoctorListItem extends Component<IProps> {
                                     variant='body2'
                                     onClick={this.depositModalHandler}
                                     className={cx(classes.deposit)}>
-                                    { deposit || 0 }
+                                    {deposit || 0}
                                 </Typography>
                                 {
                                     isAllowed &&
                                     <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
-                                        <EditOutlinedIcon fontSize='small' />
+                                        <EditOutlinedIcon fontSize='small'/>
                                     </IconButton>
                                 }
                             </>

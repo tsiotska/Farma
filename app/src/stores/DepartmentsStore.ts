@@ -99,12 +99,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
+        const { uiStore: {  sortSettings, filterSettings } } = this.rootStore;
 
         if (!this.LPUs) return this.LPUs;
 
-        const order = LpuSortSettings ? LpuSortSettings.order : null;
-        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+        const order = sortSettings ? sortSettings.order : null;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
         // console.log('order: ', toJS(order));
         const callback = order === SORT_ORDER.ASCENDING
             ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
@@ -114,8 +114,8 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? this.LPUs.slice().sort(callback)
             : this.LPUs;
         // console.log('sorted: ', toJS(sorted));
-        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
-        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+        const ignoredValues = filterSettings ? filterSettings.ignoredItems : null;
+        const filterPropName = filterSettings ? filterSettings.propName : null;
 
         return (ignoredValues && ignoredValues.length && filterPropName)
             ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
@@ -125,12 +125,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
+        const { uiStore: {  sortSettings, filterSettings } } = this.rootStore;
 
         if (!this.pharmacies) return this.pharmacies;
 
-        const order = LpuSortSettings ? LpuSortSettings.order : null;
-        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+        const order = sortSettings ? sortSettings.order : null;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
 
         const callback = order === SORT_ORDER.ASCENDING
             ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
@@ -140,8 +140,33 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? this.pharmacies.slice().sort(callback)
             : this.pharmacies;
 
-        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
-        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+        const ignoredValues = filterSettings ? filterSettings.ignoredItems : null;
+        const filterPropName = filterSettings ? filterSettings.propName : null;
+
+        return (ignoredValues && ignoredValues.length && filterPropName)
+            ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
+            : sorted;
+    }
+
+    @computed
+    get sortedDoctors(): IDoctor[] {
+        const { uiStore: { sortSettings, filterSettings } } = this.rootStore;
+
+        if (!this.doctors) return this.doctors;
+
+        const order = sortSettings ? sortSettings.order : null;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
+
+        const callback = order === SORT_ORDER.ASCENDING
+            ? (a: IDoctor, b: IDoctor) => a[sortPropName].localeCompare(b[sortPropName])
+            : (a: IDoctor, b: IDoctor) => b[sortPropName].localeCompare(a[sortPropName]);
+
+        const sorted = (sortPropName && order)
+            ? this.doctors.slice().sort(callback)
+            : this.doctors;
+
+        const ignoredValues = filterSettings ? filterSettings.ignoredItems : null;
+        const filterPropName = filterSettings ? filterSettings.propName : null;
 
         return (ignoredValues && ignoredValues.length && filterPropName)
             ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)

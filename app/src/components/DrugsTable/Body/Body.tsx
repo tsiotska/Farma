@@ -49,9 +49,6 @@ class Body extends Component<IProps> {
             rowPrepend: PrependComponent
         } = this.props;
 
-        console.log('label data: ', toJS(labelData));
-        console.log('sales stat: ', toJS(salesStat));
-
         return salesStat.map(stat => {
             const isIgnored = ignoredItems.has(stat.id);
             return (

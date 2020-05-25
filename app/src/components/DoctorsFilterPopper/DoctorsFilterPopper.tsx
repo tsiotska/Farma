@@ -14,7 +14,7 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import cx from 'classnames';
 import { SORT_ORDER } from '../../stores/UIStore';
-import { ILPU } from '../../interfaces/ILPU';
+import { IDoctor } from '../../interfaces/IDoctor';
 import LoadingMask from '../LoadingMask';
 import { Search } from '@material-ui/icons';
 import SuggestList from './SuggestList';
@@ -50,11 +50,11 @@ const styles = (theme: any) => createStyles({
     },
 });
 
-export type LPUSortableProps = 'regionName' | 'name' | 'oblast' | 'city';
+export type DoctorsSortableProps = 'LPUName' | 'name' | 'specialty';
 
 interface IProps extends WithStyles<typeof styles> {
     toggleAll: () => void;
-    propName: LPUSortableProps;
+    propName: DoctorsSortableProps;
     anchor: HTMLElement;
     onClose: () => void;
     isLoading: boolean;
@@ -69,13 +69,13 @@ interface IProps extends WithStyles<typeof styles> {
     totalLength: number;
     suggestions: Array<{ id: number, value: string}>;
     ignoredItems: Array<{ id: number, value: string}>;
-    itemClickHandler: (lpu: ILPU) => void;
+    itemClickHandler: (doctor: IDoctor) => void;
 
     applyClickHandler: () => void;
 }
 
 @observer
-class LpuFilterPopper extends Component<IProps> {
+class DoctorsFilterPopper extends Component<IProps> {
     readonly wrapperClasses: any;
     readonly anchorOrigin: any = {
         vertical: 'bottom',
@@ -85,11 +85,10 @@ class LpuFilterPopper extends Component<IProps> {
         vertical: 'top',
         horizontal: 'center',
     };
-    readonly titles: Record<LPUSortableProps, string> = {
-        'regionName': 'Регіон',
-        'name': 'Назва',
-        'oblast': 'Область',
-        'city': 'Місто',
+    readonly titles: Record<DoctorsSortableProps, string> = {
+        'LPUName': 'ЛПУ',
+        'name': 'ПІБ лікаря',
+        'specialty': 'Спеціальність',
     };
     constructor(props: IProps) {
         super(props);
@@ -184,4 +183,4 @@ class LpuFilterPopper extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(LpuFilterPopper);
+export default withStyles(styles)(DoctorsFilterPopper);

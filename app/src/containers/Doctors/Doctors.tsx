@@ -50,31 +50,36 @@ interface IProps extends WithStyles<typeof styles> {
     previewDoctorId?: number;
     setPreviewDoctor?: (id: number) => void;
     acceptAgent?: (doc: IDoctor) => boolean;
+
+    clearSorting?: () => void;
+    clearFilters?: () => void;
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            loadDoctors,
-            getAsyncStatus,
-            clearDoctors,
-            doctors,
-            removeDoctor,
-            previewDoctorId,
-            setPreviewDoctor,
-            acceptAgent
-        },
-        uiStore: {
-            setCurrentPage,
-            currentPage,
-            itemsPerPage,
-            openDelPopper
-        },
-        userStore: {
-            previewUser
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     loadDoctors,
+                     getAsyncStatus,
+                     clearDoctors,
+                     sortedDoctors: doctors,
+                     removeDoctor,
+                     previewDoctorId,
+                     setPreviewDoctor,
+                     acceptAgent
+                 },
+                 uiStore: {
+                     setCurrentPage,
+                     currentPage,
+                     itemsPerPage,
+                     openDelPopper,
+                     clearSorting,
+                     clearFilters
+                 },
+                 userStore: {
+                     previewUser
+                 }
+             }
+         }) => ({
     removeDoctor,
     acceptAgent,
     loadDoctors,
@@ -87,7 +92,9 @@ interface IProps extends WithStyles<typeof styles> {
     openDelPopper,
     previewUser,
     previewDoctorId,
-    setPreviewDoctor
+    setPreviewDoctor,
+    clearSorting,
+    clearFilters
 }))
 @observer
 class Doctors extends Component<IProps> {
@@ -202,6 +209,11 @@ class Doctors extends Component<IProps> {
     componentWillUnmount() {
         if (this.pageReactionDisposer) this.pageReactionDisposer();
         if (this.reactionDisposer) this.reactionDisposer();
+        const { clearSorting, clearFilters } = this.props;
+
+        clearSorting();
+        clearFilters();
+
         this.props.clearDoctors();
         this.props.setCurrentPage(0);
     }
@@ -218,9 +230,9 @@ class Doctors extends Component<IProps> {
 
         return (
             <Grid className={classes.root} container direction='column'>
-                <Header />
-                <ListHeader />
-                { this.isLoading && <LinearProgress /> }
+                <Header/>
+                <ListHeader/>
+                {this.isLoading && <LinearProgress/>}
                 {
                     (this.isLoaded && !doctors.length) &&
                     <Typography>
@@ -264,8 +276,8 @@ class Doctors extends Component<IProps> {
                     message={this.snackbarMessage}
                 />
                 <EditDepositModal/>
-                <CreateDoctorModal />
-                <EditDoctorModal />
+                <CreateDoctorModal/>
+                <EditDoctorModal/>
                 <DeletePopover
                     name='deleteDoc'
                     anchorOrigin={{
