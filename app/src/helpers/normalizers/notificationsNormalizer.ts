@@ -41,7 +41,8 @@ const defaultUserNotification: IUserNotification = {
     card: null,
     image: null,
     created: null,
-    confirmed: null
+    confirmed: null,
+    deleted: null
 };
 
 const userNotificationValuesMap: IValuesMap = {
@@ -54,7 +55,8 @@ const userNotificationValuesMap: IValuesMap = {
     bank_card: 'card',
     image: 'image',
     created: 'created',
-    confirmed: 'confirmed'
+    confirmed: 'confirmed',
+    deleted: 'deleted'
 };
 
 const typeNormalizer = (value: string) => NOTIFICATIONS_TYPE[value.toUpperCase()] || NOTIFICATIONS_TYPE.MESSAGE;

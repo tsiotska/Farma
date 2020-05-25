@@ -1198,16 +1198,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             if (createdDepartment) {
                 this.loadDepartments().then(() => this.loadFFMs());
             }
+        } else {
+            await this.deleteDepartment(createdDepartment.id);
         }
-
-        // const callback = createdDepartment && createdFFM
-        //     ? async () => {
-        //         await this.loadDepartments();
-        //         this.loadFFMs();
-        //     }
-        //     : null;
-        // if (callback) callback();
-
         return initialReport;
     }
 
@@ -1736,9 +1729,9 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
-    async deleteDepartment() {
+    async deleteDepartment(id?: number) {
         const { api } = this.rootStore;
-        const depId = this.currentDepartmentId;
+        const depId = id || this.currentDepartmentId;
         if (!depId) return null;
         return await api.deleteDepartment(depId);
     }

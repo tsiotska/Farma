@@ -14,7 +14,9 @@ import { IAsyncStatus } from '../../../stores/AsyncStore';
 const styles = (theme: any) => createStyles({
     ...gridStyles(theme),
     root: {
-        margin: '20px 0 2px',
+        marginTop: 16,
+        padding: '0 10px',
+        height: 40,
     },
     text: {
         fontFamily: 'Source Sans Pro SemiBold',

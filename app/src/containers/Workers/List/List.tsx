@@ -15,7 +15,9 @@ import { EDIT_WORKER_MODAL } from '../../../constants/Modals';
 const styles = (theme: any) => createStyles({
     header: {
         color: theme.palette.primary.gray.light,
-        margin: '20px 0 2px',
+        marginTop: 16,
+        padding: '0 10px',
+        height: 40,
         paddingLeft: ({ fired, expandable }: any) => (expandable && !fired) ? 32 : 0,
         '& p': {
             fontFamily: 'Source Sans Pro SemiBold',

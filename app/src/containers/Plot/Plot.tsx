@@ -17,7 +17,7 @@ import { IMedsSalesStat, IPeriodSalesStat, IDaySalesStat, IMonthSalesStat, IYear
 import { IMedicine } from '../../interfaces/IMedicine';
 import { STAT_DISPLAY_MODE } from '../../stores/SalesStore';
 import { IAsyncStatus } from '../../stores/AsyncStore';
-import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../components/DateTimeUtils/DateTimeUtils';
 import LoadingMask from '../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({

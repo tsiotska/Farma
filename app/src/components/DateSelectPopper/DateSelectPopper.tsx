@@ -9,8 +9,8 @@ import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { observable } from 'mobx';
 import { Event } from '@material-ui/icons';
-import { uaMonthsNames } from '../../../Sales/DateTimeUtils/DateTimeUtils';
-import DateSelect from '../../../../components/DateSelect';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
+import DateSelect from '../DateSelect';
 
 const styles = (theme: any) => createStyles({
     button: {
@@ -54,7 +54,7 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @observer
-class ModalDateSelectPopper extends Component<IProps> {
+class DateSelectPopper extends Component<IProps> {
     @observable popperAnchor: HTMLElement = null;
 
     clickHandler = ({ currentTarget }: any) => {
@@ -124,4 +124,4 @@ class ModalDateSelectPopper extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(ModalDateSelectPopper);
+export default withStyles(styles)(DateSelectPopper);

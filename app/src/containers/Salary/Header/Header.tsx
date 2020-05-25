@@ -13,8 +13,7 @@ import { observable } from 'mobx';
 
 import ExcelIcon from '../../../components/ExcelIcon';
 import LoadingMask from '../../../components/LoadingMask';
-import DateSelectPopper from '../DateSelectPopper';
-import { IUserSalary } from '../../../interfaces/IUserSalary';
+import DateSelectPopper from '../../../components/DateSelectPopper';
 
 const styles = (theme: any) => createStyles({
     header: {
@@ -52,6 +51,7 @@ interface IProps extends WithStyles<typeof styles> {
     calculateSalaries?: (year: number, month: number) => void;
     loadSalariesExcel?: (year: number, month: number) => void;
     lastSalary?: Date;
+    applyHandler?: () => void;
 }
 
 @inject(({
@@ -88,7 +88,8 @@ class Header extends Component<IProps> {
             changeYear,
             month,
             changeMonth,
-            lastSalary
+            lastSalary,
+            applyHandler
         } = this.props;
 
         return (
@@ -102,6 +103,7 @@ class Header extends Component<IProps> {
                     <DateSelectPopper
                         year={year}
                         month={month}
+                        applyHandler={applyHandler}
                         changeMonth={changeMonth}
                         changeYear={changeYear}
                     />

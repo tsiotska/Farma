@@ -20,7 +20,7 @@ const defaultAgentInfo: IAgentInfo = {
     deposit: null,
     lastPayment: null,
     lastDeposit: null,
-    isDone: null,
+    isDone: true,
     marks: new Map(),
 };
 
@@ -56,9 +56,9 @@ const marksValuesMap: IValuesMap = {
 const agentsValuesMap: IValuesMap = {
     id: 'id',
     deposit: 'deposit',
-    last_payments: 'lastPayment',
-    last_deposit: 'lastDeposit',
     is_done: 'isDone',
+    last_payments: 'lastPayment',
+    last_deposit: 'lastDeposit'
 };
 
 export const bonusInfoNormalizer = ({ data: { data }}: any): any => objectArrayNormalizer(
@@ -95,7 +95,6 @@ export const bonusesDataNormalizer = ({
         { requiredProps: [ 'id', 'last_payments', 'last_deposit', 'is_done' ] }
     ).map(agent => {
         const { [agent.id]: agentMarks, ...rest } = groupedMarks;
-
         groupedMarks = rest;
 
         if (agentMarks) {
@@ -108,7 +107,6 @@ export const bonusesDataNormalizer = ({
 
             agent.marks = new Map(normalizedMarks);
         }
-
         return agent;
     });
 
@@ -138,7 +136,6 @@ export const bonusesDataNormalizer = ({
         drugSaleValuesMap,
         { requiredProps: ['drug', 'amount', 'mark']}
     ).map(x => ([ x.id, x ]));
-
     return {
         sales: new Map(normalizedSales),
         agents: normalizedAgents

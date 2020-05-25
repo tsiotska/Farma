@@ -9,7 +9,7 @@ import {
 import { observer } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { computed, observable, toJS } from 'mobx';
-import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({

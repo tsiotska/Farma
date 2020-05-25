@@ -3,7 +3,7 @@ import { createStyles, WithStyles, Button } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { lightFormat } from 'date-fns';
-import DateTimeUtils, { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import DateTimeUtils, { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import { DATA_RANGE_MODAL } from '../../constants/Modals';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 

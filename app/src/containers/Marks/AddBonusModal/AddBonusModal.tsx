@@ -112,8 +112,7 @@ class AddBonusModal extends Component<IProps> {
                 open={openedModal === ADD_BONUS_MODAL}
                 onClose={this.closeHandler}
                 title='Створити розподіл бонусів'
-                maxWidth='xs'
-                closeIcon>
+                maxWidth='xs'>
                     <DateSelect
                         classes={{ container: classes.dateSelectContainer }}
                         year={this.year}

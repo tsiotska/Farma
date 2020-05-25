@@ -12,16 +12,21 @@ import { DOCTORS_ROUTE } from '../../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
-        zIndex: 1100
+        zIndex: 1100,
+        height: '45vh',
     },
     paper: {
-        maxHeight: '30vh',
-        overflow: 'hidden auto',
-        padding: '10px 0',
+        padding: '15px 5px',
+        display: 'block',
+        height: '100%',
+    },
+    infoContainer: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start'
+        justifyContent: 'flex-start',
+        overflow: 'hidden auto',
+        height: '100%'
     },
     loadButton: {
         marginTop: 16,
@@ -42,18 +47,18 @@ interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            getUser,
-            historyReplace,
-            user
-        },
-        departmentsStore: {
-            setCurrentDepartment,
-            setPreviewDoctor
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     getUser,
+                     historyReplace,
+                     user
+                 },
+                 departmentsStore: {
+                     setCurrentDepartment,
+                     setPreviewDoctor
+                 }
+             }
+         }) => ({
     getUser,
     historyReplace,
     setCurrentDepartment,
@@ -116,7 +121,7 @@ class SearchList extends Component<IProps> {
         const filtered = loadedUsers.filter(x => !!x);
         this.isLoading = false;
 
-        const targetDep = user.department ||  filtered[0].department;
+        const targetDep = user.department || filtered[0].department;
         if (!targetDep) return;
 
         if (filtered.length > 1) {
@@ -130,7 +135,7 @@ class SearchList extends Component<IProps> {
 
         const newUserHistory = multiDepartmentRoles.includes(user.position)
             ? filtered
-            : [ user, ...filtered ];
+            : [user, ...filtered];
         historyReplace(newUserHistory);
         setPreviewDoctor(id);
         history.push(DOCTORS_ROUTE.replace(':departmentId', `${targetDep}`));
@@ -151,34 +156,35 @@ class SearchList extends Component<IProps> {
                 className={classes.root}
                 open={items !== null}
                 anchorEl={anchor}>
-                    <Paper className={classes.paper} style={this.paperWidth}>
-                        <div>
-                            {
-                                this.shouldDisplayData &&
-                                items.map(x => (
-                                    <SearchItem
-                                        key={`${x.id}${x.mp}`}
-                                        maxWidth={this.anchorWidth}
-                                        clickHandler={this.itemClickHandler}
-                                        isLoading={this.isLoading}
-                                        item={x}
-                                    />
-                                ))
-                            }
-                        </div>
+                <Paper className={classes.paper} style={this.paperWidth}>
+                    <div className={classes.infoContainer}>
                         {
-                            this.hasNoData &&
-                            <Typography>
-                                За вашим пошуком нічого не знайдено
-                            </Typography>
+                            this.shouldDisplayData &&
+                            items.map(x => (
+                                <SearchItem
+                                    key={`${x.id}${x.mp}`}
+                                    maxWidth={this.anchorWidth}
+                                    clickHandler={this.itemClickHandler}
+                                    isLoading={this.isLoading}
+                                    item={x}
+                                />
+                            ))
                         }
-                        {
-                            this.shouldDisplayData && items.length % this.maxCount === 0 &&
-                            <Button onClick={loadMoreHandler} className={classes.loadButton} variant='contained' color='primary'>
-                                Завантажити ще лікарів...
-                            </Button>
-                        }
-                    </Paper>
+                    {
+                        this.hasNoData &&
+                        <Typography>
+                            За вашим пошуком нічого не знайдено
+                        </Typography>
+                    }
+                    {
+                        this.shouldDisplayData && items.length % this.maxCount === 0 &&
+                        <Button onClick={loadMoreHandler} className={classes.loadButton} variant='contained'
+                                color='primary'>
+                            Завантажити ще лікарів...
+                        </Button>
+                    }
+                    </div>
+                </Paper>
             </Popper>
         );
     }

@@ -8,9 +8,10 @@ import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
     root: {
+        marginTop: 16,
         padding: '0 10px',
+        height: 40,
         color: theme.palette.primary.gray.light,
-        margin: '20px 0 2px',
     },
     firstItem: {
         width: 90,

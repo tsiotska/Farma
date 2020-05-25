@@ -23,7 +23,7 @@ import { IWorker } from '../../interfaces/IWorker';
 import { IUserCommonInfo } from '../../interfaces/IUser';
 import { USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
-import { uaMonthsNames } from '../../containers/Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
 import ImageLoader from '../ImageLoader';
 import Config from '../../../Config';
@@ -372,20 +372,20 @@ class WorkerListItem extends Component<IProps> {
                             fired === false &&
                             <>
                                 {
-                                    isVacancy === false &&
-                                    <DeleteButton
-                                        workerId={id}
-                                        className={classes.iconButton}
-                                        onClick={this.removeClickHandler}
-                                    />
-                                }
-                                {
                                     isAllowed &&
                                     <IconButton
                                         onClick={this.editClickHandler}
                                         className={cx(classes.iconButton, classes.colorGreen)}>
                                         <EditOutlinedIcon fontSize='small' />
                                     </IconButton>
+                                }
+                                {
+                                    isVacancy === false &&
+                                    <DeleteButton
+                                        workerId={id}
+                                        className={classes.iconButton}
+                                        onClick={this.removeClickHandler}
+                                    />
                                 }
                             </>
                         }

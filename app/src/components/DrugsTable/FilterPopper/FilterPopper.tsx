@@ -8,7 +8,6 @@ import { ILPU } from '../../../interfaces/ILPU';
 import { computed, observable, toJS } from 'mobx';
 import SuggestListItem from '../SuggestListItem';
 import debounce from 'lodash/debounce';
-import DateSelect from '../../../containers/Header/SalaryReviewModal/ModalDateSelectPopper/ModalDateSelectPopper';
 
 const styles = (theme: any) => createStyles({
     input: {

@@ -250,8 +250,10 @@ class AddDepartmentModal extends Component<IProps> {
         const report = await createDepartment(departmentData, ffmData);
         this.isProccessing = false;
 
+        console.log(report);
+
         this.openSnackbar(report);
-        if (report && report.hasOwnProperty('isFFMCreated') && report.isFFMCreated) { // correct it all
+        if (report.isFFMCreated) {
             this.props.openModal(null);
         }
     }

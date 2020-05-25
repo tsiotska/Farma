@@ -18,7 +18,7 @@ import { IAsyncStatus } from '../../stores/AsyncStore';
 import { computed, toJS, observable, reaction } from 'mobx';
 import ExcelIcon from '../../components/ExcelIcon';
 import TransferBlock from './TransferBlock';
-import { uaMonthsNames } from '../Sales/DateTimeUtils/DateTimeUtils';
+import { uaMonthsNames } from '../../components/DateTimeUtils/DateTimeUtils';
 import TableHeader from './TableHeader';
 import Table from './Table';
 import { USER_ROLE } from '../../constants/Roles';
@@ -73,26 +73,26 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            loadBonuses,
-            getAsyncStatus,
-            // previewBonus,
-            role,
-            bonusesYear,
-            updateBonuses,
-            previewUser,
-            // setPreviewBonus
-            loadBonusesData,
-            previewBonusMonth,
-            bonuses,
-            clearChangedMarks
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     loadBonuses,
+                     getAsyncStatus,
+                     // previewBonus,
+                     role,
+                     bonusesYear,
+                     updateBonuses,
+                     previewUser,
+                     // setPreviewBonus
+                     loadBonusesData,
+                     previewBonusMonth,
+                     bonuses,
+                     clearChangedMarks
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     previewBonusMonth,
     loadBonuses,
     loadBonusesData,
@@ -200,7 +200,7 @@ class Marks extends Component<IProps> {
                 <Paper className={classes.paper}>
                     <Grid alignItems='center' justify='space-between' container>
                         <Typography variant='h5'>
-                            Бали { this.monthName && ` за ${this.monthName}` }
+                            Бали {this.monthName && ` за ${this.monthName}`}
                         </Typography>
                         {
                             role !== USER_ROLE.MEDICAL_AGENT &&
@@ -209,8 +209,8 @@ class Marks extends Component<IProps> {
                                     this.excelPopperAnchor
                                         ? this.closeExcelPopper
                                         : this.openExcelPopper
-                                    }>
-                                    <ExcelIcon />
+                                }>
+                                    <ExcelIcon/>
                                 </IconButton>
 
                                 <ExcelLoadPopper
@@ -221,7 +221,7 @@ class Marks extends Component<IProps> {
                         }
                     </Grid>
                     <Grid alignItems='flex-end' justify='space-between' container>
-                        <TransferBlock parentUser={previewUser} previewBonus={this.previewBonus} />
+                        <TransferBlock parentUser={previewUser} previewBonus={this.previewBonus}/>
                         {
                             role === USER_ROLE.MEDICAL_AGENT &&
                             <Button
@@ -248,7 +248,7 @@ class Marks extends Component<IProps> {
                         />
                     }
                 </Paper>
-                <AddBonusModal />
+                <AddBonusModal/>
                 <DeletePopover
                     name='deleteBonusAgent'
                     anchorOrigin={{

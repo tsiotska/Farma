@@ -65,9 +65,6 @@ const styles = (theme: any) => createStyles({
         display: 'flex',
         flexDirection: 'column'
     },
-    editIcon: {
-        color: theme.palette.primary.green.main
-    },
     removeIcon: {
         color: ({ unconfirmed }: any) => unconfirmed
             ? 'white'
@@ -273,7 +270,7 @@ class DoctorListItem extends Component<IProps> {
                                 {
                                     isAllowed &&
                                     <IconButton onClick={this.editClickHandler} className={classes.colorGreen}>
-                                        <EditOutlinedIcon className={classes.editIcon} fontSize='small' />
+                                        <EditOutlinedIcon fontSize='small' />
                                     </IconButton>
                                 }
                             </>

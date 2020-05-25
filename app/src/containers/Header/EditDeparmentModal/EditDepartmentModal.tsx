@@ -145,7 +145,7 @@ class EditDepartmentModal extends Component<IProps> {
                 open={this.isOpen}
                 onClose={this.closeHandler}
                 maxWidth='xs'
-                title='Редагувати віділення'>
+                title='Редагувати відділення'>
                 <Grid alignItems='center' wrap='nowrap' container>
                     <DepartmentDropzone
                         file={this.image}
@@ -157,7 +157,7 @@ class EditDepartmentModal extends Component<IProps> {
                     <FormRow
                         fullWidth
                         required
-                        label='Назва віділення'
+                        label='Назва відділення'
                         value={this.name}
                         onChange={this.nameChangeHandler}
                         propName='name'
@@ -180,7 +180,7 @@ class EditDepartmentModal extends Component<IProps> {
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS
                             ? 'Віділення успішно змінено'
-                            : 'Неможливо змінити віділення'
+                            : 'Неможливо змінити відділення'
                     }
                 />
             </Dialog>
