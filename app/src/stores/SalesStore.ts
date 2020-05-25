@@ -36,10 +36,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     // data for chart
     @observable chartSalesStat: IMedsSalesStat[] = null;
     // data for drugsTable
-    // @observable locationSalesStat: ISalesStat[] = null;
     @observable ignoredLocations: Set<number> = new Set();
     // data for drugsTable
-    // @observable agentSalesStat: ISalesStat[] = null;
     @observable ignoredAgents: Set<number> = new Set();
 
     @observable agentsSales: IPeriodSalesStat[] = null;

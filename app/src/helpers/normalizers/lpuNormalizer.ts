@@ -16,6 +16,7 @@ export const defaultLPU: ILPU = {
     confirmed: true,
     lpuName: null,
     lpu: null,
+    regionName: null,
     deleted: null
 };
 
@@ -35,6 +36,7 @@ export const lpuValuesMap: IValuesMap = {
     confirmed: 'confirmed',
     hcf: 'lpu',
     hcf_name: 'lpuName',
+    region_name: 'regionName',
     deleted: 'deleted'
 };
 

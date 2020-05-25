@@ -5,7 +5,7 @@ import TableRow from '../TableRow';
 import { ISalesStat, IMedSalesInfo } from '../../../interfaces/ISalesStat';
 import { IUserCommonInfo } from '../../../interfaces/IUser';
 import { ILocation } from '../../../interfaces/ILocation';
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 
 interface IProps {
     meds: IMedicine[];
@@ -48,6 +48,9 @@ class Body extends Component<IProps> {
             meds,
             rowPrepend: PrependComponent
         } = this.props;
+
+        console.log('label data: ', toJS(labelData));
+        console.log('sales stat: ', toJS(salesStat));
 
         return salesStat.map(stat => {
             const isIgnored = ignoredItems.has(stat.id);

@@ -3,6 +3,7 @@ export interface ILPU {
     name: string;
     type: string;
     region: number;
+    regionName?: string;
     oblast: string;
     city: string;
     address: string;

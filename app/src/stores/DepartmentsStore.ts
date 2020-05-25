@@ -99,40 +99,53 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const { uiStore: { LpuSortSettings } } = this.rootStore;
-        if (!LpuSortSettings || !this.LPUs) return this.LPUs;
+        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
 
-        const { order, propName } = LpuSortSettings;
+        if (!this.LPUs) return this.LPUs;
 
-        if (['name', 'oblast'].includes(propName)) {
-            const callback = order === SORT_ORDER.ASCENDING
-                // @ts-ignore
-                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-                // @ts-ignore
-                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
-            return this.LPUs.sort(callback);
-        } else {
-            return this.LPUs;
-        }
+        const order = LpuSortSettings ? LpuSortSettings.order : null;
+        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+        // console.log('order: ', toJS(order));
+        const callback = order === SORT_ORDER.ASCENDING
+            ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
+            : (a: ILPU, b: ILPU) => b[sortPropName].localeCompare(a[sortPropName]);
+
+        const sorted = (sortPropName && order)
+            ? this.LPUs.slice().sort(callback)
+            : this.LPUs;
+        // console.log('sorted: ', toJS(sorted));
+        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
+        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+
+        return (ignoredValues && ignoredValues.length && filterPropName)
+            ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
+            : sorted;
+
     }
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const { uiStore: { LpuSortSettings } } = this.rootStore;
-        if (!LpuSortSettings || !this.pharmacies) return this.pharmacies;
+        const { uiStore: { LpuSortSettings, LpuFilterSettings } } = this.rootStore;
 
-        const { order, propName } = LpuSortSettings;
+        if (!this.pharmacies) return this.pharmacies;
 
-        if (['name', 'oblast'].includes(propName)) {
-            const callback = order === SORT_ORDER.ASCENDING
-                // @ts-ignore
-                ? (a: ILPU, b: ILPU) => a[propName].localeCompare(b[propName])
-                // @ts-ignore
-                : (a: ILPU, b: ILPU) => b[propName].localeCompare(a[propName]);
-            return this.pharmacies.sort(callback);
-        } else {
-            return this.pharmacies;
-        }
+        const order = LpuSortSettings ? LpuSortSettings.order : null;
+        const sortPropName = LpuSortSettings ? LpuSortSettings.propName : null;
+
+        const callback = order === SORT_ORDER.ASCENDING
+            ? (a: ILPU, b: ILPU) => a[sortPropName].localeCompare(b[sortPropName])
+            : (a: ILPU, b: ILPU) => b[sortPropName].localeCompare(a[sortPropName]);
+
+        const sorted = (sortPropName && order)
+            ? this.pharmacies.slice().sort(callback)
+            : this.pharmacies;
+
+        const ignoredValues = LpuFilterSettings ? LpuFilterSettings.ignoredItems : null;
+        const filterPropName = LpuFilterSettings ? LpuFilterSettings.propName : null;
+
+        return (ignoredValues && ignoredValues.length && filterPropName)
+            ? sorted.filter(x => ignoredValues.includes(x[filterPropName]) === false)
+            : sorted;
     }
 
     @computed
@@ -449,6 +462,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         while (keepDoing) {
             const url = `${initialUrl}?page=${page}`;
             const part = await api.getMedicalDepartments(url);
+
             if (this.getMedicalDepartmentsApiUrl() !== initialUrl) {
                 this.LPUs = null;
                 break;

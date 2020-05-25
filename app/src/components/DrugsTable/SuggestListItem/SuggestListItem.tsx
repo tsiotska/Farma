@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, ListItem, ListItemIcon, Checkbox, ListItemText } from '@material-ui/core';
+import {
+    ListItem,
+    ListItemIcon,
+    Checkbox,
+    ListItemText
+} from '@material-ui/core';
 import { observer } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { IDoctor } from '../../../interfaces/IDoctor';
 import { ILPU } from '../../../interfaces/ILPU';
 
 interface IProps {
@@ -20,7 +23,11 @@ class SuggestListItem extends Component<IProps> {
     }
 
     render() {
-        const { className, checked, pharma: { name, city, address }} = this.props;
+        const {
+            className,
+            checked,
+            pharma: { name, city, address }
+        } = this.props;
 
         return (
             <ListItem
@@ -30,10 +37,10 @@ class SuggestListItem extends Component<IProps> {
                 onClick={this.clickHandler}>
                 <ListItemIcon>
                     <Checkbox
-                    checked={checked}
-                    edge='start'
-                    color='default'
-                    disableRipple
+                        checked={checked}
+                        edge='start'
+                        color='default'
+                        disableRipple
                     />
                 </ListItemIcon>
                 <ListItemText primary={name} secondary={

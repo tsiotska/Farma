@@ -4,9 +4,10 @@ import { SNACKBAR_TYPE } from './../constants/Snackbars';
 import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action, toJS } from 'mobx';
 import { SortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
+import { ILPU } from '../interfaces/ILPU';
 
 export enum SORT_ORDER {
-    ASCENDING, // a-z
+    ASCENDING = 1, // a-z
     DESCENDING // z-a
 }
 
@@ -17,7 +18,7 @@ export interface ISortBy {
 
 export interface IFilterBy {
     propName: SortableProps;
-    value: string;
+    ignoredItems: any[];
 }
 
 export interface IDeletePopoverSettings {
@@ -126,8 +127,8 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    filterLpuBy(propName: SortableProps, value: string) {
-        this.LpuFilterSettings = { propName, value };
+    filterLpuBy(propName: SortableProps, ignoredItems: ILPU[]) {
+        this.LpuFilterSettings = { propName, ignoredItems: [...ignoredItems] };
     }
 
     @action.bound
