@@ -23,7 +23,6 @@ const styles = (theme: any) => createStyles({
         fontSize: 14,
         color: '#aaa',
         fontFamily: 'Source Sans Pro SemiBold',
-        textAlign: 'center'
     },
 });
 

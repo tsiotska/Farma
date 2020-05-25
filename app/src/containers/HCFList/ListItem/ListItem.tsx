@@ -159,7 +159,7 @@ class ListItem extends Component<IProps> {
 
                     <Grid direction='column' item container>
                         {lpuName &&
-                        <Typography color='textSecondary'>
+                        <Typography className={unconfirmed && classes.text} variant='body2'>
                             {lpuName}
                         </Typography>
                         }
