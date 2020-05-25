@@ -219,7 +219,7 @@ class DoctorListItem extends Component<IProps> {
                     <Typography variant='body2' className={classes.text}>
                         {LPUName || '-'}
                     </Typography>
-                    <Typography color='textSecondary'>
+                    <Typography className={classes.text}>
                         {address}
                     </Typography>
                 </Grid>

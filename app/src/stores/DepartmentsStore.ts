@@ -99,7 +99,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedLpus(): ILPU[] {
-        const { uiStore: {  sortSettings, filterSettings } } = this.rootStore;
+        const { uiStore: { sortSettings, filterSettings } } = this.rootStore;
 
         if (!this.LPUs) return this.LPUs;
 
@@ -125,7 +125,7 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
 
     @computed
     get sortedPharmacies(): ILPU[] {
-        const { uiStore: {  sortSettings, filterSettings } } = this.rootStore;
+        const { uiStore: { sortSettings, filterSettings } } = this.rootStore;
 
         if (!this.pharmacies) return this.pharmacies;
 
@@ -161,9 +161,14 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             ? (a: IDoctor, b: IDoctor) => a[sortPropName].localeCompare(b[sortPropName])
             : (a: IDoctor, b: IDoctor) => b[sortPropName].localeCompare(a[sortPropName]);
 
-        const sorted = (sortPropName && order)
-            ? this.doctors.slice().sort(callback)
-            : this.doctors;
+        let sorted;
+        if (sortPropName && order) {
+            const unconfirmedCount = this.doctors.filter(doc => doc.confirmed === false).length;
+            sorted = this.doctors.slice(unconfirmedCount).sort(callback);
+            sorted.unshift(...this.doctors.slice(0, unconfirmedCount));
+        } else {
+            sorted = this.doctors;
+        }
 
         const ignoredValues = filterSettings ? filterSettings.ignoredItems : null;
         const filterPropName = filterSettings ? filterSettings.propName : null;

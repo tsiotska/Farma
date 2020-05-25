@@ -92,7 +92,7 @@ export const bonusesDataNormalizer = ({
         agents,
         defaultAgentInfo,
         agentsValuesMap,
-        { requiredProps: [ 'id', 'last_payments', 'last_deposit', 'is_done' ] }
+        { requiredProps: [ 'id' ] } // 'last_payments', 'last_deposit'
     ).map(agent => {
         const { [agent.id]: agentMarks, ...rest } = groupedMarks;
         groupedMarks = rest;

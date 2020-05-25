@@ -174,7 +174,6 @@ class Table extends Component<IProps> {
                 : [];
             return res;
         }
-        // console.log(toJS(this.agents));
         return this.agents.slice(0, 50);
     }
 

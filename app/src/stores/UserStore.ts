@@ -493,8 +493,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 : null;
             this.setPreviewBonusMonth(newMonth);
         }
-        console.log('this.bonuses');
-        console.log(toJS(this.bonuses));
     }
 
     @action.bound
@@ -513,6 +511,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ),
             'loadBonusesData'
         );
+
         const targetBonus = this.bonuses[user.position]
             && this.bonuses[user.position].find(({ month }) => month === this.previewBonusMonth);
 

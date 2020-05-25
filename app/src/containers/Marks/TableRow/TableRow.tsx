@@ -317,7 +317,6 @@ class TableRow extends Component<IProps> {
     }
 
     deleteConfirmHandler = (confirmed: boolean) => {
-        console.log(confirmed);
         this.props.openDelPopper(null);
         if (confirmed) {
             this.removeBonusAgent();
