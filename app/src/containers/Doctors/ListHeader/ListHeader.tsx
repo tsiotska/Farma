@@ -91,7 +91,7 @@ class ListHeader extends Component<IProps> {
     @observable source: IDoctor[] = null;
 
     get totalLength(): number {
-        const { doctors} = this.props;
+        const { doctors } = this.props;
         return (doctors || []).length;
     }
 
@@ -207,15 +207,17 @@ class ListHeader extends Component<IProps> {
             sortDataBy(this.propName, this.order);
         }
 
-        for (const item of this.source) {
-            let exists = false;
-            for (const filtered of this.filteredOptions) {
-                if (item[this.propName] === filtered.value) {
-                    exists = true;
+        if (this.searchString) {
+            for (const item of this.source) {
+                let exists = false;
+                for (const filtered of this.filteredOptions) {
+                    if (item[this.propName] === filtered.value) {
+                        exists = true;
+                    }
                 }
-            }
-            if (!exists) {
-                this.ignoredItems.push(item[this.propName]);
+                if (!exists) {
+                    this.ignoredItems.push(item[this.propName]);
+                }
             }
         }
 
@@ -227,7 +229,7 @@ class ListHeader extends Component<IProps> {
         if (this.ignoredItems.length) {
             this.ignoredItems = [];
         } else {
-            this.ignoredItems = this.sortedOptions.reduce((acc, {[this.propName]: value}) => {
+            this.ignoredItems = this.sortedOptions.reduce((acc, { [this.propName]: value }) => {
                 return acc.includes(value)
                     ? acc
                     : [...acc, value];
@@ -258,7 +260,7 @@ class ListHeader extends Component<IProps> {
         }
     }
 
-    inputChangeHandler = ({ target: { value }}: any) => {
+    inputChangeHandler = ({ target: { value } }: any) => {
         this.searchInputValue = value;
     }
 
@@ -267,7 +269,7 @@ class ListHeader extends Component<IProps> {
     }
 
     render() {
-        const { classes, loadDocsExcel, unconfirmed,  filterSettings, sortSettings } = this.props;
+        const { classes, loadDocsExcel, unconfirmed, filterSettings, sortSettings } = this.props;
         const sortPropName = sortSettings ? sortSettings.propName : null;
         const filterPropName = filterSettings ? filterSettings.propName : null;
         return (

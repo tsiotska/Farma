@@ -151,7 +151,7 @@ class Header extends Component<IProps> {
             const value = this.sortedOptions[i][this.propName];
 
             // if filterString === '' -> its already pass filter, otherwise -> check searchString
-            const passFilter = lowerCaseFilter === '' || value.toLowerCase().includes(lowerCaseFilter);
+            const passFilter = lowerCaseFilter === '' || value.includes(lowerCaseFilter);
 
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);
@@ -262,21 +262,19 @@ class Header extends Component<IProps> {
             sortDataBy(this.propName, this.order);
         }
 
-        for (const item of this.source) {
-            let exists = false;
-            for (const filtered of this.filteredOptions) {
-                if (item[this.propName] === filtered.value) {
-                    exists = true;
+        if (this.searchString) {
+            for (const item of this.source) {
+                let exists = false;
+                for (const filtered of this.filteredOptions) {
+                    if (item[this.propName] === filtered.value) {
+                        exists = true;
+                    }
+                }
+                if (!exists) {
+                    this.ignoredItems.push(item[this.propName]);
                 }
             }
-            if (!exists) {
-                this.ignoredItems.push(item[this.propName]);
-            }
         }
-        /*
-        this.ignoredItems =  this.source.reduce((acc: ILPU, item: ILPU) => {
-            return this.filteredOptions.filter((check) => check.value !== item[this.propName]);
-        });*/
 
         filterDataBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
