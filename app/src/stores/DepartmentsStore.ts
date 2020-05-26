@@ -160,7 +160,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const callback = order === SORT_ORDER.ASCENDING
             ? (a: IDoctor, b: IDoctor) => a[sortPropName].localeCompare(b[sortPropName])
             : (a: IDoctor, b: IDoctor) => b[sortPropName].localeCompare(a[sortPropName]);
-
+        /*
+        const sorted = (sortPropName && order)
+            ? this.doctors.slice().sort(callback)
+            : this.doctors;
+        */
         let sorted;
         if (sortPropName && order) {
             const unconfirmedCount = this.doctors.filter(doc => doc.confirmed === false).length;

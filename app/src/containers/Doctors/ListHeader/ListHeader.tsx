@@ -187,7 +187,7 @@ class ListHeader extends Component<IProps> {
 
         for (let i = 0; i < maxIter; ++i) {
             const value = this.sortedOptions[i][this.propName];
-            const passFilter = lowerCaseFilter === '' || value.includes(lowerCaseFilter);
+            const passFilter = lowerCaseFilter === '' || value.toLowerCase().includes(lowerCaseFilter);
 
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);
