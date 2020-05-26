@@ -207,6 +207,18 @@ class ListHeader extends Component<IProps> {
             sortDataBy(this.propName, this.order);
         }
 
+        for (const item of this.source) {
+            let exists = false;
+            for (const filtered of this.filteredOptions) {
+                if (item[this.propName] === filtered.value) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                this.ignoredItems.push(item[this.propName]);
+            }
+        }
+
         filterDataBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
     }

@@ -38,9 +38,6 @@ const styles = (theme: any) => createStyles({
             borderColor: '#aaa'
         }
     },
-    submitButton: {
-        color: theme.palette.primary.lightBlue
-    },
     iconButton: {
         padding: 6,
         borderRadius: 2
@@ -48,6 +45,22 @@ const styles = (theme: any) => createStyles({
     placeholder: {
         marginTop: 12
     },
+    discardButton: {
+        color: '#36A0F4',
+        width: '100%'
+    },
+    applyButton: {
+        backgroundColor: '#647CFE',
+        color: 'white',
+        width: '100%',
+        '&:hover': {
+            backgroundColor: '#7a8fff',
+        }
+    },
+    buttonGroup: {
+        padding: 10,
+        marginTop: 10
+    }
 });
 
 export type DoctorsSortableProps = 'LPUName' | 'name' | 'specialty';
@@ -174,9 +187,14 @@ class DoctorsFilterPopper extends Component<IProps> {
                                     }
                                 </Typography>
                         }
-                        <Button onClick={applyClickHandler} className={classes.submitButton}>
-                            Застосувати
-                        </Button>
+                        <Grid className={classes.buttonGroup} container wrap='nowrap' alignItems='center'>
+                            <Button onClick={onClose} className={classes.discardButton}>
+                                Відмінити
+                            </Button>
+                            <Button onClick={applyClickHandler} className={classes.applyButton}>
+                                Застосувати
+                            </Button>
+                        </Grid>
                     </Grid>
             </Popover>
         );

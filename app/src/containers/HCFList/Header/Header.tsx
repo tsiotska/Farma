@@ -61,22 +61,22 @@ export interface IState {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            LPUs,
-            getAsyncStatus,
-            pharmacies
-        },
-        uiStore: {
-            sortSettings,
-            filterSettings,
-            filterDataBy,
-            sortDataBy,
-            clearSorting,
-            clearFilters
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     LPUs,
+                     getAsyncStatus,
+                     pharmacies
+                 },
+                 uiStore: {
+                     sortSettings,
+                     filterSettings,
+                     filterDataBy,
+                     sortDataBy,
+                     clearSorting,
+                     clearFilters
+                 }
+             }
+         }) => ({
     LPUs,
     pharmacies,
     getAsyncStatus,
@@ -102,7 +102,7 @@ class Header extends Component<IProps> {
     @observable source: ILPU[] = null;
 
     get totalLength(): number {
-        const { type, pharmacies, LPUs} = this.props;
+        const { type, pharmacies, LPUs } = this.props;
         const source = type === 'pharmacy'
             ? pharmacies
             : LPUs;
@@ -171,7 +171,7 @@ class Header extends Component<IProps> {
         }
     }
 
-    inputChangeHandler = ({ target: { value }}: any) => {
+    inputChangeHandler = ({ target: { value } }: any) => {
         this.searchInputValue = value;
     }
 
@@ -248,7 +248,7 @@ class Header extends Component<IProps> {
             this.order = sortSettings.order;
         }
         if (filterSettings && filterSettings.propName === propName) {
-            this.ignoredItems = [ ...filterSettings.ignoredItems ];
+            this.ignoredItems = [...filterSettings.ignoredItems];
             // this.selectedItems = [...LpuFilterSettings.selectedValues];
         }
     }
@@ -263,6 +263,22 @@ class Header extends Component<IProps> {
             sortDataBy(this.propName, this.order);
         }
 
+        for (const item of this.source) {
+            let exists = false;
+            for (const filtered of this.filteredOptions) {
+                if (item[this.propName] === filtered.value) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                this.ignoredItems.push(item[this.propName]);
+            }
+        }
+        /*
+        this.ignoredItems =  this.source.reduce((acc: ILPU, item: ILPU) => {
+            return this.filteredOptions.filter((check) => check.value !== item[this.propName]);
+        });*/
+
         filterDataBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
     }
@@ -271,7 +287,7 @@ class Header extends Component<IProps> {
         if (this.ignoredItems.length) {
             this.ignoredItems = [];
         } else {
-            this.ignoredItems = this.sortedOptions.reduce((acc, {[this.propName]: value}) => {
+            this.ignoredItems = this.sortedOptions.reduce((acc, { [this.propName]: value }) => {
                 return acc.includes(value)
                     ? acc
                     : [...acc, value];
@@ -297,87 +313,88 @@ class Header extends Component<IProps> {
 
         return (
             <>
-            <Grid className={classes.root} container alignItems='center'>
-                <Grid className={cx(classes.cell, classes.name)} xs alignItems='center' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Назва
-                        <IconButton
-                            onClick={this.openFilterPopper('name')}
-                            className={cx(classes.iconButton, { active: ('name' === sortPropName || 'name' === filterPropName) }) }>
-                            <FilterList fontSize='small' />
-                        </IconButton>
-                    </Typography>
-                </Grid>
-                <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Регіон
-                        <IconButton
-                            onClick={this.openFilterPopper('regionName')}
-                            className={cx(classes.iconButton, { active: ('regionName' === sortPropName || 'regionName' === filterPropName) }) }
-                            // className={classes.iconButton}
+                <Grid className={classes.root} container alignItems='center'>
+                    <Grid className={cx(classes.cell, classes.name)} xs alignItems='center' container item>
+                        <Typography className={classes.text} variant='body2'>
+                            Назва
+                            <IconButton
+                                onClick={this.openFilterPopper('name')}
+                                className={cx(classes.iconButton, { active: ('name' === sortPropName || 'name' === filterPropName) })}>
+                                <FilterList fontSize='small'/>
+                            </IconButton>
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell, classes.region)} xs={1} alignItems='center' container item>
+                        <Typography className={classes.text} variant='body2'>
+                            Регіон
+                            <IconButton
+                                onClick={this.openFilterPopper('regionName')}
+                                className={cx(classes.iconButton, { active: ('regionName' === sortPropName || 'regionName' === filterPropName) })}
+                                // className={classes.iconButton}
                             >
-                            <FilterList fontSize='small' />
-                        </IconButton>
-                    </Typography>
+                                <FilterList fontSize='small'/>
+                            </IconButton>
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell, classes.oblast)} xs={1} alignItems='center' container item>
+                        <Typography className={classes.text} variant='body2'>
+                            Область
+                            <IconButton
+                                onClick={this.openFilterPopper('oblast')}
+                                className={cx(classes.iconButton, { active: ('oblast' === sortPropName || 'oblast' === filterPropName) })}>
+                                <FilterList fontSize='small'/>
+                            </IconButton>
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
+                        <Typography className={classes.text} variant='body2'>
+                            Місто
+                            <IconButton
+                                onClick={this.openFilterPopper('city')}
+                                className={cx(classes.iconButton, { active: ('city' === sortPropName || 'city' === filterPropName) })}>
+                                <FilterList fontSize='small'/>
+                            </IconButton>
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
+                        <Typography className={classes.text} variant='body2'>
+                            Адрес
+                        </Typography>
+                    </Grid>
+                    <Grid className={cx(classes.cell, classes.phone)} xs={1} alignItems='center' wrap='nowrap' container
+                          item>
+                        <Typography className={classes.text} variant='body2'>
+                            Телефон
+                        </Typography>
+                        {
+                            (!!sortSettings || !!filterSettings) &&
+                            <IconButton className={classes.closeIconButton} onClick={this.clearAll}>
+                                <Close fontSize='small'/>
+                            </IconButton>
+                        }
+                    </Grid>
                 </Grid>
-                <Grid className={cx(classes.cell, classes.oblast)} xs={1} alignItems='center' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Область
-                        <IconButton
-                            onClick={this.openFilterPopper('oblast')}
-                            className={cx(classes.iconButton, { active: ('oblast' === sortPropName || 'oblast' === filterPropName) }) }>
-                            <FilterList fontSize='small' />
-                        </IconButton>
-                    </Typography>
-                </Grid>
-                <Grid className={cx(classes.cell, classes.city)} xs={1} alignItems='center' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Місто
-                        <IconButton
-                            onClick={this.openFilterPopper('city')}
-                            className={cx(classes.iconButton, { active: ('city' === sortPropName || 'city' === filterPropName) }) }>
-                            <FilterList fontSize='small' />
-                        </IconButton>
-                    </Typography>
-                </Grid>
-                <Grid className={cx(classes.cell, classes.address)} xs alignItems='center' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Адрес
-                    </Typography>
-                </Grid>
-                <Grid className={cx(classes.cell, classes.phone)} xs={1} alignItems='center' wrap='nowrap' container item>
-                    <Typography className={classes.text} variant='body2'>
-                        Телефон
-                    </Typography>
-                    {
-                        (!!sortSettings || !!filterSettings) &&
-                        <IconButton className={classes.closeIconButton} onClick={this.clearAll}>
-                            <Close fontSize='small' />
-                        </IconButton>
-                    }
-                </Grid>
-            </Grid>
-            <LpuFilterPopper
-                toggleAll={this.toggleAll}
-                propName={this.propName}
-                anchor={this.filterPopperAnchor}
-                onClose={this.popoverCloseHandler}
-                isLoading={this.isLoading}
+                <LpuFilterPopper
+                    toggleAll={this.toggleAll}
+                    propName={this.propName}
+                    anchor={this.filterPopperAnchor}
+                    onClose={this.popoverCloseHandler}
+                    isLoading={this.isLoading}
 
-                order={this.order}
-                onOrderChange={this.sortOrderChangeHandler}
+                    order={this.order}
+                    onOrderChange={this.sortOrderChangeHandler}
 
-                searchString={this.searchInputValue}
-                onSearchStringChange={this.inputChangeHandler}
-                applySearch={this.findSuggestions}
+                    searchString={this.searchInputValue}
+                    onSearchStringChange={this.inputChangeHandler}
+                    applySearch={this.findSuggestions}
 
-                totalLength={this.totalLength}
-                suggestions={this.filteredOptions}
-                ignoredItems={this.ignoredItems}
-                itemClickHandler={this.itemClickHandler}
+                    totalLength={this.totalLength}
+                    suggestions={this.filteredOptions}
+                    ignoredItems={this.ignoredItems}
+                    itemClickHandler={this.itemClickHandler}
 
-                applyClickHandler={this.applyFilters}
-            />
+                    applyClickHandler={this.applyFilters}
+                />
             </>
         );
     }
