@@ -151,14 +151,13 @@ class Header extends Component<IProps> {
             const value = this.sortedOptions[i][this.propName];
 
             // if filterString === '' -> its already pass filter, otherwise -> check searchString
-            const passFilter = lowerCaseFilter === '' || value.includes(lowerCaseFilter);
+            const passFilter = lowerCaseFilter === '' || value.toLowerCase().includes(lowerCaseFilter);
 
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);
                 res.push({ id: i, value });
             }
         }
-
         return res;
     }
 
