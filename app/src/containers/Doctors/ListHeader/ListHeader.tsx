@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import ExcelIcon from '../../../components/ExcelIcon';
 import cx from 'classnames';
-import { FilterList } from '@material-ui/icons';
+import { Close, FilterList } from '@material-ui/icons';
 import DoctorsFilterPopper, { DoctorsSortableProps } from '../../../components/DoctorsFilterPopper/DoctorsFilterPopper';
 import { computed, observable, reaction, toJS } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
@@ -35,6 +35,13 @@ const styles = (theme: any) => createStyles({
             color: theme.palette.primary.green.main
         }
     },
+    closeIconButton: {
+        padding: 4,
+        borderRadius: 2,
+        fontSize: 10,
+        marginRight: 2,
+        marginLeft: 'auto'
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -268,6 +275,12 @@ class ListHeader extends Component<IProps> {
         this.searchString = this.searchInputValue;
     }
 
+    clearAll = () => {
+        const { clearFilters, clearSorting } = this.props;
+        clearFilters();
+        clearSorting();
+    }
+
     render() {
         const { classes, loadDocsExcel, unconfirmed, filterSettings, sortSettings } = this.props;
         const sortPropName = sortSettings ? sortSettings.propName : null;
@@ -331,6 +344,12 @@ class ListHeader extends Component<IProps> {
                                 <Typography variant='body2' color='textSecondary'>
                                     Депозит
                                 </Typography>
+                                {
+                                    (!!sortSettings || !!filterSettings) &&
+                                    <IconButton className={classes.closeIconButton} onClick={this.clearAll}>
+                                        <Close fontSize='small'/>
+                                    </IconButton>
+                                }
                                 <IconButton className={classes.excelButton} onClick={loadDocsExcel}>
                                     <ExcelIcon/>
                                 </IconButton>
