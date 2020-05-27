@@ -149,9 +149,9 @@ class TransferBlock extends Component<IProps> {
         return condition && isMedsDivisionValid;
     }
 
-    get currentBonuses(): [number, number] {
+    get currentBonuses(): [number | string, number | string] {
         const current = Math.round((this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit));
-        return [100 - current, current];
+        return [100 - current || '-', current || '-'];
     }
 
     submitHandler = async () => {
@@ -178,7 +178,7 @@ class TransferBlock extends Component<IProps> {
                 </Typography>
                 <Typography className={classes.text} variant='body2'>
                     <span className={classes.gray}>Поточний розподіл балів - </span>
-                    <span className={classes.dark}>{this.currentBonuses[0]} / {this.currentBonuses[1]}</span>
+                    <span className={classes.dark}>{this.currentBonuses[0]}  / {this.currentBonuses[1]}</span>
                 </Typography>
                 <Grid
                     className={cx(classes.root, { invalid: !this.isValid })}
