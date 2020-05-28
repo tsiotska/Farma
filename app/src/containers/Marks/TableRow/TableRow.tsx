@@ -26,6 +26,7 @@ import { USER_ROLE } from '../../../constants/Roles';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
 import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import {IUser} from '../../../interfaces';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -139,6 +140,7 @@ interface IProps extends WithStyles<typeof styles> {
     isNested: boolean;
     allowEdit: boolean;
 
+    user?: IUser;
     meds?: IMedicine[];
     itemRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
@@ -170,6 +172,7 @@ interface IProps extends WithStyles<typeof styles> {
                      role,
                      userMarks,
                      changedMarks,
+                     user
                  },
                  uiStore: {
                      openDelPopper
@@ -183,7 +186,8 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonusChangeHandler,
     previewBonusMonth,
     changedMarks,
-    openDelPopper
+    openDelPopper,
+    user
 }))
 @observer
 class TableRow extends Component<IProps> {
@@ -440,9 +444,12 @@ class TableRow extends Component<IProps> {
                                                 card={card}
                                             />
                                         </InfoWindow>
-                                        <IconButton className={classes.removeIcon} onClick={this.deleteClickHandler}>
-                                            <PersonRemove width={20} height={20}/>
-                                        </IconButton>
+                                        { this.props.user.position !== USER_ROLE.MEDICAL_AGENT &&
+                                            <IconButton className={classes.removeIcon}
+                                                        onClick={this.deleteClickHandler}>
+                                                <PersonRemove width={20} height={20}/>
+                                            </IconButton>
+                                        }
                                     </>
                                 }
                                 {
