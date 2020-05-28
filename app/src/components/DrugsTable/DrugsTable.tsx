@@ -141,9 +141,8 @@ class DrugsTable extends Component<IProps> {
 
     @computed
     get medsArray(): IMedicine[] {
-        const { currentDepartmentMeds, ignoredMeds } = this.props;
+        const { currentDepartmentMeds } = this.props;
         return currentDepartmentMeds;
-        // return currentDepartmentMeds.filter(({ id }) => ignoredMeds.has(id) === false);
     }
 
     @computed

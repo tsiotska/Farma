@@ -10,7 +10,6 @@ export const numberValidator: Validator = (value: string): boolean => {
 
 export const moneyValidator: Validator = (value: string): boolean => {
     const mantissa = value.match(/\.([^.]*)$/);
-
     return mantissa === null
         ? numberValidator(value)
         : numberValidator(value) && mantissa[0].length <= 3;

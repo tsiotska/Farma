@@ -96,21 +96,6 @@ class Sales extends Component<IProps> {
         );
     }
 
-    @computed
-    get sortedCurrentDepartmentMeds() {
-        let {currentDepartmentMeds} = this.props;
-        currentDepartmentMeds =  currentDepartmentMeds.sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
-        return currentDepartmentMeds;
-    }
-
     @action.bound
     updateData = ([role, departmentId]: [USER_ROLE, number]) => {
         const {
@@ -145,7 +130,8 @@ class Sales extends Component<IProps> {
             classes,
             chartSalesStat,
             currentDepartmentId,
-            loadSalesExcel
+            loadSalesExcel,
+            currentDepartmentMeds
         } = this.props;
 
         return (
@@ -169,7 +155,7 @@ class Sales extends Component<IProps> {
                             />
                         }
                         departmentId={currentDepartmentId}
-                        meds={this.sortedCurrentDepartmentMeds}
+                        meds={currentDepartmentMeds}
                         chartSalesStat={chartSalesStat}
                     />
                 </Grid>
