@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     createStyles,
     WithStyles,
@@ -6,22 +6,22 @@ import {
     Typography,
     Button,
 } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
+import {observer, inject} from 'mobx-react';
+import {withStyles} from '@material-ui/styles';
 
-import { IMedicine } from '../../interfaces/IMedicine';
-import { IAsyncStatus } from '../../stores/AsyncStore';
+import {IMedicine} from '../../interfaces/IMedicine';
+import {IAsyncStatus} from '../../stores/AsyncStore';
 import LoadingMask from '../../components/LoadingMask';
 import ListHeader from './ListHeader';
 import List from './List';
-import { ADD_MEDICINE_MODAL } from '../../constants/Modals';
+import {ADD_MEDICINE_MODAL} from '../../constants/Modals';
 import AddMedsModal from './AddMedsModal';
-import { computed } from 'mobx';
+import {computed} from 'mobx';
 import EditMedsModal from './EditMedsModal';
 import DeletePopover from '../../components/DeletePopover';
-import { withRestriction } from '../../components/hoc/withRestriction';
-import { IWithRestriction } from '../../interfaces';
-import { PERMISSIONS } from '../../constants/Permissions';
+import {withRestriction} from '../../components/hoc/withRestriction';
+import {IWithRestriction} from '../../interfaces';
+import {PERMISSIONS} from '../../constants/Permissions';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -74,7 +74,17 @@ class Medicines extends Component<IProps> {
 
     @computed
     get sortedMeds(): IMedicine[] {
-        return this.props.currentDepartmentMeds.slice().sort((a, b) => {
+        let {currentDepartmentMeds} = this.props;
+        currentDepartmentMeds = currentDepartmentMeds.sort((a, b) => { // apply in one sort method using || operator
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+        return currentDepartmentMeds.slice().sort((a, b) => {
             const isDeletedA = a.deleted;
             const isDeletedB = b.deleted;
             if (isDeletedA === isDeletedB) return 0;
@@ -87,7 +97,7 @@ class Medicines extends Component<IProps> {
     addMedsClickHandler = () => this.props.openModal(ADD_MEDICINE_MODAL);
 
     render() {
-        const { classes, isAllowed } = this.props;
+        const {classes, isAllowed} = this.props;
 
         return (
             <Grid className={classes.root} direction='column' container>

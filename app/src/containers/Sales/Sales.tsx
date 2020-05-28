@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { createStyles, WithStyles, Grid, Typography } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
+import React, {Component} from 'react';
+import {createStyles, WithStyles, Grid, Typography} from '@material-ui/core';
+import {observer, inject} from 'mobx-react';
+import {withStyles} from '@material-ui/styles';
 import Plot from '../Plot';
 import TableStat from './TableStat';
-import { IMedsSalesStat } from '../../interfaces/ISalesStat';
-import { reaction, observable, action, computed, toJS } from 'mobx';
-import { USER_ROLE } from '../../constants/Roles';
+import {IMedsSalesStat} from '../../interfaces/ISalesStat';
+import {reaction, observable, action, computed, toJS} from 'mobx';
+import {USER_ROLE} from '../../constants/Roles';
 import DateRangeButton from '../../components/DateRangeButton';
-import { IMedicine } from '../../interfaces/IMedicine';
+import {IMedicine} from '../../interfaces/IMedicine';
 import MedsStatistic from '../MedsStatistic';
 import SalesModeSwitch from '../../components/SalesModeSwitch';
 
@@ -45,24 +45,24 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        salesStore: {
-            computedChartSales: chartSalesStat,
-            loadAllStat,
-            loadSalesExcel
-        },
-        userStore: {
-            role
-        },
-        departmentsStore: {
-            currentDepartmentMeds,
-            currentDepartmentId,
-            loadLocationsAgents,
-            setPharmacyDemand,
-            clearLocationsAgents
-        }
-    }
-}) => ({
+             appState: {
+                 salesStore: {
+                     computedChartSales: chartSalesStat,
+                     loadAllStat,
+                     loadSalesExcel
+                 },
+                 userStore: {
+                     role
+                 },
+                 departmentsStore: {
+                     currentDepartmentMeds,
+                     currentDepartmentId,
+                     loadLocationsAgents,
+                     setPharmacyDemand,
+                     clearLocationsAgents
+                 }
+             }
+         }) => ({
     chartSalesStat,
     currentDepartmentMeds,
     role,
@@ -81,10 +81,10 @@ class Sales extends Component<IProps> {
 
     @computed
     get medsMap(): Map<number, IMedicine> {
-        const { chartSalesStat, currentDepartmentMeds } = this.props;
-        const ids = (chartSalesStat || []).map(({ medId }) => medId);
-        const meds = currentDepartmentMeds.filter(({ id, deleted }) => ids.includes(id));
-        const mapped: Array<[number, IMedicine]> = meds.map(medicine => ([ medicine.id, medicine]));
+        const {chartSalesStat, currentDepartmentMeds} = this.props;
+        const ids = (chartSalesStat || []).map(({medId}) => medId);
+        const meds = currentDepartmentMeds.filter(({id, deleted}) => ids.includes(id));
+        const mapped: Array<[number, IMedicine]> = meds.map(medicine => ([medicine.id, medicine]));
         return new Map(mapped);
     }
 
@@ -92,8 +92,23 @@ class Sales extends Component<IProps> {
         this.reactionDisposer = reaction(
             () => [this.props.role, this.props.currentDepartmentId],
             this.updateData,
-            { fireImmediately: true }
+            {fireImmediately: true}
         );
+    }
+
+    @computed
+    get sortedCurrentDepartmentMeds() {
+        let {currentDepartmentMeds} = this.props;
+        currentDepartmentMeds =  currentDepartmentMeds.sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+        return currentDepartmentMeds;
     }
 
     @action.bound
@@ -129,7 +144,6 @@ class Sales extends Component<IProps> {
         const {
             classes,
             chartSalesStat,
-            currentDepartmentMeds,
             currentDepartmentId,
             loadSalesExcel
         } = this.props;
@@ -137,10 +151,10 @@ class Sales extends Component<IProps> {
         return (
             <Grid className={classes.root} direction='column' container>
                 <Grid alignItems='center' container>
-                    <Typography  variant='h5'>
+                    <Typography variant='h5'>
                         Реализація препаратів за
                     </Typography>
-                    <DateRangeButton />
+                    <DateRangeButton/>
                 </Grid>
                 <Grid className={classes.plotContainer} wrap='nowrap' container>
                     <Plot
@@ -155,11 +169,11 @@ class Sales extends Component<IProps> {
                             />
                         }
                         departmentId={currentDepartmentId}
-                        meds={currentDepartmentMeds}
+                        meds={this.sortedCurrentDepartmentMeds}
                         chartSalesStat={chartSalesStat}
                     />
                 </Grid>
-                <TableStat />
+                <TableStat/>
             </Grid>
         );
     }
