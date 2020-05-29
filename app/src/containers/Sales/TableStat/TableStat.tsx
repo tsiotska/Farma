@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import React, {Component} from 'react';
+import {observer, inject} from 'mobx-react';
 import DrugsTable from '../../../components/DrugsTable';
-import { IAsyncStatus } from '../../../stores/AsyncStore';
-import { ISalesStat } from '../../../interfaces/ISalesStat';
-import { IUserCommonInfo, IUser } from '../../../interfaces/IUser';
-import { ILocation } from '../../../interfaces/ILocation';
+import {IAsyncStatus} from '../../../stores/AsyncStore';
+import {ISalesStat} from '../../../interfaces/ISalesStat';
+import {IUserCommonInfo, IUser} from '../../../interfaces/IUser';
+import {ILocation} from '../../../interfaces/ILocation';
 import AgentTextCell from '../../../components/DrugsTable/AgentTextCell';
 import HeaderCell from '../../../components/DrugsTable/HeaderCell';
-import { USER_ROLE } from '../../../constants/Roles';
-import { computed, toJS } from 'mobx';
+import {USER_ROLE} from '../../../constants/Roles';
+import {computed, toJS} from 'mobx';
 import LocationTextCell from '../../../components/DrugsTable/LocationTextCell';
-import { ILPU } from '../../../interfaces/ILPU';
+import {ILPU} from '../../../interfaces/ILPU';
 
 interface IProps {
     role?: USER_ROLE;
@@ -37,31 +37,31 @@ export enum GROUP_BY {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            role,
-            previewUser,
-        },
-        salesStore: {
-            getAsyncStatus,
-            sortedLocationSalesStat,
-            sortedAgentsSalesStat,
-            ignoredLocations,
-            ignoredAgents,
-            loadLocaleSalesStat,
-            loadAgentSalesStat,
-            pharmaciesMap,
-            locations,
+             appState: {
+                 userStore: {
+                     role,
+                     previewUser,
+                 },
+                 salesStore: {
+                     getAsyncStatus,
+                     sortedLocationSalesStat,
+                     sortedAgentsSalesStat,
+                     ignoredLocations,
+                     ignoredAgents,
+                     loadLocaleSalesStat,
+                     loadAgentSalesStat,
+                     pharmaciesMap,
+                     locations,
 
-            loadAgentsSalesExcel,
-            loadLocationsExcel
-        },
-        departmentsStore: {
-            locationsAgents,
-            regions
-        }
-    }
-}) => ({
+                     loadAgentsSalesExcel,
+                     loadLocationsExcel
+                 },
+                 departmentsStore: {
+                     locationsAgents,
+                     regions
+                 }
+             }
+         }) => ({
     role,
     previewUser,
     getAsyncStatus,
@@ -107,7 +107,7 @@ class TableStat extends Component<IProps> {
 
     @computed
     get isLoading(): boolean {
-        const { getAsyncStatus } = this.props;
+        const {getAsyncStatus} = this.props;
         const s1 = getAsyncStatus('loadLocaleSalesStat');
         const s2 = getAsyncStatus('loadMedsStat');
         const s3 = getAsyncStatus('loadAgentSalesStat');
@@ -116,30 +116,30 @@ class TableStat extends Component<IProps> {
 
     @computed
     get showAgentStat(): boolean {
-        const { role } = this.props;
+        const {role} = this.props;
         return this.agentStatRoles.includes(role);
     }
 
     @computed
     get locationsLabels(): Map<number, ILocation | ILPU> {
-        const { role, locations, pharmaciesMap } = this.props;
+        const {role, locations, pharmaciesMap} = this.props;
         return role === USER_ROLE.MEDICAL_AGENT
             ? pharmaciesMap
             : locations;
     }
 
     getTitle(): string {
-        const { role, regions, previewUser } = this.props;
+        const {role, regions, previewUser} = this.props;
         if (role === USER_ROLE.REGIONAL_MANAGER) {
             const region = previewUser
-            ? previewUser.region
-            : null;
+                ? previewUser.region
+                : null;
 
             const userRegion = regions.get(region);
 
             return userRegion
-            ? `${userRegion.name} регіон`
-            : '';
+                ? `${userRegion.name} регіон`
+                : '';
         }
 
         return '';
@@ -147,8 +147,8 @@ class TableStat extends Component<IProps> {
 
     getCurrentTableTitle = (groupBy: GROUP_BY): string => {
         return this.tableTitles[this.props.role]
-        ? this.tableTitles[this.props.role][groupBy]
-        : '-';
+            ? this.tableTitles[this.props.role][groupBy]
+            : '-';
     }
 
     retryClickHandler = () => {
@@ -166,11 +166,11 @@ class TableStat extends Component<IProps> {
         const {
             sortedAgentsSalesStat,
             sortedLocationSalesStat,
-            locationsAgents,
             ignoredAgents,
             ignoredLocations,
             loadAgentsSalesExcel,
-            loadLocationsExcel
+            loadLocationsExcel,
+            locationsAgents
         } = this.props;
 
         return (

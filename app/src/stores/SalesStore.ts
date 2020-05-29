@@ -1,7 +1,7 @@
-import { IRootStore } from './../interfaces/IRootStore';
+import {IRootStore} from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
-import { ISalesStore } from './../interfaces/ISalesStore';
-import { observable, action, computed, toJS } from 'mobx';
+import {ISalesStore} from './../interfaces/ISalesStore';
+import {observable, action, computed, toJS} from 'mobx';
 import {
     endOfMonth,
     format,
@@ -9,18 +9,19 @@ import {
     differenceInCalendarMonths,
     subMonths
 } from 'date-fns';
-import { stringify } from 'query-string';
-import { IMedSalesInfo, IMedsSalesStat, ISalesStat } from '../interfaces/ISalesStat';
-import { USER_ROLE } from '../constants/Roles';
-import { IUserCommonInfo } from '../interfaces/IUser';
-import { ILPU } from '../interfaces/ILPU';
-import { ILocation } from '../interfaces/ILocation';
-import { IPeriodSalesStat, IMedSales } from '../helpers/normalizers/periodSalesNormalizer';
+import {stringify} from 'query-string';
+import {IMedSalesInfo, IMedsSalesStat, ISalesStat} from '../interfaces/ISalesStat';
+import {USER_ROLE} from '../constants/Roles';
+import {IUserCommonInfo} from '../interfaces/IUser';
+import {ILPU} from '../interfaces/ILPU';
+import {ILocation} from '../interfaces/ILocation';
+import {IPeriodSalesStat, IMedSales} from '../helpers/normalizers/periodSalesNormalizer';
 
 export enum STAT_DISPLAY_MODE {
     PACK,
     CURRENCY
 }
+
 type AgentTargetProperty = 'city' | 'region' | null;
 
 export default class SalesStore extends AsyncStore implements ISalesStore {
@@ -62,8 +63,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @computed
     get pharmaciesMap(): Map<number, ILPU> {
         const {
-            departmentsStore: { pharmacies },
-            userStore: { role }
+            departmentsStore: {pharmacies},
+            userStore: {role}
         } = this.rootStore;
 
         const statExist = Array.isArray(this.locationsSales);
@@ -72,10 +73,10 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         let data: Array<[number, ILPU]> = [];
 
         if (statExist && shouldReturnData && pharmacies) {
-            const ids = this.locationsSales.map(({ id }) => id);
+            const ids = this.locationsSales.map(({id}) => id);
             data = pharmacies
-                .filter(({ id }) => ids.includes(id))
-                .map(x => ([ x.id, x ]));
+                .filter(({id}) => ids.includes(id))
+                .map(x => ([x.id, x]));
 
         }
 
@@ -84,7 +85,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @computed
     get agentsTargetProperty(): AgentTargetProperty {
-        const { userStore: { role }, departmentsStore: { locationsAgents } } = this.rootStore;
+        const {userStore: {role}, departmentsStore: {locationsAgents}} = this.rootStore;
         if (role === USER_ROLE.FIELD_FORCE_MANAGER) return 'region';
         if (role === USER_ROLE.REGIONAL_MANAGER) return 'city';
         return null;
@@ -93,8 +94,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @computed
     get locations(): Map<number, ILocation> {
         const {
-            userStore: { role },
-            departmentsStore: { cities, regions }
+            userStore: {role},
+            departmentsStore: {cities, regions}
         } = this.rootStore;
 
         return role === USER_ROLE.FIELD_FORCE_MANAGER
@@ -118,17 +119,17 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             : this.agentsSales;
 
         const itemsToIgnore = sourceValues.reduce((acc, x) => {
-            const item = source.find(({ id }) => id === x);
+            const item = source.find(({id}) => id === x);
             if (item && item.sales) {
                 Object.entries(item.sales).forEach(([key, list]) => {
                     if (!acc[key]) acc[key] = {};
 
-                    list.forEach(({ medId, amount, money }) => {
+                    list.forEach(({medId, amount, money}) => {
                         if (acc[key][medId]) {
                             acc[key][medId].amount += amount;
                             acc[key][medId].money += money;
                         } else {
-                            acc[key][medId] = { amount, money };
+                            acc[key][medId] = {amount, money};
                         }
                     });
 
@@ -137,7 +138,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             return acc;
         }, {});
 
-        const res = chartData.map(({ periods, amount, money, medId, kpd }) =>  {
+        const res = chartData.map(({periods, amount, money, medId, kpd}) => {
             let newMoney = money;
             let newAmount = amount;
 
@@ -147,9 +148,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             if ('day' in periods[0]) targetProp = 'day';
 
             const newPeriods = periods.map(period => {
-                const newPeriod = { ...period };
+                const newPeriod = {...period};
 
-                Object.entries(itemsToIgnore).forEach(([ stringKey, medsObj ]) => {
+                Object.entries(itemsToIgnore).forEach(([stringKey, medsObj]) => {
                     const key = (+stringKey.split('.')[0]) - 1;
 
                     const target = medsObj[medId];
@@ -162,7 +163,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                     newPeriod.amount -= target.amount;
                 });
 
-                return { ...newPeriod };
+                return {...newPeriod};
             });
 
             return {
@@ -182,8 +183,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         if (!this.locationsSales) return null;
 
         const {
-            userStore: { role },
-            uiStore: { salesPharmacyFilter: { map }}
+            userStore: {role},
+            uiStore: {salesPharmacyFilter: {map}}
         } = this.rootStore;
 
         const condition = role !== USER_ROLE.MEDICAL_AGENT
@@ -214,21 +215,21 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             : summedUp;
     }
 
-    periodSalesReducer = ({ id, sales }: IPeriodSalesStat) => {
+    periodSalesReducer = ({id, sales}: IPeriodSalesStat) => {
         const summedSales = Object.values(sales).reduce(
             (acc, salesItems) => {
-                salesItems.forEach(({ medId, amount, money }: IMedSales) => {
+                salesItems.forEach(({medId, amount, money}: IMedSales) => {
                     if (acc[medId]) {
                         acc[medId].amount += amount;
                         acc[medId].money += money;
                     } else {
-                        acc[medId] = { medId, amount, money };
+                        acc[medId] = {medId, amount, money};
                     }
                 });
 
                 return acc;
             }
-        , {});
+            , {});
 
         return {
             id,
@@ -250,15 +251,12 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         };
 
         const summedUp: ISalesStat[] = this.agentsSales.map(this.periodSalesReducer);
-
-        return summedUp
-            ? summedUp.sort(sortCallback)
-            : summedUp;
+        return summedUp ? summedUp.sort(sortCallback) : summedUp;
     }
 
     @action.bound
     async loadAllStat(withReset: boolean = true) {
-        const { userStore: { role }} = this.rootStore;
+        const {userStore: {role}} = this.rootStore;
 
         if (withReset) {
             this.chartSalesStat = null;
@@ -283,8 +281,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.dateTo = new Date();
 
         const fromYear = this.dateTo.getMonth() === 0
-        ? this.dateTo.getFullYear() - 1
-        : this.dateTo.getFullYear();
+            ? this.dateTo.getFullYear() - 1
+            : this.dateTo.getFullYear();
 
         this.dateFrom = new Date(fromYear, 0);
 
@@ -305,7 +303,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleIgnoredLocation = (locationId: number) => {
-        const { departmentsStore: { locationsAgents }} = this.rootStore;
+        const {departmentsStore: {locationsAgents}} = this.rootStore;
 
         if (this.ignoredLocations.has(locationId)) {
             this.ignoredLocations.delete(locationId);
@@ -318,7 +316,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
             : this.ignoredAgents.delete;
 
         locationsAgents.forEach((agent) => {
-            const { id, [this.agentsTargetProperty]: location} = agent;
+            const {id, [this.agentsTargetProperty]: location} = agent;
             if (location === locationId) callback.call(this.ignoredAgents, id);
         });
     }
@@ -326,8 +324,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     toggleIgnoredAgents = (targetAgent: IUserCommonInfo) => {
         if (this.agentsTargetProperty === null) return;
-        const { id, [this.agentsTargetProperty]: targetLocation } = targetAgent;
-        const { departmentsStore: { locationsAgents }} = this.rootStore;
+        const {id, [this.agentsTargetProperty]: targetLocation} = targetAgent;
+        const {departmentsStore: {locationsAgents}} = this.rootStore;
 
         if (this.ignoredAgents.has(id)) {
             this.ignoredAgents.delete(id);
@@ -339,7 +337,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
             const agentsWithSameLocation: number[] = [];
             for (const [, agent] of locationsAgents) {
-                const { id: agentId, [this.agentsTargetProperty]: location } = agent;
+                const {id: agentId, [this.agentsTargetProperty]: location} = agent;
                 if (location === targetLocation) agentsWithSameLocation.push(agentId);
             }
 
@@ -351,7 +349,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleAllIgnoredLocations() {
-        const { userStore: { role }, departmentsStore: { locationsAgents }} = this.rootStore;
+        const {userStore: {role}, departmentsStore: {locationsAgents}} = this.rootStore;
 
         if (this.ignoredLocations.size) {
             this.ignoredLocations.clear();
@@ -368,7 +366,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleAllIgnoredAgents() {
-        const { departmentsStore: { locationsAgents }} = this.rootStore;
+        const {departmentsStore: {locationsAgents}} = this.rootStore;
 
         if (this.ignoredAgents.size) {
             this.ignoredLocations.clear();
@@ -405,9 +403,9 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     toggleAllMedsDisplayStatus(departmentId: number) {
-        const { departmentsStore: { meds }} = this.rootStore;
+        const {departmentsStore: {meds}} = this.rootStore;
         const departmentMeds = meds.get(departmentId) || [];
-        const ids = departmentMeds.map(({ id }) => id);
+        const ids = departmentMeds.map(({id}) => id);
         const shouldDisplayAll = ids.some(x => this.ignoredMeds.has(x));
 
         if (shouldDisplayAll) {
@@ -423,7 +421,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadMedsStat() {
         const requestName = 'loadMedsStat';
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         const url = this.getMedsStatUrl(currentDepartmentId);
 
         if (!url) return;
@@ -438,8 +436,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
         // if fetched data is relevant we process it
         const callback = res
-        ? this.setSuccess
-        : this.setError;
+            ? this.setSuccess
+            : this.setError;
 
         callback(requestName);
         this.clearParams(requestName);
@@ -448,7 +446,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadLocaleSalesStat() {
         const requestName = 'loadLocaleSalesStat';
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         const url = this.getLocationStatUrl(currentDepartmentId);
         const id = currentDepartmentId;
 
@@ -468,7 +466,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
     @action.bound
     async loadAgentSalesStat() {
         const requestName = 'loadAgentSalesStat';
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         const url = this.getAgentStatUrl(currentDepartmentId);
         const id = currentDepartmentId;
 
@@ -480,8 +478,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         this.agentsSales = res;
 
         const callback = res
-        ? this.setSuccess
-        : this.setError;
+            ? this.setSuccess
+            : this.setError;
 
         callback(requestName);
         this.clearParams(requestName);
@@ -489,7 +487,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     async loadSalesExcel() {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         // if (!currentDepartmentId) return;
         const url = this.getMedsStatUrl(currentDepartmentId, true);
         if (url) api.getExcel(url);
@@ -497,7 +495,7 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     async loadLocationsExcel() {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         const url = this.getLocationStatUrl(currentDepartmentId, true);
         if (currentDepartmentId === null || !url) return;
         api.getExcel(url);
@@ -505,14 +503,14 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
 
     @action.bound
     async loadAgentsSalesExcel() {
-        const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
+        const {api, departmentsStore: {currentDepartmentId}} = this.rootStore;
         const url = this.getAgentStatUrl(currentDepartmentId, true);
         if (currentDepartmentId === null || !url) return;
         api.getExcel(url);
     }
 
     private getAgentStatUrl(departmentId: number, excel?: boolean) {
-        const { userStore: { role, previewUser }} = this.rootStore;
+        const {userStore: {role, previewUser}} = this.rootStore;
 
         let group_by: string = 'year';
         if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
@@ -529,20 +527,21 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const urlParams = stringify(params);
 
         const userId = previewUser
-        ? previewUser.id
-        : -1;
+            ? previewUser.id
+            : -1;
 
         switch (role) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
                 return `/api/branch/${departmentId}/ffm/sales/rm?${urlParams}`;
             case USER_ROLE.REGIONAL_MANAGER:
                 return `/api/branch/${departmentId}/rm/${userId}/sales/mp?${urlParams}`;
-            default: return null;
+            default:
+                return null;
         }
     }
 
     private getLocationStatUrl(departmentId: number, excel?: boolean): string {
-        const { userStore: { role, previewUser }} = this.rootStore;
+        const {userStore: {role, previewUser}} = this.rootStore;
 
         let group_by: string = 'year';
         if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
@@ -559,8 +558,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const urlParams = stringify(params);
 
         const userId = previewUser
-        ? previewUser.id
-        : -1;
+            ? previewUser.id
+            : -1;
 
         switch (role) {
             case USER_ROLE.FIELD_FORCE_MANAGER:
@@ -569,16 +568,17 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 return `/api/branch/${departmentId}/rm/${userId}/sales/city?${urlParams}`;
             case USER_ROLE.MEDICAL_AGENT:
                 return `/api/branch/${departmentId}/mp/${userId}/sales/pharmacy?${urlParams}`;
-            default: return null;
+            default:
+                return null;
         }
     }
 
     private getMedsStatUrl(departmentId: number, excel?: boolean): string {
-        const { userStore: { user, previewUser } } = this.rootStore;
+        const {userStore: {user, previewUser}} = this.rootStore;
 
         const userId = previewUser
-        ? previewUser.id
-        : -1;
+            ? previewUser.id
+            : -1;
 
         let group_by: string = 'year';
         if (differenceInCalendarDays(this.dateTo, this.dateFrom) <= 30) group_by = 'day';
@@ -595,8 +595,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
         const paramsStringified = stringify(params);
 
         const targetRole = previewUser
-        ? previewUser.position
-        : user.position;
+            ? previewUser.position
+            : user.position;
 
         switch (targetRole) {
             case USER_ROLE.ADMIN:
@@ -607,7 +607,8 @@ export default class SalesStore extends AsyncStore implements ISalesStore {
                 return `/api/branch/${departmentId}/rm/${userId}/sales?${paramsStringified}`;
             case USER_ROLE.MEDICAL_AGENT:
                 return `/api/branch/${departmentId}/mp/${userId}/sales?${paramsStringified}`;
-            default: return null;
+            default:
+                return null;
         }
     }
 }

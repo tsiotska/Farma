@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
-import { createStyles, WithStyles, withStyles, Button, Grid } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
-import { IMedicine } from '../../../../interfaces/IMedicine';
+import React, {Component} from 'react';
+import {createStyles, WithStyles, withStyles, Button, Grid} from '@material-ui/core';
+import {observer, inject} from 'mobx-react';
+import {IMedicine} from '../../../../interfaces/IMedicine';
 import SalaryHeader from '../SalaryHeader';
-import { ISalaryInfo, IUserSales } from '../../../../interfaces/ISalaryInfo';
-import { IUser, IWithRestriction } from '../../../../interfaces';
+import {ISalaryInfo, IUserSales} from '../../../../interfaces/ISalaryInfo';
+import {IUser, IWithRestriction} from '../../../../interfaces';
 import SalaryRow from '../SalaryRow';
 import SumRow from '../SumRow';
-import { computed, toJS, reaction, observable } from 'mobx';
-import { ISalarySettings } from '../../../../interfaces/ISalarySettings';
+import {computed, toJS, reaction, observable} from 'mobx';
+import {ISalarySettings} from '../../../../interfaces/ISalarySettings';
 import TotalRow from '../TotalRow';
-import { IAsyncStatus } from '../../../../stores/AsyncStore';
+import {IAsyncStatus} from '../../../../stores/AsyncStore';
 import LoadingMask from '../../../../components/LoadingMask';
-import { withRestriction } from '../../../../components/hoc/withRestriction';
-import { PERMISSIONS } from '../../../../constants/Permissions';
-import { USER_ROLE } from '../../../../constants/Roles';
+import {withRestriction} from '../../../../components/hoc/withRestriction';
+import {PERMISSIONS} from '../../../../constants/Permissions';
+import {USER_ROLE} from '../../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     red: {
@@ -99,7 +99,7 @@ class UserContent extends Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
-        const { classes: { red, orangered, yellow, limeGreen, green } } = props;
+        const {classes: {red, orangered, yellow, limeGreen, green}} = props;
         this.colors = {
             3: [red, yellow, green],
             5: [red, orangered, yellow, limeGreen, green]
@@ -113,28 +113,28 @@ class UserContent extends Component<IProps> {
 
     @computed
     get userColors(): string[] {
-        const { levelsCount } = this.props;
+        const {levelsCount} = this.props;
         return this.colors[levelsCount] || [];
     }
 
     @computed
     get levels(): number[] {
-        const { levelsCount } = this.props;
+        const {levelsCount} = this.props;
         return [...new Array(levelsCount)].map((x, i) => i + 1);
     }
 
     get deletedMedsIds(): number[] {
-        const { currentDepartmentMeds } = this.props;
-        return currentDepartmentMeds.filter(({ deleted }) => deleted === true).map(({ id }) => id);
+        const {currentDepartmentMeds} = this.props;
+        return currentDepartmentMeds.filter(({deleted}) => deleted === true).map(({id}) => id);
     }
 
     @computed
     get plannedCosts(): number[] {
-        const { salary } = this.props;
+        const {salary} = this.props;
         return this.levels.map(level => {
             const infoItem = salary.get(level);
             const plannedCost = infoItem
-                ? [...Object.values(infoItem.meds)].reduce((total, { amount, price }) => (total + (amount || 0) * (price || 0)), 0)
+                ? [...Object.values(infoItem.meds)].reduce((total, {amount, price}) => (total + (amount || 0) * (price || 0)), 0)
                 : 0;
             return Math.floor(plannedCost);
         });
@@ -142,16 +142,16 @@ class UserContent extends Component<IProps> {
 
     @computed
     get userMoneyDeficit(): number {
-        const { userSales } = this.props;
+        const {userSales} = this.props;
         if (!userSales) return 0;
         const value = Object.values(userSales)
-            .reduce((total, { money }) => total + (money || 0), 0);
+            .reduce((total, {money}) => total + (money || 0), 0);
         return Math.floor(value);
     }
 
     @computed
     get extraCosts(): number[] {
-        const { salary } = this.props;
+        const {salary} = this.props;
         return this.levels.map(level => {
             const infoItem = salary.get(level);
             const extraCosts = infoItem
@@ -163,7 +163,7 @@ class UserContent extends Component<IProps> {
 
     @computed
     get KPIs(): number[] {
-        const { salary } = this.props;
+        const {salary} = this.props;
         return this.levels.map(level => {
             const infoItem = salary.get(level);
             const res = infoItem
@@ -175,7 +175,7 @@ class UserContent extends Component<IProps> {
 
     @computed
     get ratingSalary(): number[] {
-        const { salary } = this.props;
+        const {salary} = this.props;
         return this.levels.map(level => {
             const infoItem = salary.get(level);
             const res = infoItem
@@ -187,7 +187,7 @@ class UserContent extends Component<IProps> {
 
     @computed
     get bonuses(): number[] {
-        const { salarySettings, salary, userSales, previewUser: { position } } = this.props;
+        const {salarySettings, salary, userSales, previewUser: {position}} = this.props;
         let levelType: string;
 
         switch (position) {
@@ -217,7 +217,7 @@ class UserContent extends Component<IProps> {
                 ? salaryInfo.meds
                 : {};
 
-            const bonusValues = Object.entries(meds).map(([medId, { amount, bonus }]) => {
+            const bonusValues = Object.entries(meds).map(([medId, {amount, bonus}]) => {
                 const soldAmount = userSales[medId]
                     ? (userSales[medId].amount || 0)
                     : 0;
@@ -234,8 +234,8 @@ class UserContent extends Component<IProps> {
         });
     }
 
-    changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, { target: { value } }: any) => {
-        const { changeUserSalary } = this.props;
+    changeHandler = (propName: keyof Omit<ISalaryInfo, 'meds'>) => (level: number, {target: {value}}: any) => {
+        const {changeUserSalary} = this.props;
         const casted = +value;
         const isValid = value.length
             ? !Number.isNaN(casted)
@@ -273,16 +273,16 @@ class UserContent extends Component<IProps> {
     render() {
         const {
             classes,
-            currentDepartmentMeds,
             salary,
             userSales,
             onSubmit,
-            isAllowed
+            isAllowed,
+            currentDepartmentMeds
         } = this.props;
         return (
             <>
                 {
-                    currentDepartmentMeds.filter(({ deleted }) => deleted === false).map(medicine => (
+                    currentDepartmentMeds.filter(({deleted}) => deleted === false).map(medicine => (
                         <SalaryRow
                             key={medicine.id}
                             userSales={userSales}
