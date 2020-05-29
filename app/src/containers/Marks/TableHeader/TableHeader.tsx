@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     createStyles,
     WithStyles,
@@ -10,15 +10,15 @@ import {
     Typography,
     Grid
 } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { computed, toJS } from 'mobx';
-import { IMedicine } from '../../../interfaces/IMedicine';
+import {observer, inject} from 'mobx-react';
+import {withStyles} from '@material-ui/styles';
+import {computed, toJS} from 'mobx';
+import {IMedicine} from '../../../interfaces/IMedicine';
 import cx from 'classnames';
-import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
-import { IUserInfo } from '../Table/Table';
-import { IUserLikeObject } from '../../../stores/DepartmentsStore';
-import { USER_ROLE } from '../../../constants/Roles';
+import {IDrugSale, IBonusInfo, IMark} from '../../../interfaces/IBonusInfo';
+import {IUserInfo} from '../Table/Table';
+import {IUserLikeObject} from '../../../stores/DepartmentsStore';
+import {USER_ROLE} from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -85,18 +85,18 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            currentDepartmentMeds: meds
-        },
-        userStore: {
-            totalSold,
-            role,
-            changedMedsMarks,
-            setDivisionValidity
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     currentDepartmentMeds: meds
+                 },
+                 userStore: {
+                     totalSold,
+                     role,
+                     changedMedsMarks,
+                     setDivisionValidity
+                 }
+             }
+         }) => ({
     meds,
     role,
     totalSold,
@@ -105,10 +105,10 @@ interface IProps extends WithStyles<typeof styles> {
 }))
 @observer
 class TableHeader extends Component<IProps> {
-    isValid: boolean;
+    isValid: boolean = false;
 
     get nestLevel(): number {
-        const { role, parentUser, isNested } = this.props;
+        const {role, parentUser, isNested} = this.props;
         const userRole = typeof parentUser.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : parentUser.position;
@@ -121,79 +121,85 @@ class TableHeader extends Component<IProps> {
     }
 
     get sales(): Map<number, IDrugSale> {
-        const { previewBonus } = this.props;
+        const {previewBonus} = this.props;
         return previewBonus
             ? previewBonus.sales
             : new Map();
     }
 
     componentDidUpdate() {
-        const { setDivisionValidity, parentUser: { position } } = this.props;
+        const {setDivisionValidity, parentUser: {position}} = this.props;
         if (position === USER_ROLE.MEDICAL_AGENT) {
             setDivisionValidity(this.isValid);
         }
     }
 
-    getMedsList() {
+    @computed
+    get getMedsList() {
         const {
             classes,
             meds,
             totalSold,
             previewBonus,
             hideName,
-            changedMedsMarks
+            changedMedsMarks,
+            parentUser: {position}
         } = this.props;
 
-        this.isValid = true;
-        return meds.length
-        ? meds.map(x => {
-            const saleInfo = this.sales.get(x.id);
-            const leftValue = (totalSold[x.id] || 0) + (
-                (x.id in changedMedsMarks)
-                    ? changedMedsMarks[x.id]
-                    : 0
-            );
-            const rightValue = saleInfo
-                ? saleInfo.amount
-                : 0;
-            if (leftValue > rightValue) {
-                this.isValid = false;
-            }
-            return (
-                <TableCell
-                    key={x.id}
-                    padding='none'
-                    className={cx(classes.cell, { invalid: leftValue > rightValue })}>
-                    <Grid
-                        direction='column'
-                        container>
-                            {
-                                !hideName &&
-                                <Typography className={classes.medItem}>
-                                    { x.name }
-                                </Typography>
-                            }
-                            {
-                                !!previewBonus &&
-                                <Typography variant='subtitle1' className={classes.salesStat}>
+        if (position === USER_ROLE.MEDICAL_AGENT) {
+            this.isValid = true;
+
+            return meds.length
+                ? meds.map(x => {
+                    const saleInfo = this.sales.get(x.id);
+                    const leftValue = (totalSold[x.id] || 0) + (
+                        (x.id in changedMedsMarks)
+                            ? changedMedsMarks[x.id]
+                            : 0
+                    );
+                    const rightValue = saleInfo
+                        ? saleInfo.amount
+                        : 0;
+
+                    if (leftValue !== rightValue) {
+                        this.isValid = false;
+                    }
+                    return (
+                        <TableCell
+                            key={x.id}
+                            padding='none'
+                            className={cx(classes.cell, {invalid: leftValue > rightValue})}>
+                            <Grid
+                                direction='column'
+                                container>
+                                {
+                                    !hideName &&
+                                    <Typography className={classes.medItem}>
+                                        {x.name}
+                                    </Typography>
+                                }
+                                {
+                                    !!previewBonus &&
+                                    <Typography variant='subtitle1' className={classes.salesStat}>
                                     <span className={classes.span}>
-                                        { leftValue }
+                                        {leftValue}
                                     </span>
-                                    <span>/</span>
-                                    <span className={classes.span}>
-                                        { rightValue }
+                                        <span>/</span>
+                                        <span className={classes.span}>
+                                        {rightValue}
                                     </span>
-                                </Typography>
-                            }
-                    </Grid>
-                </TableCell>
-            );
-        })
-        : <TableCell />;
+                                    </Typography>
+                                }
+                            </Grid>
+                        </TableCell>
+                    );
+                })
+                : <TableCell/>;
+        }
     }
 
     render() {
-        const { classes, showLpu } = this.props;
+        const {classes, showLpu} = this.props;
 
         return (
             <TableContainer className={classes.container}>
@@ -204,38 +210,38 @@ class TableHeader extends Component<IProps> {
                                 showLpu &&
                                 <TableCell
                                     padding='none'
-                                    style={{ width: this.columnWidth }}
+                                    style={{width: this.columnWidth}}
                                     className={cx(classes.cell, classes.wideColumn)}>
                                     ЛПУ
                                 </TableCell>
                             }
                             <TableCell
                                 padding='none'
-                                style={{ width: this.columnWidth * (!!showLpu ? 1 : 2)}}
+                                style={{width: this.columnWidth * (!!showLpu ? 1 : 2)}}
                                 className={cx(classes.cell, {
                                     [classes.doubleWidthColumn]: !showLpu,
                                     [classes.wideColumn]: showLpu,
                                 })}>
                                 ПІБ
                             </TableCell>
-                            { this.getMedsList() }
+                            {this.getMedsList}
                             <TableCell
                                 padding='none'
                                 align='center'
                                 className={cx(classes.cell, classes.column)}>
-                                    уп
+                                уп
                             </TableCell>
                             <TableCell
                                 align='center'
                                 padding='none'
                                 className={cx(classes.cell, classes.column)}>
-                                    бонуси
+                                бонуси
                             </TableCell>
                             <TableCell
                                 align='right'
                                 padding='none'
                                 className={cx(classes.cell, classes.column)}>
-                                    всього
+                                всього
                             </TableCell>
                         </TableRow>
                     </TableHead>

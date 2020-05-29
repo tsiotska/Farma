@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     createStyles,
     WithStyles,
@@ -12,20 +12,20 @@ import {
     IconButton
 } from '@material-ui/core';
 import PersonRemove from '-!react-svg-loader!../../../../assets/icons/personRemoveFill.svg';
-import { KeyboardArrowDown, Close } from '@material-ui/icons';
-import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { computed, toJS, observable } from 'mobx';
+import {KeyboardArrowDown, Close} from '@material-ui/icons';
+import {observer, inject} from 'mobx-react';
+import {withStyles} from '@material-ui/styles';
+import {computed, toJS, observable} from 'mobx';
 import cx from 'classnames';
-import { IAgentInfo, IDrugSale, IMark, IBonusInfo } from '../../../interfaces/IBonusInfo';
-import { IMedicine } from '../../../interfaces/IMedicine';
+import {IAgentInfo, IDrugSale, IMark, IBonusInfo} from '../../../interfaces/IBonusInfo';
+import {IMedicine} from '../../../interfaces/IMedicine';
 import HoverableCell from '../HoverableCell';
-import Table, { IUserInfo } from '../Table/Table';
-import { IUserLikeObject } from '../../../stores/DepartmentsStore';
-import { USER_ROLE } from '../../../constants/Roles';
+import Table, {IUserInfo} from '../Table/Table';
+import {IUserLikeObject} from '../../../stores/DepartmentsStore';
+import {USER_ROLE} from '../../../constants/Roles';
 import InfoWindow from '../../../components/InfoWindow';
 import AgentInfoWindowForm from '../../../components/AgentInfoWindowForm';
-import { IDeletePopoverSettings } from '../../../stores/UIStore';
+import {IDeletePopoverSettings} from '../../../stores/UIStore';
 import {IUser} from '../../../interfaces';
 
 const styles = (theme: any) => createStyles({
@@ -196,7 +196,7 @@ class TableRow extends Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
-        const { classes } = this.props;
+        const {classes} = this.props;
         this.cellClasses = {
             cell: classes.cell,
             tooltip: classes.tooltip,
@@ -207,7 +207,7 @@ class TableRow extends Component<IProps> {
 
     @computed
     get agentMarks(): Map<number, IMark> {
-        const { agentInfo } = this.props;
+        const {agentInfo} = this.props;
         return agentInfo
             ? agentInfo.marks
             : new Map();
@@ -215,16 +215,16 @@ class TableRow extends Component<IProps> {
 
     @computed
     get userChangedMarks(): Map<number, IMark> {
-        const { changedMarks, agent: { id } } = this.props;
+        const {changedMarks, agent: {id}} = this.props;
         return changedMarks.get(id) || new Map();
     }
 
     @computed
     get packs(): [number, number] {
-        const { meds } = this.props;
+        const {meds} = this.props;
 
         return meds.length
-            ? meds.reduce((total, { id }) => {
+            ? meds.reduce((total, {id}) => {
                 const mark = this.userChangedMarks.get(id) || this.agentMarks.get(id);
 
                 if (mark) {
@@ -239,10 +239,10 @@ class TableRow extends Component<IProps> {
 
     @computed
     get total(): [number, number] {
-        const { meds } = this.props;
+        const {meds} = this.props;
 
         return meds.length
-            ? meds.reduce((total, { id }) => {
+            ? meds.reduce((total, {id}) => {
                 const mark = this.userChangedMarks.get(id) || this.agentMarks.get(id);
 
                 if (mark) {
@@ -257,21 +257,21 @@ class TableRow extends Component<IProps> {
 
     @computed
     get columnsCount(): number {
-        const { meds, showLpu } = this.props;
+        const {meds, showLpu} = this.props;
         return 4 + meds.length + (showLpu ? 1 : 0);
     }
 
     @computed
     get childBonus(): IBonusInfo {
-        const { bonuses, agent, previewBonusMonth } = this.props;
+        const {bonuses, agent, previewBonusMonth} = this.props;
         return bonuses[agent.position]
-            ? bonuses[agent.position].find(({ month }) => month === previewBonusMonth)
+            ? bonuses[agent.position].find(({month}) => month === previewBonusMonth)
             : null;
     }
 
     @computed
     get nestLevel(): number {
-        const { role, agent } = this.props;
+        const {role, agent} = this.props;
         const userRole = typeof agent.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : agent.position;
@@ -284,24 +284,24 @@ class TableRow extends Component<IProps> {
     }
 
     get isEditable(): boolean {
-        const { agent: { position }, allowEdit } = this.props;
+        const {agent: {position}, allowEdit} = this.props;
         const isEditable = typeof position === 'string' && allowEdit === true;
         return isEditable;
     }
 
     get isExpandable(): boolean {
-        const { expandHandler, expanded } = this.props;
+        const {expandHandler, expanded} = this.props;
         return !!expandHandler && typeof expanded === 'boolean';
     }
 
     get showCloseIcon(): boolean {
-        const { agentInfo, agent: { position } } = this.props;
+        const {agentInfo, agent: {position}} = this.props;
         return !agentInfo && typeof position !== 'string' && position !== USER_ROLE.REGIONAL_MANAGER
             || agentInfo && agentInfo.isDone === false;
     }
 
     expandHandler = () => {
-        const { expandHandler, expanded, agent } = this.props;
+        const {expandHandler, expanded, agent} = this.props;
         if (this.isExpandable) expandHandler(agent, !expanded);
     }
 
@@ -311,7 +311,7 @@ class TableRow extends Component<IProps> {
         medId: number,
         value: number
     ) => {
-        const { previewBonusChangeHandler } = this.props;
+        const {previewBonusChangeHandler} = this.props;
         previewBonusChangeHandler(
             propName,
             agentInfo,
@@ -327,14 +327,14 @@ class TableRow extends Component<IProps> {
         }
     }
 
-    deleteClickHandler = ({ currentTarget }: any) => this.props.openDelPopper({
+    deleteClickHandler = ({currentTarget}: any) => this.props.openDelPopper({
         anchorEl: currentTarget,
         callback: this.deleteConfirmHandler,
         name: 'deleteBonusAgent'
     })
 
     removeBonusAgent = () => {
-        const { removeBonusAgent, agentInfo: { id } } = this.props;
+        const {removeBonusAgent, agentInfo: {id}} = this.props;
         removeBonusAgent(id);
     }
 
@@ -372,7 +372,7 @@ class TableRow extends Component<IProps> {
             : 0;
 
         const medsContent = meds.length
-            ? meds.map(({ id }) => {
+            ? meds.map(({id}) => {
                 const tooltip = tooltips[id];
                 return (
                     <HoverableCell
@@ -400,7 +400,7 @@ class TableRow extends Component<IProps> {
                         showLpu &&
                         <TableCell
                             padding='none'
-                            style={{ width: this.columnWidth }}
+                            style={{width: this.columnWidth}}
                             className={classes.cell}>
                             <Typography variant='body2'>
                                 {LPUName}
@@ -417,7 +417,7 @@ class TableRow extends Component<IProps> {
                             maxWidth: this.columnWidth * (!!showLpu ? 1 : 2),
                             width: this.columnWidth * (!!showLpu ? 1 : 2)
                         }}
-                        className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
+                        className={cx(classes.cell, {[classes.clickable]: this.isExpandable})}>
                         <Grid
                             container
                             wrap='nowrap'
@@ -426,7 +426,7 @@ class TableRow extends Component<IProps> {
                             {
                                 this.isExpandable === true && showLpu === false &&
                                 <KeyboardArrowDown
-                                    className={cx(classes.expandIcon, { rotate: expanded === true })}
+                                    className={cx(classes.expandIcon, {rotate: expanded === true})}
                                     fontSize='small'/>
                             }
                             <Typography variant='body2'>
@@ -444,11 +444,11 @@ class TableRow extends Component<IProps> {
                                                 card={card}
                                             />
                                         </InfoWindow>
-                                        { this.props.user.position !== USER_ROLE.MEDICAL_AGENT &&
-                                            <IconButton className={classes.removeIcon}
-                                                        onClick={this.deleteClickHandler}>
-                                                <PersonRemove width={20} height={20}/>
-                                            </IconButton>
+                                        {this.props.user.position !== USER_ROLE.MEDICAL_AGENT &&
+                                        <IconButton className={classes.removeIcon}
+                                                    onClick={this.deleteClickHandler}>
+                                            <PersonRemove width={20} height={20}/>
+                                        </IconButton>
                                         }
                                     </>
                                 }
@@ -515,7 +515,7 @@ class TableRow extends Component<IProps> {
                     this.isExpandable &&
                     <MuiTableRow>
                         <TableCell
-                            className={cx(classes.nestedContainer, { nest: !!this.nestLevel })}
+                            className={cx(classes.nestedContainer, {nest: !!this.nestLevel})}
                             colSpan={this.columnsCount}>
                             <Collapse in={expanded} timeout='auto' unmountOnExit>
                                 <Table
