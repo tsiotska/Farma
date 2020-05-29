@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     createStyles,
     WithStyles,
@@ -8,18 +8,18 @@ import {
     IconButton,
     LinearProgress
 } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
-import { withStyles } from '@material-ui/styles';
-import { USER_ROLE } from '../../../constants/Roles';
-import { Close } from '@material-ui/icons';
-import { IBonusInfo, IMark, IAgentInfo } from '../../../interfaces/IBonusInfo';
-import { ADD_DOC_MODAL } from '../../../constants/Modals';
+import {observer, inject} from 'mobx-react';
+import {withStyles} from '@material-ui/styles';
+import {USER_ROLE} from '../../../constants/Roles';
+import {Close} from '@material-ui/icons';
+import {IBonusInfo, IMark, IAgentInfo} from '../../../interfaces/IBonusInfo';
+import {ADD_DOC_MODAL} from '../../../constants/Modals';
 import cx from 'classnames';
-import { IMarkFraction } from '../../../stores/UserStore';
-import { ISalarySettings } from '../../../interfaces/ISalarySettings';
-import { IUserLikeObject } from '../../../stores/DepartmentsStore';
-import { IUserInfo } from '../Table/Table';
-import { toJS, observable } from 'mobx';
+import {IMarkFraction} from '../../../stores/UserStore';
+import {ISalarySettings} from '../../../interfaces/ISalarySettings';
+import {IUserLikeObject} from '../../../stores/DepartmentsStore';
+import {IUserInfo} from '../Table/Table';
+import {toJS, observable} from 'mobx';
 import TableHeader from '../TableHeader';
 
 const styles = (theme: any) => createStyles({
@@ -79,7 +79,7 @@ interface IProps extends WithStyles<typeof styles> {
     agents: IUserInfo[];
     summedTotal: IMarkFraction;
 
-    changedMarks?: Map<number,  Map<number, IMark>>;
+    changedMarks?: Map<number, Map<number, IMark>>;
     salarySettings?: ISalarySettings;
     clearChangedMarks?: () => void;
     openModal?: (modalName: string) => void;
@@ -88,19 +88,19 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            changedMarks,
-            clearChangedMarks,
-            updateBonus,
-            salarySettings,
-            isMedsDivisionValid
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     changedMarks,
+                     clearChangedMarks,
+                     updateBonus,
+                     salarySettings,
+                     isMedsDivisionValid
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     changedMarks,
     clearChangedMarks,
     openModal,
@@ -111,12 +111,12 @@ interface IProps extends WithStyles<typeof styles> {
 @observer
 class TableSubheader extends Component<IProps> {
     get userIsMedicalAgent(): boolean {
-        const { parentUser: { position } } = this.props;
+        const {parentUser: {position}} = this.props;
         return position === USER_ROLE.MEDICAL_AGENT;
     }
 
     get isEmpty(): boolean {
-        const { agentsLoaded, agents } = this.props;
+        const {agentsLoaded, agents} = this.props;
         // return agentsLoaded === true && !agents.length;
         return agents && !agents.length;
     }
@@ -124,25 +124,24 @@ class TableSubheader extends Component<IProps> {
     get isValid(): boolean {
         const {
             isMedsDivisionValid,
-            summedTotal: { payments, deposit },
+            summedTotal: {payments, deposit},
             salarySettings
         } = this.props;
-        const current = (deposit * 100) / (payments + deposit);
+       /* const current = (deposit * 100) / (payments + deposit);
         const initValue = salarySettings
             ? salarySettings.payments
             : 0;
         const settingsPayments = (1 - initValue) * 100;
         const isTotalDivisionValid = settingsPayments >= 0 && settingsPayments <= 100
             ? current >= settingsPayments
-            : false;
-
-        return isMedsDivisionValid && isTotalDivisionValid;
+            : false; */
+        return isMedsDivisionValid;
     }
 
     openAddDocModal = () => this.props.openModal(ADD_DOC_MODAL);
 
     updateBonus = () => {
-        const { updateBonus, previewBonus } = this.props;
+        const {updateBonus, previewBonus} = this.props;
         updateBonus(previewBonus, true);
     }
 
@@ -157,64 +156,64 @@ class TableSubheader extends Component<IProps> {
             changedMarks,
             agents,
         } = this.props;
-        const { position } = parentUser;
+        const {position} = parentUser;
 
         if (!isNested) return null;
 
         return (
             <>
-            <Grid container className={classes.container} alignItems='center'>
-                <Typography>
-                    { position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники' }
-                    { position === USER_ROLE.MEDICAL_AGENT && 'Лікарі' }
-                </Typography>
-                {
-                    agentsLoaded && this.userIsMedicalAgent && <>
-                        <Button
-                            disabled={!previewBonus}
-                            className={classes.addDocButton}
-                            onClick={this.openAddDocModal}>
-                            Додати лікаря
-                        </Button>
-                        {
-                            this.isEmpty === false && <>
-                                <Button
-                                    className={cx(classes.saveButton, { invalid: !this.isValid })}
-                                    disabled={!changedMarks.size || !this.isValid}
-                                    onClick={this.updateBonus}>
-                                        Зберегти зміни
-                                </Button>
-                                <IconButton
-                                    disabled={!changedMarks.size}
-                                    onClick={clearChangedMarks}
-                                    className={classes.cancelChanges}>
-                                    <Close fontSize='small' />
-                                </IconButton>
-                            </>
-                        }
-                    </>
-                }
-                {
-                    agentsLoaded === false &&
-                    <LinearProgress className={classes.progress} />
-                }
-                {
-                    agentsLoaded && this.isEmpty &&
-                    <Typography variant='body2' className={classes.emptyText}>
-                        Список { this.userIsMedicalAgent ? 'лікарів' : 'працівників' } пустий
+                <Grid container className={classes.container} alignItems='center'>
+                    <Typography>
+                        {position === USER_ROLE.REGIONAL_MANAGER && 'Медицинські представники'}
+                        {position === USER_ROLE.MEDICAL_AGENT && 'Лікарі'}
                     </Typography>
+                    {
+                        agentsLoaded && this.userIsMedicalAgent && <>
+                            <Button
+                                disabled={!previewBonus}
+                                className={classes.addDocButton}
+                                onClick={this.openAddDocModal}>
+                                Додати лікаря
+                            </Button>
+                            {
+                                this.isEmpty === false && <>
+                                    <Button
+                                        className={cx(classes.saveButton, {invalid: !this.isValid})}
+                                        disabled={!changedMarks.size || !this.isValid}
+                                        onClick={this.updateBonus}>
+                                        Зберегти зміни
+                                    </Button>
+                                    <IconButton
+                                        disabled={!changedMarks.size}
+                                        onClick={clearChangedMarks}
+                                        className={classes.cancelChanges}>
+                                        <Close fontSize='small'/>
+                                    </IconButton>
+                                </>
+                            }
+                        </>
+                    }
+                    {
+                        agentsLoaded === false &&
+                        <LinearProgress className={classes.progress}/>
+                    }
+                    {
+                        agentsLoaded && this.isEmpty &&
+                        <Typography variant='body2' className={classes.emptyText}>
+                            Список {this.userIsMedicalAgent ? 'лікарів' : 'працівників'} пустий
+                        </Typography>
+                    }
+                </Grid>
+                {
+                    agentsLoaded && this.isEmpty === false &&
+                    <TableHeader
+                        showLpu={this.userIsMedicalAgent}
+                        previewBonus={previewBonus}
+                        hideName
+                        isNested
+                        parentUser={parentUser}
+                    />
                 }
-            </Grid>
-            {
-                agentsLoaded && this.isEmpty === false &&
-                <TableHeader
-                    showLpu={this.userIsMedicalAgent}
-                    previewBonus={previewBonus}
-                    hideName
-                    isNested
-                    parentUser={parentUser}
-                />
-            }
             </>
         );
     }
