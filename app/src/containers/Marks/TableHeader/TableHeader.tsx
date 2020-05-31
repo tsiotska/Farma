@@ -146,56 +146,54 @@ class TableHeader extends Component<IProps> {
             parentUser: {position}
         } = this.props;
 
-        if (position === USER_ROLE.MEDICAL_AGENT) {
-            this.isValid = true;
+        this.isValid = true;
 
-            return meds.length
-                ? meds.map(x => {
-                    const saleInfo = this.sales.get(x.id);
-                    const leftValue = (totalSold[x.id] || 0) + (
-                        (x.id in changedMedsMarks)
-                            ? changedMedsMarks[x.id]
-                            : 0
-                    );
-                    const rightValue = saleInfo
-                        ? saleInfo.amount
-                        : 0;
+        return meds.length
+            ? meds.map(x => {
+                const saleInfo = this.sales.get(x.id);
+                const leftValue = (totalSold[x.id] || 0) + (
+                    (x.id in changedMedsMarks)
+                        ? changedMedsMarks[x.id]
+                        : 0
+                );
+                const rightValue = saleInfo
+                    ? saleInfo.amount
+                    : 0;
 
-                    if (leftValue !== rightValue) {
-                        this.isValid = false;
-                    }
-                    return (
-                        <TableCell
-                            key={x.id}
-                            padding='none'
-                            className={cx(classes.cell, {invalid: leftValue > rightValue})}>
-                            <Grid
-                                direction='column'
-                                container>
-                                {
-                                    !hideName &&
-                                    <Typography className={classes.medItem}>
-                                        {x.name}
-                                    </Typography>
-                                }
-                                {
-                                    !!previewBonus &&
-                                    <Typography variant='subtitle1' className={classes.salesStat}>
+                if (leftValue !== rightValue) {
+                    this.isValid = false;
+                }
+                return (
+                    <TableCell
+                        key={x.id}
+                        padding='none'
+                        className={cx(classes.cell, {invalid: leftValue > rightValue})}>
+                        <Grid
+                            direction='column'
+                            container>
+                            {
+                                !hideName &&
+                                <Typography className={classes.medItem}>
+                                    {x.name}
+                                </Typography>
+                            }
+                            {
+                                !!previewBonus &&
+                                <Typography variant='subtitle1' className={classes.salesStat}>
                                     <span className={classes.span}>
                                         {leftValue}
                                     </span>
-                                        <span>/</span>
-                                        <span className={classes.span}>
+                                    <span>/</span>
+                                    <span className={classes.span}>
                                         {rightValue}
                                     </span>
-                                    </Typography>
-                                }
-                            </Grid>
-                        </TableCell>
-                    );
-                })
-                : <TableCell/>;
-        }
+                                </Typography>
+                            }
+                        </Grid>
+                    </TableCell>
+                );
+            })
+            : <TableCell/>;
     }
 
     render() {
