@@ -190,7 +190,7 @@ interface IProps extends WithStyles<typeof styles> {
     user
 }))
 @observer
-class TableRow extends Component<IProps> {
+class Row extends Component<IProps> {
     readonly paddingLeft: number = 10;
     readonly cellClasses: any = {};
 
@@ -445,6 +445,7 @@ class TableRow extends Component<IProps> {
                                             />
                                         </InfoWindow>
                                         {this.props.user.position !== USER_ROLE.MEDICAL_AGENT &&
+                                        this.props.user.position !== USER_ROLE.REGIONAL_MANAGER &&
                                         <IconButton className={classes.removeIcon}
                                                     onClick={this.deleteClickHandler}>
                                             <PersonRemove width={20} height={20}/>
@@ -533,4 +534,4 @@ class TableRow extends Component<IProps> {
     }
 }
 
-export default withStyles(styles)(TableRow);
+export default withStyles(styles)(Row);

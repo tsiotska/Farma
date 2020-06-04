@@ -122,19 +122,7 @@ class TableSubheader extends Component<IProps> {
     }
 
     get isValid(): boolean {
-        const {
-            isMedsDivisionValid,
-            summedTotal: {payments, deposit},
-            salarySettings
-        } = this.props;
-       /* const current = (deposit * 100) / (payments + deposit);
-        const initValue = salarySettings
-            ? salarySettings.payments
-            : 0;
-        const settingsPayments = (1 - initValue) * 100;
-        const isTotalDivisionValid = settingsPayments >= 0 && settingsPayments <= 100
-            ? current >= settingsPayments
-            : false; */
+        const { isMedsDivisionValid } = this.props;
         return isMedsDivisionValid;
     }
 

@@ -5,13 +5,13 @@ import {
     TableContainer,
     TableBody,
     Table as MuiTable,
-    Paper,
+    Paper, TableCell, Grid, Typography, TableHead, TableRow
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { IAgentInfo, IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
 import { computed, observable, toJS, when, reaction } from 'mobx';
-import TableRow from '../TableRow';
+import Row from '../Row';
 import { IUser } from '../../../interfaces';
 import { IDoctor } from '../../../interfaces/IDoctor';
 import { USER_ROLE } from '../../../constants/Roles';
@@ -21,15 +21,56 @@ import AddDocsModal from '../AddDocsModal';
 import { ADD_DOC_MODAL } from '../../../constants/Modals';
 import TableSubheader from '../TableSubheader';
 import { IMarkFraction } from '../../../stores/UserStore';
+import { IMedicine } from '../../../interfaces/IMedicine';
+import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
-    fixedTable: {
-        position: 'fixed',
-        tableLayout: 'fixed',
-        padding: '0 20px',
-        bottom: 0,
-    }
-});
+        container: {
+            overflow: 'visible'
+        },
+        fixedTable: {
+            position: 'fixed',
+            overflow: 'visible',
+            tableLayout: 'fixed',
+            padding: '0 20px',
+            bottom: 10,
+        },
+        table: {
+            tableLayout: 'fixed'
+        },
+        medItem: {
+            transform: 'rotate(-45deg)',
+            whiteSpace: 'nowrap',
+            margin: '0 auto -10px 25%',
+            fontSize: theme.typography.pxToRem(15),
+            color: '#aaa',
+            transformOrigin: 'left -50%',
+        },
+        column: {
+            width: 70,
+            '&:last-of-type': {
+                width: 85
+            }
+        },
+        cell: {
+            verticalAlign: 'bottom',
+            border: 'none',
+            paddingBottom: '5px !important',
+            '&:first-child': {
+                width: 324
+            },
+            '&:last-of-type':
+                {
+                    paddingRight: 8
+                }
+            ,
+            '&.invalid':
+                {
+                    color: '#EE6969'
+                }
+        },
+    })
+;
 
 interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
@@ -54,7 +95,7 @@ interface IProps extends WithStyles<typeof styles> {
     openModal?: (modalName: string) => void;
     setPreviewBonusTotal?: (packs: IMarkFraction, marks: IMarkFraction) => void;
     clearPreviewBonusTotal?: () => void;
-
+    meds?: IMedicine[];
     removeBonusAgent?: (id: number, parentId: number) => boolean;
 }
 
@@ -69,7 +110,8 @@ export interface IUserInfo {
                  departmentsStore: {
                      loadConfirmedDoctors,
                      getLocationsAgents,
-                     currentDepartmentId
+                     currentDepartmentId,
+                     currentDepartmentMeds: meds
                  },
                  userStore: {
                      role,
@@ -107,7 +149,8 @@ export interface IUserInfo {
     openModal,
     setPreviewBonusTotal,
     clearPreviewBonusTotal,
-    removeBonusAgent
+    removeBonusAgent,
+    meds
 }))
 @observer
 class Table extends Component<IProps> {
@@ -353,14 +396,32 @@ class Table extends Component<IProps> {
         }
     }
 
+    @computed
+    get getMedsNames() {
+        const { meds, classes } = this.props;
+
+        return meds.length
+            ? meds.map(x => {
+                    return <TableCell key={x.id} className={classes.cell}>
+                        <Grid direction='column' container>
+                            <Typography className={classes.medItem}>
+                                {x.name}
+                            </Typography>
+                        </Grid>
+                    </TableCell>;
+                }
+            )
+            : <TableCell/>;
+    }
+
     render() {
         const {
             classes,
             isNested,
             role,
             previewBonus,
-            parentUser,
-            bonusUsers
+            bonusUsers,
+            parentUser
         } = this.props;
         const { position } = parentUser;
         const lastIndex = this.agentsInfo.length - 1;
@@ -386,7 +447,7 @@ class Table extends Component<IProps> {
                                             : false
                                         : true;
                                     return (
-                                        <TableRow
+                                        <Row
                                             key={x.id}
                                             agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
                                             isNested={isNested}
@@ -416,13 +477,36 @@ class Table extends Component<IProps> {
                         </TableBody>
                     </MuiTable>
                 </TableContainer>
+                {/*(this.showTotalRow && this.totalRowPosition === 'fixed') &&*/}
                 {
-                    (this.showTotalRow && this.totalRowPosition === 'fixed') &&
-                    <TableContainer
-                        component={Paper}
-                        className={classes.fixedTable}
-                        style={this.fixedTableStyles}>
-                        <MuiTable padding='none'>
+                    <TableContainer style={this.fixedTableStyles} className={classes.container}>
+                        <MuiTable className={classes.fixedTable} padding='none' component={Paper}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell className={classes.cell}/>
+                                    {
+                                        this.getMedsNames
+                                    }
+                                    <TableCell
+                                        padding='none'
+                                        align='center'
+                                        className={cx(classes.cell, classes.column)}>
+                                        уп
+                                    </TableCell>
+                                    <TableCell
+                                        align='center'
+                                        padding='none'
+                                        className={cx(classes.cell, classes.column)}>
+                                        бонуси
+                                    </TableCell>
+                                    <TableCell
+                                        align='right'
+                                        padding='none'
+                                        className={cx(classes.cell, classes.column)}>
+                                        всього
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
                             <TableBody>
                                 <TotalRow
                                     position={this.totalRowPosition}
