@@ -25,26 +25,25 @@ import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
+        doubleWidthColumn: {
+            width: 284
+        },
         container: {
             overflow: 'visible'
         },
         fixedTable: {
             position: 'fixed',
             overflow: 'visible',
-            tableLayout: 'fixed',
             padding: '0 20px',
             bottom: 10,
-        },
-        table: {
-            tableLayout: 'fixed'
         },
         medItem: {
             transform: 'rotate(-45deg)',
             whiteSpace: 'nowrap',
+            transformOrigin: 'left -50%',
             margin: '0 auto -10px 25%',
             fontSize: theme.typography.pxToRem(15),
-            color: '#aaa',
-            transformOrigin: 'left -50%',
+            color: '#aaa'
         },
         column: {
             width: 70,
@@ -57,7 +56,7 @@ const styles = (theme: any) => createStyles({
             border: 'none',
             paddingBottom: '5px !important',
             '&:first-child': {
-                width: 324
+                width: '284px'
             },
             '&:last-of-type':
                 {
@@ -68,6 +67,12 @@ const styles = (theme: any) => createStyles({
                 {
                     color: '#EE6969'
                 }
+        },
+        table: {
+            tableLayout: 'fixed'
+        },
+        tableRow: {
+            height: 100
         },
     })
 ;
@@ -402,7 +407,7 @@ class Table extends Component<IProps> {
 
         return meds.length
             ? meds.map(x => {
-                    return <TableCell key={x.id} className={classes.cell}>
+                    return <TableCell padding='none' key={x.id} className={classes.cell}>
                         <Grid direction='column' container>
                             <Typography className={classes.medItem}>
                                 {x.name}
@@ -477,13 +482,13 @@ class Table extends Component<IProps> {
                         </TableBody>
                     </MuiTable>
                 </TableContainer>
-                {/*(this.showTotalRow && this.totalRowPosition === 'fixed') &&*/}
                 {
-                    <TableContainer style={this.fixedTableStyles} className={classes.container}>
-                        <MuiTable className={classes.fixedTable} padding='none' component={Paper}>
+                    (this.showTotalRow && this.totalRowPosition === 'fixed') &&
+                    <TableContainer component={Paper} className={classes.fixedTable} style={this.fixedTableStyles}>
+                        <MuiTable className={classes.table} padding='none'>
                             <TableHead>
-                                <TableRow>
-                                    <TableCell className={classes.cell}/>
+                                <TableRow className={classes.tableRow}>
+                                    <TableCell padding='none' className={cx(classes.cell, classes.doubleWidthColumn)}/>
                                     {
                                         this.getMedsNames
                                     }
@@ -507,6 +512,8 @@ class Table extends Component<IProps> {
                                     </TableCell>
                                 </TableRow>
                             </TableHead>
+                        </MuiTable>
+                        <MuiTable className={classes.table} padding='none'>
                             <TableBody>
                                 <TotalRow
                                     position={this.totalRowPosition}
