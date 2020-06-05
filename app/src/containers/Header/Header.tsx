@@ -22,7 +22,7 @@ import Settings from '-!react-svg-loader!../../../assets/icons/settings.svg';
 import AddWorkerModal from './AddWorkerModal';
 import EditWorkerModal from './EditWorkerModal';
 import Search from './Search';
-import { IDeletePopoverSettings } from '../../stores/UIStore';
+import { IDeletePopoverSettings, ISnackbar } from '../../stores/UIStore';
 import DeletePopover from '../../components/DeletePopover';
 import EditDepartmentModal from './EditDeparmentModal';
 import { EDIT_DEPARTMENT_MODAL } from '../../constants/Modals';
@@ -30,6 +30,7 @@ import EditBranchButton from './EditBranchButton';
 import RemoveBranchButton from './RemoveBranchButton';
 import Snackbar from '../../components/Snackbar';
 import { SNACKBAR_TYPE } from '../../constants/Snackbars';
+import LoadingMask from '../../components/LoadingMask';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -65,6 +66,9 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     openModal?: (modalName: string, payload: any) => void;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     deleteDepartment?: () => boolean;
+    isSynchronizing?: boolean;
+    synchronizingSnackbar?: ISnackbar;
+    syncSnackbarCloseHandler?: () => void;
 }
 
 @inject(({
@@ -78,7 +82,10 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
                  },
                  uiStore: {
                      openDelPopper,
-                     openModal
+                     openModal,
+                     isSynchronizing,
+                     synchronizingSnackbar,
+                     syncSnackbarCloseHandler
                  }
              }
          }) => ({
@@ -86,7 +93,10 @@ interface IProps extends WithStyles<typeof styles>, RouteComponentProps<any> {
     openDelPopper,
     openModal,
     isAdmin,
-    deleteDepartment
+    deleteDepartment,
+    isSynchronizing,
+    synchronizingSnackbar,
+    syncSnackbarCloseHandler
 }))
 @observer
 export class Header extends Component<IProps, {}> {
@@ -160,7 +170,7 @@ export class Header extends Component<IProps, {}> {
     })
 
     render() {
-        const { classes } = this.props;
+        const { classes, isSynchronizing, synchronizingSnackbar: { message: syncMessage, type: syncStatus }, syncSnackbarCloseHandler } = this.props;
 
         return (
             <>
@@ -219,6 +229,12 @@ export class Header extends Component<IProps, {}> {
                     type={this.snackbarType}
                     message={this.snackbarMessage}
                 />
+                <Snackbar
+                    open={!!syncMessage}
+                    onClose={syncSnackbarCloseHandler}
+                    type={syncStatus}
+                    message={syncMessage}
+                />
                 <DeletePopover
                     name='deleteDepartment'
                     anchorOrigin={{
@@ -230,6 +246,7 @@ export class Header extends Component<IProps, {}> {
                         horizontal: 'right',
                     }}
                 />
+                {isSynchronizing && <LoadingMask/>}
             </>
         );
     }

@@ -82,15 +82,15 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            user
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     user
+                 }
+             }
+         }) => ({
     user
 }))
-@withRestriction([ PERMISSIONS.EDIT_AGENT ])
+@withRestriction([PERMISSIONS.EDIT_AGENT])
 @observer
 class FormContent extends Component<IProps> {
     readonly initialValue: IDepositFormValue = {

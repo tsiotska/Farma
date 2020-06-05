@@ -33,14 +33,14 @@ export interface ISalesPharmacyFilter {
     map?: number[];
 }
 
-export interface INotificationSnackbar {
+export interface ISnackbar {
     type: SNACKBAR_TYPE;
     message: string;
 }
 
 export class UIStore implements IUIStore {
     rootStore: IRootStore;
-    @observable notificationSnackbar: INotificationSnackbar = {
+    @observable notificationSnackbar: ISnackbar = {
         type: SNACKBAR_TYPE.SUCCESS,
         message: ''
     };
@@ -64,6 +64,11 @@ export class UIStore implements IUIStore {
         ignoredLpus: new Set(),
         map: []
     };
+    @observable isSynchronizing: boolean = false;
+    @observable synchronizingSnackbar: ISnackbar = {
+        type: SNACKBAR_TYPE.SUCCESS,
+        message: ''
+    };
 
     constructor(rootStore: IRootStore) {
         this.rootStore = rootStore;
@@ -71,7 +76,7 @@ export class UIStore implements IUIStore {
 
     @action.bound
     setPharmacyFilters(value: ISalesPharmacyFilter) {
-        const { salesStore: { setIgnoredLocations }} = this.rootStore;
+        const { salesStore: { setIgnoredLocations } } = this.rootStore;
         if (value !== null) {
             const { ignoredLpus } = value;
             setIgnoredLocations(ignoredLpus);
@@ -82,6 +87,26 @@ export class UIStore implements IUIStore {
         this.salesPharmacyFilter = value === null
             ? { order: null, ignoredLpus: new Set(), map: [] }
             : { ...value, ignoredLpus: new Set() };
+    }
+
+    @action.bound
+    setSynchronizing(val: boolean) {
+        this.isSynchronizing = val;
+    }
+
+    @action.bound
+    setSnackbarType(isSynchronized: boolean) {
+        this.synchronizingSnackbar.type = isSynchronized
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.synchronizingSnackbar.message = isSynchronized
+            ? 'Синхронізовано'
+            : 'Не вдалося синхронізувати';
+    }
+
+    @action.bound
+    synchSnackbarCloseHandler() {
+        this.synchronizingSnackbar.message = '';
     }
 
     @action.bound
@@ -99,16 +124,16 @@ export class UIStore implements IUIStore {
     @action.bound
     setSalesHeaderHeight(value: number) {
         this.salesHeaderHeight = value > 0
-        ? value
-        : 0;
+            ? value
+            : 0;
     }
 
     @action.bound
     openModal(modalName: string, payload: any = null) {
         this.openedModal = modalName;
         this.modalPayload = modalName === null
-        ? null
-        : payload;
+            ? null
+            : payload;
     }
 
     @action.bound
@@ -137,7 +162,7 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    openNotificationSnackbar(newNotification: INotificationSnackbar) {
+    openNotificationSnackbar(newNotification: ISnackbar) {
         if (newNotification === null) this.notificationSnackbar.message = null;
         const snackbarIsOpen = !!this.notificationSnackbar.message;
         if (snackbarIsOpen) this.notificationSnackbar.message = '';

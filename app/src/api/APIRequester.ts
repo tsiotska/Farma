@@ -680,14 +680,20 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-   removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<any> {
+   removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<boolean> {
         return this.instance.delete(`/api/branch/${departmentId}/mp/${mpId}/mark/agent/${agentId}?year=${year}&month=${month}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
 
-    deleteDepartment(departmentId: number): Promise<any> {
+    deleteDepartment(departmentId: number): Promise<boolean> {
         return this.instance.delete(`/api/branch/${departmentId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    synchronize(): Promise<boolean> {
+        return this.instance.post(`/api/synchronize/data/`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
