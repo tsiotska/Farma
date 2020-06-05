@@ -105,7 +105,7 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    synchSnackbarCloseHandler() {
+    syncSnackbarCloseHandler() {
         this.synchronizingSnackbar.message = '';
     }
 

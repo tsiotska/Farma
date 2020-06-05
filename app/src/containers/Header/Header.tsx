@@ -163,6 +163,10 @@ export class Header extends Component<IProps, {}> {
         this.snackbarMessage = null;
     }
 
+    syncSnackbarCloseHandler = () => {
+        this.props.syncSnackbarCloseHandler();
+    }
+
     deleteClickHandler = ({ currentTarget }: any) => this.props.openDelPopper({
         anchorEl: currentTarget,
         callback: this.deleteConfirmHandler,
@@ -226,12 +230,14 @@ export class Header extends Component<IProps, {}> {
                 <Snackbar
                     open={!!this.snackbarMessage}
                     onClose={this.snackbarCloseHandler}
+                    autoHideDuration={6000}
                     type={this.snackbarType}
                     message={this.snackbarMessage}
                 />
                 <Snackbar
                     open={!!syncMessage}
-                    onClose={syncSnackbarCloseHandler}
+                    onClose={this.syncSnackbarCloseHandler}
+                    autoHideDuration={6000}
                     type={syncStatus}
                     message={syncMessage}
                 />
