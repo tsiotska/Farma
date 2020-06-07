@@ -25,9 +25,6 @@ import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 
 const styles = (theme: any) => createStyles({
-        doubleWidthColumn: {
-            width: 284
-        },
         container: {
             overflow: 'visible'
         },
@@ -56,7 +53,7 @@ const styles = (theme: any) => createStyles({
             border: 'none',
             paddingBottom: '5px !important',
             '&:first-child': {
-                width: '284px'
+                width: 324
             },
             '&:last-of-type':
                 {
@@ -488,7 +485,9 @@ class Table extends Component<IProps> {
                         <MuiTable className={classes.table} padding='none'>
                             <TableHead>
                                 <TableRow className={classes.tableRow}>
-                                    <TableCell padding='none' className={cx(classes.cell, classes.doubleWidthColumn)}/>
+                                    <TableCell padding='none' className={classes.cell}>
+                                        ПІБ
+                                    </TableCell>
                                     {
                                         this.getMedsNames
                                     }
