@@ -693,7 +693,7 @@ export class APIRequester {
     }
 
     synchronize(): Promise<boolean> {
-        return this.instance.post(`/api/synchronize/data/`)
+        return this.instance.post(`/api/synchronize/data`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

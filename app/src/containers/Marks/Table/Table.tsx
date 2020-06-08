@@ -485,9 +485,7 @@ class Table extends Component<IProps> {
                         <MuiTable className={classes.table} padding='none'>
                             <TableHead>
                                 <TableRow className={classes.tableRow}>
-                                    <TableCell padding='none' className={classes.cell}>
-                                        ПІБ
-                                    </TableCell>
+                                    <TableCell padding='none' className={classes.cell}/>
                                     {
                                         this.getMedsNames
                                     }
