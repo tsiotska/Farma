@@ -11,8 +11,8 @@ import Master from '../Master';
 import RootStore from '../../stores';
 
 import theme from '../../theme';
-import { HashRouter } from 'react-router-dom';
-
+import { HashRouter, Router } from 'react-router-dom';
+import History from '../../history';
 /**
  * Class representing application root component
  * @class
@@ -23,9 +23,9 @@ export class App extends Component<{}, null> {
             <Provider appState={new RootStore()}>
                 <MuiThemeProvider theme={theme} >
                     <CssBaseline />
-                    <HashRouter >
+                    <Router history={History}>
                         <Master />
-                    </HashRouter>
+                    </Router>
                 </MuiThemeProvider>
             </Provider>
         );

@@ -56,7 +56,7 @@ const styles = (theme: any) => createStyles({
         width: '100%',
         maxWidth: 1550,
         paddingBottom: 60,
-        [`@media (max-width:${ 1620 +  theme.overrides.MuiDrawer.paper.width + 5}px)`]: {
+        [`@media (max-width:${1620 + theme.overrides.MuiDrawer.paper.width + 5}px)`]: {
             // [`@media (max-width:${ theme.breakpoints.width('lg') +  theme.overrides.MuiDrawer.paper.width + 5}px)`]: {
             maxWidth: 'none',
             // marginLeft: 80,
@@ -92,20 +92,20 @@ const lpu = { title: 'ЛПУ', path: LPU_ROUTE, component: Lpu };
 const doctors = { title: 'Лікарі', path: DOCTORS_ROUTE, component: Doctors };
 
 @inject(({
-    appState: {
-        userStore: {
-            role,
-            isAdmin,
-            user,
-            isUserFetched,
-            previewUser
-        },
-        departmentsStore: {
-            currentDepartmentId,
-            setCurrentDepartment
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     role,
+                     isAdmin,
+                     user,
+                     isUserFetched,
+                     previewUser
+                 },
+                 departmentsStore: {
+                     currentDepartmentId,
+                     setCurrentDepartment
+                 }
+             }
+         }) => ({
     user,
     role,
     isAdmin,
@@ -118,8 +118,8 @@ const doctors = { title: 'Лікарі', path: DOCTORS_ROUTE, component: Doctors
 @observer
 export class Master extends Component<IProps, null> {
     readonly rolesPresets: Record<USER_ROLE, IRoleContent[]> = {
-        [USER_ROLE.SUPER_ADMIN]: [ adminPage],
-        [USER_ROLE.ADMIN]: [ adminPage ],
+        [USER_ROLE.SUPER_ADMIN]: [adminPage],
+        [USER_ROLE.ADMIN]: [adminPage],
         [USER_ROLE.FIELD_FORCE_MANAGER]: [
             sales,
             marks,
@@ -212,31 +212,32 @@ export class Master extends Component<IProps, null> {
         return (
             <main className={classes.root}>
                 <div className={classes.contentWrapper}>
-                    <PrivateRoute path={ADMIN_ROUTES} component={Header} />
-                    <PrivateRoute path={PROFILE_PREVIEW_ROUTES} component={ProfilePreviewContainer} />
-                    <PrivateRoute path={NAVIGATION_ROUTES} render={() => <DepartmentNav userLinks={this.userContent} />} />
+                    <PrivateRoute path={ADMIN_ROUTES} component={Header}/>
+                    <PrivateRoute path={PROFILE_PREVIEW_ROUTES} component={ProfilePreviewContainer}/>
+                    <PrivateRoute path={NAVIGATION_ROUTES}
+                                  render={() => <DepartmentNav userLinks={this.userContent}/>}/>
                     <Switch>
-                        <Route path={LOGIN_ROUTE} component={Login} />
+                        <Route path={LOGIN_ROUTE} component={Login}/>
                         {
                             isUserFetched === false &&
                             <Route>loading...</Route>
                         }
-                        <Route path={SETTINGS_ROUTES} component={AdminSettings} />
-                        <PrivateRoute path={NOTIFICATIONS_ROUTE} component={Notifications} />
+                        <Route path={SETTINGS_ROUTES} component={AdminSettings}/>
+                        <PrivateRoute path={NOTIFICATIONS_ROUTE} component={Notifications}/>
                         {
                             this.userContent.map(({ path, component }) => (
-                                <PrivateRoute key={path} path={path} component={component} />
+                                <PrivateRoute key={path} path={path} component={component}/>
                             ))
                         }
                         {
                             this.redirectPath &&
-                            <Redirect to={this.redirectPath} />
+                            <Redirect to={this.redirectPath}/>
                         }
 
                     </Switch>
                 </div>
-                <PrivateRoute path={ADMIN_ROUTES} component={SideNav} />
-                <AddDepartmentModal />
+                <PrivateRoute path={ADMIN_ROUTES} component={SideNav}/>
+                <AddDepartmentModal/>
             </main>
         );
     }
