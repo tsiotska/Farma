@@ -32,7 +32,8 @@ import DeletePopover from '../../components/DeletePopover';
 
 const styles = (theme: any) => createStyles({
     root: {
-        padding: '0 20px'
+        padding: '0 20px',
+        paddingBottom: 120
     },
     title: {
         marginBottom: 20

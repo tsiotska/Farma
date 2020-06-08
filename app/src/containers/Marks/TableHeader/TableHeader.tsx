@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     createStyles,
     WithStyles,
@@ -10,15 +10,15 @@ import {
     Typography,
     Grid
 } from '@material-ui/core';
-import {observer, inject} from 'mobx-react';
-import {withStyles} from '@material-ui/styles';
-import {computed, toJS} from 'mobx';
-import {IMedicine} from '../../../interfaces/IMedicine';
+import { observer, inject } from 'mobx-react';
+import { withStyles } from '@material-ui/styles';
+import { computed, toJS } from 'mobx';
+import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
-import {IDrugSale, IBonusInfo, IMark} from '../../../interfaces/IBonusInfo';
-import {IUserInfo} from '../Table/Table';
-import {IUserLikeObject} from '../../../stores/DepartmentsStore';
-import {USER_ROLE} from '../../../constants/Roles';
+import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
+import { IUserInfo } from '../Table/Table';
+import { IUserLikeObject } from '../../../stores/DepartmentsStore';
+import { USER_ROLE } from '../../../constants/Roles';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -33,11 +33,11 @@ const styles = (theme: any) => createStyles({
             width: 85
         }
     },
-    table: {
-        tableLayout: 'fixed'
-    },
     container: {
         overflow: 'visible'
+    },
+    table: {
+        tableLayout: 'fixed'
     },
     medItem: {
         transform: 'rotate(-45deg)',
@@ -108,11 +108,10 @@ class TableHeader extends Component<IProps> {
     isValid: boolean = false;
 
     get nestLevel(): number {
-        const {role, parentUser, isNested} = this.props;
+        const { role, parentUser } = this.props;
         const userRole = typeof parentUser.position === 'string'
             ? USER_ROLE.MEDICAL_AGENT + 1
             : parentUser.position;
-        // return (userRole - role) + (isNested ? 1 : 0);
         return (userRole - role) + 1;
     }
 
@@ -121,14 +120,14 @@ class TableHeader extends Component<IProps> {
     }
 
     get sales(): Map<number, IDrugSale> {
-        const {previewBonus} = this.props;
+        const { previewBonus } = this.props;
         return previewBonus
             ? previewBonus.sales
             : new Map();
     }
 
     componentDidUpdate() {
-        const {setDivisionValidity, parentUser: {position}} = this.props;
+        const { setDivisionValidity, parentUser: { position } } = this.props;
         if (position === USER_ROLE.MEDICAL_AGENT) {
             setDivisionValidity(this.isValid);
         }
@@ -143,7 +142,7 @@ class TableHeader extends Component<IProps> {
             previewBonus,
             hideName,
             changedMedsMarks,
-            parentUser: {position}
+            parentUser: { position }
         } = this.props;
 
         this.isValid = true;
@@ -167,7 +166,7 @@ class TableHeader extends Component<IProps> {
                     <TableCell
                         key={x.id}
                         padding='none'
-                        className={cx(classes.cell, {invalid: leftValue > rightValue})}>
+                        className={cx(classes.cell, { invalid: leftValue > rightValue })}>
                         <Grid
                             direction='column'
                             container>
@@ -197,7 +196,7 @@ class TableHeader extends Component<IProps> {
     }
 
     render() {
-        const {classes, showLpu} = this.props;
+        const { classes, showLpu } = this.props;
 
         return (
             <TableContainer className={classes.container}>
@@ -208,14 +207,14 @@ class TableHeader extends Component<IProps> {
                                 showLpu &&
                                 <TableCell
                                     padding='none'
-                                    style={{width: this.columnWidth}}
+                                    style={{ width: this.columnWidth }}
                                     className={cx(classes.cell, classes.wideColumn)}>
                                     ЛПУ
                                 </TableCell>
                             }
                             <TableCell
                                 padding='none'
-                                style={{width: this.columnWidth * (!!showLpu ? 1 : 2)}}
+                                style={{ width: this.columnWidth * (!!showLpu ? 1 : 2) }}
                                 className={cx(classes.cell, {
                                     [classes.doubleWidthColumn]: !showLpu,
                                     [classes.wideColumn]: showLpu,
