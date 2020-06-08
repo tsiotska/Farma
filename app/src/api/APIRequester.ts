@@ -60,27 +60,27 @@ export interface ICachedPromise<T> {
 export class APIRequester {
     protected cacheStore: ICacheStore;
     protected instance: AxiosInstance;
+    protected defaultErrorHandler: (result?: any) => (e: any) => any;
 
-    constructor() {
+    constructor(handleAuthorizingError: (e: any) => void) {
         this.cacheStore = new CacheStore();
         this.instance = axios.create({
             baseURL: Config.API_URL.trim(),
             withCredentials: true,
-            // paramsSerializer: (params) => {
-
-            // }
         });
+        this.defaultErrorHandler = (result: any = null) => (e: any) => {
+            console.error('error: ', e);
+            if (e.hasOwnProperty('response') && e.response.hasOwnProperty('status')) {
+                handleAuthorizingError(e);
+            }
+            return result;
+        };
 
         // request logger
         // this.instance.interceptors.request.use(request => {
         //     console.trace('Starting Request', request)
         //     return request
         //   })
-    }
-
-    defaultErrorHandler = (response: any = null) => (e: any) => {
-        console.error('error: ', e);
-        return response;
     }
 
     requestRepeater = async <T>(
@@ -680,14 +680,20 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-   removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<any> {
+    removeAgent(departmentId: number, mpId: number, agentId: number, year: number, month: number): Promise<boolean> {
         return this.instance.delete(`/api/branch/${departmentId}/mp/${mpId}/mark/agent/${agentId}?year=${year}&month=${month}`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
 
-    deleteDepartment(departmentId: number): Promise<any> {
+    deleteDepartment(departmentId: number): Promise<boolean> {
         return this.instance.delete(`/api/branch/${departmentId}`)
+            .then(() => true)
+            .catch(this.defaultErrorHandler(false));
+    }
+
+    synchronize(): Promise<boolean> {
+        return this.instance.post(`/api/synchronize/data/`)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }

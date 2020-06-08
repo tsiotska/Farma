@@ -1,4 +1,5 @@
-import { ISortBy, IFilterBy, ISalesPharmacyFilter } from '../stores/UIStore';
+import { ISortBy, IFilterBy, ISalesPharmacyFilter, ISnackbar } from '../stores/UIStore';
+import { observable } from 'mobx';
 
 export interface IUIStore {
     salesHeaderHeight: number;
@@ -8,4 +9,6 @@ export interface IUIStore {
     filterSettings: IFilterBy;
     modalPayload: any;
     salesPharmacyFilter: ISalesPharmacyFilter;
+    isSynchronizing: boolean;
+    synchronizingSnackbar: ISnackbar;
 }

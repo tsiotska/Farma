@@ -34,7 +34,7 @@
     "date-fns": "2.10.0",
     "file-saver": "^2.0.2",
     "final-form": "4.18.5",
-    "history": "4.9.0",
+    "history": "^4.9.0",
     "i18next": "17.0.14",
     "lodash": "4.17.15",
     "mobx": "5.13.0",

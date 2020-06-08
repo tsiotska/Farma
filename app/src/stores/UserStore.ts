@@ -18,6 +18,7 @@ import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IUserLikeObject } from './DepartmentsStore';
+import { SNACKBAR_TYPE } from '../constants/Snackbars';
 
 export interface IMarkFraction {
     payments: number;
@@ -933,4 +934,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ),
             'removeAgent');
     }
+
+    @action.bound
+    synchronize(): Promise<boolean> {
+        const { api } = this.rootStore;
+        return this.dispatchRequest(api.synchronize(), 'synchronize');
+    }
+
 }

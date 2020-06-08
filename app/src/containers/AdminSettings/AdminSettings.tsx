@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { createStyles, withStyles, WithStyles, Grid, Tabs, Tab, Paper } from '@material-ui/core';
-import { observer } from 'mobx-react';
+import { createStyles, withStyles, WithStyles, Grid, Tabs, Tab, Paper, Button } from '@material-ui/core';
+import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { ACCESS_SETTINGS_ROUTE, SETTINGS_ROUTE, USERS_SETTINGS_ROUTE } from '../../constants/Router';
 import { NavLink, Link, matchPath, Route, Switch } from 'react-router-dom';
@@ -26,9 +26,15 @@ const styles = (theme: any) => createStyles({
         padding: '0 10px',
         textTransform: 'none'
     },
+    syncBtn: {
+        marginLeft: 'auto',
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    synchronize?: () => boolean;
+    setSynchronizing?: (val: boolean) => void;
+    setSnackbarType?: (isSynchronized: boolean) => void;
     history?: History;
 }
 
@@ -38,6 +44,21 @@ enum SETTINGS_TAB {
     USER_SETTINGS,
 }
 
+@inject(({
+             appState: {
+                 userStore: {
+                     synchronize
+                 },
+                 uiStore: {
+                     setSynchronizing,
+                     setSnackbarType
+                 }
+             }
+         }) => ({
+    synchronize,
+    setSynchronizing,
+    setSnackbarType
+}))
 @observer
 class AdminSettings extends Component<IProps> {
     readonly tabURLs: Record<SETTINGS_TAB, string> = {
@@ -52,8 +73,16 @@ class AdminSettings extends Component<IProps> {
         this.tab = value;
     }
 
+    synchronizeData = async () => {
+        const { setSynchronizing, synchronize, setSnackbarType } = this.props;
+        setSynchronizing(true);
+        const isSynchronized = await synchronize();
+        setSynchronizing(false);
+        setSnackbarType(isSynchronized);
+    }
+
     componentDidMount() {
-        const { history: { location} } = this.props;
+        const { history: { location } } = this.props;
         for (const [tab, path] of Object.entries(this.tabURLs)) {
             if (!!matchPath(location.pathname, { path, exact: true })) {
                 this.tab = +tab;
@@ -75,16 +104,29 @@ class AdminSettings extends Component<IProps> {
                             root: classes.tabs,
                             indicator: classes.indicator
                         }}>
-                        <Tab component={Link} className={classes.tab} to={SETTINGS_ROUTE} value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування' />
-                        <Tab component={Link} className={classes.tab} to={ACCESS_SETTINGS_ROUTE} value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу' />
-                        <Tab component={Link} className={classes.tab} to={USERS_SETTINGS_ROUTE} value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі' />
+                        <Tab component={Link} className={classes.tab} to={SETTINGS_ROUTE}
+                             value={SETTINGS_TAB.COMMON_SETTINGS} label='Загальні налаштування'/>
+                        <Tab component={Link} className={classes.tab} to={ACCESS_SETTINGS_ROUTE}
+                             value={SETTINGS_TAB.ACCESS_SETTINGS} label='Права доступу'/>
+                        <Tab component={Link} className={classes.tab} to={USERS_SETTINGS_ROUTE}
+                             value={SETTINGS_TAB.USER_SETTINGS} label='Користувачі'/>
+                        <Button onClick={this.synchronizeData} variant='contained' color='primary'
+                                className={classes.syncBtn}>
+                            Синхронізувати
+                        </Button>
                     </Tabs>
                     <Switch>
-                        <Route path={USERS_SETTINGS_ROUTE} component={UserSettings} />
-                        <Route path={ACCESS_SETTINGS_ROUTE} component={AccessSettings} />
-                        <Route path={SETTINGS_ROUTE} component={CommonSettings} />
+                        <Route path={USERS_SETTINGS_ROUTE} component={UserSettings}/>
+                        <Route path={ACCESS_SETTINGS_ROUTE} component={AccessSettings}/>
+                        <Route path={SETTINGS_ROUTE} component={CommonSettings}/>
                     </Switch>
                 </Grid>
+                {/*  <Snackbar
+                    open={!!this.snackbarMessage}
+                    onClose={this.snackbarCloseHandler}
+                    type={this.snackbarType}
+                    message={this.snackbarMessage}
+                />*/}
             </Paper>
         );
     }
