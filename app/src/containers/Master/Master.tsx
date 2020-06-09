@@ -1,7 +1,7 @@
 import React from 'react';
 import { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Route, Switch, Redirect, withRouter, RouteComponentProps, matchPath } from 'react-router-dom';
+import { Route, Switch, Redirect, withRouter, matchPath } from 'react-router-dom';
 import { createStyles, WithStyles, withStyles } from '@material-ui/core';
 
 import {
@@ -44,6 +44,7 @@ import AdminSettings from '../AdminSettings';
 import Notifications from '../Notifications';
 import ProfilePreviewContainer from '../ProfilePreviewContainer';
 import Doctors from '../Doctors';
+import history from '../../history';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -65,7 +66,7 @@ const styles = (theme: any) => createStyles({
     },
 });
 
-interface IProps extends WithStyles<typeof styles>, Partial<RouteComponentProps<any>> {
+interface IProps extends WithStyles<typeof styles> {
     user?: IUser;
     role?: USER_ROLE;
     isAdmin?: boolean;
@@ -180,12 +181,10 @@ export class Master extends Component<IProps, null> {
         const {
             setCurrentDepartment,
             currentDepartmentId,
-            history,
-            location: { pathname },
             previewUser
         } = this.props;
 
-        const matchDepartmentPath = matchPath(pathname, DEPARTMENT_ROUTE);
+        const matchDepartmentPath = matchPath(history.location.pathname, DEPARTMENT_ROUTE);
         if (matchDepartmentPath) {
             const urlDepId = (matchDepartmentPath.params && 'departmentId' in matchDepartmentPath.params)
                 ? +((matchDepartmentPath.params as any).departmentId)
@@ -203,7 +202,7 @@ export class Master extends Component<IProps, null> {
                     history.push(this.redirectPath);
                 }
             }
-        } else if (!!matchPath(pathname, ADMIN_ROUTE)) {
+        } else if (!!matchPath(history.location.pathname, ADMIN_ROUTE)) {
             setCurrentDepartment(null);
         }
     }

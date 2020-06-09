@@ -11,7 +11,7 @@ import Master from '../Master';
 import RootStore from '../../stores';
 
 import theme from '../../theme';
-import { HashRouter, Router } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import History from '../../history';
 /**
  * Class representing application root component
