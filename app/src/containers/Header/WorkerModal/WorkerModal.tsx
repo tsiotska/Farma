@@ -313,9 +313,11 @@ class WorkerModal extends Component<IProps> {
 
     insertBookedRegion = () => {
         const { regions } = this.props;
+        console.log('this.formValues.region');
+        console.log(this.formValues.region);
         if (!this.regionsList.has(this.formValues.region)) {
-            const currentRegion = regions.get(this.formValues.region);  // we get current booked region for RM
-         //   this.regionsList.set(currentRegion.id, currentRegion); // and set its it empty list with free and our one regions
+            const currentRegion = regions.get(this.formValues.region);
+            this.regionsList.set(currentRegion.id, currentRegion);
         }
     }
 

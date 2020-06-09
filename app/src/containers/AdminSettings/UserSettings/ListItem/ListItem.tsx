@@ -54,8 +54,6 @@ class ListItem extends Component<IProps> {
 
     render() {
         const { worker, positions, classes, deleteHandler } = this.props;
-        console.log('worker');
-        console.log(toJS(worker));
         return (
             <WorkerListItem
                 editClickHandler={this.editClickHandler}
