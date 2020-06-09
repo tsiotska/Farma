@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/styles';
 import { NotInterested, Edit } from '@material-ui/icons';
 import { isValid, lightFormat } from 'date-fns';
 import vacancyIcon from '../../../assets/icons/vacancyIcon.png';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import { IPosition } from '../../interfaces/IPosition';
 import { IWorker } from '../../interfaces/IWorker';
 import { IUserCommonInfo } from '../../interfaces/IUser';
@@ -169,7 +169,7 @@ class WorkerListItem extends Component<IProps> {
         const { position } = this.props;
 
         return position
-            ? position.alias
+            ? position.name
             : null;
     }
 
