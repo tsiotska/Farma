@@ -1,4 +1,3 @@
-import { UIStore } from './../stores/UIStore';
 import { IUserStore } from './IUserStore';
 import { ISalesStore } from './ISalesStore';
 import { IDepartmentsStore } from './IDepartmentsStore';

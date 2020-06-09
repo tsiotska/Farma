@@ -78,7 +78,7 @@ const styles = (theme: any) => createStyles({
     summaryRoot: {
         padding: 0,
         minHeight: '48px !important',
-        border: ({ worker: { isVacancy }}: any) => isVacancy
+        border: ({ worker: { isVacancy } }: any) => isVacancy
             ? '1px solid #f3ca47'
             : '1px solid transparent',
     },
@@ -135,23 +135,23 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            historyPushUser
-        },
-        uiStore: {
-            openDelPopper
-        },
-        departmentsStore: {
-            removeWorker
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     historyPushUser
+                 },
+                 uiStore: {
+                     openDelPopper
+                 },
+                 departmentsStore: {
+                     removeWorker
+                 }
+             }
+         }) => ({
     historyPushUser,
     openDelPopper,
     removeWorker
 }))
-@withRestriction([ PERMISSIONS.EDIT_USER ])
+@withRestriction([PERMISSIONS.EDIT_USER])
 @observer
 class WorkerListItem extends Component<IProps> {
     readonly dateFormat: string = 'dd MMM yyyy';
@@ -247,7 +247,7 @@ class WorkerListItem extends Component<IProps> {
         const {
             historyPushUser,
             disableClick,
-            worker : { id, name, image, position }
+            worker: { id, name, image, position }
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
@@ -282,7 +282,6 @@ class WorkerListItem extends Component<IProps> {
                 isVacancy,
             }
         } = this.props;
-
         return (
             <ExpansionPanel
                 onChange={expandChangeHandler}
@@ -297,7 +296,7 @@ class WorkerListItem extends Component<IProps> {
                     expanded: classes.expanded
                 }}>
                 <ExpansionPanelSummary
-                    expandIcon={expandable && <KeyboardArrowDown fontSize='small' />}
+                    expandIcon={expandable && <KeyboardArrowDown fontSize='small'/>}
                     classes={{
                         content: classes.summaryContent,
                         root: classes.summaryRoot,
@@ -318,7 +317,7 @@ class WorkerListItem extends Component<IProps> {
                             componentProps={{
                                 classes: {
                                     root: classes.avatar,
-                                    img: cx({[classes.image]: isVacancy})
+                                    img: cx({ [classes.image]: isVacancy })
                                 }
                             }}
                             src={
@@ -326,28 +325,32 @@ class WorkerListItem extends Component<IProps> {
                                     ? vacancyIcon
                                     : `${Config.ASSETS_URL}/${image}`
                             }
-                            loadPlaceholder={<PermIdentity className={classes.placeholderImage} fontSize='small' />}
+                            loadPlaceholder={<PermIdentity className={classes.placeholderImage} fontSize='small'/>}
                         />
                         <Typography variant='body2'>
                             {name}
                         </Typography>
                     </Grid>
-                    <Grid xs className={cx(classes.gridItem, classes.locationCell)} alignItems='center' container zeroMinWidth item>
+                    <Grid xs className={cx(classes.gridItem, classes.locationCell)} alignItems='center' container
+                          zeroMinWidth item>
                         <Typography variant='body2'>
-                            { this.userLocation || this.position || '-' }
+                            {this.userLocation || this.position || '-'}
                         </Typography>
                     </Grid>
-                    <Grid xs={fired ? 2 : true} className={cx(classes.gridItem, classes.dateCell)} alignItems='center' zeroMinWidth container item>
+                    <Grid xs={fired ? 2 : true} className={cx(classes.gridItem, classes.dateCell)} alignItems='center'
+                          zeroMinWidth container item>
                         <Typography variant='body2'>
                             {this.date}
                         </Typography>
                     </Grid>
-                    <Grid xs className={cx(classes.gridItem, classes.emailCell)} alignItems='center' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.emailCell)} alignItems='center' zeroMinWidth
+                          container item>
                         <Typography variant='body2'>
                             {email}
                         </Typography>
                     </Grid>
-                    <Grid xs className={cx(classes.gridItem, classes.phoneCell)} direction='column' justify='center' alignItems='flex-start' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.phoneCell)} direction='column' justify='center'
+                          alignItems='flex-start' zeroMinWidth container item>
                         {
                             workPhone &&
                             <Typography variant='body2'>
@@ -361,7 +364,8 @@ class WorkerListItem extends Component<IProps> {
                             </Typography>
                         }
                     </Grid>
-                    <Grid xs className={cx(classes.gridItem, classes.cardCell)} alignItems='center' zeroMinWidth container item>
+                    <Grid xs className={cx(classes.gridItem, classes.cardCell)} alignItems='center' zeroMinWidth
+                          container item>
                         <Typography variant='body2'>
                             {card}
                         </Typography>
@@ -376,7 +380,7 @@ class WorkerListItem extends Component<IProps> {
                                     <IconButton
                                         onClick={this.editClickHandler}
                                         className={cx(classes.iconButton, classes.colorGreen)}>
-                                        <EditOutlinedIcon fontSize='small' />
+                                        <EditOutlinedIcon fontSize='small'/>
                                     </IconButton>
                                 }
                                 {

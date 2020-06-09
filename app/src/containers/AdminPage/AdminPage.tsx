@@ -87,7 +87,7 @@ class AdminPage extends Component<IProps> {
         const res: any[] = [];
         meds.forEach((items, department) => {
             const targetDepartment = departments.find(({id}) => id === department);
-            items = items.sort((a, b) => {
+            items = items.slice().sort((a, b) => {
                 if (a.name < b.name) {
                     return -1;
                 }

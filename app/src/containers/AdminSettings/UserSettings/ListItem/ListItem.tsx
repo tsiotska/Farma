@@ -25,12 +25,12 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     openModal
 }))
 @observer
@@ -54,7 +54,8 @@ class ListItem extends Component<IProps> {
 
     render() {
         const { worker, positions, classes, deleteHandler } = this.props;
-
+        console.log('worker');
+        console.log(toJS(worker));
         return (
             <WorkerListItem
                 editClickHandler={this.editClickHandler}
