@@ -143,7 +143,15 @@ export class Master extends Component<IProps, null> {
             pharmacy,
             lpu
         ],
-        [USER_ROLE.PRODUCT_MANAGER]: [],
+        [USER_ROLE.PRODUCT_MANAGER]: [
+            sales,
+            marks,
+            salary,
+            workers,
+            meds,
+            pharmacy,
+            lpu
+        ],
         [USER_ROLE.UNKNOWN]: [],
     };
 
@@ -156,7 +164,6 @@ export class Master extends Component<IProps, null> {
             : USER_ROLE.UNKNOWN;
 
         const targetRole = role || userRole;
-
         return this.rolesPresets[targetRole];
     }
 
@@ -196,11 +203,6 @@ export class Master extends Component<IProps, null> {
                     history.push(this.redirectPath);
                 }
             }
-
-            // const isDepEqual = (!!userDepartment && userDepartment) === (!!urlDepId && urlDepId);
-            // if (urlDepId && urlDepId !== currentDepartmentId) {
-            //     setCurrentDepartment(urlDepId);
-            // }
         } else if (!!matchPath(pathname, ADMIN_ROUTE)) {
             setCurrentDepartment(null);
         }

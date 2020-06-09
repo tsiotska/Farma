@@ -1,24 +1,22 @@
 import { IDoctor } from './../interfaces/IDoctor';
-import { IBonusInfo, IAgentInfo, IMark } from './../interfaces/IBonusInfo';
-import { computed, action, observable, toJS, runInAction } from 'mobx';
-import { IUserCredentials, IUserCommonInfo } from './../interfaces/IUser';
+import { IAgentInfo, IBonusInfo, IMark } from './../interfaces/IBonusInfo';
+import { action, computed, observable, runInAction } from 'mobx';
+import { IUserCommonInfo, IUserCredentials } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
 import { IUserStore } from '../interfaces/IUserStore';
 import { IUser } from '../interfaces';
-import { USER_ROLE, singleDepartmentRoles, multiDepartmentRoles } from '../constants/Roles';
+import { multiDepartmentRoles, singleDepartmentRoles, USER_ROLE } from '../constants/Roles';
 import { defaultUser } from '../helpers/normalizers/userNormalizer';
-import { ISalaryInfo, IUserSales, IMedSalary } from '../interfaces/ISalaryInfo';
+import { IMedSalary, ISalaryInfo, IUserSales } from '../interfaces/ISalaryInfo';
 import { ISalarySettings } from '../interfaces/ISalarySettings';
 import { INotification } from '../interfaces/iNotification';
 import uniq from 'lodash/uniq';
 import format from 'date-fns/format';
-import { IMedicine } from '../interfaces/IMedicine';
 import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IUserLikeObject } from './DepartmentsStore';
-import { SNACKBAR_TYPE } from '../constants/Snackbars';
 
 export interface IMarkFraction {
     payments: number;
@@ -746,7 +744,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
         this.setLoading(requestName);
         const user = await api.getUser();
-
         if (!user) {
             this.setError(requestName);
             return false;
@@ -759,10 +756,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
             this.loadNotificationsCount(),
             this.loadUserSalarySettings()
         ]);
-
         if (singleDepartmentRoles.includes(user.position)) {
+            if (user.position === USER_ROLE.PRODUCT_MANAGER) {
+                const ffm: IUser[] = await api.getAgents(user.department, USER_ROLE.FIELD_FORCE_MANAGER);
+                const userData = await api.getUser(ffm[0].id);
+                this.navHistory.push(userData);
+            } else {
+                this.navHistory.push(user);
+            }
             setCurrentDepartment(user.department);
-            this.navHistory.push(user);
+
         } else if (multiDepartmentRoles.includes(user.position)) {
             loadFFMs();
         }
