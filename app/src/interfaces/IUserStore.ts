@@ -6,5 +6,5 @@ export interface IUserStore {
     isAdmin: boolean;
     previewUser: IUser;
     role: USER_ROLE;
-    logout: () => void;
+    logout: (tokenIsValid: boolean) => void;
 }

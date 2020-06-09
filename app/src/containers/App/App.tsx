@@ -23,9 +23,11 @@ export class App extends Component<{}, null> {
             <Provider appState={new RootStore()}>
                 <MuiThemeProvider theme={theme} >
                     <CssBaseline />
+                    <HashRouter>
                     <Router history={History}>
                         <Master />
                     </Router>
+                    </HashRouter>
                 </MuiThemeProvider>
             </Provider>
         );

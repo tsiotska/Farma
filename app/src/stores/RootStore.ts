@@ -37,7 +37,7 @@ export default class RootStore implements IRootStore {
     handleAuthorizingError = (e: any) => {
         if ( e.response.status === 401 && this.userStore.user) {
             History.push(LOGIN_ROUTE);
-            this.userStore.logout();
+            this.userStore.logout(false);
         }
     }
 }

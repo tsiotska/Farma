@@ -773,15 +773,16 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    logout() {
+    logout(tokenIsValid: boolean = true) {
         const requestName = 'logout';
         const {
             api,
             departmentsStore: { resetStore: resetDepartmentsStore },
             salesStore: { resetStore: resetSalesStore }
         } = this.rootStore;
-
-        this.dispatchRequest(api.logout(), requestName);
+        if (tokenIsValid) {
+            this.dispatchRequest(api.logout(), requestName);
+        }
         this.user = null;
         this.navHistory = [];
         this.notificationsCount = 0;
