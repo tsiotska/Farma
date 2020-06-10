@@ -121,6 +121,7 @@ class WorkerModal extends Component<IProps> {
         region: 0,
     };
 
+    @observable bookedRMRegion: number;
     @observable regionsList: Map<number, ILocation> = new Map();
     @observable formValues: IWorkerModalValues = { ...this.defaultValues };
     @observable errors: Map<keyof IWorkerModalValues, boolean | string> = new Map();
@@ -313,8 +314,8 @@ class WorkerModal extends Component<IProps> {
 
     insertBookedRegion = () => {
         const { regions } = this.props;
-        if (!this.regionsList.has(this.formValues.region)) {
-            const currentRegion = regions.get(this.formValues.region);
+        if (!this.regionsList.has(this.bookedRMRegion)) {
+            const currentRegion = regions.get(this.bookedRMRegion);
             this.regionsList.set(currentRegion.id, currentRegion);
         }
     }
@@ -336,6 +337,7 @@ class WorkerModal extends Component<IProps> {
                 this.initValuesFromInitialWorker();
                 if (this.formValues.position === USER_ROLE.REGIONAL_MANAGER) {
                     this.regionsList = await loadRMRegions();
+                    this.bookedRMRegion = this.formValues.region;
                     this.insertBookedRegion();
                 } else {
                     this.regionsList = regions;

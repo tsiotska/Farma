@@ -223,8 +223,6 @@ class ProfilePreview extends Component<IProps> {
 
     editClickHandler = () => {
         const { user, openModal, positions } = this.props;
-        console.log('positions');
-        console.log(toJS(positions.get(user.position)));
         const filteredPositions = USER_ROLE.FIELD_FORCE_MANAGER === user.position
             ? [positions.get(USER_ROLE.FIELD_FORCE_MANAGER)]
             : [positions.get(USER_ROLE.REGIONAL_MANAGER), positions.get(USER_ROLE.MEDICAL_AGENT)];
