@@ -313,8 +313,6 @@ class WorkerModal extends Component<IProps> {
 
     insertBookedRegion = () => {
         const { regions } = this.props;
-        console.log('this.formValues.region');
-        console.log(this.formValues.region);
         if (!this.regionsList.has(this.formValues.region)) {
             const currentRegion = regions.get(this.formValues.region);
             this.regionsList.set(currentRegion.id, currentRegion);
@@ -323,7 +321,7 @@ class WorkerModal extends Component<IProps> {
 
     async componentDidUpdate(prevProps: IProps) {
         const { open: wasOpen } = prevProps;
-        const { open, initialWorker, positions, loadRMRegions } = this.props;
+        const { open, initialWorker, positions, loadRMRegions, regions } = this.props;
         const becomeOpened = wasOpen === false && open === true;
         const becomeClosed = wasOpen === true && open === false;
 
@@ -336,6 +334,12 @@ class WorkerModal extends Component<IProps> {
 
             if (!!initialWorker) {
                 this.initValuesFromInitialWorker();
+                if (this.formValues.position === USER_ROLE.REGIONAL_MANAGER) {
+                    this.regionsList = await loadRMRegions();
+                    this.insertBookedRegion();
+                } else {
+                    this.regionsList = regions;
+                }
                 this.insertBookedRegion();
             }
         }

@@ -112,21 +112,21 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            positions,
-            cities,
-            regions
-        },
-        userStore: {
-            historyGoTo,
-            previewUser
-        },
-        uiStore: {
-            openModal
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     positions,
+                     cities,
+                     regions
+                 },
+                 userStore: {
+                     historyGoTo,
+                     previewUser
+                 },
+                 uiStore: {
+                     openModal
+                 }
+             }
+         }) => ({
     historyGoTo,
     positions,
     cities,
@@ -223,9 +223,14 @@ class ProfilePreview extends Component<IProps> {
 
     editClickHandler = () => {
         const { user, openModal, positions } = this.props;
+        console.log('positions');
+        console.log(toJS(positions.get(user.position)));
+        const filteredPositions = USER_ROLE.FIELD_FORCE_MANAGER === user.position
+            ? [positions.get(USER_ROLE.FIELD_FORCE_MANAGER)]
+            : [positions.get(USER_ROLE.REGIONAL_MANAGER), positions.get(USER_ROLE.MEDICAL_AGENT)];
         openModal(EDIT_WORKER_MODAL, {
             initialWorker: user,
-            positions: [positions.get(user.position)]
+            positions: filteredPositions
         });
     }
 
@@ -415,21 +420,21 @@ class ProfilePreview extends Component<IProps> {
                           item>
                         <InfoWindow icon={<Phone/>}>
                             {previewUser.mobilePhone ?
-                            <Grid className={classes.windowContent} wrap='nowrap' container>
-                                <Grid direction='column' item container>
-                                    <Typography> Телефон </Typography>
-                                    <Typography> {previewUser.mobilePhone} </Typography>
+                                <Grid className={classes.windowContent} wrap='nowrap' container>
+                                    <Grid direction='column' item container>
+                                        <Typography> Телефон </Typography>
+                                        <Typography> {previewUser.mobilePhone} </Typography>
+                                    </Grid>
+                                    <Grid container alignItems='center' item>
+                                        <IconButton onClick={() => this.copyInfo(previewUser.mobilePhone)}>
+                                            <FileCopyOutlinedIcon/>
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
-                                <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo(previewUser.mobilePhone)}>
-                                        <FileCopyOutlinedIcon/>
-                                    </IconButton>
-                                </Grid>
-                            </Grid>
-                            :
-                            <Grid className={classes.windowContent} container>
-                                Дані відсутні
-                            </Grid>}
+                                :
+                                <Grid className={classes.windowContent} container>
+                                    Дані відсутні
+                                </Grid>}
                         </InfoWindow>
 
                         <InfoWindow icon={<MailOutlineOutlinedIcon/>}>
@@ -452,21 +457,21 @@ class ProfilePreview extends Component<IProps> {
 
                         <InfoWindow icon={<CreditCardOutlinedIcon/>}>
                             {previewUser.bankCard ?
-                            <Grid className={classes.windowContent} wrap='nowrap' container>
-                                <Grid direction='column' container>
-                                    <Typography> Банківська картка </Typography>
-                                    <Typography> {previewUser.bankCard} </Typography>
+                                <Grid className={classes.windowContent} wrap='nowrap' container>
+                                    <Grid direction='column' container>
+                                        <Typography> Банківська картка </Typography>
+                                        <Typography> {previewUser.bankCard} </Typography>
+                                    </Grid>
+                                    <Grid container alignItems='center' item>
+                                        <IconButton onClick={() => this.copyInfo(previewUser.bankCard)}>
+                                            <FileCopyOutlinedIcon/>
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
-                                <Grid container alignItems='center' item>
-                                    <IconButton onClick={() => this.copyInfo(previewUser.bankCard)}>
-                                        <FileCopyOutlinedIcon/>
-                                    </IconButton>
-                                </Grid>
-                            </Grid>
-                            :
-                            <Grid className={classes.windowContent} container>
-                                Дані відсутні
-                            </Grid>}
+                                :
+                                <Grid className={classes.windowContent} container>
+                                    Дані відсутні
+                                </Grid>}
                         </InfoWindow>
                     </Grid>
 
@@ -477,18 +482,18 @@ class ProfilePreview extends Component<IProps> {
                                 <Divider flexItem orientation='vertical'/>
                             </Hidden>
                             <Grid className={cx(classes.gridContainer, classes.textContainer)}
-                                direction='column'
-                                justify='center'
-                                container
-                                item>
+                                  direction='column'
+                                  justify='center'
+                                  container
+                                  item>
                                 <IconButton onClick={this.editClickHandler}>
                                     <Edit/>
                                 </IconButton>
-                                    <DeleteButton
-                                        id={id}
-                                        onClick={this.removeUserClickHandler}
-                                        onMountCallback={this.extraButtonsOnMountCallback}
-                                    />
+                                <DeleteButton
+                                    id={id}
+                                    onClick={this.removeUserClickHandler}
+                                    onMountCallback={this.extraButtonsOnMountCallback}
+                                />
                             </Grid>
                         </>
                     }
