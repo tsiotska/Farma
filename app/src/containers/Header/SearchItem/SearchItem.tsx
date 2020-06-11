@@ -54,34 +54,35 @@ class SearchItem extends Component<IProps> {
                 lpuName,
                 city,
                 address
-        } } = this.props;
+            }
+        } = this.props;
 
         return (
             <Grid
                 onClick={this.clickHandler}
                 className={cx(classes.root, { [classes.rootLoading]: isLoading })}
                 alignItems='center' container>
-                <Grid className={classes.item} direction='column' xs container item  zeroMinWidth>
+                <Grid className={classes.item} direction='column' xs container item zeroMinWidth>
                     <Typography className={classes.mpText} variant='body2'>
-                        МП: { mpName }
+                        МП: {mpName}
                     </Typography>
                     <Typography variant='body2'>
-                        { name }
-                    </Typography>
-                </Grid>
-                <Grid className={classes.item} xs container item zeroMinWidth>
-                    <Typography variant='body2'>
-                        { lpuName }
+                        {name}
                     </Typography>
                 </Grid>
                 <Grid className={classes.item} xs container item zeroMinWidth>
                     <Typography variant='body2'>
-                        { city }
+                        {lpuName}
                     </Typography>
                 </Grid>
                 <Grid className={classes.item} xs container item zeroMinWidth>
                     <Typography variant='body2'>
-                        { address }
+                        {city}
+                    </Typography>
+                </Grid>
+                <Grid className={classes.item} xs container item zeroMinWidth>
+                    <Typography variant='body2'>
+                        {address}
                     </Typography>
                 </Grid>
             </Grid>

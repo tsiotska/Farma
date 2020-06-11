@@ -20,8 +20,8 @@ import vacancyIcon from '../../../assets/icons/vacancyIcon.png';
 import { computed, observable, toJS } from 'mobx';
 import { IPosition } from '../../interfaces/IPosition';
 import { IWorker } from '../../interfaces/IWorker';
-import { IUserCommonInfo } from '../../interfaces/IUser';
-import { USER_ROLE } from '../../constants/Roles';
+import { IUser, IUserCommonInfo } from '../../interfaces/IUser';
+import { multiDepartmentRoles, USER_ROLE } from '../../constants/Roles';
 import { ILocation } from '../../interfaces/ILocation';
 import { uaMonthsNames } from '../DateTimeUtils/DateTimeUtils';
 import cx from 'classnames';
@@ -35,6 +35,8 @@ import { withRestriction } from '../hoc/withRestriction';
 import { PERMISSIONS } from '../../constants/Permissions';
 import DeleteButton from './DeleteButton';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import { IExpandedWorker } from '../../stores/DepartmentsStore';
+import { DOCTORS_ROUTE } from '../../constants/Router';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -118,6 +120,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     worker: IWorker;
+    expandedWorker: IExpandedWorker;
     fired: boolean;
     editClickHandler: (worker: IWorker) => void;
 
@@ -132,24 +135,35 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     disableClick?: boolean;
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeWorker?: (worker: IWorker) => boolean;
+    loadCurrentFFM?: () => any;
+    getUser?: (userId: number) => IUser;
+    historyReplace?: (users: IUser[]) => void;
 }
 
 @inject(({
              appState: {
                  userStore: {
-                     historyPushUser
+                     historyPushUser,
+                     historyReplace,
+                     getUser
                  },
                  uiStore: {
                      openDelPopper
                  },
                  departmentsStore: {
-                     removeWorker
+                     removeWorker,
+                     expandedWorker,
+                     loadCurrentFFM
                  }
              }
          }) => ({
     historyPushUser,
+    historyReplace,
     openDelPopper,
-    removeWorker
+    removeWorker,
+    expandedWorker,
+    loadCurrentFFM,
+    getUser
 }))
 @withRestriction([PERMISSIONS.EDIT_USER])
 @observer
@@ -243,14 +257,34 @@ class WorkerListItem extends Component<IProps> {
         editClickHandler(worker);
     }
 
-    workerClickHandler = (e: any) => {
+    workerClickHandler = async (e: any) => {
         const {
+            getUser,
             historyPushUser,
+            historyReplace,
             disableClick,
-            worker: { id, name, image, position }
+            expandedWorker,
+            loadCurrentFFM,
+            worker
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
+        const ffm = await loadCurrentFFM();
+        const rm = expandedWorker ? expandedWorker.id : null;
+        const presets: any = {
+            [USER_ROLE.FIELD_FORCE_MANAGER]: [ffm[0].id],
+            [USER_ROLE.REGIONAL_MANAGER]: [ffm[0].id, worker.id],
+            [USER_ROLE.MEDICAL_AGENT]: [ffm[0].id, rm, worker.id],
+        };
+        const targetRoles = presets[worker.position];
+        const promises = targetRoles.map((x: number) => getUser(x));
+        const loadedUsers: IUser[] = await Promise.all(promises);
+        const filtered = loadedUsers.filter(x => !!x);
+
+        const newUserHistory = multiDepartmentRoles.includes(worker.position)
+            ? filtered : [...filtered];
+        historyReplace(newUserHistory);
+        /*
         historyPushUser({
             id,
             name,
@@ -258,6 +292,7 @@ class WorkerListItem extends Component<IProps> {
             region: null,
             city: null
         }, position);
+        */
     }
 
     render() {

@@ -409,6 +409,13 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
     }
 
     @action.bound
+    async loadCurrentFFM() {
+        const requestName = 'loadCurrentFFM';
+        const { api } = this.rootStore;
+        return api.getAgents(this.currentDepartmentId, USER_ROLE.FIELD_FORCE_MANAGER);
+    }
+
+    @action.bound
     async loadFFMs() {
         const requestName = 'loadFFMs';
         const { api } = this.rootStore;
