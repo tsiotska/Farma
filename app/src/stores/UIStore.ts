@@ -100,8 +100,8 @@ export class UIStore implements IUIStore {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.synchronizingSnackbar.message = isSynchronized
-            ? 'Синхронізовано'
-            : 'Не вдалося синхронізувати';
+            ? 'Дані успішно синхронізовано з CRM'
+            : 'Не вдалося синхронізувати дані з CRM';
     }
 
     @action.bound

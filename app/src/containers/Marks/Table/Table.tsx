@@ -381,7 +381,6 @@ class Table extends Component<IProps> {
         if (condition) {
             updateBonus(previewBonus, false);
         }
-
         clearChangedMarks();
         removeBonusUser(parentUser);
         window.clearTimeout(this.initializationTimeout);

@@ -17,6 +17,7 @@ import { IDeposit } from '../interfaces/IDeposit';
 import { IDepositFormValue } from '../containers/Doctors/EditDepositModal/EditDepositModal';
 import { PERMISSIONS } from '../constants/Permissions';
 import { IUserLikeObject } from './DepartmentsStore';
+import axios from 'axios';
 
 export interface IMarkFraction {
     payments: number;
@@ -51,6 +52,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     // userId, medId
     @observable changedMarks: Map<number, Map<number, IMark>> = new Map();
     @observable bonusUsers: IUserLikeObject[] = [];
+
+    @observable syncIntervalId: number = null;
+    @observable isSynchronized: boolean = false;
 
     notificationsUpdateInterval: any = null;
 
@@ -268,7 +272,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 
         if (this.isMedsDivisionValid === false) {
-            console.log('meds division is invalid');
             return;
         }
 
@@ -940,9 +943,20 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    synchronize(): Promise<boolean> {
+    async synchronize() {
         const { api } = this.rootStore;
-        return this.dispatchRequest(api.synchronize(), 'synchronize');
+        const taskId = await this.dispatchRequest(api.synchronize(), 'synchronize');
+        if (taskId) {
+            this.syncIntervalId = window.setInterval(() => this.recursion(taskId), 30000);
+        }
     }
 
+    recursion = async (taskId: number) => {
+        const {api} = this.rootStore;
+        const status = await this.dispatchRequest(api.getSyncStatus(taskId), 'getSyncStatus');
+        this.isSynchronized = status === 200;
+        if (this.isSynchronized) {
+            window.clearInterval(this.syncIntervalId);
+        }
+    }
 }

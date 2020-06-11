@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
 import { ISearchResult } from '../../../interfaces/ISearchResult';
 import SearchItem from '../SearchItem';
-import { computed, observable } from 'mobx';
+import { computed, observable, toJS } from 'mobx';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { IUser } from '../../../interfaces';
 import { USER_ROLE, multiDepartmentRoles } from '../../../constants/Roles';
@@ -132,10 +132,9 @@ class SearchList extends Component<IProps> {
             if (!isValid) return;
             setCurrentDepartment(targetDep);
         }
-
         const newUserHistory = multiDepartmentRoles.includes(user.position)
             ? filtered
-            : [user, ...filtered];
+            : user.position === USER_ROLE.PRODUCT_MANAGER ? [...filtered] : [user, ...filtered];
         historyReplace(newUserHistory);
         setPreviewDoctor(id);
         history.push(DOCTORS_ROUTE.replace(':departmentId', `${targetDep}`));
@@ -170,19 +169,19 @@ class SearchList extends Component<IProps> {
                                 />
                             ))
                         }
-                    {
-                        this.hasNoData &&
-                        <Typography>
-                            За вашим пошуком нічого не знайдено
-                        </Typography>
-                    }
-                    {
-                        this.shouldDisplayData && items.length % this.maxCount === 0 &&
-                        <Button onClick={loadMoreHandler} className={classes.loadButton} variant='contained'
-                                color='primary'>
-                            Завантажити ще лікарів...
-                        </Button>
-                    }
+                        {
+                            this.hasNoData &&
+                            <Typography>
+                                За вашим пошуком нічого не знайдено
+                            </Typography>
+                        }
+                        {
+                            this.shouldDisplayData && items.length % this.maxCount === 0 &&
+                            <Button onClick={loadMoreHandler} className={classes.loadButton} variant='contained'
+                                    color='primary'>
+                                Завантажити ще лікарів...
+                            </Button>
+                        }
                     </div>
                 </Paper>
             </Popper>
