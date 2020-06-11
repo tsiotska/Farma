@@ -70,7 +70,8 @@ export class APIRequester {
         });
         this.defaultErrorHandler = (result: any = null) => (e: any) => {
             console.error('error: ', e);
-            if (e.hasOwnProperty('response') && e.response.hasOwnProperty('status')) {
+            // console.log({e});
+            if (e.response) {
                 handleAuthorizingError(e);
             }
             return result;
@@ -694,13 +695,13 @@ export class APIRequester {
 
     synchronize(): Promise<number> {
         return this.instance.post(`/api/synchronize/data`)
-            .then(({ data: { data: { task_id } }}) => task_id )
+            .then(({ data: { data: { task_id } } }) => task_id)
             .catch(this.defaultErrorHandler(false));
     }
 
     getSyncStatus(taskId: number): Promise<number> {
         return this.instance.get(`/api/synchronize/data?task_id=${taskId}`)
-            .then(({ data: { data: { status } }}) => status)
+            .then(({ data: { data: { status } } }) => status)
             .catch(this.defaultErrorHandler(false));
     }
 }

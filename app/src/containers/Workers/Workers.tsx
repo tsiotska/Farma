@@ -23,6 +23,8 @@ import Snackbar from '../../components/Snackbar';
 import { IWithRestriction } from '../../interfaces';
 import { withRestriction } from '../../components/hoc/withRestriction';
 import { PERMISSIONS } from '../../constants/Permissions';
+import DoctorListItem from '../Doctors/Doctors';
+import { IDeletePopoverSettings } from '../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -75,6 +77,8 @@ interface IProps extends WithStyles<typeof styles>, IWithRestriction {
     loadUnconfirmedDoctors: () => IDoctor[];
     pureAgentConfirm?: (doctor: IDoctor) => boolean;
     openModal?: (modalName: string, payload: any) => void;
+    openDelPopper?: (settings: IDeletePopoverSettings) => void;
+    removeDoctor?: (doc: IDoctor) => boolean;
 }
 
 type TabValue = 'all' | 'fired';
@@ -91,6 +95,7 @@ type TabValue = 'all' | 'fired';
             getAsyncStatus,
             loadWorkersExcel,
             resetWorkers,
+            removeDoctor,
             loadUnconfirmedDoctors,
             pureAgentConfirm
         },
@@ -98,7 +103,8 @@ type TabValue = 'all' | 'fired';
             role
         },
         uiStore: {
-            openModal
+            openModal,
+            openDelPopper
         }
     }
 }) => ({
@@ -115,6 +121,8 @@ type TabValue = 'all' | 'fired';
     loadUnconfirmedDoctors,
     pureAgentConfirm,
     openModal,
+    openDelPopper,
+    removeDoctor
 }))
 @withRestriction([ PERMISSIONS.ADD_USER ])
 @withRouter
@@ -171,15 +179,6 @@ class Workers extends Component<IProps> {
         this.loadData();
     }
 
-    deleteHandler = (workerRemoved: boolean) => {
-        this.snackbarType = workerRemoved
-            ? SNACKBAR_TYPE.SUCCESS
-            : SNACKBAR_TYPE.ERROR;
-        this.snackbarMessage = workerRemoved
-            ? 'Працівник успішно видалений'
-            : 'Видалити працівника не вдалося';
-    }
-
     snackbarCloseHandler = () => {
         this.snackbarMessage = null;
     }
@@ -196,6 +195,28 @@ class Workers extends Component<IProps> {
         if (isConfirmed) {
             this.unconfirmedDoctors = await loadUnconfirmedDoctors();
         }
+    }
+
+    deleteHandler = (workerRemoved: boolean) => {
+        this.snackbarType = workerRemoved
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = workerRemoved
+            ? 'Працівник успішно видалений'
+            : 'Видалити працівника не вдалося';
+    }
+
+    deleteUnconfirmedHandler = (doc: IDoctor) => async (confirmed: boolean) => {
+        const { openDelPopper, removeDoctor } = this.props;
+        openDelPopper(null);
+        if (!confirmed) return;
+        const docRemoved = await removeDoctor(doc);
+        this.snackbarType = docRemoved
+            ? SNACKBAR_TYPE.SUCCESS
+            : SNACKBAR_TYPE.ERROR;
+        this.snackbarMessage = docRemoved
+            ? 'Працівник успішно видалений'
+            : 'Видалити працівника не вдалося';
     }
 
     componentDidUpdate(prevProps: IProps) {
@@ -239,6 +260,7 @@ class Workers extends Component<IProps> {
                     <UnconfirmedDoctorsList
                         unconfirmedDoctors={this.unconfirmedDoctors}
                         confirmHandler={this.confirmHandler}
+                        deleteHandler={this.deleteUnconfirmedHandler}
                     />
                 }
                 <Grid wrap='nowrap' container alignItems='center'>
@@ -282,7 +304,17 @@ class Workers extends Component<IProps> {
                         </IconButton>
                     }
                 />
-                <DeletePopover name='deleteWorker' />
+                <DeletePopover
+                    name='deleteDoc'
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                />
                 <Snackbar
                     open={!!this.snackbarMessage}
                     type={this.snackbarType}
