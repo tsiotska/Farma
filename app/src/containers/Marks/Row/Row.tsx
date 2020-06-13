@@ -146,6 +146,7 @@ interface IProps extends WithStyles<typeof styles> {
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
+    previewBonus?: IBonusInfo;
     role?: USER_ROLE;
     changedMarks?: Map<number, Map<number, IMark>>;
     previewBonusChangeHandler?: (
@@ -337,7 +338,19 @@ class Row extends Component<IProps> {
         const {removeBonusAgent, agentInfo: {id}} = this.props;
         removeBonusAgent(id);
     }
-
+/*
+    get isValid(): boolean {
+        const { isMedsDivisionValid } = this.props;
+        const current = (this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit);
+        const settingsValue = this.bonuses
+            ? this.bonuses[1]
+            : 100;
+        const condition = previewBonus
+            ? current >= settingsValue
+            : true;
+        return condition && isMedsDivisionValid;
+    }
+*/
     render() {
         const {
             classes,

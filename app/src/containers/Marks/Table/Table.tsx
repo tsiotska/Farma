@@ -454,6 +454,7 @@ class Table extends Component<IProps> {
                                     return (
                                         <Row
                                             key={x.id}
+                                            previewBonus={previewBonus}
                                             agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
                                             isNested={isNested}
                                             agent={(x as IUserInfo & IUserLikeObject)}
