@@ -51,14 +51,14 @@ export interface IPharmacyModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            oblasti,
-            loadSpecificCities,
-            loadSpecificLpus,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     oblasti,
+                     loadSpecificCities,
+                     loadSpecificLpus,
+                 }
+             }
+         }) => ({
     oblasti,
     loadSpecificCities,
     loadSpecificLpus,
@@ -86,8 +86,6 @@ class PharmacyModal extends Component<IProps> {
     @observable formValues: IPharmacyModalValues = { ...this.initialValues };
 
     readonly errorMessages: { [key: string]: string } = {
-        phone1: 'Телефон має скададатись з 10 або 12 цифр',
-        phone2: 'Телефон має скададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
     };
 
@@ -151,13 +149,12 @@ class PharmacyModal extends Component<IProps> {
 
     validateValue = (propName: keyof IPharmacyModalValues, value: string) => {
         if (this.optionalFields.includes(propName)) {
-            if (!value) return false;
-
-            const isInvalid = propName === 'lpu'
-                ? !value || value.length < 3
-                : !phoneValidator(value);
-
-            return isInvalid && this.errorMessages[propName];
+            if (!value || propName !== 'lpu') {
+                return false;
+            } else {
+                const isInvalid = !value || value.length < 3;
+                return isInvalid && this.errorMessages[propName];
+            }
         } else {
             const isInvalid = !value || value.length < 3;
             return isInvalid && this.errorMessages.default;

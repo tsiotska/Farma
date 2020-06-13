@@ -13,7 +13,7 @@ import Dialog from '../../../components/Dialog';
 import { observable, computed, reaction, toJS } from 'mobx';
 import { ILocation } from '../../../interfaces/ILocation';
 import FormRow from '../../../components/FormRow';
-import { phoneValidator } from '../../../helpers/validators';
+// import { phoneValidator } from '../../../helpers/validators';
 
 const styles = (theme: any) => createStyles({
     submitButton: {
@@ -53,13 +53,13 @@ export interface ILpuModalValues {
 }
 
 @inject(({
-    appState: {
-        departmentsStore: {
-            oblasti,
-            loadSpecificCities,
-        }
-    }
-}) => ({
+             appState: {
+                 departmentsStore: {
+                     oblasti,
+                     loadSpecificCities,
+                 }
+             }
+         }) => ({
     oblasti,
     loadSpecificCities,
 }))
@@ -68,8 +68,6 @@ class LpuModal extends Component<IProps> {
     readonly objectFields: Array<keyof ILpuModalValues> = ['oblast', 'city'];
     readonly optionalFields: Array<keyof ILpuModalValues> = ['phone1', 'phone2'];
     readonly errorMessages: { [key: string]: string } = {
-        phone1: 'Телефон має склададатись з 10 або 12 цифр',
-        phone2: 'Телефон має склададатись з 10 або 12 цифр',
         default: 'Значення має містити не менше 3 символів'
     };
     readonly initialValues: ILpuModalValues = {
@@ -136,11 +134,14 @@ class LpuModal extends Component<IProps> {
     // true -> is invalid
     // string -> is invalid and string is error message to display
     valueValidator = (value: string, propName: keyof ILpuModalValues): string | boolean => {
+        /* if (this.optionalFields.includes(propName)) {
+             // phones are the only optional fields, so if they are empty, they are valid
+             if (!value) return false;
+             const isInvalid = !phoneValidator(value);
+             return isInvalid && this.errorMessages[propName];
+         } else if*/
         if (this.optionalFields.includes(propName)) {
-            // phones are the only optional fields, so if they are empty, they are valid
-            if (!value) return false;
-            const isInvalid = !phoneValidator(value);
-            return isInvalid && this.errorMessages[propName];
+            return;
         } else if (this.objectFields.includes(propName)) {
             return !value;
         } else {

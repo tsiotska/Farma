@@ -103,11 +103,8 @@ class WorkerModal extends Component<IProps> {
     readonly validators: Partial<Record<keyof IWorkerModalValues, Validator>>;
     readonly dropzoneClasses: any;
     readonly errorMessages: { [key: string]: string } = {
-        mobilePhone: 'Телефон має склададатись з 10 або 12 цифр',
-        workPhone: 'Телефон має склададатись з 10 або 12 цифр',
         name: 'Значення має містити не менше 3 символів',
         password: 'Значення має містити не менше 3 символів',
-        card: 'Значення має складатись з 16 символів'
     };
     readonly defaultValues: IWorkerModalValues = {
         name: '',
@@ -131,13 +128,10 @@ class WorkerModal extends Component<IProps> {
     constructor(props: IProps) {
         super(props);
         this.validators = {
-            mobilePhone: phoneValidator,
-            workPhone: phoneValidator,
             email: emailValidator,
             position: stringValidator,
             name: (value: string) => lengthValidator(3, value),
             password: (value: string) => lengthValidator(3, value),
-            card: (value: string) => value && value.length === 16,
         };
         const { classes } = props;
         this.dropzoneClasses = {

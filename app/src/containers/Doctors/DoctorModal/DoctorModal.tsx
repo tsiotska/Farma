@@ -84,9 +84,6 @@ class DoctorModal extends Component<IProps> {
     readonly validators: Partial<Record<keyof IDoctorModalValues, Validator>>;
     readonly errorMessages: { [key: string]: string } = {
         name: 'Значення має містити не менше 3 символів',
-        card: 'Значення має складатись з 16 цифр',
-        mobilePhone: 'Телефон має склададатись з 10 або 12 цифр',
-        workPhone: 'Телефон має склададатись з 10 або 12 цифр',
     };
     readonly initialFormValues: IDoctorModalValues = {
         name: '',
@@ -104,20 +101,11 @@ class DoctorModal extends Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
-        const phoneValidator = (value: string) => !!value
-            && onlyNumbersValidator(value)
-            && (value.length === 10 || value.length === 12);
-        const cardValidator = (value: string) => !!value
-            && value.length === 16
-            && onlyNumbersValidator(value);
         const objectValidator = (value: any) => !!value;
         this.validators = {
             name: (value: string) => lengthValidator(3, value),
             lpu: objectValidator,
             specialty: objectValidator,
-            mobilePhone: phoneValidator,
-            workPhone: phoneValidator,
-            card: cardValidator,
             position: objectValidator
         };
         this.allFields = [...Object.keys(this.initialFormValues)];
@@ -157,6 +145,7 @@ class DoctorModal extends Component<IProps> {
     }
 
     validate = (propName: keyof IDoctorModalValues, value: string) => {
+        if (!(propName in this.validators)) return;
         const validator = this.validators[propName];
         const isOptional = this.optionalFields.includes(propName);
         const errorMessage = this.errorMessages[propName];
@@ -283,7 +272,6 @@ class DoctorModal extends Component<IProps> {
                     label='Мобільний телефон'
                     values={this.formValues}
                     onChange={this.changeHandler}
-                    error={this.errors.get('mobilePhone')}
                     propName='mobilePhone'
                 />
                 <FormRow
@@ -301,7 +289,6 @@ class DoctorModal extends Component<IProps> {
                     label='Робочий телефон'
                     values={this.formValues}
                     onChange={this.changeHandler}
-                    error={this.errors.get('workPhone')}
                     propName='workPhone' />
                 <FormRow
                     required
@@ -318,9 +305,7 @@ class DoctorModal extends Component<IProps> {
                     label='Банківська картка'
                     values={this.formValues}
                     onChange={this.changeHandler}
-                    error={this.errors.get('card')}
-                    propName='card'
-                    required/>
+                    propName='card'/>
                 <FormRow
                     select
                     label='Посада'
