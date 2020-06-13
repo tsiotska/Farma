@@ -527,6 +527,8 @@ export class APIRequester {
         data: any,
         sale: boolean
     ): Promise<boolean> {
+        console.log('url is...');
+        console.log(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${sale ? '&save=1' : ''}`);
         return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${sale ? '&save=1' : ''}`, data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));

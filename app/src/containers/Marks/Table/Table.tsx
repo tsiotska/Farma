@@ -80,7 +80,7 @@ interface IProps extends WithStyles<typeof styles> {
     isNested: boolean;
     previewBonus: IBonusInfo;
 
-    totalSold?: { [key: number]: number };
+    totalSold?: (position?: number) => { [key: number]: number };
     changedMarks?: Map<number, Map<number, IMark>>;
     currentDepartmentId?: number;
     role?: USER_ROLE;
@@ -202,9 +202,11 @@ class Table extends Component<IProps> {
     @computed
     get tooltips(): { [key: number]: number } {
         const { totalSold } = this.props;
+        const sold = totalSold();
+        console.log(sold);
         return [...this.sales.values()].reduce(
             (total, curr) => {
-                total[curr.id] = curr.amount - (totalSold[curr.id] || 0);
+                total[curr.id] = curr.amount - (sold[curr.id] || 0);
                 return total;
             },
             {}
@@ -353,7 +355,7 @@ class Table extends Component<IProps> {
         }, 500);
     }
 
-    componentWillUnmount() {
+    async componentWillUnmount() {
         if (this.reactionDisposer) this.reactionDisposer();
         if (this.totalReactionDisposer) this.totalReactionDisposer();
 
@@ -375,11 +377,13 @@ class Table extends Component<IProps> {
 
         const condition = role === USER_ROLE.MEDICAL_AGENT
             && (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
-            && !this.isEmpty
-            && changedMarks.size;
-
+            && !this.isEmpty && changedMarks.size;
+        // const condition = !this.isEmpty && changedMarks.size;
+        console.log('condition');
+        console.log(condition);
         if (condition) {
-            updateBonus(previewBonus, false);
+            console.log('saving...');
+            await updateBonus(previewBonus, false);
         }
         clearChangedMarks();
         removeBonusUser(parentUser);

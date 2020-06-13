@@ -79,7 +79,7 @@ interface IProps extends WithStyles<typeof styles> {
 
     setDivisionValidity?: (value: boolean) => void;
     role?: USER_ROLE;
-    totalSold?: { [key: number]: number };
+    totalSold?: (position?: number) => { [key: number]: number };
     meds?: IMedicine[];
     changedMedsMarks?: { [key: number]: number };
 }
@@ -146,11 +146,11 @@ class TableHeader extends Component<IProps> {
         } = this.props;
 
         this.isValid = true;
-
+        const sold = totalSold(position);
         return meds.length
             ? meds.map(x => {
                 const saleInfo = this.sales.get(x.id);
-                const leftValue = (totalSold[x.id] || 0) + (
+                const leftValue = (sold[x.id] || 0) + (
                     (x.id in changedMedsMarks)
                         ? changedMedsMarks[x.id]
                         : 0

@@ -103,20 +103,20 @@ const styles = (theme: any) => createStyles({
     span1: {
         marginTop: 'auto',
         borderTop: '1px solid #0000001f',
-        padding: '1px 5px 0 5px',
+        padding: '',
         background: '#DEE6EA',
         width: '100%'
     },
     span: {
         minWidth: 25,
         textAlign: 'center',
-        maxWidth: 38,
+        //  maxWidth: 40,
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
     lastGridItem: {
-        paddingRight: 8,
-        maxWidth: 85
+       // paddingRight: 8,
+       // maxWidth: 85
     },
     closeIcon: {
         color: 'white',

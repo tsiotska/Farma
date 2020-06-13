@@ -1,6 +1,6 @@
 import { IDoctor } from './../interfaces/IDoctor';
 import { IAgentInfo, IBonusInfo, IMark } from './../interfaces/IBonusInfo';
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, computed, observable, runInAction, toJS } from 'mobx';
 import { IUserCommonInfo, IUserCredentials } from './../interfaces/IUser';
 import { IRootStore } from './../interfaces/IRootStore';
 import AsyncStore from './AsyncStore';
@@ -54,7 +54,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable bonusUsers: IUserLikeObject[] = [];
 
     @observable syncIntervalId: number = null;
-    @observable isSynchronized: boolean = false;
+    @observable isSynchronized: boolean = null;
 
     notificationsUpdateInterval: any = null;
 
@@ -107,14 +107,13 @@ export default class UserStore extends AsyncStore implements IUserStore {
             : USER_ROLE.UNKNOWN;
     }
 
-    @computed
-    get totalSold(): { [key: number]: number } {
-        const bonuses = this.bonuses[this.role];
+    @action.bound
+     totalSold(position?: number): { [key: number]: number } {
+        const bonuses = position ? this.bonuses[position] : this.bonuses[this.role];
         const actual: IBonusInfo = bonuses
-            ? bonuses.find(({ month }) => month === this.previewBonusMonth)
+            ? bonuses.find(({ month }: any) => month === this.previewBonusMonth)
             : null;
         if (!actual) return {};
-
         const res = actual.agents.reduce((acc, { marks }) => {
             marks.forEach(({ deposit, payments, drugId }) => {
                 acc[drugId] = (acc[drugId] || 0) + deposit + payments;
@@ -270,19 +269,17 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @action.bound
     async updateBonus(bonus: IBonusInfo, sale: boolean) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-
         if (this.isMedsDivisionValid === false) {
             return;
         }
-
         let id: number = null;
         if (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
             id = this.previewUser.id;
         } else {
+            console.log(toJS(this.bonusUsers));
             const mp = this.bonusUsers.find(({ position }) => position === USER_ROLE.MEDICAL_AGENT);
             id = mp ? mp.id : null;
         }
-
         if (!bonus || id === null || currentDepartmentId === null) return;
 
         const { month, agents } = bonus;
@@ -318,9 +315,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
             return [...acc, ...preparedMarks];
         }, []);
-
         if (!marks.length) return;
-
         await this.dispatchRequest(
             api.updateBonusesData(
                 currentDepartmentId,
@@ -947,15 +942,21 @@ export default class UserStore extends AsyncStore implements IUserStore {
         const { api } = this.rootStore;
         const taskId = await this.dispatchRequest(api.synchronize(), 'synchronize');
         if (taskId) {
-            this.syncIntervalId = window.setInterval(() => this.recursion(taskId), 30000);
+            this.syncIntervalId = window.setInterval(() => this.taskRequest(taskId), 30000);
         }
     }
 
-    recursion = async (taskId: number) => {
-        const {api} = this.rootStore;
+    taskRequest = async (taskId: number) => {
+        const { api } = this.rootStore;
         const status = await this.dispatchRequest(api.getSyncStatus(taskId), 'getSyncStatus');
-        this.isSynchronized = status === 200;
-        if (this.isSynchronized) {
+        console.log('status');
+        console.log(status);
+        this.isSynchronized = status === 200 ? true : status === 404 ? false : null;
+        console.log('isSynchronized');
+        console.log(this.isSynchronized);
+        if (this.isSynchronized === true || this.isSynchronized === false) {
+            console.log('syncIntervalId cleared');
+            console.log(this.syncIntervalId);
             window.clearInterval(this.syncIntervalId);
         }
     }

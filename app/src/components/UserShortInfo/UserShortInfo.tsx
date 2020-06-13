@@ -140,7 +140,7 @@ class UserShortInfo extends Component<IProps> {
                                 label: classes.levelButtonLabel
                             }}>
                             <Level user={user} />
-                            { !disableText && <Typography>Подивитись заплату </Typography>}
+                            { !disableText && <Typography>Подивитись зарплату </Typography>}
                         </Button>
                     }
                 </Grid>

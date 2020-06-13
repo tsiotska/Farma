@@ -137,6 +137,7 @@ class Marks extends Component<IProps> {
 
     get previewBonus(): IBonusInfo {
         const { bonuses, previewBonusMonth, previewUser } = this.props;
+       // console.log(previewUser.position);
         const targetBonus = previewUser.position in bonuses
             ? bonuses[previewUser.position].find(x => x.month === previewBonusMonth)
             : null;
