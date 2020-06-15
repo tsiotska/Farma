@@ -177,11 +177,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    isDivisionValid(value: boolean) {
-        // this.isMedsDivisionValid = value;
-    }
-
-    @action.bound
     loadBonusesExcel(mode: 'payment' | 'deposit', dateFrom: Date, dateTo: Date, loadPack: boolean) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
 

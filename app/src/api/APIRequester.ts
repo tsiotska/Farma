@@ -699,9 +699,12 @@ export class APIRequester {
             .catch(this.defaultErrorHandler(false));
     }
 
-    getSyncStatus(taskId: number): Promise<number> {
+    getSyncStatus(taskId: number): Promise<any> {
         return this.instance.get(`/api/synchronize/data?task_id=${taskId}`)
-            .then(({ data: { data: { status } } }) => status)
-            .catch(this.defaultErrorHandler(false));
+            .then((response) => response.status)
+            .catch((error) => {
+                this.defaultErrorHandler(false);
+                return error.response.status;
+            });
     }
 }
