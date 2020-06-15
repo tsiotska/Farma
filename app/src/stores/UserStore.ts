@@ -39,6 +39,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     @observable notificationsCount: number = 0;
     @observable notifications: INotification[] = [];
     @observable isMedsDivisionValid: boolean = false;
+    @observable previewBonusStatus: boolean = false;
 
     @observable bonuses: Partial<Record<USER_ROLE, IBonusInfo[]>> = {
         [USER_ROLE.FIELD_FORCE_MANAGER]: [],
@@ -276,7 +277,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (this.previewUser && this.previewUser.position === USER_ROLE.MEDICAL_AGENT) {
             id = this.previewUser.id;
         } else {
-            console.log(toJS(this.bonusUsers));
             const mp = this.bonusUsers.find(({ position }) => position === USER_ROLE.MEDICAL_AGENT);
             id = mp ? mp.id : null;
         }
@@ -429,8 +429,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    setPreviewBonusMonth = (month: number) => {
+    setPreviewBonusMonth = (month: number, status: boolean) => {
         this.previewBonusMonth = month;
+        this.previewBonusStatus = status;
         this.bonusUsers = [];
     }
 
@@ -488,7 +489,10 @@ export default class UserStore extends AsyncStore implements IUserStore {
             const newMonth = targetBonuses.length
                 ? targetBonuses[targetBonuses.length - 1].month
                 : null;
-            this.setPreviewBonusMonth(newMonth);
+            const newStatus = targetBonuses.length
+                ? targetBonuses[targetBonuses.length - 1].status
+                : null;
+            this.setPreviewBonusMonth(newMonth, newStatus);
         }
     }
 

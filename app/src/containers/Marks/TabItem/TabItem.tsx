@@ -37,13 +37,13 @@ const styles = (theme: any) => createStyles({
         textTransform: 'capitalize',
         fontSize: theme.typography.pxToRem(15),
         fontFamily: 'Source Sans Pro SemiBold',
-        color: ({ selected}: any) => selected
+        color: ({ selected }: any) => selected
             ? theme.palette.primary.green.main
             : theme.palette.primary.gray.main
     },
     secondaryText: {
         fontSize: theme.typography.pxToRem(14),
-        color: ({ selected}: any) => selected
+        color: ({ selected }: any) => selected
             ? theme.palette.primary.green.main
             : theme.palette.primary.gray.mainLight
     },
@@ -73,23 +73,23 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     bonus: IBonusInfo;
     selected: boolean;
-    setPreviewBonusMonth?: (month: number) => void;
+    setPreviewBonusMonth?: (month: number, status: boolean) => void;
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            setPreviewBonusMonth
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     setPreviewBonusMonth
+                 }
+             }
+         }) => ({
     setPreviewBonusMonth
 }))
 @observer
 class TabItem extends Component<IProps> {
     clickHandler = () => {
-        const { setPreviewBonusMonth, bonus: { month } } = this.props;
-        setPreviewBonusMonth(month);
+        const { setPreviewBonusMonth, bonus: { month, status } } = this.props;
+        setPreviewBonusMonth(month, status);
     }
 
     render() {
@@ -97,19 +97,19 @@ class TabItem extends Component<IProps> {
 
         return (
             <Button onClick={this.clickHandler} className={classes.root}>
-                <ExcelIcon className={classes.icon} size={35} />
+                <ExcelIcon className={classes.icon} size={35}/>
                 <Grid className={classes.textContainer} alignItems='flex-start' direction='column' container>
                     <Typography className={cx(classes.text, classes.leadText)}>
-                        { uaMonthsNames[month] }
+                        {uaMonthsNames[month]}
                     </Typography>
                     <Typography className={cx(classes.text, classes.secondaryText)} variant='body2'>
-                        { payments } / { deposit }
+                        {payments} / {deposit}
                     </Typography>
                 </Grid>
 
                 <Grid className={classes.temporaryContainer} container direction='column'>
-                    { status === true && <Check fontSize='small' className={classes.checkIcon}/> }
-                    { status === false && <Close fontSize='small' className={classes.closeIcon}/> }
+                    {status === true && <Check fontSize='small' className={classes.checkIcon}/>}
+                    {status === false && <Close fontSize='small' className={classes.closeIcon}/>}
                 </Grid>
             </Button>
         );
