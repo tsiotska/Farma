@@ -378,11 +378,8 @@ class Table extends Component<IProps> {
         const condition = role === USER_ROLE.MEDICAL_AGENT
             && (parentUser ? parentUser.position : null) === USER_ROLE.MEDICAL_AGENT
             && !this.isEmpty && changedMarks.size;
-        // const condition = !this.isEmpty && changedMarks.size;
-        console.log('condition');
-        console.log(condition);
+
         if (condition) {
-            console.log('saving...');
             await updateBonus(previewBonus, false);
         }
         clearChangedMarks();

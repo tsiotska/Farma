@@ -272,9 +272,9 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-    async updateBonus(bonus: IBonusInfo, sale: boolean) {
+    async updateBonus(bonus: IBonusInfo, save: boolean) {
         const { api, departmentsStore: { currentDepartmentId } } = this.rootStore;
-        if (this.isMedsDivisionValid === false) {
+        if (save && this.isMedsDivisionValid === false) {
             return;
         }
         let id: number = null;
@@ -328,7 +328,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
                 this.bonusesYear,
                 month + 1,
                 marks,
-                sale
+                save
             ),
             'updateBonuses'
         );

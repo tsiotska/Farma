@@ -525,11 +525,9 @@ export class APIRequester {
         year: number,
         month: number,
         data: any,
-        sale: boolean
+        save: boolean
     ): Promise<boolean> {
-        console.log('url is...');
-        console.log(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${sale ? '&save=1' : ''}`);
-        return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${sale ? '&save=1' : ''}`, data)
+        return this.instance.put(`/api/branch/${depId}/mp/${userId}/mark?year=${year}&month=${month}${save ? '&save=1' : ''}`, data)
             .then(() => true)
             .catch(this.defaultErrorHandler(false));
     }
