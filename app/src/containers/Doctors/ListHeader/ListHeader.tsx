@@ -9,7 +9,6 @@ import DoctorsFilterPopper, { DoctorsSortableProps } from '../../../components/D
 import { computed, observable, reaction, toJS } from 'mobx';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
 import { IFilterBy, ISortBy, SORT_ORDER } from '../../../stores/UIStore';
-import { ILPU } from '../../../interfaces/ILPU';
 import { IDoctor } from '../../../interfaces/IDoctor';
 
 const styles = (theme: any) => createStyles({
@@ -190,12 +189,18 @@ class ListHeader extends Component<IProps> {
 
         const lowerCaseFilter = this.searchString
             ? this.searchString.toLowerCase()
+                .replace(/\u02bc/, '')
+                .replace('ʼ', '')
+                .replace('`', '')
+                .replace('\'', '')
             : '';
 
         for (let i = 0; i < maxIter; ++i) {
             const value = this.sortedOptions[i][this.propName];
-            const passFilter = lowerCaseFilter === '' || value.toLowerCase().includes(lowerCaseFilter);
 
+            const passFilter = lowerCaseFilter === '' || value.toLowerCase()
+                .replace(/\u02bc/, '')
+                .includes(lowerCaseFilter);
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);
                 res.push({ id: i, value });
