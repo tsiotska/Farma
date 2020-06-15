@@ -11,4 +11,6 @@ export interface IUIStore {
     salesPharmacyFilter: ISalesPharmacyFilter;
     isSynchronizing: boolean;
     synchronizingSnackbar: ISnackbar;
+    setSynchronizing: (val: boolean) => void;
+    setSnackbarType: (isSynchronized: boolean) => void;
 }

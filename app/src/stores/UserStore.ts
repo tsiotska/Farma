@@ -108,7 +108,7 @@ export default class UserStore extends AsyncStore implements IUserStore {
     }
 
     @action.bound
-     totalSold(position?: number): { [key: number]: number } {
+    totalSold(position?: number): { [key: number]: number } {
         const bonuses = position ? this.bonuses[position] : this.bonuses[this.role];
         const actual: IBonusInfo = bonuses
             ? bonuses.find(({ month }: any) => month === this.previewBonusMonth)
@@ -943,15 +943,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
 
     @action.bound
     async synchronize() {
-        const { api } = this.rootStore;
+        const { api, uiStore: { setSynchronizing, setSnackbarType } } = this.rootStore;
+        setSynchronizing(true);
         const taskId = await this.dispatchRequest(api.synchronize(), 'synchronize');
         if (taskId) {
             this.syncIntervalId = window.setInterval(() => this.taskRequest(taskId), 30000);
+        } else {
+            setSynchronizing(false);
+            setSnackbarType(false);
         }
     }
 
     taskRequest = async (taskId: number) => {
-        const { api } = this.rootStore;
+        const { api, uiStore: { setSynchronizing, setSnackbarType } } = this.rootStore;
         const status = await this.dispatchRequest(api.getSyncStatus(taskId), 'getSyncStatus');
         console.log('status');
         console.log(status);
@@ -959,9 +963,11 @@ export default class UserStore extends AsyncStore implements IUserStore {
         console.log('isSynchronized');
         console.log(this.isSynchronized);
         if (this.isSynchronized === true || this.isSynchronized === false) {
-            console.log('syncIntervalId cleared');
+            console.log('syncIntervalId is cleared');
             console.log(this.syncIntervalId);
             window.clearInterval(this.syncIntervalId);
+            setSynchronizing(false);
+            setSnackbarType(this.isSynchronized);
         }
     }
 }

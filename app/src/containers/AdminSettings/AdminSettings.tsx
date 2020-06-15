@@ -36,6 +36,7 @@ interface IProps extends WithStyles<typeof styles> {
     setSynchronizing?: (val: boolean) => void;
     setSnackbarType?: (isSynchronized: boolean) => void;
     history?: History;
+    isSynchronized?: () => any;
 }
 
 enum SETTINGS_TAB {
@@ -47,7 +48,8 @@ enum SETTINGS_TAB {
 @inject(({
              appState: {
                  userStore: {
-                     synchronize
+                     synchronize,
+                     isSynchronized
                  },
                  uiStore: {
                      setSynchronizing,
@@ -57,7 +59,8 @@ enum SETTINGS_TAB {
          }) => ({
     synchronize,
     setSynchronizing,
-    setSnackbarType
+    setSnackbarType,
+    isSynchronized
 }))
 @observer
 class AdminSettings extends Component<IProps> {
@@ -74,11 +77,8 @@ class AdminSettings extends Component<IProps> {
     }
 
     synchronizeData = async () => {
-        const { setSynchronizing, synchronize, setSnackbarType } = this.props;
-        setSynchronizing(true);
-        const isSynchronized = await synchronize();
-        setSynchronizing(false);
-        setSnackbarType(isSynchronized);
+        const { setSynchronizing, synchronize, setSnackbarType, isSynchronized } = this.props;
+        await synchronize();
     }
 
     componentDidMount() {
@@ -121,12 +121,6 @@ class AdminSettings extends Component<IProps> {
                         <Route path={SETTINGS_ROUTE} component={CommonSettings}/>
                     </Switch>
                 </Grid>
-                {/*  <Snackbar
-                    open={!!this.snackbarMessage}
-                    onClose={this.snackbarCloseHandler}
-                    type={this.snackbarType}
-                    message={this.snackbarMessage}
-                />*/}
             </Paper>
         );
     }

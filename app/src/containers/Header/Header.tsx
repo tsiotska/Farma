@@ -174,7 +174,7 @@ export class Header extends Component<IProps, {}> {
     })
 
     render() {
-        const { classes, isSynchronizing, synchronizingSnackbar: { message: syncMessage, type: syncStatus }, syncSnackbarCloseHandler } = this.props;
+        const { classes, isSynchronizing, synchronizingSnackbar: { message: syncMessage, type: syncStatus }} = this.props;
 
         return (
             <>
