@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import { toJS } from 'mobx';
 import { withStyles, createStyles, WithStyles } from '@material-ui/core';
 import { IUser } from '../../interfaces';
 import ProfilePreview from '../../components/ProfilePreview';
@@ -17,33 +18,32 @@ interface IProps extends WithStyles<typeof styles> {
 }
 
 @inject(({
-    appState: {
-        userStore: {
-            navHistory
-        }
-    }
-}) => ({
+             appState: {
+                 userStore: {
+                     navHistory
+                 }
+             }
+         }) => ({
     navHistory
 }))
 @observer
 class ProfilePreviewContainer extends Component<IProps> {
     render() {
         const { navHistory, classes } = this.props;
-
         return navHistory.length
-        ? <div className={classes.navContainer}>
-            {
-                navHistory.map((user, i, arr) => (
-                    <ProfilePreview
-                        key={user.id}
-                        user={user}
-                        index={i}
-                        scaleIndex={arr.length - i - 1}
-                    />
-                ))
-            }
-          </div>
-        : null;
+            ? <div className={classes.navContainer}>
+                {
+                    navHistory.map((user, i, arr) => (
+                        <ProfilePreview
+                            key={user.id}
+                            user={user}
+                            index={i}
+                            scaleIndex={arr.length - i - 1}
+                        />
+                    ))
+                }
+            </div>
+            : null;
     }
 }
 

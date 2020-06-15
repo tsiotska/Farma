@@ -265,34 +265,37 @@ class WorkerListItem extends Component<IProps> {
             disableClick,
             expandedWorker,
             loadCurrentFFM,
-            worker
+            worker,
+            worker: { id, name, image, position }
         } = this.props;
         if (disableClick) return;
         e.stopPropagation();
         const ffm = await loadCurrentFFM();
         const rm = expandedWorker ? expandedWorker.id : null;
+
         const presets: any = {
             [USER_ROLE.FIELD_FORCE_MANAGER]: [ffm[0].id],
             [USER_ROLE.REGIONAL_MANAGER]: [ffm[0].id, worker.id],
             [USER_ROLE.MEDICAL_AGENT]: [ffm[0].id, rm, worker.id],
         };
         const targetRoles = presets[worker.position];
-        const promises = targetRoles.map((x: number) => getUser(x));
-        const loadedUsers: IUser[] = await Promise.all(promises);
-        const filtered = loadedUsers.filter(x => !!x);
+        if (worker.position === USER_ROLE.MEDICAL_AGENT && !rm) {
+            historyPushUser({
+                id,
+                name,
+                image,
+                region: null,
+                city: null
+            }, position);
+        } else {
+            const promises = targetRoles.map((x: number) => getUser(x));
+            const loadedUsers: IUser[] = await Promise.all(promises);
+            const filtered = loadedUsers.filter(x => !!x);
 
-        const newUserHistory = multiDepartmentRoles.includes(worker.position)
-            ? filtered : [...filtered];
-        historyReplace(newUserHistory);
-        /*
-        historyPushUser({
-            id,
-            name,
-            image,
-            region: null,
-            city: null
-        }, position);
-        */
+            const newUserHistory = multiDepartmentRoles.includes(worker.position)
+                ? filtered : [...filtered];
+            historyReplace(newUserHistory);
+        }
     }
 
     render() {

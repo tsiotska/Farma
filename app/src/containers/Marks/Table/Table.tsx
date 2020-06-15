@@ -203,7 +203,6 @@ class Table extends Component<IProps> {
     get tooltips(): { [key: number]: number } {
         const { totalSold } = this.props;
         const sold = totalSold();
-        console.log(sold);
         return [...this.sales.values()].reduce(
             (total, curr) => {
                 total[curr.id] = curr.amount - (sold[curr.id] || 0);
