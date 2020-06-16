@@ -237,7 +237,7 @@ export class Header extends Component<IProps, {}> {
                 <Snackbar
                     open={!!syncMessage}
                     onClose={this.syncSnackbarCloseHandler}
-                    autoHideDuration={6000}
+                    autoHideDuration={12000}
                     type={syncStatus}
                     message={syncMessage}
                 />

@@ -195,7 +195,7 @@ class TableSubheader extends Component<IProps> {
                 {
                     agentsLoaded && this.isEmpty === false &&
                     <TableHeader
-                        showLpu={this.userIsMedicalAgent}
+                        isMedicalAgent={this.userIsMedicalAgent}
                         previewBonus={previewBonus}
                         hideName
                         isNested

@@ -145,13 +145,19 @@ class Header extends Component<IProps> {
 
         const lowerCaseFilter = this.searchString
             ? this.searchString.toLowerCase()
+                .replace(/\u02bc/, '')
+                .replace('ʼ', '')
+                .replace('`', '')
+                .replace('\'', '')
             : '';
 
         for (let i = 0; i < maxIter; ++i) {
             const value = this.sortedOptions[i][this.propName];
 
             // if filterString === '' -> its already pass filter, otherwise -> check searchString
-            const passFilter = lowerCaseFilter === '' || value.includes(lowerCaseFilter);
+            const passFilter = lowerCaseFilter === '' || value
+                .replace(/\u02bc/, '')
+                .includes(lowerCaseFilter);
 
             if (passFilter === true && checklist.includes(value) === false) {
                 checklist.push(value);

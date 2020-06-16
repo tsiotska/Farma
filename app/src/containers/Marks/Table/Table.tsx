@@ -454,7 +454,7 @@ class Table extends Component<IProps> {
                                             agentInfo={(this.agentsInfo || []).find(({ id }) => id === x.id)}
                                             isNested={isNested}
                                             agent={(x as IUserInfo & IUserLikeObject)}
-                                            showLpu={this.userIsMedicalAgent}
+                                            isMedicalAgent={this.userIsMedicalAgent}
                                             tooltips={this.tooltips}
                                             expanded={bonusUsers.some(({ id }) => id === x.id)}
                                             expandHandler={this.expandHandler}

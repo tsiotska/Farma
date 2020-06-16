@@ -134,7 +134,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     agentInfo: IAgentInfo;
-    showLpu: boolean;
+    isMedicalAgent: boolean;
     tooltips: { [key: number]: number };
     agent: IUserInfo & IUserLikeObject;
     isNested: boolean;
@@ -261,8 +261,8 @@ class Row extends Component<IProps> {
 
     @computed
     get columnsCount(): number {
-        const { meds, showLpu } = this.props;
-        return 4 + meds.length + (showLpu ? 1 : 0);
+        const { meds, isMedicalAgent } = this.props;
+        return 4 + meds.length + (isMedicalAgent ? 1 : 0);
     }
 
     @computed
@@ -358,7 +358,7 @@ class Row extends Component<IProps> {
     render() {
         const {
             classes,
-            showLpu,
+            isMedicalAgent,
             agent,
             itemRef,
             expanded,
@@ -414,7 +414,7 @@ class Row extends Component<IProps> {
             <>
                 <MuiTableRow ref={itemRef} className={classes.root}>
                     {
-                        showLpu &&
+                        isMedicalAgent &&
                         <TableCell
                             padding='none'
                             style={{ width: this.columnWidth }}
@@ -431,17 +431,17 @@ class Row extends Component<IProps> {
                         onClick={this.expandHandler}
                         padding='none'
                         style={{
-                            maxWidth: this.columnWidth * (!!showLpu ? 1 : 2),
-                            width: this.columnWidth * (!!showLpu ? 1 : 2)
+                            maxWidth: this.columnWidth * (!!isMedicalAgent ? 1 : 2),
+                            width: this.columnWidth * (!!isMedicalAgent ? 1 : 2)
                         }}
                         className={cx(classes.cell, { [classes.clickable]: this.isExpandable })}>
                         <Grid
                             container
                             wrap='nowrap'
-                            // style={{ maxWidth: this.columnWidth * (!!showLpu ? 1 : 2) }}
+                            // style={{ maxWidth: this.columnWidth * (!!isMedicalAgent ? 1 : 2) }}
                             alignItems='center'>
                             {
-                                this.isExpandable === true && showLpu === false &&
+                                this.isExpandable === true && isMedicalAgent === false &&
                                 <KeyboardArrowDown
                                     className={cx(classes.expandIcon, { rotate: expanded === true })}
                                     fontSize='small'/>

@@ -131,7 +131,7 @@ class Marks extends Component<IProps> {
     }
 
     @computed
-    get showLpuColumn(): boolean {
+    get isUserMedicalAgent(): boolean {
         return this.props.role === USER_ROLE.MEDICAL_AGENT;
     }
 
@@ -236,7 +236,7 @@ class Marks extends Component<IProps> {
                     </Grid>
                     <TableHeader
                         previewBonus={this.previewBonus}
-                        showLpu={this.showLpuColumn}
+                        isMedicalAgent={this.isUserMedicalAgent}
                         parentUser={previewUser}
                         isNested={false}
                     />

@@ -956,14 +956,8 @@ export default class UserStore extends AsyncStore implements IUserStore {
     taskRequest = async (taskId: number) => {
         const { api, uiStore: { setSynchronizing, setSnackbarType } } = this.rootStore;
         const status = await this.dispatchRequest(api.getSyncStatus(taskId), 'getSyncStatus');
-        console.log('status');
-        console.log(status);
         this.isSynchronized = status === 200 ? true : status === 404 ? false : null;
-        console.log('isSynchronized');
-        console.log(this.isSynchronized);
         if (this.isSynchronized === true || this.isSynchronized === false) {
-            console.log('syncIntervalId is cleared');
-            console.log(this.syncIntervalId);
             window.clearInterval(this.syncIntervalId);
             setSynchronizing(false);
             setSnackbarType(this.isSynchronized);

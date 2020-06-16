@@ -206,8 +206,7 @@ class SideNav extends Component<IProps> {
             notificationsCount,
             isAllowed
         } = this.props;
-        console.log('notificationsCount');
-        console.log(notificationsCount);
+
         return (
             <Drawer classes={{ root: classes.root, paper: classes.paper }} variant='permanent'>
                 {

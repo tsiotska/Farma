@@ -8,17 +8,20 @@ import {
     TableRow,
     TableCell,
     Typography,
-    Grid
+    Grid, IconButton
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed, toJS } from 'mobx';
+import { computed, reaction, toJS } from 'mobx';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
 import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
 import { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
+import { FilterList } from '@material-ui/icons';
+import MarksFilterPopper, { MarksSortableProps } from '../../../components/MarksFilterPopper/MarksFilterPopper';
+import { ISortBy } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -67,21 +70,29 @@ const styles = (theme: any) => createStyles({
     },
     salesStat: {
         width: '100%', display: 'flex'
-    }
+    },
+    iconButton: {
+        padding: 4,
+        borderRadius: 2,
+        marginLeft: 5,
+        '&.active': {
+            color: theme.palette.primary.green.main
+        }
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    showLpu: boolean;
     previewBonus: IBonusInfo;
     hideName?: boolean;
     parentUser: IUserInfo & IUserLikeObject;
     isNested: boolean;
-
+    isMedicalAgent?: boolean;
     setDivisionValidity?: (value: boolean) => void;
     role?: USER_ROLE;
     totalSold?: (position?: number) => { [key: number]: number };
     meds?: IMedicine[];
     changedMedsMarks?: { [key: number]: number };
+    sortSettings?: ISortBy;
 }
 
 @inject(({
@@ -195,55 +206,141 @@ class TableHeader extends Component<IProps> {
             : <TableCell/>;
     }
 
-    render() {
-        const { classes, showLpu } = this.props;
+    openFilterPopper = (propName: MarksSortableProps) => ({ target }: any) => {
+        /*const {
+            doctors,
+            sortSettings,
+            filterSettings
+        } = this.props;
 
+        const source = doctors;
+
+        this.resetValues();
+        this.filterPopperAnchor = target;
+        this.propName = propName;
+
+        this.sortReaction = reaction(
+            () => ([this.isLoading, source && source.length]),
+            ([isLoading, size]: [boolean, number], r) => {
+                if (isLoading) {
+                    if (!size) return;
+
+                    const newItems = size > 200
+                        ? source.slice(0, 200)
+                        : source;
+
+                    const storedItemsLength = this.source
+                        ? this.source.length
+                        : -1;
+
+                    if (storedItemsLength !== newItems.length) {
+                        this.source = newItems;
+                    }
+                } else {
+                    this.source = source;
+                    r.dispose();
+                }
+            }, {
+                fireImmediately: true
+            }
+        );
+
+        if (sortSettings && sortSettings.propName === propName) {
+            this.order = sortSettings.order;
+        }
+        if (filterSettings && filterSettings.propName === propName) {
+            this.ignoredItems = [...filterSettings.ignoredItems];
+        }*/
+    }
+
+    render() {
+        const { classes, sortSettings, isMedicalAgent } = this.props;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
         return (
-            <TableContainer className={classes.container}>
-                <Table className={classes.table}>
-                    <TableHead>
-                        <TableRow>
-                            {
-                                showLpu &&
+            <>
+                <TableContainer className={classes.container}>
+                    <Table className={classes.table}>
+                        <TableHead>
+                            <TableRow>
+                                {
+                                    isMedicalAgent &&
+                                    <TableCell
+                                        padding='none'
+                                        style={{ width: this.columnWidth }}
+                                        className={cx(classes.cell, classes.wideColumn)}>
+                                        ЛПУ
+                                        <IconButton
+                                            onClick={this.openFilterPopper('name')}
+                                            className={cx(classes.iconButton, { active: ('LPUName' === sortPropName) })}>
+                                            <FilterList fontSize='small'/>
+                                        </IconButton>
+                                    </TableCell>
+                                }
                                 <TableCell
                                     padding='none'
-                                    style={{ width: this.columnWidth }}
-                                    className={cx(classes.cell, classes.wideColumn)}>
-                                    ЛПУ
+                                    style={{ width: this.columnWidth * (!!isMedicalAgent ? 1 : 2) }}
+                                    className={cx(classes.cell, {
+                                        [classes.doubleWidthColumn]: !isMedicalAgent,
+                                        [classes.wideColumn]: isMedicalAgent,
+                                    })}>
+                                    ПІБ
+                                    {
+                                        isMedicalAgent &&
+                                        <IconButton
+                                            onClick={this.openFilterPopper('name')}
+                                            className={cx(classes.iconButton, { active: ('name' === sortPropName) })}>
+                                            <FilterList fontSize='small'/>
+                                        </IconButton>
+                                    }
                                 </TableCell>
-                            }
-                            <TableCell
-                                padding='none'
-                                style={{ width: this.columnWidth * (!!showLpu ? 1 : 2) }}
-                                className={cx(classes.cell, {
-                                    [classes.doubleWidthColumn]: !showLpu,
-                                    [classes.wideColumn]: showLpu,
-                                })}>
-                                ПІБ
-                            </TableCell>
-                            {this.getMedsList}
-                            <TableCell
-                                padding='none'
-                                align='center'
-                                className={cx(classes.cell, classes.column)}>
-                                уп
-                            </TableCell>
-                            <TableCell
-                                align='center'
-                                padding='none'
-                                className={cx(classes.cell, classes.column)}>
-                                бонуси
-                            </TableCell>
-                            <TableCell
-                                align='right'
-                                padding='none'
-                                className={cx(classes.cell, classes.column)}>
-                                всього
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                </Table>
-            </TableContainer>
+                                {this.getMedsList}
+                                <TableCell
+                                    padding='none'
+                                    align='center'
+                                    className={cx(classes.cell, classes.column)}>
+                                    уп
+                                </TableCell>
+                                <TableCell
+                                    align='center'
+                                    padding='none'
+                                    className={cx(classes.cell, classes.column)}>
+                                    бонуси
+                                </TableCell>
+                                <TableCell
+                                    align='right'
+                                    padding='none'
+                                    className={cx(classes.cell, classes.column)}>
+                                    всього
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                    </Table>
+                </TableContainer>
+                {
+                    /*  <MarksFilterPopper
+                toggleAll={this.toggleAll}
+                propName={this.propName}
+                anchor={this.filterPopperAnchor}
+                onClose={this.popoverCloseHandler}
+                isLoading={this.isLoading}
+
+                order={this.order}
+                onOrderChange={this.sortOrderChangeHandler}
+
+                searchString={this.searchInputValue}
+                onSearchStringChange={this.inputChangeHandler}
+                applySearch={this.findSuggestions}
+
+                totalLength={this.totalLength}
+                suggestions={this.filteredOptions}
+                ignoredItems={this.ignoredItems}
+                itemClickHandler={this.itemClickHandler}
+
+                applyClickHandler={this.applyFilters}
+
+                />
+                */}
+            </>
         );
     }
 }
