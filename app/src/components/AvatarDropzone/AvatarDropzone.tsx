@@ -6,6 +6,9 @@ import { ArrowDownward, AddAPhotoOutlined } from '@material-ui/icons';
 import PhotoDropzone from '../PhotoDropzone';
 
 const styles = (theme: any) => createStyles({
+    container: {
+        width: 'auto'
+    },
     dropzone: {
         width: 120,
         height: 121,
@@ -17,9 +20,6 @@ const styles = (theme: any) => createStyles({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-    },
-    container: {
-        width: 'auto'
     },
     removePhotoButton: {
         marginTop: 22,
@@ -50,8 +50,8 @@ class AvatarDropzone extends Component<IProps> {
         input.setAttribute('accept', 'image/*');
         input.onchange = () => {
             const targetFile = (input.files && input.files.length)
-            ? input.files[0]
-            : null;
+                ? input.files[0]
+                : null;
             if (targetFile) appendFile(targetFile);
         };
         input.click();
@@ -59,7 +59,6 @@ class AvatarDropzone extends Component<IProps> {
 
     render() {
         const { file, appendFile, classes, removeIcon } = this.props;
-
         return (
             <Grid className={classes.container} direction='column' container item>
                 <PhotoDropzone
@@ -69,10 +68,10 @@ class AvatarDropzone extends Component<IProps> {
                     {
                         (isHovered: boolean, isDragActive: boolean) => (
                             file
-                            ? null
-                            : isDragActive
-                                ? <ArrowDownward className={classes.icon} />
-                                : <AddAPhotoOutlined className={classes.icon} />
+                                ? null
+                                : isDragActive
+                                ? <ArrowDownward className={classes.icon}/>
+                                : <AddAPhotoOutlined className={classes.icon}/>
                         )
                     }
                 </PhotoDropzone>
@@ -82,8 +81,8 @@ class AvatarDropzone extends Component<IProps> {
                     className={classes.addPhotoButton}>
                     {
                         file
-                        ? 'Змінити фото'
-                        : 'Додати фото'
+                            ? 'Змінити фото'
+                            : 'Додати фото'
                     }
                 </Button>
                 <Button

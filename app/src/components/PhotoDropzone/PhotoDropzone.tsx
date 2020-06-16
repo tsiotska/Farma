@@ -10,12 +10,18 @@ const styles = (theme: any) => createStyles({
     dropzone: {},
     input: {},
     background: {
-        background: ({ file }: any) => {
+        backgroundImage: ({ file }: any) => {
             if (!file) return 'transparent';
             return typeof file === 'string'
-                ? `url(${Config.ASSETS_URL}/${file}) center / cover no-repeat`
-                : `url(${URL.createObjectURL(file)}) center / cover no-repeat`;
-        }
+                ? `url(${Config.ASSETS_URL}/${file})`
+                : `url(${URL.createObjectURL(file)})`;
+        },
+        '-webkit-background-size': 'cover',
+        '-moz-background-size': 'cover',
+        '-o-background-size': 'cover',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
     }
 });
 
@@ -66,8 +72,8 @@ export const PhotoDropzone: React.FC<IProps> = ({ appendFile, classes, children 
             <input {...getInputProps({ className: classes.input })}/>
             {
                 children
-                ? children(isHovered, isDragActive, open)
-                : null
+                    ? children(isHovered, isDragActive, open)
+                    : null
             }
         </div>
     );

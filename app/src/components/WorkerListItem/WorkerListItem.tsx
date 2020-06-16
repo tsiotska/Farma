@@ -60,6 +60,9 @@ const styles = (theme: any) => createStyles({
         width: 32,
         height: 32
     },
+    img: {
+        objectFit: 'cover'
+    },
     image: {
         width: 20,
         height: 20
@@ -350,12 +353,13 @@ class WorkerListItem extends Component<IProps> {
                         container
                         item>
                         <ImageLoader
+                            classes={{}}
                             className={classes.avatar}
                             component={Avatar}
                             componentProps={{
                                 classes: {
                                     root: classes.avatar,
-                                    img: cx({ [classes.image]: isVacancy })
+                                    img: cx({ [classes.image]: isVacancy }, classes.img)
                                 }
                             }}
                             src={
