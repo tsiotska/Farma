@@ -139,10 +139,9 @@ interface IProps extends WithStyles<typeof styles> {
     agent: IUserInfo & IUserLikeObject;
     isNested: boolean;
     allowEdit: boolean;
-
     user?: IUser;
     meds?: IMedicine[];
-    itemRef?: any;
+    rootRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
@@ -156,10 +155,10 @@ interface IProps extends WithStyles<typeof styles> {
         value: number
     ) => void;
     expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
-
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeBonusAgent?: (id: number) => void;
     previewBonusStatus?: boolean;
+    removeHighlighting?: () => void;
 }
 
 @inject(({
@@ -360,7 +359,7 @@ class Row extends Component<IProps> {
             classes,
             isMedicalAgent,
             agent,
-            itemRef,
+            rootRef,
             expanded,
             agentInfo,
             meds,
@@ -412,7 +411,7 @@ class Row extends Component<IProps> {
 
         return (
             <>
-                <MuiTableRow ref={itemRef} className={classes.root}>
+                <MuiTableRow ref={rootRef} className={classes.root}>
                     {
                         isMedicalAgent &&
                         <TableCell

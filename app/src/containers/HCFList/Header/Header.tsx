@@ -189,7 +189,6 @@ class Header extends Component<IProps> {
         console.log(
             'new order: ', order, toJS(this.order),
             'propName: ', toJS(this.propName));
-
     }
 
     popoverCloseHandler = () => {

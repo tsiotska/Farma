@@ -23,6 +23,7 @@ import TableSubheader from '../TableSubheader';
 import { IMarkFraction } from '../../../stores/UserStore';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
+import DoctorListItem from '../../Doctors/Doctors';
 
 const styles = (theme: any) => createStyles({
         container: {
@@ -99,6 +100,8 @@ interface IProps extends WithStyles<typeof styles> {
     clearPreviewBonusTotal?: () => void;
     meds?: IMedicine[];
     removeBonusAgent?: (id: number, parentId: number) => boolean;
+    previewDoctorId?: number;
+    setPreviewDoctor?: (id: number) => void;
 }
 
 export interface IUserInfo {
@@ -113,7 +116,9 @@ export interface IUserInfo {
                      loadConfirmedDoctors,
                      getLocationsAgents,
                      currentDepartmentId,
-                     currentDepartmentMeds: meds
+                     currentDepartmentMeds: meds,
+                     previewDoctorId,
+                     setPreviewDoctor
                  },
                  userStore: {
                      role,
@@ -152,19 +157,23 @@ export interface IUserInfo {
     setPreviewBonusTotal,
     clearPreviewBonusTotal,
     removeBonusAgent,
-    meds
+    meds,
+    previewDoctorId,
+    setPreviewDoctor
 }))
 @observer
 class Table extends Component<IProps> {
     readonly totalRowHeight: number = 48;
     reactionDisposer: any;
     initializationTimeout: any;
+    pageReactionDisposer: any;
 
     @observable totalRowPosition: 'initial' | 'fixed' = 'fixed';
     @observable tableWidth: number = 0;
     @observable leftOffset: number = 0;
     @observable agents: IUserInfo[] = [];
     @observable agentsLoaded: boolean = false;
+    @observable target: number = null;
 
     @computed
     get agentsInfo(): IAgentInfo[] {
@@ -327,6 +336,14 @@ class Table extends Component<IProps> {
 
             await when(() => this.props.isLoading === false);
 
+            this.pageReactionDisposer = reaction(
+                () => this.previewDocInd,
+                (docId: number) => {
+                    if (docId === -1) return;
+                    this.target = this.props.previewDoctorId;
+                }
+            );
+
             this.reactionDisposer = reaction(
                 () => this.props.role,
                 async () => {
@@ -397,6 +414,23 @@ class Table extends Component<IProps> {
         }
     }
 
+    clearTarget = () => {
+        this.target = null;
+    }
+
+    removeHighlight = () => {
+        this.props.setPreviewDoctor(null);
+    }
+
+    @computed
+    get previewDocInd(): number {
+        const { previewDoctorId } = this.props;
+        if (previewDoctorId === null) return -1;
+        return this.preparedAgents
+            ? this.preparedAgents.findIndex(({ id }) => id === previewDoctorId)
+            : -1;
+    }
+
     @computed
     get getMedsNames() {
         const { meds, classes } = this.props;
@@ -441,7 +475,7 @@ class Table extends Component<IProps> {
                     <MuiTable padding='none'>
                         <TableBody>
                             {
-                                this.preparedAgents.map((x, i) => {
+                                this.preparedAgents && this.preparedAgents.map((x, i) => {
                                     const allowEdit = role === USER_ROLE.MEDICAL_AGENT
                                         ? previewBonus
                                             ? !previewBonus.status
@@ -459,22 +493,23 @@ class Table extends Component<IProps> {
                                             expanded={bonusUsers.some(({ id }) => id === x.id)}
                                             expandHandler={this.expandHandler}
                                             allowEdit={allowEdit}
-                                            itemRef={i === lastIndex ? this.refHandler : null}
+                                            removeHighlighting={this.removeHighlight}
+                                            rootRef={i === lastIndex
+                                                ? this.refHandler
+                                                : (el: any) => {
+                                                    try {
+                                                        if (x.id === this.target && el) {
+                                                            el.scrollIntoView();
+                                                            this.clearTarget();
+                                                        }
+                                                    } catch (e) {
+                                                        console.error(e);
+                                                    }
+                                                }}
                                             removeBonusAgent={this.removeBonusAgent}
                                         />
                                     );
                                 })
-                            }
-                            {
-                                (this.showTotalRow && this.totalRowPosition === 'initial') &&
-                                <TotalRow
-                                    agents={this.agentsInfo}
-                                    position={this.totalRowPosition}
-                                    showLpu={this.userIsMedicalAgent}
-                                    flattenMedsInfo={this.flattenMedsInfo}
-                                    summedTotal={this.summedTotal}
-                                    summedPacks={this.summedPacks}
-                                />
                             }
                         </TableBody>
                     </MuiTable>

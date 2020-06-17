@@ -12,13 +12,17 @@ import {
 } from '@material-ui/core';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { computed, reaction, toJS } from 'mobx';
+import { computed, observable, reaction, toJS } from 'mobx';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
-import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
+import { IDrugSale, IBonusInfo } from '../../../interfaces/IBonusInfo';
 import { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
+import { FilterList } from '@material-ui/icons';
+import MarksFilterPopper, { MarksSortableProps } from '../../../components/MarksFilterPopper/MarksFilterPopper';
+import { ISortBy, SORT_ORDER } from '../../../stores/UIStore';
+import { IAsyncStatus } from '../../../stores/AsyncStore';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -80,6 +84,7 @@ const styles = (theme: any) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     previewBonus: IBonusInfo;
+    agents?: IUserInfo[];
     hideName?: boolean;
     parentUser: IUserInfo & IUserLikeObject;
     isNested: boolean;
@@ -89,18 +94,32 @@ interface IProps extends WithStyles<typeof styles> {
     totalSold?: (position?: number) => { [key: number]: number };
     meds?: IMedicine[];
     changedMedsMarks?: { [key: number]: number };
+    sortSettings?: ISortBy;
+    getAsyncStatus?: (key: string) => IAsyncStatus;
+    sortDataBy?: (propName: MarksSortableProps, order: SORT_ORDER) => void;
+    setPreviewDoctor?: (id: number) => void;
 }
 
 @inject(({
              appState: {
                  departmentsStore: {
-                     currentDepartmentMeds: meds
+                     currentDepartmentMeds: meds,
+                     getAsyncStatus,
+                     setPreviewDoctor
                  },
                  userStore: {
                      totalSold,
                      role,
                      changedMedsMarks,
                      setDivisionValidity
+                 },
+                 uiStore: {
+                     sortSettings,
+                     filterSettings,
+                     filterDataBy,
+                     sortDataBy,
+                     clearSorting,
+                     clearFilters
                  }
              }
          }) => ({
@@ -108,10 +127,26 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     totalSold,
     changedMedsMarks,
-    setDivisionValidity
+    setDivisionValidity,
+    getAsyncStatus,
+    sortSettings,
+    filterSettings,
+    filterDataBy,
+    sortDataBy,
+    clearSorting,
+    clearFilters,
+    setPreviewDoctor
 }))
 @observer
 class TableHeader extends Component<IProps> {
+    sortReaction: any;
+    @observable filterPopperAnchor: HTMLElement = null;
+    @observable searchString: string = '';
+    @observable searchInputValue: string = '';
+    @observable propName: MarksSortableProps = null;
+    @observable order: SORT_ORDER = null;
+    @observable ignoredItems: any[] = [];
+    @observable source: IUserInfo[] = null;
     isValid: boolean = false;
 
     get nestLevel(): number {
@@ -202,8 +237,159 @@ class TableHeader extends Component<IProps> {
             : <TableCell/>;
     }
 
+    @computed
+    get isLoading(): boolean {
+        const { getAsyncStatus } = this.props;
+        return getAsyncStatus('loadBonuses').loading;
+    }
+
+    resetValues = () => {
+        this.propName = null;
+        this.order = null;
+        this.ignoredItems = [];
+        this.searchString = '';
+        this.searchInputValue = '';
+    }
+
+    openFilterPopper = (propName: MarksSortableProps) => ({ target }: any) => {
+        const {
+            agents,
+            sortSettings
+        } = this.props;
+        const source = agents;
+        this.resetValues();
+        this.filterPopperAnchor = target;
+        this.propName = propName;
+        source.forEach((option) => {
+            this.ignoredItems.push(option[propName]);
+        });
+        this.sortReaction = reaction(
+            () => ([this.isLoading, source && source.length]),
+            ([isLoading, size]: [boolean, number], r) => {
+                if (isLoading) {
+                    if (!size) return;
+                } else {
+                    this.source = source;
+                    r.dispose();
+                }
+            }, {
+                fireImmediately: true
+            }
+        );
+
+        if (sortSettings && sortSettings.propName === propName) {
+            this.order = sortSettings.order;
+        }/*
+        if (filterSettings && filterSettings.propName === propName) {
+            this.ignoredItems = [...filterSettings.ignoredItems];
+        }*/
+    }
+
+    popoverCloseHandler = () => {
+        if (this.sortReaction) this.sortReaction();
+        this.filterPopperAnchor = null;
+        this.resetValues();
+    }
+
+    inputChangeHandler = ({ target: { value } }: any) => {
+        this.searchInputValue = value;
+    }
+
+    sortOrderChangeHandler = (order: SORT_ORDER) => {
+        this.order = order;
+        console.log(
+            'new order: ', order, toJS(this.order),
+            'propName: ', toJS(this.propName));
+    }
+
+    findSuggestions = () => {
+        this.searchString = this.searchInputValue;
+    }
+
+    @computed
+    get sortCallback(): any {
+        return this.order === SORT_ORDER.ASCENDING
+            ? (a: any, b: any) => a[this.propName].localeCompare(b[this.propName])
+            : (a: any, b: any) => b[this.propName].localeCompare(a[this.propName]);
+    }
+
+    @computed
+    get sortedOptions(): IUserInfo[] {
+        return (this.order && this.source)
+            ? this.source.slice().sort(this.sortCallback)
+            : this.source;
+    }
+
+    @computed
+    get filteredOptions(): any[] {
+        const checklist: string[] = [];
+        const res: any[] = [];
+        if (!this.sortedOptions) return res;
+
+        const lowerCaseFilter = this.searchString
+            ? this.searchString.toLowerCase()
+                .replace(/\u02bc/, '')
+                .replace('ʼ', '')
+                .replace('`', '')
+                .replace('\'', '')
+            : '';
+        this.sortedOptions.forEach((option, i) => {
+            const value = option[this.propName];
+
+            const passFilter = lowerCaseFilter === '' || value
+                .replace(/\u02bc/, '')
+                .includes(lowerCaseFilter);
+
+            if (passFilter === true && checklist.includes(value) === false) {
+                checklist.push(value);
+                res.push({ id: i, value });
+            }
+        });
+        return res;
+    }
+
+    itemClickHandler = ({ value }: any) => {
+        const itemIndex = this.ignoredItems.indexOf(value);
+        if (itemIndex === -1) {
+            this.ignoredItems.push(value);
+        } else {
+            this.ignoredItems.splice(itemIndex, 1);
+        }
+    }
+
+    applyFilters = () => {
+        console.log('apply');
+        const { sortDataBy, setPreviewDoctor } = this.props;
+
+        if (this.order !== null) {
+            sortDataBy(this.propName, this.order);
+        }
+        // console.log(toJS(this.searchString));
+        // console.log(toJS(this.filteredOptions))
+        if (this.searchString) {
+            for (const item of this.source) {
+                let exists = false;
+                for (const filtered of this.filteredOptions) {
+                    if (item[this.propName] === filtered.value) {
+                        console.log('I FOUND IT!!!');
+                        console.log(toJS(filtered));
+                        console.log(toJS(item.id));
+                        setPreviewDoctor(item.id);
+                        exists = true;
+                    }
+                }
+                if (!exists) {
+                    // this.ignoredItems.push(item[this.propName]);
+                }
+            }
+        }
+        // filterDataBy(this.propName, this.ignoredItems);
+        this.popoverCloseHandler();
+    }
+
     render() {
-        const { classes, isMedicalAgent } = this.props;
+        const { classes, sortSettings, isMedicalAgent } = this.props;
+        const sortPropName = sortSettings ? sortSettings.propName : null;
         return (
             <>
                 <TableContainer className={classes.container}>
@@ -217,6 +403,11 @@ class TableHeader extends Component<IProps> {
                                         style={{ width: this.columnWidth }}
                                         className={cx(classes.cell, classes.wideColumn)}>
                                         ЛПУ
+                                        <IconButton
+                                            onClick={this.openFilterPopper('LPUName')}
+                                            className={cx(classes.iconButton, { active: ('LPUName' === sortPropName) })}>
+                                            <FilterList fontSize='small'/>
+                                        </IconButton>
                                     </TableCell>
                                 }
                                 <TableCell
@@ -227,6 +418,14 @@ class TableHeader extends Component<IProps> {
                                         [classes.wideColumn]: isMedicalAgent,
                                     })}>
                                     ПІБ
+                                    {
+                                        isMedicalAgent &&
+                                        <IconButton
+                                            onClick={this.openFilterPopper('name')}
+                                            className={cx(classes.iconButton, { active: ('name' === sortPropName) })}>
+                                            <FilterList fontSize='small'/>
+                                        </IconButton>
+                                    }
                                 </TableCell>
                                 {this.getMedsList}
                                 <TableCell
@@ -251,6 +450,30 @@ class TableHeader extends Component<IProps> {
                         </TableHead>
                     </Table>
                 </TableContainer>
+                {
+                    <MarksFilterPopper
+                        anchor={this.filterPopperAnchor}
+                        // toggleAll={this.toggleAll}
+                        propName={this.propName}
+
+                        onClose={this.popoverCloseHandler}
+                        isLoading={this.isLoading}
+
+                        order={this.order}
+                        onOrderChange={this.sortOrderChangeHandler}
+
+                        searchString={this.searchInputValue}
+                        onSearchStringChange={this.inputChangeHandler}
+                        applySearch={this.findSuggestions}
+
+                        // totalLength={this.totalLength}
+                        suggestions={this.filteredOptions}
+                        ignoredItems={this.ignoredItems}
+                        itemClickHandler={this.itemClickHandler}
+
+                        applyClickHandler={this.applyFilters}
+                    />
+                }
             </>
         );
     }
