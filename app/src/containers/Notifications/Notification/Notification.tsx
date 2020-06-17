@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { createStyles, WithStyles, withStyles, Grid, Divider, Paper, Typography } from '@material-ui/core';
-import { observer, inject } from 'mobx-react';
+import { createStyles, Divider, Grid, Paper, Typography, WithStyles, withStyles } from '@material-ui/core';
+import { inject, observer } from 'mobx-react';
 import { INotification } from '../../../interfaces/iNotification';
 import { IDepartment } from '../../../interfaces/IDepartment';
 import { computed, toJS } from 'mobx';
@@ -12,6 +12,8 @@ import DoctorPanel from './DoctorPanel';
 import HCFPanel from './HCFPanel';
 import UserPanel from './UserPanel';
 import Settings from '-!react-svg-loader!../../../../assets/icons/settings.svg';
+import { isValid, lightFormat } from 'date-fns';
+import { uaMonthsNames } from '../../../components/DateTimeUtils/DateTimeUtils';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -49,6 +51,10 @@ const styles = (theme: any) => createStyles({
         fontSize: '14px',
         fontFamily: 'Source Sans Pro',
         color: theme.palette.primary.gray.mainLight
+    },
+    date: {
+        marginLeft: 'auto',
+        paddingRight: 20
     }
 });
 
@@ -83,9 +89,21 @@ class Notification extends Component<IProps> {
             : null;
     }
 
+    @computed
+    get date(): string {
+        const { notification: { date } } = this.props;
+        const isDateValid = isValid(date);
+        const month = isDateValid
+            ? `${uaMonthsNames[date.getMonth()].slice(0, 3)} `
+            : '';
+        return isDateValid
+            ? lightFormat(date, `dd '${month}'yyyy hh:mm`)
+            : '';
+    }
+
     render() {
         const {
-            classes, notification: { type, action, user, message, payload },
+            classes, notification: { type, action, user, message, payload, date },
             deleteClickHandler, acceptNotification, returnNotification
         } = this.props;
         return (
@@ -123,6 +141,13 @@ class Notification extends Component<IProps> {
                             {message}
                         </Typography>
                     </Grid>
+                    {date &&
+                    <Grid xs container item>
+                        <Typography variant='body2' className={cx(classes.textSemiBold, classes.date)}>
+                            {this.date}
+                        </Typography>
+                    </Grid>
+                    }
                 </Grid>
                 {
                     payload &&

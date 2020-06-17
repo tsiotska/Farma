@@ -19,9 +19,6 @@ import { IDrugSale, IBonusInfo, IMark } from '../../../interfaces/IBonusInfo';
 import { IUserInfo } from '../Table/Table';
 import { IUserLikeObject } from '../../../stores/DepartmentsStore';
 import { USER_ROLE } from '../../../constants/Roles';
-import { FilterList } from '@material-ui/icons';
-import MarksFilterPopper, { MarksSortableProps } from '../../../components/MarksFilterPopper/MarksFilterPopper';
-import { ISortBy } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -92,7 +89,6 @@ interface IProps extends WithStyles<typeof styles> {
     totalSold?: (position?: number) => { [key: number]: number };
     meds?: IMedicine[];
     changedMedsMarks?: { [key: number]: number };
-    sortSettings?: ISortBy;
 }
 
 @inject(({
@@ -206,56 +202,8 @@ class TableHeader extends Component<IProps> {
             : <TableCell/>;
     }
 
-    openFilterPopper = (propName: MarksSortableProps) => ({ target }: any) => {
-        /*const {
-            doctors,
-            sortSettings,
-            filterSettings
-        } = this.props;
-
-        const source = doctors;
-
-        this.resetValues();
-        this.filterPopperAnchor = target;
-        this.propName = propName;
-
-        this.sortReaction = reaction(
-            () => ([this.isLoading, source && source.length]),
-            ([isLoading, size]: [boolean, number], r) => {
-                if (isLoading) {
-                    if (!size) return;
-
-                    const newItems = size > 200
-                        ? source.slice(0, 200)
-                        : source;
-
-                    const storedItemsLength = this.source
-                        ? this.source.length
-                        : -1;
-
-                    if (storedItemsLength !== newItems.length) {
-                        this.source = newItems;
-                    }
-                } else {
-                    this.source = source;
-                    r.dispose();
-                }
-            }, {
-                fireImmediately: true
-            }
-        );
-
-        if (sortSettings && sortSettings.propName === propName) {
-            this.order = sortSettings.order;
-        }
-        if (filterSettings && filterSettings.propName === propName) {
-            this.ignoredItems = [...filterSettings.ignoredItems];
-        }*/
-    }
-
     render() {
-        const { classes, sortSettings, isMedicalAgent } = this.props;
-        const sortPropName = sortSettings ? sortSettings.propName : null;
+        const { classes, isMedicalAgent } = this.props;
         return (
             <>
                 <TableContainer className={classes.container}>
@@ -269,11 +217,6 @@ class TableHeader extends Component<IProps> {
                                         style={{ width: this.columnWidth }}
                                         className={cx(classes.cell, classes.wideColumn)}>
                                         ЛПУ
-                                        <IconButton
-                                            onClick={this.openFilterPopper('name')}
-                                            className={cx(classes.iconButton, { active: ('LPUName' === sortPropName) })}>
-                                            <FilterList fontSize='small'/>
-                                        </IconButton>
                                     </TableCell>
                                 }
                                 <TableCell
@@ -284,14 +227,6 @@ class TableHeader extends Component<IProps> {
                                         [classes.wideColumn]: isMedicalAgent,
                                     })}>
                                     ПІБ
-                                    {
-                                        isMedicalAgent &&
-                                        <IconButton
-                                            onClick={this.openFilterPopper('name')}
-                                            className={cx(classes.iconButton, { active: ('name' === sortPropName) })}>
-                                            <FilterList fontSize='small'/>
-                                        </IconButton>
-                                    }
                                 </TableCell>
                                 {this.getMedsList}
                                 <TableCell
@@ -316,30 +251,6 @@ class TableHeader extends Component<IProps> {
                         </TableHead>
                     </Table>
                 </TableContainer>
-                {
-                    /*  <MarksFilterPopper
-                toggleAll={this.toggleAll}
-                propName={this.propName}
-                anchor={this.filterPopperAnchor}
-                onClose={this.popoverCloseHandler}
-                isLoading={this.isLoading}
-
-                order={this.order}
-                onOrderChange={this.sortOrderChangeHandler}
-
-                searchString={this.searchInputValue}
-                onSearchStringChange={this.inputChangeHandler}
-                applySearch={this.findSuggestions}
-
-                totalLength={this.totalLength}
-                suggestions={this.filteredOptions}
-                ignoredItems={this.ignoredItems}
-                itemClickHandler={this.itemClickHandler}
-
-                applyClickHandler={this.applyFilters}
-
-                />
-                */}
             </>
         );
     }

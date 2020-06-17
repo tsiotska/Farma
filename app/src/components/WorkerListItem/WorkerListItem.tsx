@@ -206,10 +206,13 @@ class WorkerListItem extends Component<IProps> {
             const month = isDateValid
                 ? `${uaMonthsNames[created.getMonth()].slice(0, 3)} `
                 : '';
-            const formatted = isDateValid
+            const started = isDateValid
                 ? lightFormat(created, `dd '${month}'yyyy`)
                 : '';
-            return formatted;
+            const to = isDateValid
+                ? lightFormat(fired, `dd '${month}'yyyy`)
+                : '';
+            return `${started} - ${to}`;
         }
 
         const isHiredDateValid = isValid(hired);

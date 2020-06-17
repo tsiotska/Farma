@@ -113,8 +113,8 @@ class EditWorkerModal extends Component<IProps> {
                 <Snackbar
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                            ? 'Дані успішно змінені'
-                            : 'Під час редагування користувача трапилась помилка'
+                            ? 'Дані працівника успішно змінені'
+                            : 'Не вдалося змінити дані працівника'
                     }
                     open={this.showSnackbar}
                     type={this.snackbarType}

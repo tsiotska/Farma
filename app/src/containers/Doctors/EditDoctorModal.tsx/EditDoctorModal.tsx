@@ -86,8 +86,8 @@ class EditDoctorModal extends Component<IProps> {
                     type={this.snackbarType}
                     message={
                         this.snackbarType === SNACKBAR_TYPE.SUCCESS
-                        ? 'Лікар умпішно змінений'
-                        : 'Відредагвати лікаря неможливо'
+                        ? 'Лікар успішно змінений'
+                        : 'Не вдалося відредагувати лікаря'
                     }
                 />
             </>

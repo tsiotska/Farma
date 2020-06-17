@@ -130,7 +130,7 @@ class Notifications extends Component<IProps> {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.snackbarMessage = isDeleted
-            ? 'Повідомлення успішно видалено'
+            ? 'Успішно видалено'
             : 'Не вдалося видалити повідомлення';
     }
 
@@ -142,7 +142,7 @@ class Notifications extends Component<IProps> {
             ? SNACKBAR_TYPE.SUCCESS
             : SNACKBAR_TYPE.ERROR;
         this.snackbarMessage = isAccepted
-            ? 'Повідомлення успішно підтверджено'
+            ? 'Успішно підтверджено'
             : 'Не вдалося підтвердити повідомлення';
     }
 
