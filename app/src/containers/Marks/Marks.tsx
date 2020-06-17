@@ -142,7 +142,6 @@ class Marks extends Component<IProps> {
 
     get previewBonus(): IBonusInfo {
         const { bonuses, previewBonusMonth, previewUser } = this.props;
-        // console.log(previewUser.position);
         const targetBonus = previewUser.position in bonuses
             ? bonuses[previewUser.position].find(x => x.month === previewBonusMonth)
             : null;
@@ -196,9 +195,7 @@ class Marks extends Component<IProps> {
         const condition = role === USER_ROLE.MEDICAL_AGENT
             && (previewUser ? previewUser.position : null) === USER_ROLE.MEDICAL_AGENT
             && changedMarks.size;
-        console.log(condition);
         if (condition) {
-            console.log(toJS(this.previewBonus));
             await updateBonus(this.previewBonus, false);
         }
     }

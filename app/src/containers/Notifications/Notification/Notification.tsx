@@ -12,8 +12,9 @@ import DoctorPanel from './DoctorPanel';
 import HCFPanel from './HCFPanel';
 import UserPanel from './UserPanel';
 import Settings from '-!react-svg-loader!../../../../assets/icons/settings.svg';
-import { isValid, lightFormat } from 'date-fns';
+import { isValid, lightFormat, format } from 'date-fns';
 import { uaMonthsNames } from '../../../components/DateTimeUtils/DateTimeUtils';
+import eoLocale from 'date-fns/locale/eo';
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -97,7 +98,7 @@ class Notification extends Component<IProps> {
             ? `${uaMonthsNames[date.getMonth()].slice(0, 3)} `
             : '';
         return isDateValid
-            ? lightFormat(date, `dd '${month}'yyyy hh:mm`)
+            ? format(date, `dd '${month}'yyyy HH:mm`, {locale: eoLocale})
             : '';
     }
 
@@ -111,10 +112,10 @@ class Notification extends Component<IProps> {
                 <Grid className={cx(classes.row, classes.titleRow)} alignItems='center' container>
                     {
                         this.iconSrc
-                            ? <Grid justify='center' alignItems='center' item>
+                            ? <Grid  alignItems='center' item>
                                 <img src={`${Config.ASSETS_URL}/${this.iconSrc}`} className={classes.icon}/>
                             </Grid>
-                            : <Grid justify='center' alignItems='center' item>
+                            : <Grid  alignItems='center' item>
                                 <Settings className={classes.icon}/>
                             </Grid>
                     }
