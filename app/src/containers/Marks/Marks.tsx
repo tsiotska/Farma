@@ -12,7 +12,7 @@ import {
 import { ArrowLeft, ArrowRight, Add } from '@material-ui/icons';
 import { observer, inject } from 'mobx-react';
 import { withStyles } from '@material-ui/styles';
-import { IBonusInfo, IAgentInfo, IDrugSale } from '../../interfaces/IBonusInfo';
+import { IBonusInfo, IAgentInfo, IDrugSale, IMark } from '../../interfaces/IBonusInfo';
 import TabItem from './TabItem';
 import { IAsyncStatus } from '../../stores/AsyncStore';
 import { computed, toJS, observable, reaction } from 'mobx';
@@ -64,13 +64,13 @@ interface IProps extends WithStyles<typeof styles> {
     role?: USER_ROLE;
     bonusesYear?: number;
     previewUser?: IUser;
-
+    updateBonus?: (bonus: IBonusInfo, sale: boolean) => void;
     loadBonuses?: (user: IUserLikeObject) => void;
     getAsyncStatus?: (key: string) => IAsyncStatus;
-    updateBonuses?: () => void;
     openModal?: (modalName: string) => void;
     loadBonusesData?: (user: IUserLikeObject) => void;
     clearChangedMarks?: () => void;
+    changedMarks?: Map<number, Map<number, IMark>>;
 }
 
 @inject(({
@@ -81,13 +81,14 @@ interface IProps extends WithStyles<typeof styles> {
                      // previewBonus,
                      role,
                      bonusesYear,
-                     updateBonuses,
                      previewUser,
                      // setPreviewBonus
                      loadBonusesData,
                      previewBonusMonth,
                      bonuses,
-                     clearChangedMarks
+                     clearChangedMarks,
+                     updateBonus,
+                     changedMarks
                  },
                  uiStore: {
                      openModal
@@ -103,9 +104,10 @@ interface IProps extends WithStyles<typeof styles> {
     role,
     openModal,
     bonusesYear,
-    updateBonuses,
+    updateBonus,
     previewUser,
-    clearChangedMarks
+    clearChangedMarks,
+    changedMarks
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -137,7 +139,7 @@ class Marks extends Component<IProps> {
 
     get previewBonus(): IBonusInfo {
         const { bonuses, previewBonusMonth, previewUser } = this.props;
-       // console.log(previewUser.position);
+        // console.log(previewUser.position);
         const targetBonus = previewUser.position in bonuses
             ? bonuses[previewUser.position].find(x => x.month === previewBonusMonth)
             : null;
@@ -169,6 +171,7 @@ class Marks extends Component<IProps> {
             () => this.props.previewBonusMonth,
             () => {
                 const { previewUser, clearChangedMarks } = this.props;
+                this.dataAutosaving();
                 clearChangedMarks();
                 loadBonusesData(previewUser);
             }
@@ -180,11 +183,22 @@ class Marks extends Component<IProps> {
         if (this.monthReaction) this.monthReaction();
     }
 
+    dataAutosaving = async () => {
+        console.log('saving...');
+        const {role, previewUser, updateBonus, changedMarks} = this.props;
+        const condition = role === USER_ROLE.MEDICAL_AGENT
+            && (previewUser ? previewUser.position : null) === USER_ROLE.MEDICAL_AGENT
+            && changedMarks.size;
+
+        if (condition) {
+            await updateBonus(this.previewBonus, false);
+        }
+    }
+
     render() {
         const {
             classes,
             bonusesYear,
-            updateBonuses,
             role,
             previewUser,
             bonuses,
