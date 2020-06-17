@@ -1280,11 +1280,12 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
             const initialValue = initialDoc[key];
             const propName = namesMap[key];
 
-            if (propName === namesMap.card) {
+            /*if (propName === namesMap.card) {
                 return value === initialValue
                     ? acc
                     : { ...acc, [propName]: this.diluteCardValue(value as string) };
-            } else if (propName === namesMap.specialty) {
+            } else */
+            if (propName === namesMap.specialty) {
                 actualValue = value
                     ? (value as ISpecialty).name
                     : null;
@@ -1362,10 +1363,11 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload = [...Object.entries(formValues)].reduce((acc, [key, value]) => {
             const propName = namesMap[key];
             if (!propName || !value) return acc;
-            if (propName === namesMap.card) {
+            /* if (propName === namesMap.card) {
                 const preparedValue = this.diluteCardValue(value as string);
                 return { ...acc, [propName]: preparedValue };
-            } else if (propName === namesMap.specialty) {
+            } else */
+            if (propName === namesMap.specialty) {
                 return { ...acc, [propName]: (value as ISpecialty).name };
             } else if (propName === namesMap.lpu) {
                 return { ...acc, [propName]: (value as ILPU).id };
@@ -1414,10 +1416,10 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
         const payload = Object.entries(values).reduce((acc, [prop, value]) => {
             const normalizedPropName = namesMap[prop];
             if (!(value && normalizedPropName)) return acc;
-            if (normalizedPropName === namesMap.card) {
-                const changedValue = this.diluteCardValue(value as string);
-                return { ...acc, [normalizedPropName]: changedValue };
-            }
+            /*  if (normalizedPropName === namesMap.card) {
+                  const changedValue = this.diluteCardValue(value as string);
+                  return { ...acc, [normalizedPropName]: changedValue };
+              }*/
             return { ...acc, [normalizedPropName]: value };
         }, {});
         formData.set('json', JSON.stringify(payload));
@@ -1473,16 +1475,17 @@ export class DepartmentsStore extends AsyncStore implements IDepartmentsStore {
                 const jsonPropName = namesMap[key];
 
                 if (!jsonPropName || initialValue === value) return acc;
-
-                if (jsonPropName === namesMap.card) {
-                    const cardValue = this.diluteCardValue(value as string);
-                    return { ...acc, [jsonPropName]: cardValue };
-                }
-
+                /*
+                                if (jsonPropName === namesMap.card) {
+                                    const cardValue = this.diluteCardValue(value as string);
+                                    return { ...acc, [jsonPropName]: cardValue };
+                                }
+                */
                 return { ...acc, [jsonPropName]: value };
             },
             {}
         );
+        console.log(payload);
         formData.append('json', JSON.stringify(payload));
         const { edited, image } = await this.dispatchRequest(
             api.editWorker(formData, initialWorker.id, this.currentDepartmentId),
