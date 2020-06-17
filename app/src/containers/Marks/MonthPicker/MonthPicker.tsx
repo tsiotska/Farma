@@ -24,6 +24,7 @@ interface IProps extends WithStyles<typeof styles> {
     previewBonusMonth?: number;
     setPreviewBonusMonth?: (month: number) => void;
     openModal?: (modaName: string) => void;
+    clickHandler?: (month: number, status: boolean) => void;
 }
 
 @inject(({
@@ -80,7 +81,8 @@ class MontPicker extends Component<IProps> {
             bonuses,
             isLoading,
             bonusesYear,
-            previewBonusMonth
+            previewBonusMonth,
+            clickHandler
         } = this.props;
 
         return (
@@ -103,6 +105,7 @@ class MontPicker extends Component<IProps> {
                 {
                     bonuses && bonuses.map(bonusInfo => (
                         <TabItem
+                            clickHandler={clickHandler}
                             key={bonusInfo.month}
                             bonus={bonusInfo}
                             selected={previewBonusMonth === bonusInfo.month}

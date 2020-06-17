@@ -78,7 +78,7 @@ interface IProps extends WithStyles<typeof styles> {
     isLoading: boolean;
     parentUser: IUserInfo & IUserLikeObject;
     isNested: boolean;
-    previewBonus: IBonusInfo;
+    previewBonus: any;
 
     totalSold?: (position?: number) => { [key: number]: number };
     changedMarks?: Map<number, Map<number, IMark>>;
@@ -379,6 +379,8 @@ class Table extends Component<IProps> {
             && !this.isEmpty && changedMarks.size;
 
         if (condition) {
+            console.log('good saving...');
+            console.log(toJS(previewBonus));
             await updateBonus(previewBonus, false);
         }
         clearChangedMarks();

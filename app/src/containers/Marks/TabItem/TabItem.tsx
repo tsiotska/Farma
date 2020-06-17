@@ -73,23 +73,19 @@ const styles = (theme: any) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     bonus: IBonusInfo;
     selected: boolean;
-    setPreviewBonusMonth?: (month: number, status: boolean) => void;
+    clickHandler?: (month: number, status: boolean) => void;
 }
 
 @inject(({
              appState: {
-                 userStore: {
-                     setPreviewBonusMonth
-                 }
+                 userStore: {}
              }
-         }) => ({
-    setPreviewBonusMonth
-}))
+         }) => ({}))
 @observer
 class TabItem extends Component<IProps> {
     clickHandler = () => {
-        const { setPreviewBonusMonth, bonus: { month, status } } = this.props;
-        setPreviewBonusMonth(month, status);
+        const { bonus: { month, status } } = this.props;
+        this.props.clickHandler(month, status);
     }
 
     render() {
