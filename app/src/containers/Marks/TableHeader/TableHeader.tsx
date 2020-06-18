@@ -23,6 +23,8 @@ import { FilterList } from '@material-ui/icons';
 import MarksFilterPopper, { MarksSortableProps } from '../../../components/MarksFilterPopper/MarksFilterPopper';
 import { ISortBy, SORT_ORDER } from '../../../stores/UIStore';
 import { IAsyncStatus } from '../../../stores/AsyncStore';
+import { LPUSortableProps } from '../../../components/LpuFilterPopper/LpuFilterPopper';
+import { DoctorsSortableProps } from '../../../components/DoctorsFilterPopper/DoctorsFilterPopper';
 
 const styles = (theme: any) => createStyles({
     doubleWidthColumn: {
@@ -145,8 +147,9 @@ class TableHeader extends Component<IProps> {
     @observable searchInputValue: string = '';
     @observable propName: MarksSortableProps = null;
     @observable order: SORT_ORDER = null;
-    @observable ignoredItems: any[] = [];
+    // @observable ignoredItems: any[] = [];
     @observable source: IUserInfo[] = null;
+    @observable selected: any = null;
     isValid: boolean = false;
 
     get nestLevel(): number {
@@ -244,10 +247,10 @@ class TableHeader extends Component<IProps> {
     }
 
     resetValues = () => {
+        this.searchString = '';
         this.propName = null;
         this.order = null;
-        this.ignoredItems = [];
-        this.searchString = '';
+        this.selected = null;
         this.searchInputValue = '';
     }
 
@@ -260,9 +263,9 @@ class TableHeader extends Component<IProps> {
         this.resetValues();
         this.filterPopperAnchor = target;
         this.propName = propName;
-        source.forEach((option) => {
+        /* source.forEach((option) => {
             this.ignoredItems.push(option[propName]);
-        });
+        });*/
         this.sortReaction = reaction(
             () => ([this.isLoading, source && source.length]),
             ([isLoading, size]: [boolean, number], r) => {
@@ -279,10 +282,10 @@ class TableHeader extends Component<IProps> {
 
         if (sortSettings && sortSettings.propName === propName) {
             this.order = sortSettings.order;
-        }/*
-        if (filterSettings && filterSettings.propName === propName) {
-            this.ignoredItems = [...filterSettings.ignoredItems];
-        }*/
+        }
+        /* if (filterSettings && filterSettings.propName === propName) {
+             this.ignoredItems = [...filterSettings.ignoredItems];
+         }*/
     }
 
     popoverCloseHandler = () => {
@@ -296,10 +299,13 @@ class TableHeader extends Component<IProps> {
     }
 
     sortOrderChangeHandler = (order: SORT_ORDER) => {
+        const { sortDataBy } = this.props;
         this.order = order;
+        sortDataBy(this.propName, order);
         console.log(
             'new order: ', order, toJS(this.order),
             'propName: ', toJS(this.propName));
+
     }
 
     findSuggestions = () => {
@@ -333,57 +339,38 @@ class TableHeader extends Component<IProps> {
                 .replace('`', '')
                 .replace('\'', '')
             : '';
-        this.sortedOptions.forEach((option, i) => {
-            const value = option[this.propName];
 
-            const passFilter = lowerCaseFilter === '' || value
-                .replace(/\u02bc/, '')
-                .includes(lowerCaseFilter);
+        if (this.sortedOptions.length) {
+            this.sortedOptions.forEach((option, i) => {
+                const value = option[this.propName];
+                const passFilter = lowerCaseFilter === '' ||
+                    value.toLowerCase().replace(/\u02bc/, '').includes(lowerCaseFilter);
 
-            if (passFilter === true && checklist.includes(value) === false) {
-                checklist.push(value);
-                res.push({ id: i, value });
-            }
-        });
+                if (passFilter === true && checklist.includes(value) === false) {
+                    checklist.push(value);
+                    res.push({ id: i, value });
+                }
+            });
+        }
         return res;
     }
 
     itemClickHandler = ({ value }: any) => {
-        const itemIndex = this.ignoredItems.indexOf(value);
-        if (itemIndex === -1) {
-            this.ignoredItems.push(value);
+        if (this.selected === value) {
+            this.selected = null;
         } else {
-            this.ignoredItems.splice(itemIndex, 1);
+            this.selected = value;
         }
     }
 
     applyFilters = () => {
-        console.log('apply');
-        const { sortDataBy, setPreviewDoctor } = this.props;
-
-        if (this.order !== null) {
-            sortDataBy(this.propName, this.order);
-        }
-        // console.log(toJS(this.searchString));
-        // console.log(toJS(this.filteredOptions))
-        if (this.searchString) {
-            for (const item of this.source) {
-                let exists = false;
-                for (const filtered of this.filteredOptions) {
-                    if (item[this.propName] === filtered.value) {
-                        console.log('I FOUND IT!!!');
-                        console.log(toJS(filtered));
-                        console.log(toJS(item.id));
-                        setPreviewDoctor(item.id);
-                        exists = true;
-                    }
-                }
-                if (!exists) {
-                    // this.ignoredItems.push(item[this.propName]);
-                }
+        const { setPreviewDoctor } = this.props;
+        for (const item of this.source) {
+            if (item[this.propName] === this.selected) {
+                setPreviewDoctor(item.id);
+                break;
             }
         }
-        // filterDataBy(this.propName, this.ignoredItems);
         this.popoverCloseHandler();
     }
 
@@ -468,7 +455,7 @@ class TableHeader extends Component<IProps> {
 
                         // totalLength={this.totalLength}
                         suggestions={this.filteredOptions}
-                        ignoredItems={this.ignoredItems}
+                        selected={this.selected}
                         itemClickHandler={this.itemClickHandler}
 
                         applyClickHandler={this.applyFilters}

@@ -49,7 +49,7 @@ const styles = (theme: any) => createStyles({
     },
     submitButton: {
         marginLeft: 'auto',
-        minWidth: 160
+        minWidth: 160,
     }
 });
 

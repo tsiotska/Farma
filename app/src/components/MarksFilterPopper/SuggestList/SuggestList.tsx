@@ -51,7 +51,8 @@ interface IProps<T extends IMinimumInterface> extends WithStyles<typeof styles> 
     title: string;
     itemClickHandler: (item: T) => void;
     renderPropName: keyof T;
-    ignoredItems: any[];
+    // ignoredItems: any[];
+    selected: any;
     isLoading: boolean;
     // toggleAll: () => void;
 }
@@ -69,7 +70,7 @@ class SuggestList<T extends IMinimumInterface> extends Component<IProps<T>> {
             classes,
             itemClickHandler,
             renderPropName,
-            ignoredItems,
+            selected,
             isLoading,
         } = this.props;
 
@@ -82,7 +83,7 @@ class SuggestList<T extends IMinimumInterface> extends Component<IProps<T>> {
                             onClick={itemClickHandler}
                             item={x}
                             renderPropName={renderPropName}
-                            checked={ignoredItems.includes(x[renderPropName]) === false}
+                            checked={selected === x[renderPropName]}
                             className={classes.item}
                         />
                     ))

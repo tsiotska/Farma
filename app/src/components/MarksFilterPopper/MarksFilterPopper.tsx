@@ -55,6 +55,9 @@ const styles = (theme: any) => createStyles({
         width: '100%',
         '&:hover': {
             backgroundColor: '#7a8fff',
+        },
+        '&:disabled': {
+            backgroundColor: '#cfd6ff'
         }
     },
     buttonGroup: {
@@ -81,7 +84,8 @@ interface IProps extends WithStyles<typeof styles> {
 
     // totalLength: number;
     suggestions: Array<{ id: number, value: string}>;
-    ignoredItems: Array<{ id: number, value: string}>;
+    // ignoredItems: Array<{ id: number, value: string}>;
+    selected: any;
     itemClickHandler: (doctor: IDoctor) => void;
 
     applyClickHandler: () => void;
@@ -129,7 +133,7 @@ class MarksFilterPopper extends Component<IProps> {
             applyClickHandler,
             suggestions,
             itemClickHandler,
-            ignoredItems,
+            selected,
             // toggleAll
         } = this.props;
 
@@ -172,7 +176,7 @@ class MarksFilterPopper extends Component<IProps> {
                                 items={suggestions}
                                 itemClickHandler={itemClickHandler}
                                 renderPropName='value'
-                                ignoredItems={ignoredItems}
+                                selected={selected}
                                 isLoading={isLoading}
                                 // toggleAll={toggleAll}
                               />
@@ -190,8 +194,8 @@ class MarksFilterPopper extends Component<IProps> {
                             <Button onClick={onClose} className={classes.discardButton}>
                                 Відмінити
                             </Button>
-                            <Button onClick={applyClickHandler} className={classes.applyButton}>
-                                Застосувати
+                            <Button disabled={!selected} onClick={applyClickHandler} className={classes.applyButton}>
+                                Пошук
                             </Button>
                         </Grid>
                     </Grid>

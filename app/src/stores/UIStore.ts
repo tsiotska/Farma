@@ -18,7 +18,7 @@ export interface ISortBy {
 }
 
 export interface IFilterBy {
-    propName: LPUSortableProps | DoctorsSortableProps;
+    propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps;
     ignoredItems: any[];
 }
 
@@ -153,7 +153,7 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    filterDataBy(propName: LPUSortableProps | DoctorsSortableProps, ignoredItems: ILPU[]) {
+    filterDataBy(propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps, ignoredItems: ILPU[]) {
         this.filterSettings = { propName, ignoredItems: [...ignoredItems] };
     }
 
