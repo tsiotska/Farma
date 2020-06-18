@@ -10,18 +10,12 @@ const styles = (theme: any) => createStyles({
     dropzone: {},
     input: {},
     background: {
-        backgroundImage: ({ file }: any) => {
+        background: ({ file }: any) => {
             if (!file) return 'transparent';
             return typeof file === 'string'
-                ? `url(${Config.ASSETS_URL}/${file})`
-                : `url(${URL.createObjectURL(file)})`;
+                ? `url(${Config.ASSETS_URL}/${file}) center / cover no-repeat`
+                : `url(${URL.createObjectURL(file)}) center / cover no-repeat`;
         },
-        '-webkit-background-size': 'cover',
-        '-moz-background-size': 'cover',
-        '-o-background-size': 'cover',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
     }
 });
 

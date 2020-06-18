@@ -431,7 +431,7 @@ class WorkerModal extends Component<IProps> {
                                 error={this.errors.get('workPhone')}
                             />
                             <FormRow
-                                label='Банківська картка'
+                                label='Банківська картка/коментар'
                                 values={this.formValues}
                                 onChange={this.changeHandler}
                                 propName='card'

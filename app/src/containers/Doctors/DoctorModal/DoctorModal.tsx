@@ -302,7 +302,7 @@ class DoctorModal extends Component<IProps> {
                     options={!!specialties ? specialties : []}
                     error={this.errors.get('specialty')}/>
                 <FormRow
-                    label='Банківська картка'
+                    label='Банківська картка/коментар'
                     values={this.formValues}
                     onChange={this.changeHandler}
                     propName='card'/>
