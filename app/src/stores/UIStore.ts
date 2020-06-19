@@ -4,6 +4,7 @@ import { IUIStore } from '../interfaces/IUIStore';
 import { observable, action, toJS } from 'mobx';
 import { LPUSortableProps } from '../components/LpuFilterPopper/LpuFilterPopper';
 import { DoctorsSortableProps } from '../components/DoctorsFilterPopper/DoctorsFilterPopper';
+import { MarksSortableProps } from '../components/MarksFilterPopper/MarksFilterPopper';
 import { ILPU } from '../interfaces/ILPU';
 
 export enum SORT_ORDER {
@@ -13,11 +14,11 @@ export enum SORT_ORDER {
 
 export interface ISortBy {
     order: SORT_ORDER;
-    propName: LPUSortableProps | DoctorsSortableProps;
+    propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps;
 }
 
 export interface IFilterBy {
-    propName: LPUSortableProps | DoctorsSortableProps;
+    propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps;
     ignoredItems: any[];
 }
 
@@ -142,7 +143,7 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    sortDataBy(propName: LPUSortableProps | DoctorsSortableProps, order: SORT_ORDER) {
+    sortDataBy(propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps, order: SORT_ORDER) {
         this.sortSettings = { propName, order };
     }
 
@@ -152,7 +153,7 @@ export class UIStore implements IUIStore {
     }
 
     @action.bound
-    filterDataBy(propName: LPUSortableProps | DoctorsSortableProps, ignoredItems: ILPU[]) {
+    filterDataBy(propName: LPUSortableProps | DoctorsSortableProps | MarksSortableProps, ignoredItems: ILPU[]) {
         this.filterSettings = { propName, ignoredItems: [...ignoredItems] };
     }
 

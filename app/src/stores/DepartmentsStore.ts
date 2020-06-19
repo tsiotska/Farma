@@ -26,6 +26,7 @@ import { ISpecialty } from '../interfaces/ISpecialty';
 import { ILpuModalValues } from '../containers/Lpu/LpuModal/LpuModal';
 import { SORT_ORDER } from './UIStore';
 import { CONFIRM_STATUS } from '../constants/ConfirmationStatuses';
+import { IUserInfo } from '../containers/Marks/Table/Table';
 
 export interface IExpandedWorker {
     id: number;

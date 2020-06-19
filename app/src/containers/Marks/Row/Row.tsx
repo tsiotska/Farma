@@ -129,6 +129,10 @@ const styles = (theme: any) => createStyles({
     removeIcon: {
         color: theme.palette.primary.level.red,
         padding: 8
+    },
+    highlight: {
+        fontWeight: 'bolder',
+        textDecoration: 'underline',
     }
 });
 
@@ -139,10 +143,9 @@ interface IProps extends WithStyles<typeof styles> {
     agent: IUserInfo & IUserLikeObject;
     isNested: boolean;
     allowEdit: boolean;
-
     user?: IUser;
     meds?: IMedicine[];
-    itemRef?: any;
+    rootRef?: any;
     expanded?: boolean | null; // true/false - isExpanded, null - not expandable
     bonuses?: Partial<Record<USER_ROLE, IBonusInfo[]>>;
     previewBonusMonth?: number;
@@ -156,10 +159,11 @@ interface IProps extends WithStyles<typeof styles> {
         value: number
     ) => void;
     expandHandler?: (user: IUserLikeObject, isExpanded: boolean) => void;
-
     openDelPopper?: (settings: IDeletePopoverSettings) => void;
     removeBonusAgent?: (id: number) => void;
     previewBonusStatus?: boolean;
+    highlight?: boolean;
+    removeHighlighting?: () => void;
 }
 
 @inject(({
@@ -342,30 +346,25 @@ class Row extends Component<IProps> {
         removeBonusAgent(id);
     }
 
-    /*
-        get isValid(): boolean {
-            const { isMedsDivisionValid } = this.props;
-            const current = (this.totalMarksDeposit * 100) / (this.totalMarksPayments + this.totalMarksDeposit);
-            const settingsValue = this.bonuses
-                ? this.bonuses[1]
-                : 100;
-            const condition = previewBonus
-                ? current >= settingsValue
-                : true;
-            return condition && isMedsDivisionValid;
+    componentDidUpdate() {
+        const { highlight, removeHighlighting } = this.props;
+        if (highlight) {
+            setTimeout(removeHighlighting, 2000);
         }
-    */
+    }
+
     render() {
         const {
             classes,
             isMedicalAgent,
             agent,
-            itemRef,
+            rootRef,
             expanded,
             agentInfo,
             meds,
             tooltips,
-            previewBonusStatus
+            previewBonusStatus,
+            highlight
         } = this.props;
         const {
             LPUName,
@@ -412,13 +411,13 @@ class Row extends Component<IProps> {
 
         return (
             <>
-                <MuiTableRow ref={itemRef} className={classes.root}>
+                <MuiTableRow ref={rootRef} className={classes.root}>
                     {
                         isMedicalAgent &&
                         <TableCell
                             padding='none'
                             style={{ width: this.columnWidth }}
-                            className={classes.cell}>
+                            className={cx(classes.cell)}>
                             <Typography variant='body2'>
                                 {LPUName}
                             </Typography>
@@ -446,7 +445,7 @@ class Row extends Component<IProps> {
                                     className={cx(classes.expandIcon, { rotate: expanded === true })}
                                     fontSize='small'/>
                             }
-                            <Typography variant='body2'>
+                            <Typography className={cx({ [classes.highlight]: highlight })} variant='body2'>
                                 {name}
                             </Typography>
                             <Grid justify='center' alignItems='center' container direction='column' wrap='nowrap'>

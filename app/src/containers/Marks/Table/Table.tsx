@@ -23,6 +23,8 @@ import TableSubheader from '../TableSubheader';
 import { IMarkFraction } from '../../../stores/UserStore';
 import { IMedicine } from '../../../interfaces/IMedicine';
 import cx from 'classnames';
+import DoctorListItem from '../../Doctors/Doctors';
+import { ISortBy, SORT_ORDER } from '../../../stores/UIStore';
 
 const styles = (theme: any) => createStyles({
         container: {
@@ -99,6 +101,9 @@ interface IProps extends WithStyles<typeof styles> {
     clearPreviewBonusTotal?: () => void;
     meds?: IMedicine[];
     removeBonusAgent?: (id: number, parentId: number) => boolean;
+    previewDoctorId?: number;
+    setPreviewDoctor?: (id: number) => void;
+    sortSettings?: ISortBy;
 }
 
 export interface IUserInfo {
@@ -113,7 +118,9 @@ export interface IUserInfo {
                      loadConfirmedDoctors,
                      getLocationsAgents,
                      currentDepartmentId,
-                     currentDepartmentMeds: meds
+                     currentDepartmentMeds: meds,
+                     previewDoctorId,
+                     setPreviewDoctor
                  },
                  userStore: {
                      role,
@@ -131,7 +138,8 @@ export interface IUserInfo {
                      removeBonusAgent
                  },
                  uiStore: {
-                     openModal
+                     openModal,
+                     sortSettings
                  }
              }
          }) => ({
@@ -152,19 +160,24 @@ export interface IUserInfo {
     setPreviewBonusTotal,
     clearPreviewBonusTotal,
     removeBonusAgent,
-    meds
+    meds,
+    previewDoctorId,
+    setPreviewDoctor,
+    sortSettings
 }))
 @observer
 class Table extends Component<IProps> {
     readonly totalRowHeight: number = 48;
     reactionDisposer: any;
     initializationTimeout: any;
+    pageReactionDisposer: any;
 
     @observable totalRowPosition: 'initial' | 'fixed' = 'fixed';
     @observable tableWidth: number = 0;
     @observable leftOffset: number = 0;
     @observable agents: IUserInfo[] = [];
     @observable agentsLoaded: boolean = false;
+    @observable target: number = null;
 
     @computed
     get agentsInfo(): IAgentInfo[] {
@@ -212,13 +225,25 @@ class Table extends Component<IProps> {
         );
     }
 
+    @computed
     get preparedAgents(): IUserInfo[] {
-        const { parentUser: { position } } = this.props;
+        const { parentUser: { position }, sortSettings } = this.props;
         if (position === USER_ROLE.MEDICAL_AGENT) {
-            const res = this.agentsInfo.length
+            const filteredAgents = this.agentsInfo.length
                 ? this.agents.filter(x => this.agentsInfo.some(y => y.id === x.id))
                 : [];
-            return res;
+            if (!filteredAgents) return filteredAgents;
+
+            const order = sortSettings ? sortSettings.order : null;
+            const sortPropName = sortSettings ? sortSettings.propName : null;
+
+            const callback = order === SORT_ORDER.ASCENDING
+                ? (a: IUserInfo, b: IUserInfo) => a[sortPropName].localeCompare(b[sortPropName])
+                : (a: IUserInfo, b: IUserInfo) => b[sortPropName].localeCompare(a[sortPropName]);
+
+            return (sortPropName && order)
+                ? filteredAgents.slice().sort(callback)
+                : filteredAgents;
         }
         return this.agents.slice(0, 50);
     }
@@ -327,6 +352,14 @@ class Table extends Component<IProps> {
 
             await when(() => this.props.isLoading === false);
 
+            this.pageReactionDisposer = reaction(
+                () => this.previewDocInd,
+                (docId: number) => {
+                    if (docId === -1) return;
+                    this.target = this.props.previewDoctorId;
+                }
+            );
+
             this.reactionDisposer = reaction(
                 () => this.props.role,
                 async () => {
@@ -399,6 +432,23 @@ class Table extends Component<IProps> {
         }
     }
 
+    clearTarget = () => {
+        this.target = null;
+    }
+
+    removeHighlight = () => {
+        this.props.setPreviewDoctor(null);
+    }
+
+    @computed
+    get previewDocInd(): number {
+        const { previewDoctorId } = this.props;
+        if (previewDoctorId === null) return -1;
+        return this.preparedAgents
+            ? this.preparedAgents.findIndex(({ id }) => id === previewDoctorId)
+            : -1;
+    }
+
     @computed
     get getMedsNames() {
         const { meds, classes } = this.props;
@@ -424,7 +474,8 @@ class Table extends Component<IProps> {
             role,
             previewBonus,
             bonusUsers,
-            parentUser
+            parentUser,
+            previewDoctorId,
         } = this.props;
         const { position } = parentUser;
         const lastIndex = this.agentsInfo.length - 1;
@@ -443,7 +494,7 @@ class Table extends Component<IProps> {
                     <MuiTable padding='none'>
                         <TableBody>
                             {
-                                this.preparedAgents.map((x, i) => {
+                                this.preparedAgents && this.preparedAgents.map((x, i) => {
                                     const allowEdit = role === USER_ROLE.MEDICAL_AGENT
                                         ? previewBonus
                                             ? !previewBonus.status
@@ -461,29 +512,38 @@ class Table extends Component<IProps> {
                                             expanded={bonusUsers.some(({ id }) => id === x.id)}
                                             expandHandler={this.expandHandler}
                                             allowEdit={allowEdit}
-                                            itemRef={i === lastIndex ? this.refHandler : null}
+                                            highlight={x.id === previewDoctorId}
+                                            removeHighlighting={this.removeHighlight}
+                                            rootRef={i === lastIndex
+                                                ? this.refHandler
+                                                : position === USER_ROLE.MEDICAL_AGENT ? (el: any) => {
+                                                    try {
+                                                        if (el && x.id === this.target) {
+                                                            window.setTimeout(() => {
+                                                                    el.scrollIntoView({
+                                                                        block: 'center',
+                                                                        behavior: 'smooth'
+                                                                    });
+                                                                    this.clearTarget();
+                                                                },
+                                                                100);
+                                                        }
+                                                    } catch (e) {
+                                                        console.error(e);
+                                                    }
+                                                } : null}
                                             removeBonusAgent={this.removeBonusAgent}
                                         />
                                     );
                                 })
-                            }
-                            {
-                                (this.showTotalRow && this.totalRowPosition === 'initial') &&
-                                <TotalRow
-                                    agents={this.agentsInfo}
-                                    position={this.totalRowPosition}
-                                    showLpu={this.userIsMedicalAgent}
-                                    flattenMedsInfo={this.flattenMedsInfo}
-                                    summedTotal={this.summedTotal}
-                                    summedPacks={this.summedPacks}
-                                />
                             }
                         </TableBody>
                     </MuiTable>
                 </TableContainer>
                 {
                     (this.showTotalRow && this.totalRowPosition === 'fixed') &&
-                    <TableContainer component={Paper} className={classes.fixedTable} style={this.fixedTableStyles}>
+                    <TableContainer component={Paper} className={classes.fixedTable}
+                                    style={this.fixedTableStyles}>
                         <MuiTable className={classes.table} padding='none'>
                             <TableHead>
                                 <TableRow className={classes.tableRow}>
@@ -534,7 +594,8 @@ class Table extends Component<IProps> {
                     />
                 }
             </>
-        );
+        )
+            ;
     }
 }
 
