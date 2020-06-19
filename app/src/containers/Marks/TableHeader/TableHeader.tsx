@@ -340,18 +340,16 @@ class TableHeader extends Component<IProps> {
                 .replace('\'', '')
             : '';
 
-        if (this.sortedOptions.length) {
-            this.sortedOptions.forEach((option, i) => {
-                const value = option[this.propName];
-                const passFilter = lowerCaseFilter === '' ||
-                    value.toLowerCase().replace(/\u02bc/, '').includes(lowerCaseFilter);
+        this.sortedOptions.forEach((option, i) => {
+            const value = option[this.propName];
+            const passFilter = lowerCaseFilter === '' ||
+                value.toLowerCase().replace(/\u02bc/, '').includes(lowerCaseFilter);
 
-                if (passFilter === true && checklist.includes(value) === false) {
-                    checklist.push(value);
-                    res.push({ id: i, value });
-                }
-            });
-        }
+            if (passFilter === true && checklist.includes(value) === false) {
+                checklist.push(value);
+                res.push({ id: i, value });
+            }
+        });
         return res;
     }
 
