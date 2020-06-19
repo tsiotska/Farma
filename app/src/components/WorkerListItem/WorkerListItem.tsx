@@ -197,32 +197,28 @@ class WorkerListItem extends Component<IProps> {
             fired: isFired
         } = this.props;
 
-        const emptyPlaceholder = isFired
-            ? '...'
-            : '-';
+        const emptyPlaceholder = isFired ? '...' : '-';
 
+        let from;
+        if (hired) {
+            const isHiredDateValid = isValid(hired);
+            const monthOfHiring = isHiredDateValid
+                ? `${uaMonthsNames[hired.getMonth()].slice(0, 3)} `
+                : '';
+
+            from = isHiredDateValid
+                ? lightFormat(hired, `dd '${monthOfHiring}'yyyy`)
+                : emptyPlaceholder;
+        }
         if (isVacancy) {
             const isDateValid = isValid(created);
             const month = isDateValid
                 ? `${uaMonthsNames[created.getMonth()].slice(0, 3)} `
                 : '';
-            const started = isDateValid
+            from = isDateValid
                 ? lightFormat(created, `dd '${month}'yyyy`)
                 : '';
-            const to = isDateValid
-                ? lightFormat(fired, `dd '${month}'yyyy`)
-                : '';
-            return `${started} - ${to}`;
         }
-
-        const isHiredDateValid = isValid(hired);
-        const monthOfHiring = isHiredDateValid
-            ? `${uaMonthsNames[hired.getMonth()].slice(0, 3)} `
-            : '';
-
-        const from = isHiredDateValid
-            ? lightFormat(hired, `dd '${monthOfHiring}'yyyy`)
-            : emptyPlaceholder;
 
         if (isFired) {
             const isFiredDateValid = isValid(fired);
@@ -235,7 +231,6 @@ class WorkerListItem extends Component<IProps> {
 
             return `${from} - ${to}`;
         }
-
         return from;
     }
 

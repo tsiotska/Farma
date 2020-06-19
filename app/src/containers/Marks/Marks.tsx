@@ -71,6 +71,7 @@ interface IProps extends WithStyles<typeof styles> {
     loadBonusesData?: (user: IUserLikeObject) => void;
     clearChangedMarks?: () => void;
     changedMarks?: Map<number, Map<number, IMark>>;
+    setPreviewBonusMonth?: (month: number, status: boolean) => void;
 }
 
 @inject(({
@@ -88,7 +89,8 @@ interface IProps extends WithStyles<typeof styles> {
                      bonuses,
                      clearChangedMarks,
                      updateBonus,
-                     changedMarks
+                     changedMarks,
+                     setPreviewBonusMonth
                  },
                  uiStore: {
                      openModal
@@ -107,7 +109,8 @@ interface IProps extends WithStyles<typeof styles> {
     updateBonus,
     previewUser,
     clearChangedMarks,
-    changedMarks
+    changedMarks,
+    setPreviewBonusMonth
 }))
 @observer
 class Marks extends Component<IProps> {
@@ -139,7 +142,6 @@ class Marks extends Component<IProps> {
 
     get previewBonus(): IBonusInfo {
         const { bonuses, previewBonusMonth, previewUser } = this.props;
-        // console.log(previewUser.position);
         const targetBonus = previewUser.position in bonuses
             ? bonuses[previewUser.position].find(x => x.month === previewBonusMonth)
             : null;
@@ -171,7 +173,6 @@ class Marks extends Component<IProps> {
             () => this.props.previewBonusMonth,
             () => {
                 const { previewUser, clearChangedMarks } = this.props;
-                this.dataAutosaving();
                 clearChangedMarks();
                 loadBonusesData(previewUser);
             }
@@ -183,13 +184,17 @@ class Marks extends Component<IProps> {
         if (this.monthReaction) this.monthReaction();
     }
 
+    clickHandler = (month: number, status: boolean) => {
+        const { setPreviewBonusMonth } = this.props;
+        this.dataAutosaving();
+        setPreviewBonusMonth(month, status);
+    }
+
     dataAutosaving = async () => {
-        console.log('saving...');
-        const {role, previewUser, updateBonus, changedMarks} = this.props;
+        const { role, previewUser, updateBonus, changedMarks } = this.props;
         const condition = role === USER_ROLE.MEDICAL_AGENT
             && (previewUser ? previewUser.position : null) === USER_ROLE.MEDICAL_AGENT
             && changedMarks.size;
-
         if (condition) {
             await updateBonus(this.previewBonus, false);
         }
@@ -210,6 +215,7 @@ class Marks extends Component<IProps> {
                     Бали за {bonusesYear} рік
                 </Typography>
                 <MonthPicker
+                    clickHandler={this.clickHandler}
                     bonuses={bonuses[previewUser.position]}
                     isLoading={this.isBonusesLoading || this.isBonusDataLoading}
                 />

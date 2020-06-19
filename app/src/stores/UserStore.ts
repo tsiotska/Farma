@@ -283,7 +283,6 @@ export default class UserStore extends AsyncStore implements IUserStore {
         if (!bonus || id === null || currentDepartmentId === null) return;
 
         const { month, agents } = bonus;
-
         const marks = agents.reduce((acc, curr) => {
             const {
                 marks: agentMarks,
