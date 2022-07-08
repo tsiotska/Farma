@@ -326,19 +326,19 @@ export default class UserStore extends AsyncStore implements IUserStore {
             ),
             'updateBonuses'
         );
+// if(!save) {
         this.changedMarks = new Map();
-        if (!save) {
-            const sorted = this.bonusUsers.slice().sort((a, b) => {
-                return b.position - a.position;
-            });
+        const sorted = this.bonusUsers.slice().sort((a, b) => {
+            return b.position - a.position;
+        });
 
-            for (const user of sorted) {
-                await this.loadBonuses(user, false);
-                await this.loadBonusesData(user);
-            }
-            await this.loadBonuses(this.previewUser, false);
-            await this.loadBonusesData(this.previewUser);
+        for (const user of sorted) {
+            await this.loadBonuses(user, false);
+            await this.loadBonusesData(user);
         }
+        await this.loadBonuses(this.previewUser, false);
+        await this.loadBonusesData(this.previewUser);
+// }
     }
 
     @computed

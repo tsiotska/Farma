@@ -1,5 +1,3 @@
-# bovios_frontend
-
 ## start dev server
 
 Use your preferable package manager(such as npm or yarn). All further commands uses yarn.

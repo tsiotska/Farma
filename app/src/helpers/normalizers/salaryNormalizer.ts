@@ -15,8 +15,8 @@ export const salaryNormalizer = ({ data: { data: { levels, sales } }}: any): INo
         if (keyPattern.test(key) === false) continue;
 
         const {
-            salary,
             add_costs,
+            salary,
             kpi,
             drugs
         } = levels[key];
